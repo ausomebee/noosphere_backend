@@ -48,6 +48,3 @@ class ProtectMiddleware {
 }
 
 const prisma = prismaService.getClient();
-
-export const passengerProtect = new ProtectMiddleware(prisma.passenger, "passenger").protect();
-export const driverProtect = new ProtectMiddleware(prisma.driver, "driver").protect();

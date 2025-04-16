@@ -10,6 +10,8 @@ import errorHandler from "./middleware/error-handler.js";
 import prismaService from "./config/prisma.js";
 import socketService from "./config/socket.js"
 import PassportUtil from "./config/passport.js";
+import department_route from "./features/department/presentation/routes/departmentRoute.js"
+
 dotenv.config({ path: ".env" });
 
 class App {
@@ -49,7 +51,7 @@ class App {
     }
 
     initializeRoutes() {
-        
+        this.app.use("/api/v1/department", department_route);
     }
 
     initializeErrorHandler() {

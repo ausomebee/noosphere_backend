@@ -31,7 +31,7 @@ const options = {
         },
     },
     apis: [
-
+        join(rootDir, 'features/**/presentation/routes/*.js')
     ],
 };
 

@@ -6,3 +6,125 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Module {
+  ADMIN
+  TENANT
+  CLIENT
+}
+
+model Admin {
+  id          String  @id @default(uuid())
+  fullName    String
+  email       String  @unique
+  phoneNumber String  @unique
+  roleId      String
+  superAdmin  Boolean @default(false)
+  active      Boolean
+
+  roles       Role         @relation(fields: [roleId], references: [id])
+  pipelines   Pipeline[]
+  departments Department[]
+}
+
+model Department {
+  id                String  @id @default(uuid())
+  name              String
+  module            Module
+  createdByAdminId  String?
+  createdByTenantId String?
+
+  description String?
+  access      Json
+
+  roles           Role[]
+  createdByAdmin  Admin?  @relation(fields: [createdByAdminId], references: [id])
+  createdByTenant Tenant? @relation(fields: [createdByTenantId], references: [id])
+}
+
+model Role {
+  id           String  @id @default(uuid())
+  name         String
+  description  String?
+  departmentId String
+  access       Json
+
+  admins     Admin[]
+  department Department @relation(fields: [departmentId], references: [id])
+}
+
+model Tenant {
+  id          String  @id @default(uuid())
+  fullName    String
+  email       String  @unique
+  stage       String
+  phoneNumber String  @unique
+  active      Boolean
+
+  pipelineItems PipelineItem[]
+  clientLinks   ClientTenant[]
+  pipelines     Pipeline[]
+  departments   Department[]
+}
+
+model Client {
+  id          String  @id @default(uuid())
+  fullName    String
+  email       String  @unique
+  phoneNumber String  @unique
+  DOB         String
+  gender      String
+  active      Boolean
+  stage       String
+
+  pipelineItems PipelineItem[]
+  tenantLinks   ClientTenant[]
+}
+
+model ClientTenant {
+  id       String  @id @default(uuid())
+  clientId String
+  tenantId String
+  dbAccess Boolean @default(false)
+
+  client Client @relation(fields: [clientId], references: [id])
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([clientId, tenantId])
+}
+
+model Pipeline {
+  id                String   @id @default(uuid())
+  module            Module
+  name              String
+  createdByAdminId  String?
+  createdByTenantId String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  PipelineStages  PipelineStage[]
+  createdByAdmin  Admin?          @relation(fields: [createdByAdminId], references: [id])
+  createdByTenant Tenant?         @relation(fields: [createdByTenantId], references: [id])
+}
+
+model PipelineStage {
+  id         String @id @default(uuid())
+  pipelineId String
+  tasks      Json
+  name       String
+
+  pipelineItem PipelineItem[]
+  pipeline     Pipeline       @relation(fields: [pipelineId], references: [id])
+}
+
+model PipelineItem {
+  id              String  @id @default(uuid())
+  tenantId        String?
+  clientId        String?
+  PipelineStageId String
+  doneTasks       Json
+
+  client          Client?        @relation(fields: [clientId], references: [id])
+  tenant          Tenant?        @relation(fields: [tenantId], references: [id])
+  pipelineStageId PipelineStage? @relation(fields: [PipelineStageId], references: [id])
+}
