@@ -11,17 +11,22 @@ class MailService {
     },
   });
 
-  static async sendMail(to, subject, text, html = null) {
+  static async sendMail(to, subject, text, html = null, attachments = null) {
     try {
       const mailOptions = {
-        from: '"LedihRide" <ayodejiamzat@gmail.com>',
+        from: '"Noosphere" <ayodejiamzat@gmail.com>',
         to,
         subject,
-        text,
+        ...(text && { text }),
         ...(html && { html }),
+        ...(attachments && { attachments })
       };
 
       const info = await MailService.transporter.sendMail(mailOptions);
+
+      if (!info.accepted.includes(to)) {
+        throw new Error("Failed to send mail");
+      }
 
       return { success: true, messageId: info.messageId };
     } catch (error) {

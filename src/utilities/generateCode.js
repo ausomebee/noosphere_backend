@@ -20,6 +20,27 @@ class ReferralCodeGenerator {
             return chars.charAt(Math.floor(Math.random() * chars.length));
         }).join("");
     }
+
+    generateStrongPassword(length = 12) {
+        const lower = "abcdefghijklmnopqrstuvwxyz";
+        const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const numbers = "0123456789";
+        const special = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+    
+        const all = lower + upper + numbers + special;
+        const getRandom = (str) => str.charAt(Math.floor(Math.random() * str.length));
+    
+        const password = [
+            getRandom(lower),
+            getRandom(upper),
+            getRandom(numbers),
+            getRandom(special),
+            ...Array.from({ length: length - 4 }, () => getRandom(all))
+        ];
+    
+        return password.sort(() => 0.5 - Math.random()).join('');
+    }
+    
 }
 
 export default ReferralCodeGenerator;

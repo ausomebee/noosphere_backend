@@ -8,7 +8,7 @@ class ProtectMiddleware {
         this.userType = userType;
     }
 
-    protect() {
+    protect(allowedRoles = {}) {
         return asyncHandler(async (req, res, next) => {
             let token;
 
@@ -22,7 +22,26 @@ class ProtectMiddleware {
                     const decoded = jwt.verify(token, process.env.JWT_SECRET);
                     const user = await this.model.findUnique({
                         where: { id: decoded.id },
+                        select: {
+                            id: true,
+                            superAdmin: true,
+                            roles: {
+                                select: {
+                                    access: true
+                                }
+                            }
+                        }
                     });
+
+                    if (allowedRoles.superAdmin && !user.superAdmin) {
+                        res.status(403);
+                        throw new Error("Forbidden: Access denied");
+                    }
+
+                    if (allowedRoles.access && !user.roles.access[allowedRoles.access]) {
+                        res.status(403);
+                        throw new Error("Forbidden: Access denied");
+                    }
 
                     if (!user) {
                         res.status(401);
@@ -35,16 +54,21 @@ class ProtectMiddleware {
                 } catch (error) {
                     console.error(error);
                     res.status(401);
-                    next(`Not Authorized`);
+                    return next(new Error(error));
                 }
             }
 
             if (!token) {
                 res.status(401);
-                next(`Not Authorized`);
+                return next(new Error("Not Authorized"));
             }
         });
     }
 }
 
 const prisma = prismaService.getClient();
+
+export const clientProtect = new ProtectMiddleware(prisma.client, "client").protect();
+export const staffProtect = new ProtectMiddleware(prisma.tenantStaff, "tenantStaff").protect();
+
+export const adminProtect = (roles = {}) => new ProtectMiddleware(prisma.admin, "admin").protect(roles);

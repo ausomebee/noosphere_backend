@@ -26,17 +26,27 @@ class DepartmentService {
         return newDepartment;
     }
 
-    async createTenantDepartment(data) {
+    async getAdminDepartments() {
+        const department = await this.repository.findAll({module: "ADMIN"});
+
+        if (!department) {
+            throw new Error("Failed to fetch department");
+        }
+
+        return department;
+    }
+
+    async tenantCreateDepartment(data) {
         const departmentExist = await this.repository.findFirst({
             OR: [
                 { name: data.name },
-                { module: "TENANT" },
+                { module: module },
                 { createdByTenantId: data.tenantId }
             ]
         });
 
         if (departmentExist) {
-            throw new Error("This dpartment already exists.");
+            throw new Error("This department already exists.");
         }
 
         const newDepartment = await this.repository.create(data);
@@ -48,27 +58,47 @@ class DepartmentService {
         return newDepartment;
     }
 
-    async createClientDepartment(data) {
-        const departmentExist = await this.repository.findFirst({
-            OR: [
-                { name: data.name },
-                { module: "CLIENT" },
-                { createdByTenantId: data.tenantId }
-            ]
-        });
+    async tenantGetDepartments(data) {
+        const department = await this.repository.findAll({module: data.module, createdByTenantId: data.createdByTenantId});
 
-        if (departmentExist) {
-            throw new Error("This dpartment already exists.");
+        if (!department) {
+            throw new Error("Failed to fetch department");
         }
 
-        const newDepartment = await this.repository.create(data);
-
-        if (!newDepartment) {
-            throw new Error("Failed to create department");
-        }
-
-        return newDepartment;
+        return department;
     }
+
+    // async createClientDepartment(data) {
+    //     const departmentExist = await this.repository.findFirst({
+    //         OR: [
+    //             { name: data.name },
+    //             { module: "CLIENT" },
+    //             { createdByTenantId: data.tenantId }
+    //         ]
+    //     });
+
+    //     if (departmentExist) {
+    //         throw new Error("This dpartment already exists.");
+    //     }
+
+    //     const newDepartment = await this.repository.create(data);
+
+    //     if (!newDepartment) {
+    //         throw new Error("Failed to create department");
+    //     }
+
+    //     return newDepartment;
+    // }
+
+    // async getClientDepartments(data) {
+    //     const department = await this.repository.findAll({module: "CLIENT", createdByTenantId: data.createdByTenantId});
+
+    //     if (!department) {
+    //         throw new Error("Failed to fetch department");
+    //     }
+
+    //     return department;
+    // }
 }
 
 export default DepartmentService;

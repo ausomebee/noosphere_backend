@@ -9,7 +9,11 @@ CREATE TABLE "Admin" (
     "phoneNumber" TEXT NOT NULL,
     "roleId" TEXT NOT NULL,
     "superAdmin" BOOLEAN NOT NULL DEFAULT false,
-    "active" BOOLEAN NOT NULL,
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
+    "password" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Admin_pkey" PRIMARY KEY ("id")
 );
@@ -21,6 +25,8 @@ CREATE TABLE "Department" (
     "module" "Module" NOT NULL,
     "createdByAdminId" TEXT,
     "createdByTenantId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "description" TEXT,
     "access" JSONB NOT NULL,
 
@@ -34,6 +40,8 @@ CREATE TABLE "Role" (
     "description" TEXT,
     "departmentId" TEXT NOT NULL,
     "access" JSONB NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Role_pkey" PRIMARY KEY ("id")
 );
@@ -46,8 +54,30 @@ CREATE TABLE "Tenant" (
     "stage" TEXT NOT NULL,
     "phoneNumber" TEXT NOT NULL,
     "active" BOOLEAN NOT NULL,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "password" TEXT NOT NULL,
 
     CONSTRAINT "Tenant_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "TenantStaff" (
+    "id" TEXT NOT NULL,
+    "fullName" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "stage" TEXT NOT NULL,
+    "roleId" TEXT NOT NULL,
+    "tenantId" TEXT NOT NULL,
+    "phoneNumber" TEXT NOT NULL,
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "password" TEXT NOT NULL,
+
+    CONSTRAINT "TenantStaff_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -59,6 +89,10 @@ CREATE TABLE "Client" (
     "DOB" TEXT NOT NULL,
     "gender" TEXT NOT NULL,
     "active" BOOLEAN NOT NULL,
+    "stage" TEXT NOT NULL,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Client_pkey" PRIMARY KEY ("id")
 );
@@ -69,6 +103,8 @@ CREATE TABLE "ClientTenant" (
     "clientId" TEXT NOT NULL,
     "tenantId" TEXT NOT NULL,
     "dbAccess" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "ClientTenant_pkey" PRIMARY KEY ("id")
 );
@@ -78,10 +114,12 @@ CREATE TABLE "Pipeline" (
     "id" TEXT NOT NULL,
     "module" "Module" NOT NULL,
     "name" TEXT NOT NULL,
+    "description" TEXT,
     "createdByAdminId" TEXT,
     "createdByTenantId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "Pipeline_pkey" PRIMARY KEY ("id")
 );
@@ -92,6 +130,9 @@ CREATE TABLE "PipelineStage" (
     "pipelineId" TEXT NOT NULL,
     "tasks" JSONB NOT NULL,
     "name" TEXT NOT NULL,
+    "order" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "PipelineStage_pkey" PRIMARY KEY ("id")
 );
@@ -101,8 +142,10 @@ CREATE TABLE "PipelineItem" (
     "id" TEXT NOT NULL,
     "tenantId" TEXT,
     "clientId" TEXT,
-    "PipelineStageId" TEXT NOT NULL,
+    "pipelineStageId" TEXT NOT NULL,
     "doneTasks" JSONB NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "PipelineItem_pkey" PRIMARY KEY ("id")
 );
@@ -118,6 +161,12 @@ CREATE UNIQUE INDEX "Tenant_email_key" ON "Tenant"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Tenant_phoneNumber_key" ON "Tenant"("phoneNumber");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TenantStaff_email_key" ON "TenantStaff"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TenantStaff_phoneNumber_key" ON "TenantStaff"("phoneNumber");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Client_email_key" ON "Client"("email");
@@ -141,6 +190,12 @@ ALTER TABLE "Department" ADD CONSTRAINT "Department_createdByTenantId_fkey" FORE
 ALTER TABLE "Role" ADD CONSTRAINT "Role_departmentId_fkey" FOREIGN KEY ("departmentId") REFERENCES "Department"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "TenantStaff" ADD CONSTRAINT "TenantStaff_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TenantStaff" ADD CONSTRAINT "TenantStaff_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "ClientTenant" ADD CONSTRAINT "ClientTenant_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "Client"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -162,4 +217,4 @@ ALTER TABLE "PipelineItem" ADD CONSTRAINT "PipelineItem_clientId_fkey" FOREIGN K
 ALTER TABLE "PipelineItem" ADD CONSTRAINT "PipelineItem_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PipelineItem" ADD CONSTRAINT "PipelineItem_PipelineStageId_fkey" FOREIGN KEY ("PipelineStageId") REFERENCES "PipelineStage"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "PipelineItem" ADD CONSTRAINT "PipelineItem_pipelineStageId_fkey" FOREIGN KEY ("pipelineStageId") REFERENCES "PipelineStage"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

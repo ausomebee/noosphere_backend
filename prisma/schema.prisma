@@ -13,29 +13,55 @@ enum Module {
   CLIENT
 }
 
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  CANCELLED
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+  LIFETIME
+}
+
 model Admin {
-  id          String  @id @default(uuid())
-  fullName    String
-  email       String  @unique
-  phoneNumber String  @unique
-  roleId      String
-  superAdmin  Boolean @default(false)
-  active      Boolean
+  id                    String   @id @default(uuid())
+  fullName              String
+  email                 String   @unique
+  phoneNumber           String   @unique
+  roleId                String
+  superAdmin            Boolean  @default(false)
+  active                Boolean  @default(true)
+  isDeleted             Boolean  @default(false)
+  password              String?
+  administratorPassword String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
   roles       Role         @relation(fields: [roleId], references: [id])
   pipelines   Pipeline[]
   departments Department[]
 }
 
+model Auth {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  secret    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Department {
-  id                String  @id @default(uuid())
+  id                String   @id @default(uuid())
   name              String
   module            Module
   createdByAdminId  String?
   createdByTenantId String?
-
-  description String?
-  access      Json
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  description       String?
+  access            Json
 
   roles           Role[]
   createdByAdmin  Admin?  @relation(fields: [createdByAdminId], references: [id])
@@ -43,49 +69,83 @@ model Department {
 }
 
 model Role {
-  id           String  @id @default(uuid())
+  id           String   @id @default(uuid())
   name         String
   description  String?
   departmentId String
   access       Json
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  admins     Admin[]
-  department Department @relation(fields: [departmentId], references: [id])
+  admins      Admin[]
+  department  Department    @relation(fields: [departmentId], references: [id])
+  TenantStaff TenantStaff[]
 }
 
 model Tenant {
-  id          String  @id @default(uuid())
+  id          String   @id @default(uuid())
   fullName    String
-  email       String  @unique
-  stage       String
-  phoneNumber String  @unique
-  active      Boolean
+  email       String   @unique
+  stage       String   @default("DEFAULT")
+  phoneNumber String   @unique
+  active      Boolean  @default(true)
+  isDeleted   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  // password    String
 
-  pipelineItems PipelineItem[]
-  clientLinks   ClientTenant[]
-  pipelines     Pipeline[]
-  departments   Department[]
+  pipelineItems   PipelineItem[]
+  clientLinks     ClientTenant[]
+  pipelines       Pipeline[]
+  departments     Department[]
+  TenantStaff     TenantStaff[]
+  BillingMetadata BillingMetadata?
+  Subscription    Subscription[]
+}
+
+model TenantStaff {
+  id          String   @id @default(uuid())
+  fullName    String
+  email       String   @unique
+  stage       String
+  roleId      String
+  tenantId    String
+  phoneNumber String   @unique
+  active      Boolean  @default(true)
+  isDeleted   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  password    String?
+
+  roles  Role   @relation(fields: [roleId], references: [id])
+  tenant Tenant @relation(fields: [tenantId], references: [id])
 }
 
 model Client {
-  id          String  @id @default(uuid())
+  id          String   @id @default(uuid())
   fullName    String
-  email       String  @unique
-  phoneNumber String  @unique
-  DOB         String
+  email       String   @unique
+  phoneNumber String   @unique
+  DOB         DateTime
   gender      String
-  active      Boolean
-  stage       String
+  isDeleted   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  password    String?
 
   pipelineItems PipelineItem[]
   tenantLinks   ClientTenant[]
 }
 
 model ClientTenant {
-  id       String  @id @default(uuid())
-  clientId String
-  tenantId String
-  dbAccess Boolean @default(false)
+  id        String   @id @default(uuid())
+  clientId  String
+  tenantId  String
+  dbAccess  Boolean  @default(false)
+  active    Boolean  @default(true)
+  stage     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   client Client @relation(fields: [clientId], references: [id])
   tenant Tenant @relation(fields: [tenantId], references: [id])
@@ -97,34 +157,86 @@ model Pipeline {
   id                String   @id @default(uuid())
   module            Module
   name              String
+  description       String?
   createdByAdminId  String?
   createdByTenantId String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+  isActive          Boolean  @default(true)
 
-  PipelineStages  PipelineStage[]
+  pipelineStages  PipelineStage[]
   createdByAdmin  Admin?          @relation(fields: [createdByAdminId], references: [id])
   createdByTenant Tenant?         @relation(fields: [createdByTenantId], references: [id])
 }
 
 model PipelineStage {
-  id         String @id @default(uuid())
+  id         String   @id @default(uuid())
   pipelineId String
   tasks      Json
   name       String
+  order      Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   pipelineItem PipelineItem[]
   pipeline     Pipeline       @relation(fields: [pipelineId], references: [id])
 }
 
 model PipelineItem {
-  id              String  @id @default(uuid())
+  id              String   @id @default(uuid())
   tenantId        String?
   clientId        String?
-  PipelineStageId String
+  pipelineStageId String
   doneTasks       Json
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  client          Client?        @relation(fields: [clientId], references: [id])
-  tenant          Tenant?        @relation(fields: [tenantId], references: [id])
-  pipelineStageId PipelineStage? @relation(fields: [PipelineStageId], references: [id])
+  client        Client?        @relation(fields: [clientId], references: [id])
+  tenant        Tenant?        @relation(fields: [tenantId], references: [id])
+  pipelineStage PipelineStage? @relation(fields: [pipelineStageId], references: [id])
+}
+
+model BillingMetadata {
+  id             String         @id @default(uuid())
+  tenantId       String         @unique
+  paymentMethod  String
+  billingAddress String
+  paymentHistory Transactions[]
+  tenant         Tenant         @relation(fields: [tenantId], references: [id])
+}
+
+model Transactions {
+  id                String  @id @default(uuid())
+  billingMetadataId String?
+
+  BillingMetadata BillingMetadata? @relation(fields: [billingMetadataId], references: [id])
+}
+
+model Subscription {
+  id        String             @id @default(uuid())
+  tenantId  String
+  planId    String
+  status    SubscriptionStatus
+  startDate DateTime
+  endDate   DateTime
+
+  tenant Tenant      @relation(fields: [tenantId], references: [id])
+  plan   BillingPlan @relation(fields: [planId], references: [id])
+}
+
+model BillingPlan {
+  id            String         @id @default(uuid())
+  name          String
+  description   String
+  price         Float
+  billingCycle  BillingCycle
+  features      Feature[]      @relation("PlanFeatures")
+  subscriptions Subscription[]
+}
+
+model Feature {
+  id          String        @id @default(uuid())
+  name        String
+  description String
+  plans       BillingPlan[] @relation("PlanFeatures")
 }

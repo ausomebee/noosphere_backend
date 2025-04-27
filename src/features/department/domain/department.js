@@ -23,10 +23,16 @@ class Department {
         return {
             name: this.name,
             module: this.module,
-            createdByAdminId: this.createdByTenantId,
+            createdByTenantId: this.createdByTenantId,
             description: this.description,
             access: this.access
         };
+    }
+
+    get tenantId(){
+        return{
+            createdByTenantId: this.createdByTenantId
+        }
     }
 }
 

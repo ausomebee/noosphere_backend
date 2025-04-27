@@ -1,0 +1,139 @@
+import TokenService from '../../../utilities/generate_token.js';
+import bcrypt from 'bcryptjs'
+import TenantRepository from '../infrastructure/tenantRepository.js';
+import DepartmentRepository from '../../department/infrastructure/departmentRepository.js';
+import RoleRepository from '../../role/infrastructure/roleRepository.js';
+
+class TenantService {
+    constructor() {
+        this.repository = new TenantRepository()
+        this.departmentRepository = new DepartmentRepository()
+        this.roleRepository = new RoleRepository()
+        this.token = new TokenService()
+    }
+
+    async createTenant(data) {
+        const tenantExists = await this.repository.findFirstDynamic({
+            where: {
+                OR: [{ email: data.email }, { phoneNumber: data.phoneNumber }],
+            },
+            select: {
+                email: true,
+                phoneNumber: true
+            }
+        });
+
+        if (tenantExists?.email === data.email) {
+            throw new Error("This email is already taken.");
+        }
+
+        if (tenantExists?.phoneNumber === data.phoneNumber) {
+            throw new Error("This phone number is already taken.");
+        }
+
+        const newTenant = await this.repository.prisma.$transaction(async (tx) => {
+            const tenant = await this.repository.txCreate(data.createTenant, tx);
+            const department = await this.departmentRepository.createAdminDepartment(tenant.id, tx);
+            const role = await this.roleRepository.createAdminRole(department.id, tx)
+            const staff = await this.repository.createAdminStaff({ ...data.createTenantStaff, tenantId: tenant.id, roleId: role.id }, tx);
+
+            return tenant;
+        });
+        if (!newTenant) {
+            throw new Error("Failed to create tenant");
+        }
+
+        return newTenant;
+    }
+
+    async createTenantStaff(data) {
+        const staffExists = await this.repository.findFirstDynamicStaff({
+            where: {
+                AND: [{ email: data.email }, { phoneNumber: data.phoneNumber }, { tenantId: data.tenantId }],
+            },
+            select: {
+                email: true,
+                phoneNumber: true,
+                tenantId: true
+            }
+        });
+
+        if (staffExists.email === data.email) {
+            throw new Error("This email is already taken.");
+        }
+
+        if (staffExists.phoneNumber === data.phoneNumber) {
+            throw new Error("This phone number is already taken.");
+        }
+
+        const hashedPass = await bcrypt.hash(data.password, 50);
+        data.password = hashedPass;
+
+        const newStaff = await this.repository.create(data);
+
+        if (!newStaff) {
+            throw new Error("Failed to create staff");
+        }
+
+        return newStaff;
+    }
+
+    async staffSignin(data) {
+        const staff = await this.repository.findOneStaff({
+            email: data.email
+        });
+
+        if (!staff) {
+            throw new Error("You don't have an account")
+        }
+
+        if (!bcrypt.compareSync(data.password, admin.password)) {
+            throw new Error('Incorrect password')
+        }
+
+        return { ...staff, token: this.token.generateToken(staff.id) };
+    }
+
+    async getSingleStaff(data) {
+        const staff = await this.repository.findOneStaff({
+            id: data.id
+        });
+
+        if (!staff) {
+            throw new Error("Staff not found")
+        }
+
+        return staff;
+    }
+
+    async updateTenant(data) {
+        const tenant = await this.repository.findOne({ id: data.id })
+
+        if (!tenant) {
+            throw new Error("Tenant not found");
+        }
+
+        if (data.currentPassword && !argon2.verify(tenant.password, data.currentPassword)) {
+            throw new Error('Incorrect password')
+        }
+
+        const hashedPass = data.password ? await argon2.hash(data.password) : tenant.password;
+
+        const update = await this.repository.update(data.id, {
+            fullName: data.fullName || tenant.fullName,
+            email: data.email || tenant.email,
+            phoneNumber: data.phoneNumber || tenant.phoneNumber,
+            stage: data.stage || tenant.stage,
+            active: data.active || tenant.active,
+            password: hashedPass,
+        });
+
+        if (!update) {
+            throw new Error("Failed to update tenant");
+        }
+
+        return update;
+    }
+}
+
+export default TenantService;

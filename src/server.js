@@ -11,6 +11,12 @@ import prismaService from "./config/prisma.js";
 import socketService from "./config/socket.js"
 import PassportUtil from "./config/passport.js";
 import department_route from "./features/department/presentation/routes/departmentRoute.js"
+import admin_route from "./features/admin/presentation/routes/adminRoute.js"
+import role_route from "./features/role/presentation/routes/roleRoute.js"
+import pipeline_route from "./features/pipeline/presentation/routes/pipelineRoute.js"
+import tenant_route from "./features/tenant/presentation/routes/tenantRoute.js"
+import client_route from "./features/client/presentation/routes/clientRoute.js"
+import auth_route from "./features/auth/presentation/routes/authRoute.js"
 
 dotenv.config({ path: ".env" });
 
@@ -52,6 +58,12 @@ class App {
 
     initializeRoutes() {
         this.app.use("/api/v1/department", department_route);
+        this.app.use("/api/v1/role", role_route);
+        this.app.use("/api/v1/admin", admin_route);
+        this.app.use("/api/v1/pipeline", pipeline_route);
+        this.app.use("/api/v1/tenant", tenant_route);
+        this.app.use("/api/v1/client", client_route);
+        this.app.use("/api/v1/auth", auth_route);
     }
 
     initializeErrorHandler() {

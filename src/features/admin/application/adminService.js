@@ -1,0 +1,244 @@
+import TokenService from '../../../utilities/generate_token.js';
+import AdminRepository from '../infrastructure/adminRepository.js';
+import argon2 from "argon2";
+import MailService from '../../../utilities/nodemailer.js';
+import ReferralCodeGenerator from '../../../utilities/generateCode.js';
+
+class AdminService {
+    constructor() {
+        this.repository = new AdminRepository()
+        this.token = new TokenService()
+        this.generateCode = new ReferralCodeGenerator(12)
+    }
+
+    async createAdmin(data) {
+        const adminExists = await this.repository.findFirst({
+            where: { OR: [{ email: data.email }, { phoneNumber: data.phoneNumber }] },
+            select: { email: true, phoneNumber: true }
+        });
+
+        if (adminExists?.email === data.email) {
+            throw new Error("This email is already taken.");
+        }
+
+        if (adminExists?.phoneNumber === data.phoneNumber) {
+            throw new Error("This phone number is already taken.");
+        }
+
+        const newAdmin = await this.repository.create(data);
+
+        if (!newAdmin) {
+            throw new Error("Failed to create admin");
+        }
+
+        const attachments = [
+            {
+                filename: "logo.png",
+                path: "logo.png",
+                cid: "unique@image",
+                contentType: "logo/png",
+            },
+            {
+                filename: "mailHeader.png",
+                path: "mailHeader.png",
+                cid: "unique2@image",
+                contentType: "mailHeader/png",
+            },
+        ]
+
+        const html = `
+        <body style="margin: 0%; padding: 0%; box-sizing: border-box;">
+            <main>
+                <img src="cid:unique2@image" alt="" style="width: 100%; height: 100px; object-fit: cover;">
+                <div
+                    style="text-align: center; font-family: Arial, Helvetica, sans-serif; max-width: 820px; margin: auto; padding: 20px; padding-bottom: 50px;">
+                    <img src="cid:unique@image" alt="" style="width: 230px; margin-top: 50px;">
+                    <p class="head" style="font-size: 26px; font-weight: 700; margin-top: 30px;">Hello there,<br>Get started on Noosphere
+                    </p>
+                    <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">You have been invited by
+                        NooSphere Admin to<br> create a profile on Noosphere<br><br>Click the button below to get started</p>
+                    <button
+                        style="background-color: black; color: white; font-size: 20px; width: 80%; margin: auto; padding-top: 20px; padding-bottom: 20px; border-radius: 9999px;">Create
+                        Profile</button>
+                </div>
+            </main>
+        </body>
+        `
+        const sendMail = MailService.sendMail(newAdmin.email, "Welcome to Noosphere", null, html, attachments)
+        if (!sendMail) {
+            throw new Error("Failed to send mail");
+        }
+
+        return newAdmin;
+    }
+
+    async updateAdmin(data) {
+        const admin = await this.repository.findOne({ id: data.id })
+
+        if (!admin) {
+            throw new Error("Admin not found");
+        }
+
+        if (data.currentPassword && !argon2.verify(admin.password, data.currentPassword)) {
+            throw new Error('Incorrect password')
+        }
+
+        const hashedPass = data.password ? await argon2.hash(data.password) : admin.password;
+
+        if (data.administratorPassword && !argon2.verify(admin.administratorPassword, data.currentAdministratorPassword)) {
+            throw new Error('Incorrect password')
+        }
+        const hashedAdminPass = data.administratorPassword ? await argon2.hash(data.administratorPassword) : admin.administratorPassword;
+
+        const update = await this.repository.update(data.id, {
+            fullName: data.fullName || admin.fullName,
+            email: data.email || admin.email,
+            phoneNumber: data.phoneNumber || admin.phoneNumber,
+            roleId: data.roleId || admin.roleId,
+            password: hashedPass,
+            administratorPassword: hashedAdminPass
+        });
+
+        if (!update) {
+            throw new Error("Failed to update admin");
+        }
+
+        return update;
+    }
+
+    async createSuperAdmin(data) {
+        const superAdminExists = await this.repository.findFirst({
+            where: { superAdmin: true },
+            select: { superAdmin: true }
+        });
+
+        if (superAdminExists) {
+            throw new Error("There's already a super admin");
+        }
+
+        const adminExists = await this.repository.findFirst({
+            where: { OR: [{ email: data.email }, { phoneNumber: data.phoneNumber }] },
+            select: { email: true, phoneNumber: true }
+        });
+
+        if (adminExists?.email === data.email) {
+            throw new Error("This email is already taken.");
+        }
+
+        if (adminExists?.phoneNumber === data.phoneNumber) {
+            throw new Error("This phone number is already taken.");
+        }
+
+        data.superAdmin = true;
+        const generatedPass = this.generateCode.generateStrongPassword()
+        const hashedPass = await argon2.hash(generatedPass)
+        const generatedAdminPass = this.generateCode.generateStrongPassword()
+        const hashedAdminPass = await argon2.hash(generatedAdminPass)
+        const newAdmin = await this.repository.create({ ...data, password: hashedPass, administratorPassword: hashedAdminPass });
+
+        if (!newAdmin) {
+            throw new Error("Failed to create admin");
+        }
+
+        const attachments = [
+            {
+                filename: "logo.png",
+                path: "logo.png",
+                cid: "unique@image",
+                contentType: "logo/png",
+            },
+            {
+                filename: "mailHeader.png",
+                path: "mailHeader.png",
+                cid: "unique2@image",
+                contentType: "mailHeader/png",
+            },
+        ]
+
+        const html = `
+        <body style="margin: 0%; padding: 0%; box-sizing: border-box; background-color: white;">
+            <main>
+                <img src="cid:unique2@image" alt="" style="width: 100%; height: 70px; object-fit: cover;">
+                <div
+                    style="font-family: Arial, Helvetica, sans-serif; max-width: 820px; margin: auto; padding: 20px; padding-bottom: 50px;">
+                    <img src="cid:unique@image" alt="" style="width: 230px; margin-top: 50px;">
+                    <p class="head" style="font-size: 26px; font-weight: 700; margin-top: 30px;">Welcome to NooSphere</p>
+                    <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">You've been invited to
+                        join the NooSphere Control Platform as the Administrator. Click the button below to log in using your
+                        administrator credentials:<br><br>Email: ${newAdmin.email}<br>Password: ${generatedPass}</p>
+                    <button
+                        style="background-color: black; color: white; font-size: 20px; width: 80%; margin: auto; padding-top: 20px; padding-bottom: 20px; border-radius: 9999px;">Login
+                        as Administrator</button>
+                        <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">Once you're in, you'll be prompted to:<br><br>1. Set a new password<br>2. Configure 2-factor authentication<br>3. Set platform-wide preferences for your team<br><br>We recommend doing these right away to secure your account and prepare the system for other users.<br><br>Welcome aboard,<br>— The NooSphere Team</p>
+                </div>
+            </main>
+        </body>
+        `
+        const sendMail = await MailService.sendMail(newAdmin.email, "Welcome to Noosphere", null, html, attachments)
+
+        if (!sendMail.success) {
+            throw new Error("Failed to send mail");
+        }
+
+        const html2 = `
+        <body style="margin: 0%; padding: 0%; box-sizing: border-box; background-color: white;">
+            <main>
+                <img src="cid:unique2@image" alt="" style="width: 100%; height: 90px; object-fit: cover;">
+                <div
+                    style="font-family: Arial, Helvetica, sans-serif; max-width: 820px; margin: auto; padding: 20px; padding-bottom: 50px;">
+                    <img src="cid:unique@image" alt="" style="width: 230px; margin-top: 50px;">
+                    <p class="head" style="font-size: 26px; font-weight: 700; margin-top: 30px;">Your Administrator Password</p>
+                    <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">You're receiving this message because you've been designated as the Administrator for the NooSphere Control Platform.<br><br>
+                        Below is your Administrator Password, used to authorize sensitive, system-wide actions within the platform.<br><br><span style="font-weight: 700;">Administrator password:</span> ${generatedAdminPass}</p>
+                    <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">1. You'll be required to set a new Administrator Password as soon as you log in.<br>
+                        2. You will also need to change your Administrator Password every 90 days to ensure maximum security.<br><br>
+                        Please keep this token secure. <br><br>If you didn't expect this, contact <a>security@noosphere.com</a>.<br><br>
+                        — The NooSphere Security Team</p>
+                </div>
+            </main>
+        </body>
+        `
+        const sendMail2 = await MailService.sendMail(newAdmin.email, "Your Administrator Password", null, html2, attachments)
+
+        if (!sendMail2.success) {
+            throw new Error("Failed to send mail");
+        }
+
+        return newAdmin;
+    }
+
+    async AdminSignin(data) {
+
+        const admin = await this.repository.findOne({
+            email: data.email
+        });
+
+        if (!admin) {
+            throw new Error("You don't have an account")
+        }
+
+        if (!admin.password) {
+            throw new Error("You haven't set your password")
+        }
+
+        if (!argon2.verify(admin.password, data.password)) {
+            throw new Error('Incorrect password')
+        }
+
+        return { ...admin, token: this.token.generateToken(admin.id) };
+    }
+
+    async getSingleAdmin(data) {
+        const admin = await this.repository.findOne({
+            id: data.id
+        });
+
+        if (!admin) {
+            throw new Error("Admin not found")
+        }
+
+        return { ...admin, token: this.token.generateToken(admin.id) };
+    }
+}
+
+export default AdminService;
