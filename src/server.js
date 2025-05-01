@@ -17,6 +17,7 @@ import pipeline_route from "./features/pipeline/presentation/routes/pipelineRout
 import tenant_route from "./features/tenant/presentation/routes/tenantRoute.js"
 import client_route from "./features/client/presentation/routes/clientRoute.js"
 import auth_route from "./features/auth/presentation/routes/authRoute.js"
+import billing_route from "./features/billing/presentation/routes/billingRoute.js"
 
 dotenv.config({ path: ".env" });
 
@@ -64,6 +65,7 @@ class App {
         this.app.use("/api/v1/tenant", tenant_route);
         this.app.use("/api/v1/client", client_route);
         this.app.use("/api/v1/auth", auth_route);
+        this.app.use("/api/v1/billing", billing_route);
     }
 
     initializeErrorHandler() {

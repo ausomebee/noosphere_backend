@@ -208,28 +208,33 @@ model BillingMetadata {
 model Transactions {
   id                String  @id @default(uuid())
   billingMetadataId String?
+  status            String
 
   BillingMetadata BillingMetadata? @relation(fields: [billingMetadataId], references: [id])
+  subscription    Subscription?
 }
 
 model Subscription {
-  id        String             @id @default(uuid())
-  tenantId  String
-  planId    String
-  status    SubscriptionStatus
-  startDate DateTime
-  endDate   DateTime
+  id            String             @id @default(uuid())
+  tenantId      String
+  planId        String
+  status        SubscriptionStatus
+  startDate     DateTime
+  endDate       DateTime
+  transactionId String             @unique
 
-  tenant Tenant      @relation(fields: [tenantId], references: [id])
-  plan   BillingPlan @relation(fields: [planId], references: [id])
+  tenant      Tenant       @relation(fields: [tenantId], references: [id])
+  transaction Transactions @relation(fields: [transactionId], references: [id])
+  plan        BillingPlan  @relation(fields: [planId], references: [id])
 }
 
 model BillingPlan {
-  id            String         @id @default(uuid())
-  name          String
-  description   String
-  price         Float
-  billingCycle  BillingCycle
+  id           String       @id @default(uuid())
+  name         String
+  description  String
+  price        Float
+  billingCycle BillingCycle
+
   features      Feature[]      @relation("PlanFeatures")
   subscriptions Subscription[]
 }

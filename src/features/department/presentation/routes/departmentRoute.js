@@ -86,7 +86,7 @@ class DepartmentRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/admindepartment", adminProtect, DepartmentDto.adminCreateDepartmentDto, this.controller.createAdminDepartment);
+        this.router.post("/admindepartment", DepartmentDto.adminCreateDepartmentDto, this.controller.createAdminDepartment);
 
         /**
          * @swagger
