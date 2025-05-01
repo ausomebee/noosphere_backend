@@ -3,12 +3,17 @@ import AdminRepository from '../infrastructure/adminRepository.js';
 import argon2 from "argon2";
 import MailService from '../../../utilities/nodemailer.js';
 import ReferralCodeGenerator from '../../../utilities/generateCode.js';
+import DepartmentRepository from '../../department/infrastructure/departmentRepository.js';
+import RoleRepository from '../../role/infrastructure/roleRepository.js';
 
 class AdminService {
     constructor() {
         this.repository = new AdminRepository()
         this.token = new TokenService()
         this.generateCode = new ReferralCodeGenerator(12)
+        this.departmentRepository = new DepartmentRepository()
+        this.roleRepository = new RoleRepository()
+        
     }
 
     async createAdmin(data) {
@@ -134,7 +139,15 @@ class AdminService {
         const hashedPass = await argon2.hash(generatedPass)
         const generatedAdminPass = this.generateCode.generateStrongPassword()
         const hashedAdminPass = await argon2.hash(generatedAdminPass)
-        const newAdmin = await this.repository.create({ ...data, password: hashedPass, administratorPassword: hashedAdminPass });
+
+        const newAdmin = await this.repository.prisma.$transaction(async (tx) => {
+            const department = await this.departmentRepository.createAdminDepartment(tx);
+            const role = await this.roleRepository.createAdminRole(department.id, tx)
+            const admin = await this.repository.txCreate({ ...data, password: hashedPass, administratorPassword: hashedAdminPass, roleId: role.id }, tx);
+
+            return admin;
+        });
+        // const newAdmin = await this.repository.create({ ...data, password: hashedPass, administratorPassword: hashedAdminPass });
 
         if (!newAdmin) {
             throw new Error("Failed to create admin");

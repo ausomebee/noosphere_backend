@@ -10,13 +10,27 @@ class DepartmentRepository {
         return await this.model.create({ data });
     }
 
-    async createAdminDepartment(tenantId, tx) {
+    async createTenantDepartment(tenantId, tx) {
         return await tx.department.create({
             data: {
                 name: "Administration",
                 module: "TENANT",
                 createdByTenantId: tenantId,
                 description: "This is the owner of this organization",
+                access: {
+                    canEdit: true,
+                    canDelete: false
+                }
+            }
+        });
+    }
+
+    async createAdminDepartment(tx) {
+        return await tx.department.create({
+            data: {
+                name: "Administration",
+                module: "ADMIN",
+                description: "This is the super Admin",
                 access: {
                     canEdit: true,
                     canDelete: false

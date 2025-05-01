@@ -24,29 +24,38 @@ import AdminDto from "../dto/adminDto.js";
  *           type: string
  *           format: email
  *           description: Valid email (must end with .com or .net)
- *         password:
- *           type: string
- *           pattern: "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"
- *           description: >-
- *             Password must be strong:
- *             - At least one uppercase letter  
- *             - At least one lowercase letter  
- *             - At least one digit  
- *             - At least one special character (#?!@$%^&*-)  
- *             - Minimum 8 characters
  *         phoneNumber:
  *           type: string
  *           minLength: 10
  *           maxLength: 15
  *           description: Phone number (10 to 15 digits)
- *         description:
- *           type: string
- *           description: Optional description of the admin
  *         roleId:
  *           type: string
  *           format: uuid
  *           description: UUID of the assigned role
- *
+ *     CreateSuperAdmin:
+ *       type: object
+ *       required:
+ *         - fullName
+ *         - email
+ *         - password
+ *         - phoneNumber
+ *         - roleId
+ *       properties:
+ *         fullName:
+ *           type: string
+ *           minLength: 3
+ *           maxLength: 20
+ *           description: Full name of the admin (3-20 characters)
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: Valid email (must end with .com or .net)
+ *         phoneNumber:
+ *           type: string
+ *           minLength: 10
+ *           maxLength: 15
+ *           description: Phone number (10 to 15 digits)
  *     AuthRequest:
  *       type: object
  *       required:
@@ -146,10 +155,10 @@ class AdminRoutes {
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/CreateAdmin'
+         *             $ref: '#/components/schemas/CreateSuperAdmin'
          *     responses:
          *       201:
-         *         description: Admin created successfully
+         *         description: super Admin created successfully
          *       400:
          *         description: Validation error
          */

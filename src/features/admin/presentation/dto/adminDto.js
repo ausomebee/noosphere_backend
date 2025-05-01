@@ -43,7 +43,6 @@ class AdminDto {
                     "string.min": "Phone number must be at least 10 characters long",
                     "string.max": "Phone number must be at most 15 characters long"
                 }),
-            description: Joi.string().trim().allow('').optional(),
             roleId: Joi.string().uuid().required().messages({
                 "string.empty": "Role ID is required",
                 "string.guid": "Role ID must be a valid UUID",
@@ -53,6 +52,53 @@ class AdminDto {
         Validator.validateRequest(req, next, schema);
     };
 
+    static createSuperAdminDto = (req, res, next) => {
+        const schema = Joi.object({
+            fullName: Joi.string()
+                .required()
+                .min(3)
+                .max(20)
+                .trim()
+                .messages({
+                    "string.empty": "First name is required",
+                    "string.min": "First name must be at least 3 characters",
+                    "string.max": "First name must not exceed 20 characters",
+                }),
+            email: Joi.string()
+                .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
+                .required()
+                .trim()
+                .lowercase()
+                .messages({
+                    "string.email": "Email must be a valid email",
+                    "string.empty": "Email is required",
+                    "any.required": "Email is a required field",
+                }),
+            // password: Joi.string()
+            //     .regex(strongPasswordRegex)
+            //     .trim().optional()
+            //     .messages({
+            //         "string.pattern.base": stringPasswordError,
+            //     }),
+            phoneNumber: Joi.string()
+                .required()
+                .trim()
+                .min(10)
+                .max(15)
+                .messages({
+                    "string.empty": "Phone number is required",
+                    "string.min": "Phone number must be at least 10 characters long",
+                    "string.max": "Phone number must be at most 15 characters long"
+                }),
+            // roleId: Joi.string().uuid().required().messages({
+            //     "string.empty": "Role ID is required",
+            //     "string.guid": "Role ID must be a valid UUID",
+            // })
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+    
     static updateAdminPasswordDto = (req, res, next) => {
         const schema = Joi.object({
             id: Joi.string().uuid().required().messages({

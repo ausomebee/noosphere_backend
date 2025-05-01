@@ -33,8 +33,8 @@ class TenantService {
 
         const newTenant = await this.repository.prisma.$transaction(async (tx) => {
             const tenant = await this.repository.txCreate(data.createTenant, tx);
-            const department = await this.departmentRepository.createAdminDepartment(tenant.id, tx);
-            const role = await this.roleRepository.createAdminRole(department.id, tx)
+            const department = await this.departmentRepository.createTenantDepartment(tenant.id, tx);
+            const role = await this.roleRepository.createTenantRole(department.id, tx)
             const staff = await this.repository.createAdminStaff({ ...data.createTenantStaff, tenantId: tenant.id, roleId: role.id }, tx);
 
             return tenant;

@@ -24,12 +24,26 @@ class RoleRepository {
         });
     }
 
-    async createAdminRole(departmentId, tx) {
+    async createTenantRole(departmentId, tx) {
         return await tx.role.create({
             data: {
                 name: "Admin",
                 departmentId: departmentId,
                 description: "This is the owner of this organization",
+                access: {
+                    canEdit: true,
+                    canDelete: false
+                }
+            }
+        });
+    }
+
+    async createAdminRole(departmentId, tx) {
+        return await tx.role.create({
+            data: {
+                name: "Admin",
+                departmentId: departmentId,
+                description: "This is the superadmin",
                 access: {
                     canEdit: true,
                     canDelete: false

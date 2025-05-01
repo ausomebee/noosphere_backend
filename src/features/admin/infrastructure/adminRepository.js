@@ -10,6 +10,10 @@ class AdminRepository {
         return await this.model.create({ data });
     }
 
+    async txCreate(data, tx) {
+        return await tx.admin.create({ data });
+    }
+
     async findOne(query) {
         return await this.model.findUnique({
             where: query,
