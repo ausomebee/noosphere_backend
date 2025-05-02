@@ -142,10 +142,6 @@ class AdminService {
 
         // const newAdmin = await this.repository.create({ ...data, password: hashedPass, administratorPassword: hashedAdminPass });
         
-        if (!newAdmin) {
-            throw new Error("Failed to create admin");
-        }
-        
         const attachments = [
             {
                 filename: "logo.png",
@@ -171,7 +167,7 @@ class AdminService {
                     <p class="head" style="font-size: 26px; font-weight: 700; margin-top: 30px;">Welcome to NooSphere</p>
                     <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">You've been invited to
                         join the NooSphere Control Platform as the Administrator. Click the button below to log in using your
-                        administrator credentials:<br><br>Email: ${newAdmin.email}<br>Password: ${generatedPass}</p>
+                        administrator credentials:<br><br>Email: ${data.email}<br>Password: ${generatedPass}</p>
                     <button
                         style="background-color: black; color: white; font-size: 20px; width: 80%; margin: auto; padding-top: 20px; padding-bottom: 20px; border-radius: 9999px;">Login
                         as Administrator</button>
@@ -180,7 +176,7 @@ class AdminService {
                         </main>
         </body>
         `
-        const sendMail = await MailService.sendMail(newAdmin.email, "Welcome to Noosphere", null, html, attachments)
+        const sendMail = await MailService.sendMail(data.email, "Welcome to Noosphere", null, html, attachments)
         
         if (!sendMail.success) {
             throw new Error("Failed to send mail");
@@ -204,7 +200,7 @@ class AdminService {
         </main>
         </body>
         `
-        const sendMail2 = await MailService.sendMail(newAdmin.email, "Your Administrator Password", null, html2, attachments)
+        const sendMail2 = await MailService.sendMail(data.email, "Your Administrator Password", null, html2, attachments)
         
         if (!sendMail2.success) {
             throw new Error("Failed to send mail");
@@ -217,7 +213,11 @@ class AdminService {
 
             return admin;
         });
-        
+
+        if (!newAdmin) {
+            throw new Error("Failed to create admin");
+        }
+
         return newAdmin;
     }
 
