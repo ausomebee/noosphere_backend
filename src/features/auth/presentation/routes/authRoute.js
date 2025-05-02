@@ -52,7 +52,7 @@ class AuthRoutes {
          * /api/v1/auth/{id}:
          *   get:
          *     summary: get authenticator
-         *     tags: [auth]
+         *     tags: [Auth]
          *     parameters:
          *       - in: path
          *         name: id

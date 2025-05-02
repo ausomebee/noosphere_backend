@@ -144,7 +144,7 @@ class TenantRoutes {
          * /api/v1/tenant/staffsignin:
          *   post:
          *     summary: Staff sign in
-         *     tags: [Auth]
+         *     tags: [Tenant]
          *     requestBody:
          *       required: true
          *       content:
