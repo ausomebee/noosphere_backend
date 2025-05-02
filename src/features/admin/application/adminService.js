@@ -140,19 +140,12 @@ class AdminService {
         const generatedAdminPass = this.generateCode.generateStrongPassword()
         const hashedAdminPass = await argon2.hash(generatedAdminPass)
 
-        const newAdmin = await this.repository.prisma.$transaction(async (tx) => {
-            const department = await this.departmentRepository.createAdminDepartment(tx);
-            const role = await this.roleRepository.createAdminRole(department.id, tx)
-            const admin = await this.repository.txCreate({ ...data, password: hashedPass, administratorPassword: hashedAdminPass, roleId: role.id }, tx);
-
-            return admin;
-        });
         // const newAdmin = await this.repository.create({ ...data, password: hashedPass, administratorPassword: hashedAdminPass });
-
+        
         if (!newAdmin) {
             throw new Error("Failed to create admin");
         }
-
+        
         const attachments = [
             {
                 filename: "logo.png",
@@ -183,40 +176,48 @@ class AdminService {
                         style="background-color: black; color: white; font-size: 20px; width: 80%; margin: auto; padding-top: 20px; padding-bottom: 20px; border-radius: 9999px;">Login
                         as Administrator</button>
                         <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">Once you're in, you'll be prompted to:<br><br>1. Set a new password<br>2. Configure 2-factor authentication<br>3. Set platform-wide preferences for your team<br><br>We recommend doing these right away to secure your account and prepare the system for other users.<br><br>Welcome aboard,<br>— The NooSphere Team</p>
-                </div>
-            </main>
+                        </div>
+                        </main>
         </body>
         `
         const sendMail = await MailService.sendMail(newAdmin.email, "Welcome to Noosphere", null, html, attachments)
-
+        
         if (!sendMail.success) {
             throw new Error("Failed to send mail");
         }
-
+        
         const html2 = `
         <body style="margin: 0%; padding: 0%; box-sizing: border-box; background-color: white;">
-            <main>
-                <img src="cid:unique2@image" alt="" style="width: 100%; height: 90px; object-fit: cover;">
-                <div
-                    style="font-family: Arial, Helvetica, sans-serif; max-width: 820px; margin: auto; padding: 20px; padding-bottom: 50px;">
-                    <img src="cid:unique@image" alt="" style="width: 230px; margin-top: 50px;">
-                    <p class="head" style="font-size: 26px; font-weight: 700; margin-top: 30px;">Your Administrator Password</p>
-                    <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">You're receiving this message because you've been designated as the Administrator for the NooSphere Control Platform.<br><br>
-                        Below is your Administrator Password, used to authorize sensitive, system-wide actions within the platform.<br><br><span style="font-weight: 700;">Administrator password:</span> ${generatedAdminPass}</p>
-                    <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">1. You'll be required to set a new Administrator Password as soon as you log in.<br>
-                        2. You will also need to change your Administrator Password every 90 days to ensure maximum security.<br><br>
-                        Please keep this token secure. <br><br>If you didn't expect this, contact <a>security@noosphere.com</a>.<br><br>
-                        — The NooSphere Security Team</p>
-                </div>
-            </main>
+        <main>
+        <img src="cid:unique2@image" alt="" style="width: 100%; height: 90px; object-fit: cover;">
+        <div
+        style="font-family: Arial, Helvetica, sans-serif; max-width: 820px; margin: auto; padding: 20px; padding-bottom: 50px;">
+        <img src="cid:unique@image" alt="" style="width: 230px; margin-top: 50px;">
+        <p class="head" style="font-size: 26px; font-weight: 700; margin-top: 30px;">Your Administrator Password</p>
+        <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">You're receiving this message because you've been designated as the Administrator for the NooSphere Control Platform.<br><br>
+        Below is your Administrator Password, used to authorize sensitive, system-wide actions within the platform.<br><br><span style="font-weight: 700;">Administrator password:</span> ${generatedAdminPass}</p>
+        <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">1. You'll be required to set a new Administrator Password as soon as you log in.<br>
+        2. You will also need to change your Administrator Password every 90 days to ensure maximum security.<br><br>
+        Please keep this token secure. <br><br>If you didn't expect this, contact <a>security@noosphere.com</a>.<br><br>
+        — The NooSphere Security Team</p>
+        </div>
+        </main>
         </body>
         `
         const sendMail2 = await MailService.sendMail(newAdmin.email, "Your Administrator Password", null, html2, attachments)
-
+        
         if (!sendMail2.success) {
             throw new Error("Failed to send mail");
         }
+        
+        const newAdmin = await this.repository.prisma.$transaction(async (tx) => {
+            const department = await this.departmentRepository.createAdminDepartment(tx);
+            const role = await this.roleRepository.createAdminRole(department.id, tx)
+            const admin = await this.repository.txCreate({ ...data, password: hashedPass, administratorPassword: hashedAdminPass, roleId: role.id }, tx);
 
+            return admin;
+        });
+        
         return newAdmin;
     }
 
