@@ -13,7 +13,6 @@ class MailService {
 
   static async sendMail(to, subject, text, html = null, attachments = null) {
     try {
-      console.log(to)
       const mailOptions = {
         from: '"Noosphere" <ayodejiamzat@gmail.com>',
         to,
@@ -22,8 +21,7 @@ class MailService {
         ...(html && { html }),
         ...(attachments && { attachments })
       };
-
-      console.log(process.env.MAIL_PASS)
+console.log(mailOptions)
       const info = await MailService.transporter.sendMail(mailOptions);
 
       if (!info.accepted.includes(to)) {
