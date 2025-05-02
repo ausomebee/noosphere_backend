@@ -23,9 +23,9 @@ class MailService {
         ...(attachments && { attachments })
       };
 
+      console.log(process.env.MAIL_PASS)
       const info = await MailService.transporter.sendMail(mailOptions);
 
-      console.log("info", info)
       if (!info.accepted.includes(to)) {
         throw new Error("Failed to send mail");
       }
