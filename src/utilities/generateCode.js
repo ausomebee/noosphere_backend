@@ -25,7 +25,7 @@ class ReferralCodeGenerator {
         const lower = "abcdefghijklmnopqrstuvwxyz";
         const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         const numbers = "0123456789";
-        const special = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+        const special = "#?!@$%^&*-";
     
         const all = lower + upper + numbers + special;
         const getRandom = (str) => str.charAt(Math.floor(Math.random() * str.length));
