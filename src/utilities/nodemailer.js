@@ -25,7 +25,7 @@ class MailService {
 
       const info = await MailService.transporter.sendMail(mailOptions);
 
-      console.log(info)
+      console.log("info", info)
       if (!info.accepted.includes(to)) {
         throw new Error("Failed to send mail");
       }
