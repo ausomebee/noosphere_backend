@@ -66,7 +66,7 @@ class AuthRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/:id", AuthDto.authDto, this.controller.generateAuthenticator);
+        this.router.get("/:id", AuthDto.authDto, this.controller.generateAuthenticator);
 
     }
 

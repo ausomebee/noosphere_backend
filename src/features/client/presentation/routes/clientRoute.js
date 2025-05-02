@@ -135,7 +135,7 @@ class ClientRoutes {
          * /api/v1/client/clientsignindto:
          *   post:
          *     summary: Client sign in
-         *     tags: [Auth]
+         *     tags: [Client]
          *     requestBody:
          *       required: true
          *       content:

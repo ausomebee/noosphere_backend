@@ -27,11 +27,11 @@ class AdminController {
         const admin = await this.service.createSuperAdmin(adminData.createAdmin);
 
         if (!admin) {
-            res.status(500).json({ message: 'Failed to create admin' });
+            res.status(500).json({ message: 'Failed to create super admin' });
         }
 
         return res.status(201).json({
-            message: "Admin created successfully",
+            message: "Super admin created successfully",
             status: 'ok',
             data: admin
         });

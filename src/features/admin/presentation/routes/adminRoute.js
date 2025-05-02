@@ -162,13 +162,13 @@ class AdminRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/createsuperadmin", AdminDto.createAdminDto, this.controller.createSuperAdmin);
+        this.router.post("/createsuperadmin", AdminDto.createSuperAdminDto, this.controller.createSuperAdmin);
 
          /**
          * @swagger
          * /api/v1/admin/signin:
          *   post:
-         *     summary: create a new admin
+         *     summary: admin login
          *     tags: [admin]
          *     requestBody:
          *       required: true
