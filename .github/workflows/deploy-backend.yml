@@ -30,6 +30,6 @@ jobs:
             git pull origin $BRANCH
             npm install
             pm2 stop all || true
-            pm2 start src/server.js --name noosphere_backend
+            pm2 start src/server.js --name noosphere-backend
             pm2 save
           EOF
