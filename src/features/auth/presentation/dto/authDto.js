@@ -24,6 +24,18 @@ class AuthDto {
 
         Validator.validateRequest(req, next, schema, req.params);
     };
+
+    static secretMessageDto = (req, res, next) => {
+        const schema = Joi.object({
+            userId: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID",
+            }),
+            secret: Joi.string().trim().required()
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
 }
 
 export default AuthDto;

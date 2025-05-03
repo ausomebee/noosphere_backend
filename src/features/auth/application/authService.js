@@ -1,10 +1,13 @@
 import speakeasy from "speakeasy";
 import qrcode from "qrcode";
 import AuthRepository from "../infrastructure/authRepository.js";
+import AdminController from "../../admin/presentation/controllers/adminController.js";
+import argon2 from "argon2";
 
 class AuthService {
     constructor() {
         this.repository = new AuthRepository();
+        this.adminCotroller = new AdminController;
     }
 
     async generateAuthenticator(userId) {
@@ -14,6 +17,14 @@ class AuthService {
         const auth = await this.repository.create({ userId: userId, secret: secret.base32 });
         if (!auth) {
             throw new Error("Auth failed")
+        }
+
+        const update = await this.adminCotroller.updateAdmin({
+            authType: "AUTHENTICATOR",
+        })
+
+        if (!update) {
+            throw new Error("update failed")
         }
 
         return {
@@ -36,7 +47,52 @@ class AuthService {
             token: data.token
         });
 
+        if (!verified) {
+            throw new Error("verify failed")
+        }
+
+        const update = await this.adminCotroller.updateAdmin({
+            auth2FADone: true
+        })
+
+        if (!update) {
+            throw new Error("update failed")
+        }
         return verified;
+    }
+
+    async createSecreteMessage(data) {
+        const hashedSecret = await argon2.hash(data.secret);
+
+        const auth = await this.repository.create({ userId: data.userId, secret: hashedSecret });
+        if (!auth) {
+            throw new Error("Auth failed")
+        }
+
+        const update = await this.adminCotroller.updateAdmin({
+            authType: "SECRETMESSAGE",
+            auth2FADone: true
+        })
+
+        if (!update) {
+            throw new Error("update failed")
+        }
+
+        return auth;
+    }
+
+    async verifySecretMessage(data) {
+        const secret = await this.repository.findOne({ userId: data.userId });
+
+        if (!secret) {
+            throw new Error("No 2FA secret found for this user.");
+        }
+
+        if (!argon2.verify(secret.secret, data.secret)) {
+            throw new Error('Incorrect secret')
+        }
+
+        return true;
     }
 }
 

@@ -38,6 +38,9 @@ model Admin {
   administratorPassword String?
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
+  authType              String?
+  authQuestion          String?
+  auth2FADone           Boolean  @default(false)
 
   roles       Role         @relation(fields: [roleId], references: [id])
   pipelines   Pipeline[]
@@ -244,4 +247,13 @@ model Feature {
   name        String
   description String
   plans       BillingPlan[] @relation("PlanFeatures")
+}
+
+model SuperAdminChoices {
+  id               String   @id @default(uuid())
+  Authenticator2FA Boolean
+  securityQuestion Boolean
+  setForAll        Boolean
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }

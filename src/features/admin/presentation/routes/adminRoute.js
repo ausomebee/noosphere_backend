@@ -114,6 +114,26 @@ import AdminDto from "../dto/adminDto.js";
  *           maxLength: 100
  *           example: "StrongP@ssw0rd!"
  *           description: New password (must be strong)
+ *     SuperAdminChoicesDto:
+ *       type: object
+ *       required:
+ *         - Authenticator2FA
+ *         - securityQuestion
+ *         - setForAll
+ *       properties:
+ *         Authenticator2FA:
+ *           type: boolean
+ *           description: Whether 2FA is enabled.
+ *         securityQuestion:
+ *           type: boolean
+ *           description: Whether a security question is required.
+ *         setForAll:
+ *           type: boolean
+ *           description: Whether to apply the setting to all users.
+ *       example:
+ *         Authenticator2FA: true
+ *         securityQuestion: false
+ *         setForAll: true
  */
 
 class AdminRoutes {
@@ -164,65 +184,111 @@ class AdminRoutes {
          */
         this.router.post("/createsuperadmin", AdminDto.createSuperAdminDto, this.controller.createSuperAdmin);
 
-         /**
-         * @swagger
-         * /api/v1/admin/signin:
-         *   post:
-         *     summary: admin login
-         *     tags: [admin]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/AuthRequest'
-         *     responses:
-         *       201:
-         *         description: Admin login successfully
-         *       400:
-         *         description: Validation error
-         */
-         this.router.post("/signin", AdminDto.adminSigninDto, this.controller.adminSignin);
+        /**
+        * @swagger
+        * /api/v1/admin/signin:
+        *   post:
+        *     summary: admin login
+        *     tags: [admin]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/AuthRequest'
+        *     responses:
+        *       201:
+        *         description: Admin login successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.post("/signin", AdminDto.adminSigninDto, this.controller.adminSignin);
 
-         /**
-         * @swagger
-         * /api/v1/admin/setpassword:
-         *   patch:
-         *     summary: set a new admin password
-         *     tags: [admin]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/UpdateAdminPasswordDto'
-         *     responses:
-         *       201:
-         *         description: password updated successfully successfully
-         *       400:
-         *         description: Validation error
-         */
-         this.router.patch("/setpassword", AdminDto.updateAdminPasswordDto, this.controller.updateAdmin);
+        /**
+        * @swagger
+        * /api/v1/admin/setpassword:
+        *   patch:
+        *     summary: set a new admin password
+        *     tags: [admin]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/UpdateAdminPasswordDto'
+        *     responses:
+        *       201:
+        *         description: password updated successfully successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.patch("/setpassword", AdminDto.updateAdminPasswordDto, this.controller.updateAdmin);
 
-         /**
+        /**
+        * @swagger
+        * /api/v1/admin/setadministratorpassword:
+        *   patch:
+        *     summary: set a new administrator password
+        *     tags: [admin]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/updateAdministratorPasswordDto'
+        *     responses:
+        *       201:
+        *         description: password updated successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.patch("/setadministratorpassword", AdminDto.updateAdministratorPasswordDto, this.controller.updateAdmin);
+
+        /**
+        * @swagger
+        * /api/v1/admin/superadminchoices:
+        *   post:
+        *     summary: set superadmin choices
+        *     tags: [choice]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/superAdminChoicesDto'
+        *     responses:
+        *       201:
+        *         description: Choice created successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.post("/superadminchoices", AdminDto.superAdminChoicesDto, this.controller.superAdminChoices);
+
+        /**
          * @swagger
-         * /api/v1/admin/setadministratorpassword:
-         *   patch:
-         *     summary: set a new administrator password
-         *     tags: [admin]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/updateAdministratorPasswordDto'
+         * /api/v1/admin/superadminchoices:
+         *   get:
+         *     summary: Retrieve superadmin choices
+         *     tags: [choice]
          *     responses:
-         *       201:
-         *         description: password updated successfully
+         *       200:
+         *         description: Choices retrieved successfully
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 Authenticator2FA:
+         *                   type: boolean
+         *                 securityQuestion:
+         *                   type: boolean
+         *                 setForAll:
+         *                   type: boolean
          *       400:
-         *         description: Validation error
+         *         description: Bad request
          */
-         this.router.patch("/setadministratorpassword", AdminDto.updateAdministratorPasswordDto, this.controller.updateAdmin);
+        this.router.get("/superadminchoices", this.controller.getChoices);
+
 
         /**
          * @swagger
@@ -243,7 +309,28 @@ class AdminRoutes {
          *       400:
          *         description: Validation error
          */
-         this.router.get("/getadmin/:id", AdminDto.getSingleAdminDto, this.controller.getSingleAdmin);
+        this.router.get("/getadmin/:id", AdminDto.getSingleAdminDto, this.controller.getSingleAdmin);
+
+        /**
+         * @swagger
+         * /api/v1/admin/forgotpassword/{email}:
+         *   get:
+         *     summary: send forgot password mail
+         *     tags: [admin]
+         *     parameters:
+         *       - in: path
+         *         name: email
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The email of the admin
+         *     responses:
+         *       200:
+         *         description: email sent successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/forgotpassword/:email", AdminDto.forgotPasswordDto, this.controller.forgotPassword);
 
     }
 

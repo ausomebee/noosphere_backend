@@ -13,7 +13,6 @@ class AdminService {
         this.generateCode = new ReferralCodeGenerator(12)
         this.departmentRepository = new DepartmentRepository()
         this.roleRepository = new RoleRepository()
-        
     }
 
     async createAdmin(data) {
@@ -101,7 +100,10 @@ class AdminService {
             phoneNumber: data.phoneNumber || admin.phoneNumber,
             roleId: data.roleId || admin.roleId,
             password: hashedPass,
-            administratorPassword: hashedAdminPass
+            administratorPassword: hashedAdminPass,
+            authType: data.authType || admin.authType,
+            authQuestion: data.authQuestion || admin.authQuestion,
+            auth2FADone: data.auth2FADone || admin.auth2FADone,
         });
 
         if (!update) {
@@ -141,7 +143,7 @@ class AdminService {
         const hashedAdminPass = await argon2.hash(generatedAdminPass)
 
         // const newAdmin = await this.repository.create({ ...data, password: hashedPass, administratorPassword: hashedAdminPass });
-        
+
         const attachments = [
             {
                 filename: "logo.png",
@@ -177,11 +179,11 @@ class AdminService {
         </body>
         `
         const sendMail = await MailService.sendMail(data.email, "Welcome to Noosphere", null, html, attachments)
-        
+
         if (!sendMail.success) {
             throw new Error("Failed to send mail");
         }
-        
+
         const html2 = `
         <body style="margin: 0%; padding: 0%; box-sizing: border-box; background-color: white;">
         <main>
@@ -201,11 +203,11 @@ class AdminService {
         </body>
         `
         const sendMail2 = await MailService.sendMail(data.email, "Your Administrator Password", null, html2, attachments)
-        
+
         if (!sendMail2.success) {
             throw new Error("Failed to send mail");
         }
-        
+
         const newAdmin = await this.repository.prisma.$transaction(async (tx) => {
             const department = await this.departmentRepository.createAdminDepartment(tx);
             const role = await this.roleRepository.createAdminRole(department.id, tx)
@@ -251,7 +253,88 @@ class AdminService {
             throw new Error("Admin not found")
         }
 
-        return { ...admin, token: this.token.generateToken(admin.id) };
+        return admin;
+    }
+
+    async superAdminChoices(data) {
+        const choiceExists = await this.repository.findOneChoice({});
+        if (choiceExists) {
+            const update = await this.repository.updateChoice(data.id, {
+                Authenticator2FA: data.Authenticator2FA || choiceExists.Authenticator2FA,
+                securityQuestion: data.securityQuestion || choiceExists.securityQuestion
+            });
+
+            if (!update) {
+                throw new Error("Failed to update choice");
+            }
+
+            return update;
+        }
+
+        const newChoice = await this.repository.createChoice(data);
+
+        if (!newChoice) {
+            throw new Error("Failed to create choice");
+        }
+
+        return newChoice;
+    }
+
+    async getChoices(data) {
+        const choice = await this.repository.findOneChoice({});
+
+        if (!choice) {
+            throw new Error("choice not found")
+        }
+
+        return choice;
+    }
+
+    async forgotPassword(data) {
+        const adminExists = await this.repository.findFirst({
+            where: { email: data.email },
+        });
+
+        if (!adminExists) {
+            throw new Error("Admin not found.");
+        }
+
+        const attachments = [
+            {
+                filename: "logo.png",
+                path: "logo.png",
+                cid: "unique@image",
+                contentType: "logo/png",
+            },
+            {
+                filename: "mailHeader.png",
+                path: "mailHeader.png",
+                cid: "unique2@image",
+                contentType: "mailHeader/png",
+            },
+        ]
+
+        const html = `
+        <body style="margin: 0%; padding: 0%; box-sizing: border-box; background-color: white;">
+            <main>
+                <img src="/mailHeader.png" alt="" style="width: 100%; height: 70px; object-fit: cover;">
+                <div
+                    style="font-family: Arial, Helvetica, sans-serif; text-align: center; max-width: 820px; margin: auto; padding: 20px; padding-bottom: 50px;">
+                    <img src="/logo.png" alt="" style="width: 230px; margin-top: 70px;">
+                    <p class="head" style="font-size: 26px; font-weight: 700; margin-top: 70px;">Reset your password</p>
+                    <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">Please click the button
+                        below to reset your password</p>
+                    <a href="http://frontend/${this.token.generateToken(adminExists.id)}" style="background-color: black; border-radius: 9999px; padding-top: 20px; padding-bottom: 20px; color: white; text-decoration: none; font-weight: 600; font-size: 18px; width: 90%; display: block; margin: auto;">Reset Password</a>
+                </div>
+            </main>
+        </body>
+        `
+        const sendMail = MailService.sendMail(newAdmin.email, "Reset your password", null, html, attachments)
+        if (!sendMail) {
+            throw new Error("Failed to send mail");
+        }
+
+        return true;
     }
 }
 

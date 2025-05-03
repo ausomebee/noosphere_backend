@@ -118,6 +118,18 @@ class BillingRoutes {
         */
         this.router.get("/getbillingmetadata/:id", BillingDto.checkIdDto, this.controller.getSingleBillingMetadata);
 
+        /**
+         * @swagger
+         * /api/v1/billing/allbillingmetadata:
+         *   get:
+         *     summary: Retrieve all billing metadata
+         *     tags: [billing]
+         *     responses:
+         *       200:
+         *         description: all billing metadata retrieved successfully
+         *       400:
+         *         description: Bad request
+         */
         this.router.get("/allbillingmetadata", this.controller.getAllBillingMetadata);
 
         /**
@@ -161,6 +173,18 @@ class BillingRoutes {
         */
         this.router.get("/gettransaction/:id", BillingDto.checkIdDto, this.controller.getAllTransaction);
 
+        /**
+         * @swagger
+         * /api/v1/billing/alltransaction:
+         *   get:
+         *     summary: Retrieve all transactions
+         *     tags: [billing]
+         *     responses:
+         *       200:
+         *         description: all transaction retrieved successfully
+         *       400:
+         *         description: Bad request
+         */
         this.router.get("/alltransaction", this.controller.getAllTransaction);
 
         /**
@@ -204,6 +228,18 @@ class BillingRoutes {
         */
         this.router.get("/getsubscription/:id", BillingDto.checkIdDto, this.controller.getAllSubscription);
 
+        /**
+         * @swagger
+         * /api/v1/billing/allsubscription:
+         *   get:
+         *     summary: Retrieve all subscription
+         *     tags: [billing]
+         *     responses:
+         *       200:
+         *         description: all subscription retrieved successfully
+         *       400:
+         *         description: Bad request
+         */
         this.router.get("/allsubscription", this.controller.getAllSubscription);
 
         /**
@@ -247,6 +283,18 @@ class BillingRoutes {
         */
         this.router.get("/getbillingplan/:id", BillingDto.checkIdDto, this.controller.getSingleBillingPlan);
 
+        /**
+         * @swagger
+         * /api/v1/billing/allbillingplan:
+         *   get:
+         *     summary: Retrieve all billing plan
+         *     tags: [billing]
+         *     responses:
+         *       200:
+         *         description: all billing plan retrieved successfully
+         *       400:
+         *         description: Bad request
+         */
         this.router.get("/allbillingplan", this.controller.getAllBillingPlan);
 
         /**
@@ -290,6 +338,18 @@ class BillingRoutes {
         */
         this.router.get("/getfeature/:id", BillingDto.checkIdDto, this.controller.getSingleFeature);
 
+        /**
+         * @swagger
+         * /api/v1/billing/allfeature:
+         *   get:
+         *     summary: Retrieve all feature
+         *     tags: [billing]
+         *     responses:
+         *       200:
+         *         description: all feature retrieved successfully
+         *       400:
+         *         description: Bad request
+         */
         this.router.get("/allfeature", this.controller.getAllFeature);
 
     }

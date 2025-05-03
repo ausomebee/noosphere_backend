@@ -4,10 +4,15 @@ class AdminRepository {
     constructor() {
         this.prisma = prismaService.getClient();
         this.model = this.prisma.admin;
+        this.superAdminChoices = this.prisma.superAdminChoices;
     }
 
     async create(data) {
         return await this.model.create({ data });
+    }
+
+    async createChoice(data) {
+        return await this.superAdminChoices.create({ data });
     }
 
     async txCreate(data, tx) {
@@ -16,6 +21,12 @@ class AdminRepository {
 
     async findOne(query) {
         return await this.model.findUnique({
+            where: query,
+        });
+    }
+
+    async findOneChoice(query) {
+        return await this.superAdminChoices.findUnique({
             where: query,
         });
     }
@@ -49,7 +60,14 @@ class AdminRepository {
     async update(id, data) {
         return await this.model.update({
             where: { id },
-            data: {...data},
+            data: { ...data },
+        });
+    }
+
+    async updateChoice(id, data) {
+        return await this.superAdminChoices.update({
+            where: { id },
+            data: { ...data },
         });
     }
 

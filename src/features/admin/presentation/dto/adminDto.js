@@ -98,7 +98,7 @@ class AdminDto {
 
         Validator.validateRequest(req, next, schema);
     };
-    
+
     static updateAdminPasswordDto = (req, res, next) => {
         const schema = Joi.object({
             id: Joi.string().uuid().required().messages({
@@ -169,6 +169,33 @@ class AdminDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID",
             }),
+        });
+
+        Validator.validateRequest(req, next, schema, req.params);
+    };
+
+    static superAdminChoicesDto = (req, res, next) => {
+        const schema = Joi.object({
+            Authenticator2FA: Joi.boolean().required(),
+            securityQuestion: Joi.boolean().required(),
+            setForAll: Joi.boolean().required()
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static forgotPasswordDto = (req, res, next) => {
+        const schema = Joi.object({
+            email: Joi.string()
+                .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
+                .required()
+                .trim()
+                .lowercase()
+                .messages({
+                    "string.email": "Email must be a valid email",
+                    "string.empty": "Email is required",
+                    "any.required": "Email is a required field",
+                }),
         });
 
         Validator.validateRequest(req, next, schema, req.params);

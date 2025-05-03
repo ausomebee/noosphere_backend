@@ -78,6 +78,48 @@ class AdminController {
             data: admin
         });
     });
+
+    superAdminChoices = expressAsyncHandler(async (req, res) => {
+        const choice = await this.service.superAdminChoices(req.body);
+
+        if (!choice) {
+            res.status(500).json({ message: 'Failed to create choice' });
+        }
+
+        return res.status(201).json({
+            message: "Choice created successfully",
+            status: 'ok',
+            data: choice
+        });
+    });
+
+    getChoices = expressAsyncHandler(async (req, res) => {
+        const choice = await this.service.getSingleAdmin();
+
+        if (!choice) {
+            res.status(500).json({ message: 'Failed to get choice' });
+        }
+
+        return res.status(201).json({
+            message: "choice fetched successfully",
+            status: 'ok',
+            data: choice
+        });
+    });
+
+    forgotPassword = expressAsyncHandler(async (req, res) => {
+        const mail = await this.service.forgotPassword(req.params);
+
+        if (!mail) {
+            res.status(500).json({ message: 'Failed to send mail' });
+        }
+
+        return res.status(201).json({
+            message: "mail sent successfully",
+            status: 'ok',
+            data: mail
+        });
+    });
 }
 
 export default AdminController;

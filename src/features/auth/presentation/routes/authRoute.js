@@ -68,6 +68,76 @@ class AuthRoutes {
          */
         this.router.get("/:id", AuthDto.authDto, this.controller.generateAuthenticator);
 
+        /**
+        * @swagger
+        * /api/v1/auth/createsecretemessage:
+        *   post:
+        *     summary: create 2FA secret message
+        *     description: creates a user's 2FA secret using their user ID and secret.
+        *     tags:
+        *       - Auth
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             type: object
+        *             required:
+        *               - userId
+        *               - secret
+        *             properties:
+        *               userId:
+        *                 type: string
+        *                 format: uuid
+        *                 example: "123e4567-e89b-12d3-a456-426614174000"
+        *                 description: UUID of the user
+        *               secret:
+        *                 type: string
+        *                 example: "malik"
+        *                 description: answer to your secret message
+        *     responses:
+        *       200:
+        *         description: secret message created successfully
+        *       400:
+        *         description: Invalid input
+        */
+        this.router.post("/createsecretemessage", AuthDto.secretMessageDto, this.controller.createSecreteMessage);
+
+        /**
+        * @swagger
+        * /api/v1/auth/verifysecretmessage:
+        *   post:
+        *     summary: verify 2FA secret message
+        *     description: verifies a user's 2FA secret using their user ID and secret.
+        *     tags:
+        *       - Auth
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             type: object
+        *             required:
+        *               - userId
+        *               - secret
+        *             properties:
+        *               userId:
+        *                 type: string
+        *                 format: uuid
+        *                 example: "123e4567-e89b-12d3-a456-426614174000"
+        *                 description: UUID of the user
+        *               secret:
+        *                 type: string
+        *                 example: "malik"
+        *                 description: answer to your secret message
+        *     responses:
+        *       200:
+        *         description: secret message verified successfully
+        *       400:
+        *         description: Invalid input
+        */
+        this.router.post("/verifysecretmessage", AuthDto.secretMessageDto, this.controller.verifySecretMessage);
+
     }
 
     getRouter() {
