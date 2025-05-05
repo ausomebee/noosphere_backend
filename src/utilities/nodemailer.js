@@ -6,8 +6,8 @@ class MailService {
     secure: true,
     port: 465,
     auth: {
-      user: process.env.MAIL,
-      pass: process.env.MAIL_PASS,
+      user: "ayodejiamzat@gmail.com",
+      pass: "gqjxzidmmqxpyqkr",
     },
   });
 
