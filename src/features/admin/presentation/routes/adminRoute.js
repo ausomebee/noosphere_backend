@@ -204,6 +204,7 @@ class AdminRoutes {
         */
         this.router.post("/signin", AdminDto.adminSigninDto, this.controller.adminSignin);
 
+        
         /**
         * @swagger
         * /api/v1/admin/setpassword:
