@@ -93,17 +93,7 @@ class AdminService {
             throw new Error('Incorrect password')
         }
         const hashedAdminPass = data.administratorPassword ? await argon2.hash(data.administratorPassword) : admin.administratorPassword;
-console.log({
-    fullName: data.fullName || admin.fullName,
-    email: data.email || admin.email,
-    phoneNumber: data.phoneNumber || admin.phoneNumber,
-    roleId: data.roleId || admin.roleId,
-    password: hashedPass,
-    administratorPassword: hashedAdminPass,
-    authType: data.authType || admin.authType,
-    authQuestion: data.authQuestion || admin.authQuestion,
-    auth2FADone: data.auth2FADone || admin.auth2FADone,
-})
+
         const update = await this.repository.update(data.id, {
             fullName: data.fullName || admin.fullName,
             email: data.email || admin.email,
@@ -113,7 +103,6 @@ console.log({
                   id: data.roleId || admin.roleId
                 }
             },
-            // roleId: data.roleId || admin.roleId,
             password: hashedPass,
             administratorPassword: hashedAdminPass,
             authType: data.authType || admin.authType,
