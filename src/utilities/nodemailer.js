@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+console.log("maaail", process.env.TRY, process.env.MAIL_PASS)
 
 class MailService {
   static transporter = nodemailer.createTransport({
@@ -6,8 +7,8 @@ class MailService {
     secure: true,
     port: 465,
     auth: {
-      user: `${process.env.TRY}`,
-      pass: `${process.env.MAIL_PASS}`,
+      user: process.env.TRY,
+      pass: process.env.MAIL_PASS,
     },
   });
   
