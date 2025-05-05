@@ -8,7 +8,6 @@ class AuthController {
     }
 
     generateAuthenticator = expressAsyncHandler(async (req, res) => {
-        console.log(req.params.id)
         const auth = await this.service.generateAuthenticator(req.params.id);
 
         if (!auth) {

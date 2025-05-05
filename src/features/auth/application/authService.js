@@ -1,13 +1,13 @@
 import speakeasy from "speakeasy";
 import qrcode from "qrcode";
 import AuthRepository from "../infrastructure/authRepository.js";
-import AdminController from "../../admin/presentation/controllers/adminController.js";
 import argon2 from "argon2";
+import AdminService from "../../admin/application/adminService.js";
 
 class AuthService {
     constructor() {
         this.repository = new AuthRepository();
-        this.adminCotroller = new AdminController;
+        this.adminService = new AdminService;
     }
 
     async generateAuthenticator(userId) {
@@ -19,7 +19,7 @@ class AuthService {
             throw new Error("Auth failed")
         }
 
-        const update = await this.adminCotroller.updateAdmin({
+        const update = await this.adminService.updateAdmin({
             authType: "AUTHENTICATOR",
             id: auth.userId
         })
@@ -52,7 +52,7 @@ class AuthService {
             throw new Error("verify failed")
         }
 
-        const update = await this.adminCotroller.updateAdmin({
+        const update = await this.adminService.updateAdmin({
             auth2FADone: true
         })
 
@@ -70,7 +70,7 @@ class AuthService {
             throw new Error("Auth failed")
         }
 
-        const update = await this.adminCotroller.updateAdmin({
+        const update = await this.adminService.updateAdmin({
             authType: "SECRETMESSAGE",
             auth2FADone: true,
             id: data.userId
