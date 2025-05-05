@@ -21,7 +21,7 @@ class AuthService {
 
         const update = await this.adminCotroller.updateAdmin({
             authType: "AUTHENTICATOR",
-            id: userId
+            id: auth.userId
         })
 
         if (!update) {
