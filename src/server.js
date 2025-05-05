@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+dotenv.config({ path: ".env" });
 import express from "express";
 import http from "http";
 import cors from "cors";
@@ -19,7 +20,6 @@ import client_route from "./features/client/presentation/routes/clientRoute.js"
 import auth_route from "./features/auth/presentation/routes/authRoute.js"
 import billing_route from "./features/billing/presentation/routes/billingRoute.js"
 
-dotenv.config({ path: ".env" });
 
 class App {
     constructor() {
