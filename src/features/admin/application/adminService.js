@@ -333,7 +333,7 @@ class AdminService {
             </main>
         </body>
         `
-        const sendMail = MailService.sendMail(newAdmin.email, "Reset your password", null, html, attachments)
+        const sendMail = MailService.sendMail(adminExists.email, "Reset your password", null, html, attachments)
         if (!sendMail) {
             throw new Error("Failed to send mail");
         }
