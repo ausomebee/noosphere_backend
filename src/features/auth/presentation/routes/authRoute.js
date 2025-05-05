@@ -95,6 +95,10 @@ class AuthRoutes {
         *                 type: string
         *                 example: "malik"
         *                 description: answer to your secret message
+        *               authQuestion:
+        *                 type: string
+        *                 example: "who are you"
+        *                 description: your secret question
         *     responses:
         *       200:
         *         description: secret message created successfully

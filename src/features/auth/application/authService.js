@@ -73,6 +73,7 @@ class AuthService {
         const update = await this.adminService.updateAdmin({
             authType: "SECRETMESSAGE",
             auth2FADone: true,
+            authQuestion: data.authQuestion,
             id: data.userId
         })
 

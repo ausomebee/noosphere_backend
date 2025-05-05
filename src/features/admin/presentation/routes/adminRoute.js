@@ -114,7 +114,7 @@ import AdminDto from "../dto/adminDto.js";
  *           maxLength: 100
  *           example: "StrongP@ssw0rd!"
  *           description: New password (must be strong)
- *     SuperAdminChoicesDto:
+ *     superAdminChoicesDto:
  *       type: object
  *       required:
  *         - Authenticator2FA

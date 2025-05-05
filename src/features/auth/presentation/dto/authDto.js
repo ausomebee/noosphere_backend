@@ -31,7 +31,8 @@ class AuthDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID",
             }),
-            secret: Joi.string().trim().required()
+            secret: Joi.string().trim().required(),
+            authQuestion: Joi.string().trim().required()
         });
 
         Validator.validateRequest(req, next, schema);
