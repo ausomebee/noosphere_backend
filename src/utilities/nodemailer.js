@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-
+console.log(process.env.TRY)
 class MailService {
   static transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
