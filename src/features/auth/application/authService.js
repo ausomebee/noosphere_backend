@@ -21,6 +21,7 @@ class AuthService {
 
         const update = await this.adminCotroller.updateAdmin({
             authType: "AUTHENTICATOR",
+            id: userId
         })
 
         if (!update) {
@@ -71,7 +72,8 @@ class AuthService {
 
         const update = await this.adminCotroller.updateAdmin({
             authType: "SECRETMESSAGE",
-            auth2FADone: true
+            auth2FADone: true,
+            id: data.userId
         })
 
         if (!update) {
