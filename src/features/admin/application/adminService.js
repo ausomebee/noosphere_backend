@@ -77,6 +77,7 @@ class AdminService {
     }
 
     async updateAdmin(data) {
+        console.log(data)
         const admin = await this.repository.findOne({ id: data.id })
 
         if (!admin) {
