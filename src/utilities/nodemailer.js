@@ -10,9 +10,10 @@ class MailService {
       pass: `${process.env.MAIL_PASS}`,
     },
   });
-
+  
   static async sendMail(to, subject, text, html = null, attachments = null) {
     try {
+      console.log(process.env.MAIL, process.env.MAIL_PASS)
       const mailOptions = {
         from: '"Noosphere" <ayodejiamzat@gmail.com>',
         to,
@@ -22,7 +23,6 @@ class MailService {
         ...(attachments && { attachments })
       };
       const info = await MailService.transporter.sendMail(mailOptions);
-      console.log(info)
       
       if (!info.accepted.includes(to)) {
         throw new Error("Failed to send mail");
