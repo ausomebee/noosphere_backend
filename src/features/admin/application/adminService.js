@@ -108,7 +108,12 @@ console.log({
             fullName: data.fullName || admin.fullName,
             email: data.email || admin.email,
             phoneNumber: data.phoneNumber || admin.phoneNumber,
-            roleId: data.roleId || admin.roleId,
+            roles: {
+                connect: {
+                  id: data.roleId || admin.roleId
+                }
+            },
+            // roleId: data.roleId || admin.roleId,
             password: hashedPass,
             administratorPassword: hashedAdminPass,
             authType: data.authType || admin.authType,
