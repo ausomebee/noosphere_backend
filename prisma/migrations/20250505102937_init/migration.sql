@@ -21,6 +21,9 @@ CREATE TABLE "Admin" (
     "administratorPassword" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "authType" TEXT,
+    "authQuestion" TEXT,
+    "auth2FADone" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Admin_pkey" PRIMARY KEY ("id")
 );
@@ -195,6 +198,7 @@ CREATE TABLE "Subscription" (
     "status" "SubscriptionStatus" NOT NULL,
     "startDate" TIMESTAMP(3) NOT NULL,
     "endDate" TIMESTAMP(3) NOT NULL,
+    "transactionId" TEXT NOT NULL,
 
     CONSTRAINT "Subscription_pkey" PRIMARY KEY ("id")
 );
@@ -217,6 +221,18 @@ CREATE TABLE "Feature" (
     "description" TEXT NOT NULL,
 
     CONSTRAINT "Feature_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "SuperAdminChoices" (
+    "id" TEXT NOT NULL,
+    "Authenticator2FA" BOOLEAN NOT NULL,
+    "securityQuestion" BOOLEAN NOT NULL,
+    "setForAll" BOOLEAN NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "SuperAdminChoices_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -259,6 +275,9 @@ CREATE UNIQUE INDEX "ClientTenant_clientId_tenantId_key" ON "ClientTenant"("clie
 
 -- CreateIndex
 CREATE UNIQUE INDEX "BillingMetadata_tenantId_key" ON "BillingMetadata"("tenantId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Subscription_transactionId_key" ON "Subscription"("transactionId");
 
 -- CreateIndex
 CREATE INDEX "_PlanFeatures_B_index" ON "_PlanFeatures"("B");
@@ -313,6 +332,9 @@ ALTER TABLE "Transactions" ADD CONSTRAINT "Transactions_billingMetadataId_fkey" 
 
 -- AddForeignKey
 ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_transactionId_fkey" FOREIGN KEY ("transactionId") REFERENCES "Transactions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_planId_fkey" FOREIGN KEY ("planId") REFERENCES "BillingPlan"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
