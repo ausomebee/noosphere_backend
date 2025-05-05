@@ -1,5 +1,4 @@
 import "./config/env.js";
-console.log("first")
 import express from "express";
 import http from "http";
 import cors from "cors";
