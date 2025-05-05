@@ -21,9 +21,9 @@ class MailService {
         ...(html && { html }),
         ...(attachments && { attachments })
       };
-console.log(mailOptions)
       const info = await MailService.transporter.sendMail(mailOptions);
-
+      console.log(info)
+      
       if (!info.accepted.includes(to)) {
         throw new Error("Failed to send mail");
       }
