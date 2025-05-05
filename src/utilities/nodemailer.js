@@ -13,7 +13,7 @@ class MailService {
   
   static async sendMail(to, subject, text, html = null, attachments = null) {
     try {
-      console.log(process.env.MAIL, process.env.MAIL_PASS)
+      console.log("maaail", process.env.MAIL, process.env.MAIL_PASS)
       const mailOptions = {
         from: '"Noosphere" <ayodejiamzat@gmail.com>',
         to,
