@@ -1,7 +1,4 @@
-// import dotenv from "dotenv";
-// dotenv.config();
 import nodemailer from "nodemailer";
-console.log("maaail", process.env.TRY, process.env.MAIL_PASS)
 
 class MailService {
   static transporter = nodemailer.createTransport({
