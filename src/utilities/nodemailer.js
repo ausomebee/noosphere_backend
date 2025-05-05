@@ -6,14 +6,14 @@ class MailService {
     secure: true,
     port: 465,
     auth: {
-      user: `${process.env.MAIL}`,
+      user: `${process.env.TRY}`,
       pass: `${process.env.MAIL_PASS}`,
     },
   });
   
   static async sendMail(to, subject, text, html = null, attachments = null) {
     try {
-      console.log("maaail", process.env.MAIL, process.env.MAIL_PASS)
+      console.log("maaail", process.env.TRY, process.env.MAIL_PASS)
       const mailOptions = {
         from: '"Noosphere" <ayodejiamzat@gmail.com>',
         to,
