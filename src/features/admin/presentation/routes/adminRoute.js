@@ -100,14 +100,14 @@ import AdminDto from "../dto/adminDto.js";
  *           format: uuid
  *           example: "e77e41fe-124f-4eeb-b13e-5dfe119b1d01"
  *           description: Unique admin ID
- *         currentAdministratorPassword:
+ *         oldAdministratorPassword:
  *           type: string
  *           format: password
  *           minLength: 8
  *           maxLength: 100
  *           example: "StrongP@ssw0rd!"
  *           description: New password (must be strong)
- *         administratorPassword:
+ *         newAdministratorPassword:
  *           type: string
  *           format: password
  *           minLength: 8
@@ -204,7 +204,6 @@ class AdminRoutes {
         */
         this.router.post("/signin", AdminDto.adminSigninDto, this.controller.adminSignin);
 
-        
         /**
         * @swagger
         * /api/v1/admin/setpassword:

@@ -89,10 +89,10 @@ class AdminService {
 
         const hashedPass = data.password ? await argon2.hash(data.password) : admin.password;
 
-        if (data.administratorPassword && !(await argon2.verify(admin.administratorPassword, data.currentAdministratorPassword))) {
+        if (data.newAdministratorPassword && !(await argon2.verify(admin.administratorPassword, data.oldAdministratorPassword))) {
             throw new Error('Incorrect current password')
         }
-        const hashedAdminPass = data.administratorPassword ? await argon2.hash(data.administratorPassword) : admin.administratorPassword;
+        const hashedAdminPass = data.newAdministratorPassword ? await argon2.hash(data.newAdministratorPassword) : admin.administratorPassword;
 
         const update = await this.repository.update(data.id, {
             fullName: data.fullName || admin.fullName,

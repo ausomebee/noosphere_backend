@@ -122,13 +122,13 @@ class AdminDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID",
             }),
-            administratorPassword: Joi.string()
+            newAdministratorPassword: Joi.string()
                 .regex(strongPasswordRegex)
                 .trim().required()
                 .messages({
                     "string.pattern.base": stringPasswordError,
                 }),
-            currentAdministratorPassword: Joi.string()
+            oldAdministratorPassword: Joi.string()
                 .regex(strongPasswordRegex)
                 .trim().required()
                 .messages({
