@@ -113,7 +113,7 @@ class TenantService {
             throw new Error("Tenant not found");
         }
 
-        if (data.currentPassword && !argon2.verify(tenant.password, data.currentPassword)) {
+        if (data.currentPassword && !(await argon2.verify(tenant.password, data.currentPassword))) {
             throw new Error('Incorrect password')
         }
 

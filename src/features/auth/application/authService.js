@@ -92,7 +92,7 @@ class AuthService {
             throw new Error("No 2FA secret found for this user.");
         }
 
-        if (!argon2.verify(secret.secret, data.secret)) {
+        if (!(await argon2.verify(secret.secret, data.secret))) {
             throw new Error('Incorrect secret')
         }
 

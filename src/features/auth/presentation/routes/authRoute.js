@@ -140,7 +140,7 @@ class AuthRoutes {
         *       400:
         *         description: Invalid input
         */
-        this.router.post("/verifysecretmessage", AuthDto.secretMessageDto, this.controller.verifySecretMessage);
+        this.router.post("/verifysecretmessage", AuthDto.verifySecretMessageDto, this.controller.verifySecretMessage);
 
         
     }

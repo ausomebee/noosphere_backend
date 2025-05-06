@@ -83,13 +83,13 @@ class AdminService {
             throw new Error("Admin not found");
         }
 
-        if (data.currentPassword && !argon2.verify(admin.password, data.currentPassword)) {
+        if (data.currentPassword && !(await argon2.verify(admin.password, data.currentPassword))) {
             throw new Error('Incorrect password')
         }
 
         const hashedPass = data.password ? await argon2.hash(data.password) : admin.password;
 
-        if (data.administratorPassword && !argon2.verify(admin.administratorPassword, data.currentAdministratorPassword)) {
+        if (data.administratorPassword && !(await argon2.verify(admin.administratorPassword, data.currentAdministratorPassword))) {
             throw new Error('Incorrect password')
         }
         const hashedAdminPass = data.administratorPassword ? await argon2.hash(data.administratorPassword) : admin.administratorPassword;
@@ -241,7 +241,7 @@ class AdminService {
             throw new Error("You haven't set your password")
         }
 
-        if (!argon2.verify(admin.password, data.password)) {
+        if (!(await argon2.verify(admin.password, data.password))) {
             throw new Error('Incorrect password')
         }
 
@@ -265,8 +265,9 @@ class AdminService {
         
         if (choiceExists) {
             const update = await this.repository.updateChoice(choiceExists.id, {
-                Authenticator2FA: data.Authenticator2FA || choiceExists.Authenticator2FA,
-                securityQuestion: data.securityQuestion || choiceExists.securityQuestion
+                Authenticator2FA: data.Authenticator2FA ?? choiceExists.Authenticator2FA,
+                securityQuestion: data.securityQuestion ?? choiceExists.securityQuestion,
+                setForAll: data.setForAll ?? choiceExists.setForAll
             });
 
             if (!update) {
