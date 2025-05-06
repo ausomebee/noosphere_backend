@@ -53,7 +53,8 @@ class AuthService {
         }
 
         const update = await this.adminService.updateAdmin({
-            auth2FADone: true
+            auth2FADone: true,
+            id: data.userId
         })
 
         if (!update) {
