@@ -61,9 +61,9 @@ class AdminService {
                     </p>
                     <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">You have been invited by
                         NooSphere Admin to<br> create a profile on Noosphere<br><br>Click the button below to get started</p>
-                    <button
+                    <a href='http://localhost:5173/admin/onboarding/${newAdmin.email}/${newAdmin.id}'
                         style="background-color: black; color: white; font-size: 20px; width: 80%; margin: auto; padding-top: 20px; padding-bottom: 20px; border-radius: 9999px;">Create
-                        Profile</button>
+                        Profile</a>
                 </div>
             </main>
         </body>
