@@ -290,7 +290,6 @@ class AdminRoutes {
          */
         this.router.get("/superadminchoices", this.controller.getChoices);
 
-
         /**
          * @swagger
          * /api/v1/admin/getadmin/{id}:

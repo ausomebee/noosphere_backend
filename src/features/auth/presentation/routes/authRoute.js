@@ -142,7 +142,6 @@ class AuthRoutes {
         */
         this.router.post("/verifysecretmessage", AuthDto.verifySecretMessageDto, this.controller.verifySecretMessage);
 
-        
     }
 
     getRouter() {
