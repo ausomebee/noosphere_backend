@@ -65,18 +65,18 @@ class AuthService {
 
     async createSecreteMessage(data) {
         const hashedSecret = await argon2.hash(data.secret);
-
-        const auth = await this.repository.create({ userId: data.userId, secret: hashedSecret });
-        if (!auth) {
-            throw new Error("Auth failed")
-        }
-
+        
         const update = await this.adminService.updateAdmin({
             authType: "SECRETMESSAGE",
             auth2FADone: true,
             authQuestion: data.authQuestion,
             id: data.userId
         })
+        
+        const auth = await this.repository.create({ userId: data.userId, secret: hashedSecret });
+        if (!auth) {
+            throw new Error("Auth failed")
+        }
 
         if (!update) {
             throw new Error("update failed")
