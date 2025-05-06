@@ -90,7 +90,7 @@ class AdminService {
         const hashedPass = data.password ? await argon2.hash(data.password) : admin.password;
 
         if (data.administratorPassword && !(await argon2.verify(admin.administratorPassword, data.currentAdministratorPassword))) {
-            throw new Error('Incorrect password')
+            throw new Error('Incorrect current password')
         }
         const hashedAdminPass = data.administratorPassword ? await argon2.hash(data.administratorPassword) : admin.administratorPassword;
 
@@ -228,7 +228,6 @@ class AdminService {
     }
 
     async AdminSignin(data) {
-
         const admin = await this.repository.findOne({
             email: data.email
         });
