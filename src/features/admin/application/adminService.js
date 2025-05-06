@@ -100,7 +100,7 @@ class AdminService {
             phoneNumber: data.phoneNumber || admin.phoneNumber,
             roles: {
                 connect: {
-                  id: data.roleId || admin.roleId
+                    id: data.roleId || admin.roleId
                 }
             },
             password: hashedPass,
@@ -261,9 +261,10 @@ class AdminService {
     }
 
     async superAdminChoices(data) {
-        const choiceExists = await this.repository.findOneChoice({});
+        const choiceExists = await this.repository.findFirstChoice({ where: {} });
+        
         if (choiceExists) {
-            const update = await this.repository.updateChoice(data.id, {
+            const update = await this.repository.updateChoice(choiceExists.id, {
                 Authenticator2FA: data.Authenticator2FA || choiceExists.Authenticator2FA,
                 securityQuestion: data.securityQuestion || choiceExists.securityQuestion
             });

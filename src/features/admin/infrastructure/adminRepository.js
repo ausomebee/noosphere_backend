@@ -44,6 +44,19 @@ class AdminRepository {
         });
     }
 
+    async findFirstChoice(query) {
+        const { where, include, select, orderBy, take, skip } = query;
+
+        return await this.superAdminChoices.findFirst({
+            where,
+            include,
+            select,
+            orderBy,
+            take,
+            skip,
+        });
+    }
+
     async findAll(query = {}) {
         const { where, include, select, orderBy, take, skip } = query;
 
