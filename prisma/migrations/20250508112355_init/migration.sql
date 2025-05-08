@@ -32,6 +32,7 @@ CREATE TABLE "Admin" (
 CREATE TABLE "Auth" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
+    "module" "Module" NOT NULL,
     "secret" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
