@@ -55,7 +55,7 @@ class AuthRoutes {
          *     tags: [Auth]
          *     parameters:
          *       - in: path
-         *         name: id
+         *         name: userId
          *         required: true
          *         schema:
          *           type: string
@@ -72,7 +72,7 @@ class AuthRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/:id/:module", AuthDto.authDto, this.controller.generateAuthenticator);
+        this.router.get("/:userId/:module", AuthDto.authDto, this.controller.generateAuthenticator);
 
         /**
         * @swagger
