@@ -27,12 +27,7 @@ class AdminDto {
                     "string.empty": "Email is required",
                     "any.required": "Email is a required field",
                 }),
-            // password: Joi.string()
-            //     .regex(strongPasswordRegex)
-            //     .trim().optional()
-            //     .messages({
-            //         "string.pattern.base": stringPasswordError,
-            //     }),
+            authType: Joi.string().trim().required(),
             phoneNumber: Joi.string()
                 .required()
                 .trim()
@@ -74,12 +69,7 @@ class AdminDto {
                     "string.empty": "Email is required",
                     "any.required": "Email is a required field",
                 }),
-            // password: Joi.string()
-            //     .regex(strongPasswordRegex)
-            //     .trim().optional()
-            //     .messages({
-            //         "string.pattern.base": stringPasswordError,
-            //     }),
+            authType: Joi.string().trim().required(),
             phoneNumber: Joi.string()
                 .required()
                 .trim()
@@ -89,11 +79,7 @@ class AdminDto {
                     "string.empty": "Phone number is required",
                     "string.min": "Phone number must be at least 10 characters long",
                     "string.max": "Phone number must be at most 15 characters long"
-                }),
-            // roleId: Joi.string().uuid().required().messages({
-            //     "string.empty": "Role ID is required",
-            //     "string.guid": "Role ID must be a valid UUID",
-            // })
+                })
         });
 
         Validator.validateRequest(req, next, schema);

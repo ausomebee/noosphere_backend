@@ -33,6 +33,10 @@ import AdminDto from "../dto/adminDto.js";
  *           type: string
  *           format: uuid
  *           description: UUID of the assigned role
+ *         authType:
+ *           type: string
+ *           format: text
+ *           description: Authentication type
  *     CreateSuperAdmin:
  *       type: object
  *       required:
@@ -56,6 +60,10 @@ import AdminDto from "../dto/adminDto.js";
  *           minLength: 10
  *           maxLength: 15
  *           description: Phone number (10 to 15 digits)
+ *         authType:
+ *           type: string
+ *           format: text
+ *           description: Authentication type
  *     AuthRequest:
  *       type: object
  *       required:

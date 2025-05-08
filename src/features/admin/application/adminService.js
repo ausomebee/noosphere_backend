@@ -262,6 +262,8 @@ class AdminService {
     async superAdminChoices(data) {
         const choiceExists = await this.repository.findFirstChoice({ where: {} });
         
+        
+        
         if (choiceExists) {
             const update = await this.repository.updateChoice(choiceExists.id, {
                 Authenticator2FA: data.Authenticator2FA ?? choiceExists.Authenticator2FA,

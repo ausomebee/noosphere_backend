@@ -16,6 +16,7 @@ class Admin {
             phoneNumber: this.phoneNumber,
             roleId: this.roleId,
             superAdmin: this.superAdmin,
+            authType: this.authType
         };
     }
 
