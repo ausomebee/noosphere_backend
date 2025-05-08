@@ -60,10 +60,6 @@ import AdminDto from "../dto/adminDto.js";
  *           minLength: 10
  *           maxLength: 15
  *           description: Phone number (10 to 15 digits)
- *         authType:
- *           type: string
- *           format: text
- *           description: Authentication type
  *     AuthRequest:
  *       type: object
  *       required:

@@ -69,7 +69,6 @@ class AdminDto {
                     "string.empty": "Email is required",
                     "any.required": "Email is a required field",
                 }),
-            authType: Joi.string().trim().required(),
             phoneNumber: Joi.string()
                 .required()
                 .trim()
