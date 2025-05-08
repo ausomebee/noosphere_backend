@@ -99,14 +99,14 @@ class AuthService {
         return true;
     }
 
-    async deleteForModule(module) {
-        const deleted = await this.repository.deleteMany({ module: module });
-        if (!deleted) {
-            throw new Error("failed to delete")
-        }
+    // async deleteForModule(module) {
+    //     const deleted = await this.repository.deleteMany({ module: module });
+    //     if (!deleted) {
+    //         throw new Error("failed to delete")
+    //     }
 
-        return true;
-    }
+    //     return true;
+    // }
 }
 
 export default AuthService;

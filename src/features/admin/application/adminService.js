@@ -5,7 +5,7 @@ import MailService from '../../../utilities/nodemailer.js';
 import ReferralCodeGenerator from '../../../utilities/generateCode.js';
 import DepartmentRepository from '../../department/infrastructure/departmentRepository.js';
 import RoleRepository from '../../role/infrastructure/roleRepository.js';
-import AuthService from '../../auth/application/authService.js';
+import AuthRepository from '../../auth/infrastructure/authRepository.js';
 
 class AdminService {
     constructor() {
@@ -14,7 +14,7 @@ class AdminService {
         this.generateCode = new ReferralCodeGenerator(12)
         this.departmentRepository = new DepartmentRepository()
         this.roleRepository = new RoleRepository()
-        this.authService = new AuthService()
+        this.authRepository = new AuthRepository()
     }
 
     async createAdmin(data) {
@@ -276,7 +276,7 @@ class AdminService {
                     throw new Error("Failed to reset all");
                 }
 
-                const deleted = this.authService.deleteForModule("ADMIN")
+                const deleted = this.authRepository.deleteMany({ module: "ADMIN" })
 
                 if (!deleted) {
                     throw new Error("Failed to delete auth");
@@ -305,7 +305,7 @@ class AdminService {
         return newChoice;
     }
 
-    async getChoices(data) {
+    async getChoices() {
         const choice = await this.repository.findOneChoice({});
 
         if (!choice) {
