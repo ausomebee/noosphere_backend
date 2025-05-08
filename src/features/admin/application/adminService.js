@@ -349,7 +349,7 @@ class AdminService {
                     <p class="head" style="font-size: 26px; font-weight: 700; margin-top: 70px;">Reset your password</p>
                     <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">Please click the button
                         below to reset your password</p>
-                    <a href="http://localhost:5173/SA/reset-password/${adminExists.id}/${adminExists.email}" style="background-color: black; border-radius: 9999px; padding-top: 20px; padding-bottom: 20px; color: white; text-decoration: none; font-weight: 600; font-size: 18px; width: 90%; display: block; margin: auto;">Reset Password</a>
+                    <a href="http://localhost:5173/SA/reset-password/${adminExists.id}" style="background-color: black; border-radius: 9999px; padding-top: 20px; padding-bottom: 20px; color: white; text-decoration: none; font-weight: 600; font-size: 18px; width: 90%; display: block; margin: auto;">Reset Password</a>
                 </div>
             </main>
         </body>
