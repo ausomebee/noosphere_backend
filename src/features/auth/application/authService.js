@@ -13,10 +13,19 @@ class AuthService {
     async generateAuthenticator(data) {
         const secret = speakeasy.generateSecret({ name: "Noosphere" });
         const qrCode = await qrcode.toDataURL(secret.otpauth_url);
+        const authExists = await this.repository.findOne({ userId: data.userId });
 
-        const auth = await this.repository.create({ userId: data.userId, secret: secret.base32, module: data.module });
-        if (!auth) {
-            throw new Error("Auth failed")
+        let auth
+        if (authExists) {
+            auth = await this.repository.update(authExists.id, { secret: secret.base32 });
+            if (!auth) {
+                throw new Error("Auth failed")
+            }
+        } else {
+            auth = await this.repository.create({ userId: data.userId, secret: secret.base32, module: data.module });
+            if (!auth) {
+                throw new Error("Auth failed")
+            }
         }
 
         const update = await this.adminService.updateAdmin({
@@ -65,14 +74,14 @@ class AuthService {
 
     async createSecreteMessage(data) {
         const hashedSecret = await argon2.hash(data.secret);
-        
+
         const update = await this.adminService.updateAdmin({
             authType: "SECRETMESSAGE",
             auth2FADone: true,
             authQuestion: data.authQuestion,
             id: data.userId
         })
-        
+
         const auth = await this.repository.create({ userId: data.userId, secret: hashedSecret, module: data.module });
         if (!auth) {
             throw new Error("Auth failed")
