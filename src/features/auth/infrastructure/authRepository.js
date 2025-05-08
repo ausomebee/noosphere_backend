@@ -16,6 +16,12 @@ class AuthRepository {
         });
     }
 
+    async deleteMany(query) {
+        return await this.model.deleteMany({
+            where: query,
+        });
+    }
+
     async findFirst(query) {
         const { where, include, select, orderBy, take, skip } = query;
 

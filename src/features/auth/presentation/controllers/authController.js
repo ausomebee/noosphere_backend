@@ -8,7 +8,7 @@ class AuthController {
     }
 
     generateAuthenticator = expressAsyncHandler(async (req, res) => {
-        const auth = await this.service.generateAuthenticator(req.params.id);
+        const auth = await this.service.generateAuthenticator(req.params);
 
         if (!auth) {
             res.status(500).json({ message: 'Failed to create auth' });

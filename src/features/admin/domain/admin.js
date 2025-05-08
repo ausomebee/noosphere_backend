@@ -1,5 +1,5 @@
 class Admin {
-    constructor({ id, fullName, email, phoneNumber, roleId, superAdmin = false, password }) {
+    constructor({ id, fullName, email, phoneNumber, roleId, superAdmin = false, password, authType }) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
@@ -7,6 +7,7 @@ class Admin {
         this.roleId = roleId;
         this.superAdmin = superAdmin;
         this.password = password;
+        this.authType = authType;
     }
 
     get createAdmin() {

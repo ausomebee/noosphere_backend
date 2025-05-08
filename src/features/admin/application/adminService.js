@@ -5,6 +5,7 @@ import MailService from '../../../utilities/nodemailer.js';
 import ReferralCodeGenerator from '../../../utilities/generateCode.js';
 import DepartmentRepository from '../../department/infrastructure/departmentRepository.js';
 import RoleRepository from '../../role/infrastructure/roleRepository.js';
+import AuthService from '../../auth/application/authService.js';
 
 class AdminService {
     constructor() {
@@ -13,6 +14,7 @@ class AdminService {
         this.generateCode = new ReferralCodeGenerator(12)
         this.departmentRepository = new DepartmentRepository()
         this.roleRepository = new RoleRepository()
+        this.authService = new AuthService()
     }
 
     async createAdmin(data) {
@@ -261,10 +263,26 @@ class AdminService {
 
     async superAdminChoices(data) {
         const choiceExists = await this.repository.findFirstChoice({ where: {} });
-        
-        
-        
+
         if (choiceExists) {
+            if (data.setForAll && choiceExists && choiceExists.Authenticator2FA !== data.Authenticator2FA && choiceExists.securityQuestion !== data.securityQuestion) {
+                const reset = this.repository.updateAll({
+                    authType: data.Authenticator2FA ? "AUTHENTICATOR" : "SECRETMESSAGE",
+                    authQuestion: null,
+                    auth2FADone: false
+                })
+
+                if (!reset) {
+                    throw new Error("Failed to reset all");
+                }
+
+                const deleted = this.authService.deleteForModule("ADMIN")
+
+                if (!deleted) {
+                    throw new Error("Failed to delete auth");
+                }
+            }
+
             const update = await this.repository.updateChoice(choiceExists.id, {
                 Authenticator2FA: data.Authenticator2FA ?? choiceExists.Authenticator2FA,
                 securityQuestion: data.securityQuestion ?? choiceExists.securityQuestion,
@@ -331,7 +349,7 @@ class AdminService {
                     <p class="head" style="font-size: 26px; font-weight: 700; margin-top: 70px;">Reset your password</p>
                     <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">Please click the button
                         below to reset your password</p>
-                    <a href="http://frontend/${this.token.generateToken(adminExists.id)}" style="background-color: black; border-radius: 9999px; padding-top: 20px; padding-bottom: 20px; color: white; text-decoration: none; font-weight: 600; font-size: 18px; width: 90%; display: block; margin: auto;">Reset Password</a>
+                    <a href="http://localhost:5173/SA/reset-password/${adminExists.id}/${adminExists.email}" style="background-color: black; border-radius: 9999px; padding-top: 20px; padding-bottom: 20px; color: white; text-decoration: none; font-weight: 600; font-size: 18px; width: 90%; display: block; margin: auto;">Reset Password</a>
                 </div>
             </main>
         </body>

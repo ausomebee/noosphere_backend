@@ -20,6 +20,7 @@ class AuthDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID",
             }),
+            module: Joi.string().trim().required()
         });
 
         Validator.validateRequest(req, next, schema, req.params);
@@ -32,7 +33,8 @@ class AuthDto {
                 "string.guid": "ID must be a valid UUID",
             }),
             secret: Joi.string().trim().required(),
-            authQuestion: Joi.string().trim().required()
+            authQuestion: Joi.string().trim().required(),
+            module: Joi.string().trim().required()
         });
 
         Validator.validateRequest(req, next, schema);

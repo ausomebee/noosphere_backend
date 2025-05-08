@@ -10,11 +10,11 @@ class AuthService {
         this.adminService = new AdminService;
     }
 
-    async generateAuthenticator(userId) {
+    async generateAuthenticator(data) {
         const secret = speakeasy.generateSecret({ name: "Noosphere" });
         const qrCode = await qrcode.toDataURL(secret.otpauth_url);
 
-        const auth = await this.repository.create({ userId: userId, secret: secret.base32 });
+        const auth = await this.repository.create({ userId: data.userId, secret: secret.base32, module: data.module });
         if (!auth) {
             throw new Error("Auth failed")
         }
@@ -73,7 +73,7 @@ class AuthService {
             id: data.userId
         })
         
-        const auth = await this.repository.create({ userId: data.userId, secret: hashedSecret });
+        const auth = await this.repository.create({ userId: data.userId, secret: hashedSecret, module: data.module });
         if (!auth) {
             throw new Error("Auth failed")
         }
@@ -94,6 +94,15 @@ class AuthService {
 
         if (!(await argon2.verify(secret.secret, data.secret))) {
             throw new Error('Incorrect secret')
+        }
+
+        return true;
+    }
+
+    async deleteForModule(module) {
+        const deleted = await this.repository.deleteMany({ module: module });
+        if (!deleted) {
+            throw new Error("failed to delete")
         }
 
         return true;

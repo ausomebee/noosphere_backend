@@ -77,6 +77,12 @@ class AdminRepository {
         });
     }
 
+    async updateAll(data) {
+        return await this.model.updateMany({
+            data: { ...data },
+        });
+    }
+
     async updateChoice(id, data) {
         return await this.superAdminChoices.update({
             where: { id },

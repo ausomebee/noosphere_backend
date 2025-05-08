@@ -49,7 +49,7 @@ class AuthRoutes {
 
         /**
          * @swagger
-         * /api/v1/auth/{id}:
+         * /api/v1/auth/{id}/{module}:
          *   get:
          *     summary: get authenticator
          *     tags: [Auth]
@@ -60,13 +60,19 @@ class AuthRoutes {
          *         schema:
          *           type: string
          *         description: The ID of the user
+         *       - in: path
+         *         name: module
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The module of the user
          *     responses:
          *       200:
          *         description: auth created successfully
          *       400:
          *         description: Validation error
          */
-        this.router.get("/:id", AuthDto.authDto, this.controller.generateAuthenticator);
+        this.router.get("/:id/:module", AuthDto.authDto, this.controller.generateAuthenticator);
 
         /**
         * @swagger
@@ -85,6 +91,7 @@ class AuthRoutes {
         *             required:
         *               - userId
         *               - secret
+        *               - module
         *             properties:
         *               userId:
         *                 type: string
@@ -99,6 +106,10 @@ class AuthRoutes {
         *                 type: string
         *                 example: "who are you"
         *                 description: your secret question
+        *               module:
+        *                 type: string
+        *                 example: "ADMIN"
+        *                 description: The module of the user
         *     responses:
         *       200:
         *         description: secret message created successfully
