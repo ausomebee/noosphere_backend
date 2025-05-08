@@ -94,7 +94,7 @@ class AdminController {
     });
 
     getChoices = expressAsyncHandler(async (req, res) => {
-        const choice = await this.service.getSingleAdmin();
+        const choice = await this.service.getChoices();
 
         if (!choice) {
             res.status(500).json({ message: 'Failed to get choice' });

@@ -26,7 +26,7 @@ class AdminRepository {
     }
 
     async findOneChoice(query) {
-        return await this.superAdminChoices.findUnique({
+        return await this.superAdminChoices.findFirst({
             where: query,
         });
     }
