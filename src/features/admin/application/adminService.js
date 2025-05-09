@@ -63,9 +63,7 @@ class AdminService {
                     </p>
                     <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">You have been invited by
                         NooSphere Admin to<br> create a profile on Noosphere<br><br>Click the button below to get started</p>
-                    <a href='http://localhost:5173/admin/onboarding/${newAdmin.email}/${newAdmin.id}'
-                        style="background-color: black; color: white; font-size: 20px; width: 80%; margin: auto; padding-top: 20px; padding-bottom: 20px; border-radius: 9999px;">Create
-                        Profile</a>
+                    <a href='http://localhost:5173/admin/onboarding/${newAdmin.email}/${newAdmin.id}' style="background-color: black; border-radius: 9999px; padding-top: 20px; padding-bottom: 20px; color: white; text-decoration: none; font-weight: 600; font-size: 18px; width: 90%; display: block; margin: auto;">Create Profile</a>
                 </div>
             </main>
         </body>
@@ -176,9 +174,7 @@ class AdminService {
                     <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">You've been invited to
                         join the NooSphere Control Platform as the Administrator. Click the button below to log in using your
                         administrator credentials:<br><br>Email: ${data.email}<br>Password: ${generatedPass}</p>
-                    <a href="http://localhost:5173/"
-                        style="background-color: black; color: white; font-size: 20px; width: 80%; margin: auto; padding-top: 20px; padding-bottom: 20px; border-radius: 9999px;">Login
-                        as Administrator</a>
+                    <a href="http://localhost:5173/" style="background-color: black; border-radius: 9999px; padding-top: 20px; padding-bottom: 20px; color: white; text-decoration: none; font-weight: 600; font-size: 18px; width: 90%; display: block; margin: auto;">Login as Administrator</a>
                         <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">Once you're in, you'll be prompted to:<br><br>1. Set a new password<br>2. Configure 2-factor authentication<br>3. Set platform-wide preferences for your team<br><br>We recommend doing these right away to secure your account and prepare the system for other users.<br><br>Welcome aboard,<br>— The NooSphere Team</p>
                         </div>
                         </main>
