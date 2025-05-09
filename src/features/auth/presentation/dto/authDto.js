@@ -17,8 +17,8 @@ class AuthDto {
     static authDto = (req, res, next) => {
         const schema = Joi.object({
             userId: Joi.string().uuid().required().messages({
-                "string.empty": "ID is required",
-                "string.guid": "ID must be a valid UUID",
+                "string.empty": "userId is required",
+                "string.guid": "userId must be a valid UUID",
             }),
             module: Joi.string().trim().required()
         });

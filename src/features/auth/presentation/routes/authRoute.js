@@ -49,7 +49,7 @@ class AuthRoutes {
 
         /**
          * @swagger
-         * /api/v1/auth/{id}/{module}:
+         * /api/v1/auth/{userId}/{module}:
          *   get:
          *     summary: get authenticator
          *     tags: [Auth]
