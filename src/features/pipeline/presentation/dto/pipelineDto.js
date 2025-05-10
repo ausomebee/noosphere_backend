@@ -12,17 +12,18 @@ class PipelineDto {
                     "string.empty": "Name is required",
                     "string.max": "Name must not exceed 20 characters",
                 }),
-            description: Joi.string().trim().allow('').optional(),
+            description: Joi.string().trim().optional(),
             createdByAdminId: Joi.string().uuid().required().messages({
                 "string.empty": "ADMIN ID is required",
                 "string.guid": "ADMIN ID must be a valid UUID",
             }),
+            module: Joi.string().trim().required()
         });
 
         Validator.validateRequest(req, next, schema);
     };
 
-    static internalPipelineDto = (req, res, next) => {
+    static clientPipelineDto = (req, res, next) => {
         const schema = Joi.object({
             name: Joi.string()
                 .required()
@@ -32,17 +33,49 @@ class PipelineDto {
                     "string.empty": "Name is required",
                     "string.max": "Name must not exceed 20 characters",
                 }),
-            description: Joi.string().trim().allow('').optional(),
+            description: Joi.string().trim().optional(),
             createdByTenantId: Joi.string().uuid().required().messages({
-                "string.empty": "Tenant ID is required",
-                "string.guid": "Tenant ID must be a valid UUID",
+                "string.empty": "TENANT ID is required",
+                "string.guid": "TENANT ID must be a valid UUID",
+            }),
+            module: Joi.string().trim().required()
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static getPipelinesByTenantIdDto = (req, res, next) => {
+        const schema = Joi.object({
+            tenantId: Joi.string().uuid().required().messages({
+                "string.empty": "TENANT ID is required",
+                "string.guid": "TENANT ID must be a valid UUID",
             }),
         });
 
+        Validator.validateRequest(req, next, schema, req.params);
+    };
+
+    static getPipelinesByModuleDto = (req, res, next) => {
+        const schema = Joi.object({
+            module: Joi.string().trim().required()
+        });
+
+        Validator.validateRequest(req, next, schema, req.params);
+    };
+
+    static updateActivityDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID",
+            }),
+            isActive: Joi.boolean().required()
+        });
+
         Validator.validateRequest(req, next, schema);
     };
 
-    static pipelineStageDto = (req, res, next) => {
+    static createStageDto = (req, res, next) => {
         const schema = Joi.object({
             name: Joi.string()
                 .required()
@@ -52,35 +85,126 @@ class PipelineDto {
                     "string.empty": "Name is required",
                     "string.max": "Name must not exceed 20 characters",
                 }),
+            description: Joi.string().trim().optional(),
             pipelineId: Joi.string().uuid().required().messages({
                 "string.empty": "Pipeline ID is required",
                 "string.guid": "Pipeline ID must be a valid UUID",
             }),
-            tasks: Joi.object().optional(),
-            order: Joi.number().required()
+            colourCode: Joi.string().trim().required(),
+            tasks: Joi.array().items(
+                Joi.object({
+                    name: Joi.string().trim().required().messages({
+                        'string.base': 'Task name must be a string',
+                        'string.empty': 'Task name is required'
+                    }),
+                    required: Joi.boolean().required().messages({
+                        'boolean.base': 'Required must be a boolean',
+                        'any.required': 'Required field is required'
+                    })
+                })
+            ),
+            documents: Joi.array().items(
+                Joi.object({
+                    name: Joi.string().trim().required().messages({
+                        'string.base': 'Task name must be a string',
+                        'string.empty': 'Task name is required'
+                    }),
+                    required: Joi.boolean().required().messages({
+                        'boolean.base': 'Required must be a boolean',
+                        'any.required': 'Required field is required'
+                    })
+                })
+            )
         });
 
         Validator.validateRequest(req, next, schema);
     };
 
-    static pipelineItemDto = (req, res, next) => {
+    static getStagesByPipelineIdDto = (req, res, next) => {
         const schema = Joi.object({
-            clientId: Joi.string().uuid().allow('').optional().messages({
-                "string.guid": "Client ID must be a valid UUID",
+            pipelineId: Joi.string().uuid().required().messages({
+                "string.empty": "Pipeline ID is required",
+                "string.guid": "Pipeline ID must be a valid UUID",
             }),
-            tenantId: Joi.string().uuid().allow('').optional().messages({
+        });
+
+        Validator.validateRequest(req, next, schema, req.params);
+    };
+
+    static getByIdDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID",
+            }),
+        });
+
+        Validator.validateRequest(req, next, schema, req.params);
+    };
+
+    static createTenantPipelineItemDto = (req, res, next) => {
+        const schema = Joi.object({
+            tenantId: Joi.string().uuid().required().messages({
+                "string.empty": "Tenant ID is required",
                 "string.guid": "Tenant ID must be a valid UUID",
             }),
             pipelineStageId: Joi.string().uuid().required().messages({
                 "string.empty": "Pipeline stage ID is required",
                 "string.guid": "Pipeline stage ID must be a valid UUID",
             }),
-            doneTasks: Joi.object().optional(),
+            assignToStaff: Joi.string().uuid().required().messages({
+                "string.empty": "Staff ID is required",
+                "string.guid": "Staff ID must be a valid UUID",
+            }),
         });
 
         Validator.validateRequest(req, next, schema);
     };
 
+    static createClientPipelineItemDto = (req, res, next) => {
+        const schema = Joi.object({
+            clientId: Joi.string().uuid().required().messages({
+                "string.empty": "Client ID is required",
+                "string.guid": "Client ID must be a valid UUID",
+            }),
+            pipelineStageId: Joi.string().uuid().required().messages({
+                "string.empty": "Pipeline stage ID is required",
+                "string.guid": "Pipeline stage ID must be a valid UUID",
+            }),
+            assignToStaff: Joi.string().uuid().required().messages({
+                "string.empty": "Staff ID is required",
+                "string.guid": "Staff ID must be a valid UUID",
+            }),
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static getItemByStageIdDto = (req, res, next) => {
+        const schema = Joi.object({
+            pipelineStageId: Joi.string().uuid().required().messages({
+                "string.empty": "Pipeline stage ID is required",
+                "string.guid": "Pipeline stage ID must be a valid UUID",
+            }),
+        });
+
+        Validator.validateRequest(req, next, schema, req.params);
+    };
+
+    static updateStageDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID",
+            }),
+            pipelineStageId: Joi.string().uuid().required().messages({
+                "string.empty": "Pipeline stage ID is required",
+                "string.guid": "Pipeline stage ID must be a valid UUID",
+            })
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
 }
 
 export default PipelineDto;

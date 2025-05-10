@@ -1,15 +1,21 @@
 import expressAsyncHandler from "express-async-handler";
 import PipelineService from "../../application/pipelineService.js";
-import Pipeline from "../../domain/pipeline.js";
+import PipelineRepository from "../../infrastructure/pipelineRepository.js";
+import prismaService from "../../../../config/prisma.js";
+import StageRepository from "../../infrastructure/stageRepository.js";
+import ItemRepository from "../../infrastructure/itemRepository.js";
 
 class PipelineController {
     constructor() {
-        this.service = new PipelineService();
+        this.prisma = prismaService.getClient()
+        this.pipelineRepository = new PipelineRepository(this.prisma.pipeline)
+        this.stageRepository = new StageRepository(this.prisma.pipelineStage)
+        this.itemRepository = new ItemRepository(this.prisma.pipelineItem)
+        this.service = new PipelineService({ pipelineRepository: this.pipelineRepository, stageRepository: this.stageRepository, itemRepository: this.itemRepository });
     }
 
-    tenantPipeline = expressAsyncHandler(async (req, res) => {
-        const pipelineData = new Pipeline(req.body);
-        const pipeline = await this.service.tenantPipeline(pipelineData.tenantPipeline);
+    createPipeline = expressAsyncHandler(async (req, res) => {
+        const pipeline = await this.service.createPipeline(req.body);
 
         if (!pipeline) {
             res.status(500).json({ message: 'Failed to create pipeline' });
@@ -22,39 +28,106 @@ class PipelineController {
         });
     });
 
-    internalPipeline = expressAsyncHandler(async (req, res) => {
-        const pipelineData = new Pipeline(req.body);
-        const pipeline = await this.service.internalPipeline(pipelineData.internalPipeline);
+    getPipelinesByModule = expressAsyncHandler(async (req, res) => {
+        const pipelines = await this.service.getPipelinesByModule(req.params.module);
 
-        if (!pipeline) {
-            res.status(500).json({ message: 'Failed to create pipeline' });
+        if (!pipelines) {
+            res.status(500).json({ message: 'Failed to fetch pipelines' });
         }
 
         return res.status(201).json({
-            message: "Pipeline created successfully",
+            message: "Pipelines fetched successfully",
+            status: 'ok',
+            data: pipelines
+        });
+    });
+
+    getPipelinesByTenantId = expressAsyncHandler(async (req, res) => {
+        const pipelines = await this.service.getPipelinesByTenantId(req.params.tenantId);
+
+        if (!pipelines) {
+            res.status(500).json({ message: 'Failed to fetch pipelines' });
+        }
+
+        return res.status(201).json({
+            message: "Pipelines fetched successfully",
+            status: 'ok',
+            data: pipelines
+        });
+    });
+
+    updatePipeline = expressAsyncHandler(async (req, res) => {
+        const pipeline = await this.service.updatePipeline(req.body);
+
+        if (!pipeline) {
+            res.status(500).json({ message: 'Failed to update pipeline' });
+        }
+
+        return res.status(201).json({
+            message: "Pipeline updated successfully",
             status: 'ok',
             data: pipeline
         });
     });
 
     createPipelineStage = expressAsyncHandler(async (req, res) => {
-        const stageData = new Pipeline(req.body);
-        const stage = await this.service.createPipelineStage(stageData.createPipelineStage);
+        const stage = await this.service.createStage(req.body);
 
         if (!stage) {
             res.status(500).json({ message: 'Failed to create stage' });
         }
 
         return res.status(201).json({
-            message: "stage created successfully",
+            message: "Stage created successfully",
+            status: 'ok',
+            data: stage
+        });
+    });
+
+    getStageByPipelineId = expressAsyncHandler(async (req, res) => {
+        const stages = await this.service.getStageByPipelineId(req.params.pipelineId);
+
+        if (!stages) {
+            res.status(500).json({ message: 'Failed to fetch stages' });
+        }
+
+        return res.status(201).json({
+            message: "Stages fetched successfully",
+            status: 'ok',
+            data: stages
+        });
+    });
+
+    getStageById = expressAsyncHandler(async (req, res) => {
+        const stage = await this.service.getStageById(req.params.id);
+
+        if (!stage) {
+            res.status(500).json({ message: 'Failed to fetch stage' });
+        }
+
+        return res.status(201).json({
+            message: "Stage fetched successfully",
+            status: 'ok',
+            data: stage
+        });
+    });
+
+    updateStage = expressAsyncHandler(async (req, res) => {
+        const stage = await this.service.updateStage(req.body);
+
+        if (!stage) {
+            res.status(500).json({ message: 'Failed to update stage' });
+        }
+
+        return res.status(201).json({
+            message: "Stage updated successfully",
             status: 'ok',
             data: stage
         });
     });
 
     createPipelineItem = expressAsyncHandler(async (req, res) => {
-        const itemData = new Pipeline(req.body);
-        const item = await this.service.createPipelineItem(itemData.createPipelineItem);
+        const item = await this.service.createPipelineItem(req.body);
 
         if (!item) {
             res.status(500).json({ message: 'Failed to create item' });
@@ -66,6 +139,49 @@ class PipelineController {
             data: item
         });
     });
+
+    getItemByStageId = expressAsyncHandler(async (req, res) => {
+        const items = await this.service.getItemByStageId(req.params.pipelineStageId);
+
+        if (!items) {
+            res.status(500).json({ message: 'Failed to fetch items' });
+        }
+
+        return res.status(201).json({
+            message: "Items fetched successfully",
+            status: 'ok',
+            data: items
+        });
+    });
+
+    getItemById = expressAsyncHandler(async (req, res) => {
+        const item = await this.service.getItemById(req.params.id);
+
+        if (!item) {
+            res.status(500).json({ message: 'Failed to fetch item' });
+        }
+
+        return res.status(201).json({
+            message: "Item fetched successfully",
+            status: 'ok',
+            data: item
+        });
+    });
+
+    updateItem = expressAsyncHandler(async (req, res) => {
+        const item = await this.service.updateItem(req.body);
+
+        if (!item) {
+            res.status(500).json({ message: 'Failed to update item' });
+        }
+
+        return res.status(201).json({
+            message: "Item updated successfully",
+            status: 'ok',
+            data: item
+        });
+    });
+
 }
 
 export default PipelineController;
