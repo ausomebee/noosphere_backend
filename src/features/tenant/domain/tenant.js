@@ -1,5 +1,5 @@
 class Tenant {
-    constructor({ id, fullName, email, phoneNumber, roleId, stage, password, tenantId }) {
+    constructor({ id, fullName, email, phoneNumber, roleId, stage, password, tenantId, contactPerson, companySize, organizationType, location, leadSource, companyName }) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
@@ -7,16 +7,26 @@ class Tenant {
         this.roleId = roleId;
         this.stage = stage;
         this.password = password;
-        this.tenantId=tenantId;
+        this.tenantId = tenantId;
+        this.contactPerson = contactPerson;
+        this.companySize = companySize;
+        this.organizationType = organizationType;
+        this.location = location;
+        this.leadSource = leadSource;
+        this.companyName = companyName;
     }
-  
+
     get createTenant() {
         return {
-            fullName: this.fullName,
             email: this.email,
             phoneNumber: this.phoneNumber,
-            password: this.password,
-            stage: this.stage
+            companyName: this.companyName,
+            stage: this.stage,
+            contactPerson: this.contactPerson,
+            companySize: this.companySize,
+            organizationType: this.organizationType,
+            location: this.location,
+            leadSource: this.leadSource
         };
     }
 
@@ -27,11 +37,10 @@ class Tenant {
             phoneNumber: this.phoneNumber,
             roleId: this.roleId,
             tenantId: this.tenantId,
-            password: this.password,
             stage: this.stage
         };
     }
-    
+
 }
 
 export default Tenant;

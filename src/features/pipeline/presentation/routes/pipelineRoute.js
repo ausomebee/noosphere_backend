@@ -7,101 +7,189 @@ import PipelineController from "../controllers/pipeline.Controller.js";
  * @swagger
  * components:
  *   schemas:
- *     TenantPipelineDto:
+ *     TenantPipeline:
  *       type: object
+ *       required:
+ *         - name
+ *         - createdByAdminId
+ *         - module
  *       properties:
  *         name:
  *           type: string
  *           maxLength: 20
- *           example: Sales Pipeline
- *           description: Name of the pipeline
  *         description:
  *           type: string
- *           example: Handles initial lead stages
- *           description: Optional pipeline description
  *         createdByAdminId:
  *           type: string
  *           format: uuid
- *           example: f06f4f54-d981-4588-a024-560f35b21f03
- *           description: Optional admin UUID who created the pipeline
+ *         module:
+ *           type: string
+ *
+ *     ClientPipeline:
+ *       type: object
  *       required:
  *         - name
- * 
- *     internalPipelineDto:
- *       type: object
+ *         - createdByTenantId
+ *         - module
  *       properties:
  *         name:
  *           type: string
  *           maxLength: 20
- *           example: Sales Pipeline
- *           description: Name of the pipeline
  *         description:
  *           type: string
- *           example: Handles initial lead stages
- *           description: Optional pipeline description
  *         createdByTenantId:
  *           type: string
  *           format: uuid
- *           example: f06f4f54-d981-4588-a024-560f35b21f03
- *           description: Optional tenant UUID who created the pipeline
+ *         module:
+ *           type: string
+ *
+ *     GetPipelinesByTenantIdParams:
+ *       type: object
+ *       required:
+ *         - tenantId
+ *       properties:
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *
+ *     GetPipelinesByModuleParams:
+ *       type: object
+ *       required:
+ *         - module
+ *       properties:
+ *         module:
+ *           type: string
+ *
+ *     UpdateActivity:
+ *       type: object
+ *       required:
+ *         - id
+ *         - isActive
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *         isActive:
+ *           type: boolean
+ *
+ *     CreateStage:
+ *       type: object
  *       required:
  *         - name
- * 
- *     PipelineStageDto:
- *       type: object
+ *         - pipelineId
+ *         - colourCode
+ *         - tasks
+ *         - documents
  *       properties:
  *         name:
  *           type: string
  *           maxLength: 20
- *           example: Initial Contact
- *           description: Name of the pipeline stage
+ *         description:
+ *           type: string
  *         pipelineId:
  *           type: string
  *           format: uuid
- *           example: b3b7f7c2-1c54-4b09-9e64-a3db1c2b35d6
- *           description: Optional UUID of the related pipeline
+ *         colourCode:
+ *           type: string
  *         tasks:
- *           type: object
- *           example: { "callClient": true, "sendEmail": false }
- *           description: Optional object containing task-related data
- *         order:
- *           type: number
- *           example: 1
- *           description: Position/order of the stage within the pipeline
- *       required:
- *         - name
- *         - order
- * 
- * 
- *     PipelineItemDto:
+ *           type: array
+ *           items:
+ *             type: object
+ *             required:
+ *               - name
+ *               - required
+ *             properties:
+ *               name:
+ *                 type: string
+ *               required:
+ *                 type: boolean
+ *         documents:
+ *           type: array
+ *           items:
+ *             type: object
+ *             required:
+ *               - name
+ *               - required
+ *             properties:
+ *               name:
+ *                 type: string
+ *               required:
+ *                 type: boolean
+ *
+ *     GetStagesByPipelineIdParams:
  *       type: object
+ *       required:
+ *         - pipelineId
+ *       properties:
+ *         pipelineId:
+ *           type: string
+ *           format: uuid
+ *
+ *     GetByIdParams:
+ *       type: object
+ *       required:
+ *         - id
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *
+ *     CreateTenantPipelineItem:
+ *       type: object
+ *       required:
+ *         - tenantId
+ *         - pipelineStageId
+ *         - assignToStaff
+ *       properties:
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *         pipelineStageId:
+ *           type: string
+ *           format: uuid
+ *         assignToStaff:
+ *           type: string
+ *           format: uuid
+ *
+ *     CreateClientPipelineItem:
+ *       type: object
+ *       required:
+ *         - clientId
+ *         - pipelineStageId
+ *         - assignToStaff
  *       properties:
  *         clientId:
  *           type: string
  *           format: uuid
- *           example: "c2d7f8e9-8a5a-4f61-8c8a-1234567890ab"
- *           description: Optional client ID (UUID)
- *         tenantId:
+ *         pipelineStageId:
  *           type: string
  *           format: uuid
- *           example: "f3b8b12e-b93e-4d74-a729-abcdef123456"
- *           description: Optional tenant ID (UUID)
- *         PipelineStageId:
+ *         assignToStaff:
  *           type: string
  *           format: uuid
- *           example: "a7aeb1d7-3b98-4de2-b67d-87654f3210cd"
- *           description: Required pipeline stage ID (UUID)
- *         doneTasks:
- *           type: object
- *           additionalProperties: true
- *           example:
- *             task1: true
- *             task2: false
- *           description: Optional object representing completed tasks
+ *
+ *     GetItemByStageIdParams:
+ *       type: object
  *       required:
- *         - PipelineStageId
+ *         - pipelineStageId
+ *       properties:
+ *         pipelineStageId:
+ *           type: string
+ *           format: uuid
+ *
+ *     UpdateStage:
+ *       type: object
+ *       required:
+ *         - id
+ *         - pipelineStageId
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *         pipelineStageId:
+ *           type: string
+ *           format: uuid
  */
-
 
 class PipelineRoutes {
     constructor() {
@@ -113,83 +201,283 @@ class PipelineRoutes {
     initializeRoutes() {
         /**
          * @swagger
-         * /api/v1/pipeline/tenantpipeine:
+         * /api/v1/pipeline/tenants:
          *   post:
-         *     summary: create a new tenant pipeline
-         *     tags: [pipeline]
+         *     summary: Create a new pipeline for a tenant
+         *     tags: [TenantPipeline]
          *     requestBody:
          *       required: true
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/TenantPipelineDto'
+         *             $ref: '#/components/schemas/TenantPipeline'
          *     responses:
          *       201:
-         *         description: pipeline created successfully
+         *         description: Pipeline created successfully
          *       400:
          *         description: Validation error
          */
-        this.router.post("/tenantpipeine", adminProtect, PipelineDto.tenantPipelineDto, this.controller.tenantPipeline);
+        this.router.post("/tenants", PipelineDto.tenantPipelineDto, this.controller.createPipeline);
 
         /**
          * @swagger
-         * /api/v1/pipeline/internalpipeine:
+         * /api/v1/pipeline/clients:
          *   post:
-         *     summary: create a new internal pipeline
-         *     tags: [pipeline]
+         *     summary: Create a new pipeline for a client
+         *     tags: [ClientPipeline]
          *     requestBody:
          *       required: true
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/internalPipelineDto'
+         *             $ref: '#/components/schemas/ClientPipeline'
          *     responses:
          *       201:
-         *         description: pipeline created successfully
+         *         description: Pipeline created successfully
          *       400:
          *         description: Validation error
          */
-        this.router.post("/internalpipeine", adminProtect, PipelineDto.internalPipelineDto, this.controller.internalPipeline);
+        this.router.post("/clients", PipelineDto.clientPipelineDto, this.controller.createPipeline);
 
         /**
          * @swagger
-         * /api/v1/pipeline/pipelinestage:
-         *   post:
-         *     summary: create a new pipeline stage
-         *     tags: [pipeline]
+         * /api/v1/pipeline/module/{module}:
+         *   get:
+         *     summary: get pipeline by module
+         *     tags: [Pipeline]
          *     requestBody:
          *       required: true
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/PipelineStageDto'
+         *             $ref: '#/components/schemas/GetPipelinesByModuleParams'
          *     responses:
          *       201:
-         *         description: pipeline stage created successfully
+         *         description: Pipeline fetched successfully
          *       400:
          *         description: Validation error
          */
-        this.router.post("/pipelinestage", adminProtect, PipelineDto.pipelineStageDto, this.controller.createPipelineStage);
+        this.router.get("/module/:module", PipelineDto.getPipelinesByModuleDto, this.controller.getPipelinesByModule);
 
         /**
-        * @swagger
-        * /api/v1/pipeline/pipelineItem:
-        *   post:
-        *     summary: create a new pipeline item
-        *     tags: [pipeline]
-        *     requestBody:
-        *       required: true
-        *       content:
-        *         application/json:
-        *           schema:
-        *             $ref: '#/components/schemas/PipelineItemDto'
-        *     responses:
-        *       201:
-        *         description: pipeline item created successfully
-        *       400:
-        *         description: Validation error
-        */
-        this.router.post("/pipelineItem", adminProtect, PipelineDto.pipelineItemDto, this.controller.createPipelineItem);
+         * @swagger
+         * /api/v1/pipeline/tenant/{tenantId}:
+         *   get:
+         *     summary: get pipeline by tenant id
+         *     tags: [Pipeline]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/GetPipelinesByTenantIdParams'
+         *     responses:
+         *       201:
+         *         description: Pipeline fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/tenant/:tenantId", PipelineDto.getPipelinesByTenantIdDto, this.controller.getPipelinesByTenantId);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/active:
+         *   patch:
+         *     summary: update activity
+         *     tags: [Pipeline]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateActivity'
+         *     responses:
+         *       201:
+         *         description: Pipeline updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/active", PipelineDto.updateActivityDto, this.controller.updatePipeline);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/stage:
+         *   post:
+         *     summary: Create a new pipeline stage 
+         *     tags: [PipelineStage]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/CreateStage'
+         *     responses:
+         *       201:
+         *         description: Pipeline stage created successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/stage", PipelineDto.createStageDto, this.controller.createPipelineStage);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/stage/pipeline/{pipelineId}:
+         *   get:
+         *     summary: get pipeline stage by pipeline id
+         *     tags: [PipelineStage]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/GetStagesByPipelineIdParams'
+         *     responses:
+         *       201:
+         *         description: Pipeline stage fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/stage/pipeline/:pipelineId", PipelineDto.getStagesByPipelineIdDto, this.controller.getStageByPipelineId);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/stage/{id}:
+         *   get:
+         *     summary: get pipeline stage by id
+         *     tags: [PipelineStage]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/GetByIdParams'
+         *     responses:
+         *       201:
+         *         description: Pipeline stage fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/stage/:id", PipelineDto.getByIdDto, this.controller.getStageById);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/stage/active:
+         *   patch:
+         *     summary: update activity
+         *     tags: [PipelineStage]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateActivity'
+         *     responses:
+         *       201:
+         *         description: Pipeline stage updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/stage/active", PipelineDto.updateActivityDto, this.controller.updateStage);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/client/pipelineitem:
+         *   post:
+         *     summary: Create a new pipeline item for client 
+         *     tags: [PipelineItem]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/CreateClientPipelineItem'
+         *     responses:
+         *       201:
+         *         description: Pipeline item created successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/client/pipelineitem", PipelineDto.createClientPipelineItemDto, this.controller.createPipelineItem);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/tenant/pipelineitem:
+         *   post:
+         *     summary: Create a new pipeline item for tenant 
+         *     tags: [PipelineItem]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/CreateTenantPipelineItem'
+         *     responses:
+         *       201:
+         *         description: Pipeline item created successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/tenant/pipelineitem", PipelineDto.createTenantPipelineItemDto, this.controller.createPipelineItem);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/item/stage/{pipelineStageId}:
+         *   get:
+         *     summary: get pipeline item by stage id
+         *     tags: [PipelineItem]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/GetItemByStageIdParams'
+         *     responses:
+         *       201:
+         *         description: Pipeline items fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/item/stage/:pipelineStageId", PipelineDto.getItemByStageIdDto, this.controller.getItemByStageId);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/item/{id}:
+         *   get:
+         *     summary: get pipeline item by id
+         *     tags: [PipelineItem]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/GetByIdParams'
+         *     responses:
+         *       201:
+         *         description: Pipeline item fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/item/:id", PipelineDto.getByIdDto, this.controller.getItemById);
+
+        /**
+         * @swagger
+         * /api/v1/item/stage:
+         *   patch:
+         *     summary: update activity
+         *     tags: [PipelineItem]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateActivity'
+         *     responses:
+         *       201:
+         *         description: Pipeline item updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/item/stage", PipelineDto.updateStageDto, this.controller.updateItem);
 
     }
 

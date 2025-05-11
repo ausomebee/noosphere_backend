@@ -6,89 +6,68 @@ import TenantController from "../controllers/tenantController.js";
  * @swagger
  * components:
  *   schemas:
- *     CreateTenant:
+ *     CreateCandidateDto:
  *       type: object
  *       required:
  *         - fullName
  *         - email
- *         - password
  *         - phoneNumber
  *         - stage
+ *         - companyName
+ *         - contactPerson
+ *         - companySize
+ *         - organizationType
+ *         - location
+ *         - leadSource
+ *         - pipelineStageId
+ *         - assignToStaff
  *       properties:
  *         fullName:
  *           type: string
  *           minLength: 3
  *           maxLength: 20
  *           example: John Doe
+ *           description: Candidate's full name
  *         email:
  *           type: string
  *           format: email
  *           example: johndoe@example.com
- *         password:
- *           type: string
- *           example: StrongPassword123!
+ *           description: Valid email (only `.com` or `.net` domains allowed)
  *         phoneNumber:
  *           type: string
  *           minLength: 10
  *           maxLength: 15
- *           example: 08012345678
+ *           example: "+2348012345678"
+ *           description: Candidate's phone number
  *         stage:
  *           type: string
- *           example: registration
- *
- *     CreateTenantStaff:
- *       type: object
- *       required:
- *         - fullName
- *         - email
- *         - password
- *         - phoneNumber
- *         - stage
- *         - roleId
- *         - tenantId
- *       properties:
- *         fullName:
+ *           example: VERIFIED
+ *         companyName:
  *           type: string
- *           minLength: 3
- *           maxLength: 20
- *           example: Admin User
- *         email:
+ *           example: Malik Inc
+ *         contactPerson:
  *           type: string
- *           format: email
- *           example: admin@tenant.com
- *         password:
+ *           example: Malik
+ *         companySize:
  *           type: string
- *           example: AdminPass@2023
- *         phoneNumber:
+ *           example: 1-2
+ *         organizationType:
  *           type: string
- *           minLength: 10
- *           maxLength: 15
- *           example: 08098765432
- *         stage:
+ *           example: Startup
+ *         location:
  *           type: string
- *           example: onboarding
- *         roleId:
+ *           example: Ikeja
+ *         leadSource:
+ *           type: string
+ *           example: LinkedIn
+ *         pipelineStageId:
  *           type: string
  *           format: uuid
- *           example: 123e4567-e89b-12d3-a456-426614174000
- *         tenantId:
+ *           example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *         assignToStaff:
  *           type: string
  *           format: uuid
- *           example: 987e6543-e21b-43d3-c456-123456789abc
- *
- *     StaffSignin:
- *       type: object
- *       required:
- *         - email
- *         - password
- *       properties:
- *         email:
- *           type: string
- *           format: email
- *           example: staff@tenant.com
- *         password:
- *           type: string
- *           example: SecurePass123!
+ *           example: d6c6f7b4-b2f9-4d76-9f9c-9b292d3a1cfa
  */
 
 class TenantRoutes {
@@ -101,84 +80,105 @@ class TenantRoutes {
     initializeRoutes() {
         /**
          * @swagger
-         * /api/v1/tenant/createtenant:
+         * /api/v1/tenant/candidate:
          *   post:
-         *     summary: Create a new tenant
-         *     tags: [Tenant]
+         *     summary: Create a new candidate
+         *     tags: [Candidate]
          *     requestBody:
          *       required: true
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/CreateTenantDto'
+         *             $ref: '#/components/schemas/CreateCandidateDto'
          *     responses:
          *       201:
-         *         description: Tenant created successfully
+         *         description: Candidate created successfully
          *       400:
-         *         description: Validation error
+         *         description: Bad request
          */
-        this.router.post("/createtenant", TenantDto.createTenantDto, this.controller.createTenant);
+        this.router.post("/candidate", TenantDto.createCandidateDto, this.controller.createCandidate);
 
-        /**
-         * @swagger
-         * /api/v1/tenant/createtenantstaff:
-         *   post:
-         *     summary: Create a new tenant staff
-         *     tags: [Tenant]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/CreateTenantStaffDto'
-         *     responses:
-         *       201:
-         *         description: Tenant staff created successfully
-         *       400:
-         *         description: Validation error
-         */
-        this.router.post("/createtenantstaff", TenantDto.createTenantStaffDto, this.controller.createTenantStaff);
 
-        /**
-         * @swagger
-         * /api/v1/tenant/staffsignin:
-         *   post:
-         *     summary: Staff sign in
-         *     tags: [Tenant]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/StaffSigninDto'
-         *     responses:
-         *       200:
-         *         description: Sign-in successful
-         *       401:
-         *         description: Invalid credentials
-         */
-        this.router.post("/staffsignin", TenantDto.staffSigninDto, this.controller.staffSignin);
+        // /**
+        //  * @swagger
+        //  * /api/v1/tenant/createtenant:
+        //  *   post:
+        //  *     summary: Create a new tenant
+        //  *     tags: [Tenant]
+        //  *     requestBody:
+        //  *       required: true
+        //  *       content:
+        //  *         application/json:
+        //  *           schema:
+        //  *             $ref: '#/components/schemas/CreateTenantDto'
+        //  *     responses:
+        //  *       201:
+        //  *         description: Tenant created successfully
+        //  *       400:
+        //  *         description: Validation error
+        //  */
+        // this.router.post("/createtenant", TenantDto.createTenantDto, this.controller.createTenant);
 
-        /**
-         * @swagger
-         * /api/v1/tenant/getstaff/{id}:
-         *   get:
-         *     summary: gets single staff
-         *     tags: [staff]
-         *     parameters:
-         *       - in: path
-         *         name: id
-         *         required: true
-         *         schema:
-         *           type: string
-         *         description: The ID of the staff
-         *     responses:
-         *       200:
-         *         description: staff fetched successfully
-         *       400:
-         *         description: Validation error
-         */
-        this.router.get("/getstaff/:id", TenantDto.getSingleStaffDto, this.controller.getSingleStaff);
+        // /**
+        //  * @swagger
+        //  * /api/v1/tenant/createtenantstaff:
+        //  *   post:
+        //  *     summary: Create a new tenant staff
+        //  *     tags: [Tenant]
+        //  *     requestBody:
+        //  *       required: true
+        //  *       content:
+        //  *         application/json:
+        //  *           schema:
+        //  *             $ref: '#/components/schemas/CreateTenantStaffDto'
+        //  *     responses:
+        //  *       201:
+        //  *         description: Tenant staff created successfully
+        //  *       400:
+        //  *         description: Validation error
+        //  */
+        // this.router.post("/createtenantstaff", TenantDto.createTenantStaffDto, this.controller.createTenantStaff);
+
+        // /**
+        //  * @swagger
+        //  * /api/v1/tenant/staffsignin:
+        //  *   post:
+        //  *     summary: Staff sign in
+        //  *     tags: [Tenant]
+        //  *     requestBody:
+        //  *       required: true
+        //  *       content:
+        //  *         application/json:
+        //  *           schema:
+        //  *             $ref: '#/components/schemas/StaffSigninDto'
+        //  *     responses:
+        //  *       200:
+        //  *         description: Sign-in successful
+        //  *       401:
+        //  *         description: Invalid credentials
+        //  */
+        // this.router.post("/staffsignin", TenantDto.staffSigninDto, this.controller.staffSignin);
+
+        // /**
+        //  * @swagger
+        //  * /api/v1/tenant/getstaff/{id}:
+        //  *   get:
+        //  *     summary: gets single staff
+        //  *     tags: [staff]
+        //  *     parameters:
+        //  *       - in: path
+        //  *         name: id
+        //  *         required: true
+        //  *         schema:
+        //  *           type: string
+        //  *         description: The ID of the staff
+        //  *     responses:
+        //  *       200:
+        //  *         description: staff fetched successfully
+        //  *       400:
+        //  *         description: Validation error
+        //  */
+        // this.router.get("/getstaff/:id", TenantDto.getSingleStaffDto, this.controller.getSingleStaff);
 
     }
 

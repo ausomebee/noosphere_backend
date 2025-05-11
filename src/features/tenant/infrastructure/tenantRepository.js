@@ -1,116 +1,117 @@
-import prismaService from "../../../config/prisma.js";
+import BaseRepository from "./baseRepository.js";
 
-class TenantRepository {
-    constructor() {
-        this.prisma = prismaService.getClient();
-        this.model = this.prisma.tenant;
-        this.staff = this.prisma.tenantStaff;
-    }
-
-    async create(data) {
-        return await this.model.create({ data });
-    }
-
-    async createAdminStaff(data, tx) {
-        return await tx.tenantStaff.create({
-            data: {
-                fullName: data.fullName,
-                email: data.email,
-                password: data.password,
-                roleId: data.roleId,
-                tenantId: data.tenantId,
-                phoneNumber: data.phoneNumber,
-                stage: data.stage
-            }
-        });
+class TenantRepository extends BaseRepository {
+    constructor(model) {
+        super(model)
     }
 
     async txCreate(data, tx) {
         return await tx.tenant.create({ data });
     }
+    // async create(data) {
+    //     return await this.model.create({ data });
+    // }
 
-    async findOne(query) {
-        return await this.model.findUnique({
-            where: query,
-        });
-    }
+    // async createAdminStaff(data, tx) {
+    //     return await tx.tenantStaff.create({
+    //         data: {
+    //             fullName: data.fullName,
+    //             email: data.email,
+    //             password: data.password,
+    //             roleId: data.roleId,
+    //             tenantId: data.tenantId,
+    //             phoneNumber: data.phoneNumber,
+    //             stage: data.stage
+    //         }
+    //     });
+    // }
 
-    async findOneStaff(query) {
-        return await this.staff.findUnique({
-            where: query,
-        });
-    }
+    // async txCreate(data, tx) {
+    //     return await tx.tenant.create({ data });
+    // }
 
-    async findFirst(query) {
-        return await this.model.findFirst({
-            where: query,
-        });
-    }
+    // async findOne(query) {
+    //     return await this.model.findUnique({
+    //         where: query,
+    //     });
+    // }
 
-    async findFirstDynamic(query) {
-        const { where, include, select, orderBy, take, skip } = query;
+    // async findOneStaff(query) {
+    //     return await this.staff.findUnique({
+    //         where: query,
+    //     });
+    // }
 
-        return await this.model.findFirst({
-            where,
-            include,
-            select,
-            orderBy,
-            take,
-            skip,
-        });
-    }
+    // async findFirst(query) {
+    //     return await this.model.findFirst({
+    //         where: query,
+    //     });
+    // }
 
-    async findFirstDynamicStaff(query) {
-        const { where, include, select, orderBy, take, skip } = query;
+    // async findFirstDynamic(query) {
+    //     const { where, include, select, orderBy, take, skip } = query;
 
-        return await this.staff.findFirst({
-            where,
-            include,
-            select,
-            orderBy,
-            take,
-            skip,
-        });
-    }
+    //     return await this.model.findFirst({
+    //         where,
+    //         include,
+    //         select,
+    //         orderBy,
+    //         take,
+    //         skip,
+    //     });
+    // }
 
-    async findAll(query = {}) {
-        const { where, include, select, orderBy, take, skip } = query;
+    // async findFirstDynamicStaff(query) {
+    //     const { where, include, select, orderBy, take, skip } = query;
 
-        return await this.model.findMany({
-            where,
-            include,
-            select,
-            orderBy,
-            take,
-            skip,
-        });
-    }
+    //     return await this.staff.findFirst({
+    //         where,
+    //         include,
+    //         select,
+    //         orderBy,
+    //         take,
+    //         skip,
+    //     });
+    // }
 
-    async update(id, data) {
-        return await this.model.update({
-            where: { id },
-            data,
-        });
-    }
+    // async findAll(query = {}) {
+    //     const { where, include, select, orderBy, take, skip } = query;
 
-    async updateWithField(field, value, data) {
-        const record = await this.model.findUnique({
-            where: { [field]: value },
-        });
+    //     return await this.model.findMany({
+    //         where,
+    //         include,
+    //         select,
+    //         orderBy,
+    //         take,
+    //         skip,
+    //     });
+    // }
 
-        if (!record) return { count: 0 };
+    // async update(id, data) {
+    //     return await this.model.update({
+    //         where: { id },
+    //         data,
+    //     });
+    // }
 
-        return await this.model.update({
-            where: { [field]: value },
-            data,
-        });
-    }
+    // async updateWithField(field, value, data) {
+    //     const record = await this.model.findUnique({
+    //         where: { [field]: value },
+    //     });
 
-    async delete(id) {
-        return await this.model.delete({
-            where: { id },
-        });
-    }
+    //     if (!record) return { count: 0 };
+
+    //     return await this.model.update({
+    //         where: { [field]: value },
+    //         data,
+    //     });
+    // }
+
+    // async delete(id) {
+    //     return await this.model.delete({
+    //         where: { id },
+    //     });
+    // }
 
 }
 

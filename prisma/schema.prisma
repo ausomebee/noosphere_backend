@@ -87,16 +87,20 @@ model Role {
 }
 
 model Tenant {
-  id          String   @id @default(uuid())
-  fullName    String
-  email       String   @unique
-  stage       String   @default("DEFAULT")
-  phoneNumber String   @unique
-  active      Boolean  @default(true)
-  isDeleted   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  // password    String
+  id               String   @id @default(uuid())
+  email            String   @unique
+  phoneNumber      String   @unique
+  active           Boolean  @default(true)
+  isDeleted        Boolean  @default(false)
+  companyName      String
+  contactPerson    String
+  companySize      String
+  organizationType String
+  location         String
+  leadSource       String
+  stage            String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   pipelineItems   PipelineItem[]
   clientLinks     ClientTenant[]
@@ -174,13 +178,17 @@ model Pipeline {
 }
 
 model PipelineStage {
-  id         String   @id @default(uuid())
-  pipelineId String
-  tasks      Json
-  name       String
-  order      Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          String   @id @default(uuid())
+  pipelineId  String
+  tasks       Json
+  documents   Json
+  name        String
+  colourCode  String
+  order       Int
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   pipelineItem PipelineItem[]
   pipeline     Pipeline       @relation(fields: [pipelineId], references: [id])
@@ -191,7 +199,9 @@ model PipelineItem {
   tenantId        String?
   clientId        String?
   pipelineStageId String
-  doneTasks       Json
+  assignToStaff   String
+  doneTasks       Json?
+  sentDocuments   Json?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

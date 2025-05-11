@@ -1,5 +1,5 @@
 class Pipeline {
-    constructor({ id, module, name, description, createdByAdminId, createdByTenantId, isActive, pipelineId, tasks, order, tenantId, clientId, pipelineStageId, doneTasks }) {
+    constructor({ id, module, name, description, createdByAdminId, createdByTenantId, isActive, pipelineId, tasks, order, tenantId, clientId, pipelineStageId, doneTasks, documents, colourCode, assignToStaff }) {
         this.id = id;
         this.module = module;
         this.name = name;
@@ -10,45 +10,43 @@ class Pipeline {
         this.pipelineId = pipelineId;
         this.tasks = tasks;
         this.order = order;
+        this.documents = documents;
+        this.colourCode = colourCode;
         this.tenantId = tenantId;
         this.clientId = clientId;
         this.pipelineStageId = pipelineStageId;
         this.doneTasks = doneTasks;
+        this.assignToStaff = assignToStaff;
     }
 
-    get tenantPipeline() {
+    get createPipeline() {
         return {
-            module: "TENANT",
+            module: this.module,
             name: this.name,
             description: this.description,
             createdByAdminId: this.createdByAdminId,
+            createdByTenantId: this.createdByTenantId
         };
     }
 
-    get internalPipeline() {
-        return {
-            module: "CLIENT",
-            name: this.name,
-            description: this.description,
-            createdByTenantId: this.createdByTenantId,
-        };
-    }
-
-    get createPipelineStage() {
+    get createStage() {
         return {
             pipelineId: this.pipelineId,
             tasks: this.tasks,
+            documents: this.documents,
             name: this.name,
+            colourCode: this.colourCode,
             order: this.order,
+            description: this.description
         };
     }
 
     get createPipelineItem() {
         return {
+            tenantId: this.tenantId,
             clientId: this.clientId,
             pipelineStageId: this.pipelineStageId,
-            tenantId: this.tenantId,
-            doneTasks: this.doneTasks,
+            assignToStaff: this.assignToStaff
         };
     }
 }
