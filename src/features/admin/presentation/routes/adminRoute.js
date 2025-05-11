@@ -316,6 +316,20 @@ class AdminRoutes {
 
         /**
          * @swagger
+         * /api/v1/admin:
+         *   get:
+         *     summary: gets all admins
+         *     tags: [admin]
+         *     responses:
+         *       200:
+         *         description: admins fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/", this.controller.getAllAdmin);
+
+        /**
+         * @swagger
          * /api/v1/admin/forgotpassword/{email}:
          *   get:
          *     summary: send forgot password mail

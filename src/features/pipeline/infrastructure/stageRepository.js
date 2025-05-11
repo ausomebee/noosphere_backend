@@ -5,16 +5,16 @@ class StageRepository extends BaseRepository {
         super(model)
     }
 
-    async incrementOrdersBetween(startOrder, endOrder) {
+    async incrementOrdersBetween(startOrder, endOrder, pipelineId) {
         return await this.model.updateMany({
-            where: { order: { gte: startOrder, lte: endOrder } },
+            where: { AND: [{ order: { gte: startOrder, lte: endOrder } }, { pipelineId: pipelineId }] },
             data: { order: { increment: 1 } }
         });
     }
 
-    async decrementOrdersBetween(startOrder, endOrder) {
+    async decrementOrdersBetween(startOrder, endOrder, pipelineId) {
         return await this.model.updateMany({
-            where: { order: { gte: startOrder, lte: endOrder } },
+            where: { AND: [{ order: { gte: startOrder, lte: endOrder } }, { pipelineId: pipelineId }] },
             data: { order: { decrement: 1 } }
         });
     }

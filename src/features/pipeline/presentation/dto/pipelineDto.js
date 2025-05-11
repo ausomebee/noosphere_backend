@@ -106,8 +106,8 @@ class PipelineDto {
             documents: Joi.array().items(
                 Joi.object({
                     name: Joi.string().trim().required().messages({
-                        'string.base': 'Task name must be a string',
-                        'string.empty': 'Task name is required'
+                        'string.base': 'Document name must be a string',
+                        'string.empty': 'Document name is required'
                     }),
                     required: Joi.boolean().required().messages({
                         'boolean.base': 'Required must be a boolean',
@@ -191,7 +191,7 @@ class PipelineDto {
         Validator.validateRequest(req, next, schema, req.params);
     };
 
-    static updateStageDto = (req, res, next) => {
+    static updateItemStageDto = (req, res, next) => {
         const schema = Joi.object({
             id: Joi.string().uuid().required().messages({
                 "string.empty": "ID is required",
@@ -201,6 +201,88 @@ class PipelineDto {
                 "string.empty": "Pipeline stage ID is required",
                 "string.guid": "Pipeline stage ID must be a valid UUID",
             })
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateStageOrderDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID",
+            }),
+            order: Joi.number().required()
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateStageDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID",
+            }),
+            name: Joi.string()
+                .required()
+                .max(20)
+                .trim()
+                .messages({
+                    "string.empty": "Name is required",
+                    "string.max": "Name must not exceed 20 characters",
+                }),
+            description: Joi.string().trim().optional(),
+            colourCode: Joi.string().trim().required()
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateTasksDto = (req, res, next) => {
+        const schema = Joi.object({
+            tasks: Joi.array().items(
+                Joi.object({
+                    name: Joi.string().trim().required().messages({
+                        'string.base': 'Task name must be a string',
+                        'string.empty': 'Task name is required'
+                    }),
+                    required: Joi.boolean().required().messages({
+                        'boolean.base': 'Required must be a boolean',
+                        'any.required': 'Required field is required'
+                    })
+                })
+            )
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateDocumentsDto = (req, res, next) => {
+        const schema = Joi.object({
+            documents: Joi.array().items(
+                Joi.object({
+                    name: Joi.string().trim().required().messages({
+                        'string.base': 'Document name must be a string',
+                        'string.empty': 'Document name is required'
+                    }),
+                    required: Joi.boolean().required().messages({
+                        'boolean.base': 'Required must be a boolean',
+                        'any.required': 'Required field is required'
+                    })
+                })
+            )
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static assignCandidateDto = (req, res, next) => {
+        const schema = Joi.object({
+            assignToStaff: Joi.string().uuid().required().messages({
+                "string.empty": "Staff ID is required",
+                "string.guid": "Staff ID must be a valid UUID",
+            }),
         });
 
         Validator.validateRequest(req, next, schema);

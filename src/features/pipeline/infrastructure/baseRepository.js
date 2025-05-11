@@ -31,6 +31,12 @@ class BaseRepository {
             data,
         });
     }
+
+    async delete(id) {
+        return await this.model.delete({
+            where: { id },
+        });
+    }
 }
 
 export default BaseRepository

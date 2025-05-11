@@ -79,6 +79,20 @@ class AdminController {
         });
     });
 
+    getAllAdmin = expressAsyncHandler(async (req, res) => {
+        const admin = await this.service.getAllAdmin();
+
+        if (!admin) {
+            res.status(500).json({ message: 'Failed to fetch admins' });
+        }
+
+        return res.status(201).json({
+            message: "Admins fetched successfully",
+            status: 'ok',
+            data: admin
+        });
+    });
+
     superAdminChoices = expressAsyncHandler(async (req, res) => {
         const choice = await this.service.superAdminChoices(req.body);
 

@@ -257,6 +257,16 @@ class AdminService {
         return admin;
     }
 
+    async getAllAdmin() {
+        const admins = await this.repository.findAll({});
+
+        if (!admins) {
+            throw new Error("Failed to fetch admins")
+        }
+
+        return admins;
+    }
+
     async superAdminChoices(data) {
         const choiceExists = await this.repository.findFirstChoice({ where: {} });
 
@@ -318,6 +328,16 @@ class AdminService {
 
         if (!adminExists) {
             throw new Error("Admin not found.");
+        }
+
+        if(!adminExists.auth2FADone && adminExists.superAdmin){
+            throw new Error("2FA required.");
+        }
+
+        const setAll = await this.repository.findFirstChoice({});
+
+        if(!adminExists.auth2FADone && setAll.setForAll){
+            throw new Error("2FA required.");
         }
 
         const attachments = [
