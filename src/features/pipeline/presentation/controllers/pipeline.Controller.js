@@ -140,8 +140,22 @@ class PipelineController {
         });
     });
 
-    getItemByStageId = expressAsyncHandler(async (req, res) => {
-        const items = await this.service.getItemByStageId(req.params.pipelineStageId);
+    getItemByStageIdTenant = expressAsyncHandler(async (req, res) => {
+        const items = await this.service.getItemByStageIdTenant(req.params.pipelineStageId);
+
+        if (!items) {
+            res.status(500).json({ message: 'Failed to fetch items' });
+        }
+
+        return res.status(201).json({
+            message: "Items fetched successfully",
+            status: 'ok',
+            data: items
+        });
+    });
+
+    getItemByStageIdClient = expressAsyncHandler(async (req, res) => {
+        const items = await this.service.getItemByStageIdClient(req.params.pipelineStageId);
 
         if (!items) {
             res.status(500).json({ message: 'Failed to fetch items' });
@@ -179,6 +193,20 @@ class PipelineController {
             message: "Item updated successfully",
             status: 'ok',
             data: item
+        });
+    });
+
+    deleteStage = expressAsyncHandler(async (req, res) => {
+        const stage = await this.service.deleteStage(req.params.id);
+
+        if (!stage) {
+            res.status(500).json({ message: 'Failed to delete stage' });
+        }
+
+        return res.status(201).json({
+            message: "Stage deleted successfully",
+            status: 'ok',
+            data: stage
         });
     });
 

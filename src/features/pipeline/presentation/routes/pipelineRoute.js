@@ -72,6 +72,18 @@ import PipelineController from "../controllers/pipeline.Controller.js";
  *         isActive:
  *           type: boolean
  *
+ *     updateStageOrder:
+ *       type: object
+ *       required:
+ *         - id
+ *         - order
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *         order:
+ *           type: number
+ *
  *     CreateStage:
  *       type: object
  *       required:
@@ -177,7 +189,7 @@ import PipelineController from "../controllers/pipeline.Controller.js";
  *           type: string
  *           format: uuid
  *
- *     UpdateStage:
+ *     updateItemStage:
  *       type: object
  *       required:
  *         - id
@@ -187,6 +199,65 @@ import PipelineController from "../controllers/pipeline.Controller.js";
  *           type: string
  *           format: uuid
  *         pipelineStageId:
+ *           type: string
+ *           format: uuid
+ *     updateStage:
+ *       type: object
+ *       required:
+ *         - id
+ *         - name
+ *         - description
+ *         - colourCode
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *         name:
+ *           type: string
+ *         description:
+ *           type: string
+ *         colourCode:
+ *           type: string
+ *     updateTasks:
+ *       type: object
+ *       required:
+ *         - tasks
+ *       properties:
+ *         tasks:
+ *           type: array
+ *           items:
+ *             type: object
+ *             required:
+ *               - name
+ *               - required
+ *             properties:
+ *               name:
+ *                 type: string
+ *               required:
+ *                 type: boolean
+ *     updateDocuments:
+ *       type: object
+ *       required:
+ *         - documents
+ *       properties:
+ *         documents:
+ *           type: array
+ *           items:
+ *             type: object
+ *             required:
+ *               - name
+ *               - required
+ *             properties:
+ *               name:
+ *                 type: string
+ *               required:
+ *                 type: boolean
+ *     assignCandidate:
+ *       type: object
+ *       required:
+ *         - assignToStaff
+ *       properties:
+ *         assignToStaff:
  *           type: string
  *           format: uuid
  */
@@ -421,9 +492,9 @@ class PipelineRoutes {
 
         /**
          * @swagger
-         * /api/v1/pipeline/item/stage/{pipelineStageId}:
+         * /api/v1/pipeline/item/stage/tenant/{pipelineStageId}:
          *   get:
-         *     summary: get pipeline item by stage id
+         *     summary: get pipeline items(tenants) by stage id
          *     tags: [PipelineItem]
          *     requestBody:
          *       required: true
@@ -437,7 +508,27 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/item/stage/:pipelineStageId", PipelineDto.getItemByStageIdDto, this.controller.getItemByStageId);
+        this.router.get("/item/stage/tenant/:pipelineStageId", PipelineDto.getItemByStageIdDto, this.controller.getItemByStageIdTenant);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/item/stage/client/{pipelineStageId}:
+         *   get:
+         *     summary: get pipeline items(clients) by stage id 
+         *     tags: [PipelineItem]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/GetItemByStageIdParams'
+         *     responses:
+         *       201:
+         *         description: Pipeline items fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/item/stage/client/:pipelineStageId", PipelineDto.getItemByStageIdDto, this.controller.getItemByStageIdClient);
 
         /**
          * @swagger
@@ -470,14 +561,134 @@ class PipelineRoutes {
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/UpdateActivity'
+         *             $ref: '#/components/schemas/updateItemStage'
          *     responses:
          *       201:
          *         description: Pipeline item updated successfully
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/item/stage", PipelineDto.updateStageDto, this.controller.updateItem);
+        this.router.patch("/item/stage", PipelineDto.updateItemStageDto, this.controller.updateItem);
+
+        /**
+        * @swagger
+        * /api/v1/pipeline/stage/{id}:
+        *   delete:
+        *     summary: delete pipeline stage
+        *     tags: [PipelineStage]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/GetByIdParams'
+        *     responses:
+        *       201:
+        *         description: Pipeline stage deleted successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.delete("/stage/:id", PipelineDto.getByIdDto, this.controller.deleteStage);
+
+        /**
+        * @swagger
+        * /api/v1/pipeline/stage/order:
+        *   patch:
+        *     summary: update order
+        *     tags: [PipelineStage]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/updateStageOrder'
+        *     responses:
+        *       201:
+        *         description: Pipeline stage order updated successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.patch("/stage/order", PipelineDto.updateStageOrderDto, this.controller.updateStage);
+
+        /**
+        * @swagger
+        * /api/v1/pipeline/stage:
+        *   patch:
+        *     summary: update stage data
+        *     tags: [PipelineStage]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/updateStage'
+        *     responses:
+        *       201:
+        *         description: Pipeline stage data updated successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.patch("/stage", PipelineDto.updateStageDto, this.controller.updateStage);
+
+        /**
+        * @swagger
+        * /api/v1/pipeline/stage/task:
+        *   patch:
+        *     summary: update stage tasks
+        *     tags: [PipelineStage]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/updateTasks'
+        *     responses:
+        *       201:
+        *         description: Pipeline stage tasks updated successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.patch("/stage/task", PipelineDto.updateTasksDto, this.controller.updateStage);
+
+        /**
+        * @swagger
+        * /api/v1/pipeline/stage/document:
+        *   patch:
+        *     summary: update stage documents
+        *     tags: [PipelineStage]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/updateDocuments'
+        *     responses:
+        *       201:
+        *         description: Pipeline stage documents updated successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.patch("/stage/document", PipelineDto.updateDocumentsDto, this.controller.updateStage);
+
+        /**
+        * @swagger
+        * /api/v1/pipeline/item/assign:
+        *   patch:
+        *     summary: assign candidate to staff
+        *     tags: [PipelineItem]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/assignCandidate'
+        *     responses:
+        *       201:
+        *         description: Assigned candidate successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.patch("/item/assign", PipelineDto.assignCandidateDto, this.controller.updateItem);
 
     }
 

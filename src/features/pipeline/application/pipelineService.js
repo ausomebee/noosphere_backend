@@ -123,9 +123,9 @@ class PipelineService {
 
         if (data.order && (data.order != stage.order)) {
             if (data.order < stage.order) {
-                await this.stageRepository.incrementOrdersBetween(data.order, stage.order - 1);
+                await this.stageRepository.incrementOrdersBetween(data.order, stage.order - 1, stage.pipelineId);
             } else {
-                await this.stageRepository.decrementOrdersBetween(stage.order + 1, data.order);
+                await this.stageRepository.decrementOrdersBetween(stage.order + 1, data.order, stage.pipelineId);
             }
         }
 
@@ -168,8 +168,18 @@ class PipelineService {
         return newPipelineItem;
     }
 
-    async getItemByStageId(pipelineStageId) {
-        const items = await this.itemRepository.findAll({ pipelineStageId: pipelineStageId });
+    async getItemByStageIdTenant(pipelineStageId) {
+        const items = await this.itemRepository.findAllAndPopulate({ pipelineStageId: pipelineStageId }, { tenant: true });
+
+        if (!items) {
+            throw new Error("Failed to fetch items.");
+        }
+
+        return items;
+    }
+
+    async getItemByStageIdClient(pipelineStageId) {
+        const items = await this.itemRepository.findAllAndPopulate({ pipelineStageId: pipelineStageId }, { client: true });
 
         if (!items) {
             throw new Error("Failed to fetch items.");
@@ -201,14 +211,46 @@ class PipelineService {
             doneTasks: data.doneTasks || item.doneTasks,
             sentDocuments: data.sentDocuments || item.sentDocuments
         });
-        
+
         if (!update) {
             throw new Error("Failed to update item");
         }
 
         return update;
     }
-    
+
+    async deleteStage(id) {
+        const stage = await this.stageRepository.findOne({ id })
+        const items = await this.itemRepository.findAll({ pipelineStageId: stage.pipelineStageId })
+
+        if (stage.order === 1 && items.length > 0) {
+            throw new Error("Kindly remove all items");
+        }
+
+        const lastStage = await this.stageRepository.findLast(stage.pipelineId);
+        const increment = await this.stageRepository.incrementOrdersBetween(stage.order, lastStage.order - 1, stage.pipelineId);
+
+        if (!increment) {
+            throw new Error("Failed to adjust order");
+        }
+
+        if (items.length > 0) {
+            const firstStage = await this.stageRepository.findFirst({ AND: [{ pipelineId: stage.pipelineId }, { order: 1 }] })
+            const update = await this.itemRepository.updateManyByPipelineStageId(stage.pipelineStageId, { pipelineStageId: firstStage.id })
+
+            if (update.count < 1) {
+                throw new Error("Failed to adjust order");
+            }
+        }
+
+        const deleted = await this.stageRepository.delete(id);
+
+        if (!deleted) {
+            throw new Error("Failed to delete stage");
+        }
+
+        return deleted;
+    }
 }
 
 export default PipelineService;
