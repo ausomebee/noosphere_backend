@@ -326,14 +326,15 @@ class PipelineRoutes {
          * @swagger
          * /api/v1/pipeline/module/{module}:
          *   get:
-         *     summary: get pipeline by module
+         *     summary: Get pipeline by module
          *     tags: [Pipeline]
          *     parameters:
          *       - in: path
-         *           name: module
-         *           required: true
-         *           schema:
+         *         name: module
+         *         required: true
+         *         schema:
          *           type: string
+         *         description: The module to fetch pipeline for
          *     responses:
          *       201:
          *         description: Pipeline fetched successfully
@@ -346,14 +347,15 @@ class PipelineRoutes {
          * @swagger
          * /api/v1/pipeline/tenant/{tenantId}:
          *   get:
-         *     summary: get pipeline by tenant id
+         *     summary: Get pipeline by tenant ID
          *     tags: [Pipeline]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/GetPipelinesByTenantIdParams'
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The tenant ID to fetch pipeline for
          *     responses:
          *       201:
          *         description: Pipeline fetched successfully
@@ -406,14 +408,15 @@ class PipelineRoutes {
          * @swagger
          * /api/v1/pipeline/stage/pipeline/{pipelineId}:
          *   get:
-         *     summary: get pipeline stage by pipeline id
+         *     summary: Get pipeline stage by pipeline ID
          *     tags: [PipelineStage]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/GetStagesByPipelineIdParams'
+         *     parameters:
+         *       - in: path
+         *         name: pipelineId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The ID of the pipeline
          *     responses:
          *       201:
          *         description: Pipeline stage fetched successfully
@@ -426,14 +429,15 @@ class PipelineRoutes {
          * @swagger
          * /api/v1/pipeline/stage/{id}:
          *   get:
-         *     summary: get pipeline stage by id
+         *     summary: Get pipeline stage by ID
          *     tags: [PipelineStage]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/GetByIdParams'
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The ID of the pipeline stage
          *     responses:
          *       201:
          *         description: Pipeline stage fetched successfully
@@ -506,14 +510,15 @@ class PipelineRoutes {
          * @swagger
          * /api/v1/pipeline/item/stage/tenant/{pipelineStageId}:
          *   get:
-         *     summary: get pipeline items(tenants) by stage id
+         *     summary: Get pipeline items (tenants) by stage ID
          *     tags: [PipelineItem]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/GetItemByStageIdParams'
+         *     parameters:
+         *       - in: path
+         *         name: pipelineStageId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The ID of the pipeline stage
          *     responses:
          *       201:
          *         description: Pipeline items fetched successfully
@@ -526,14 +531,15 @@ class PipelineRoutes {
          * @swagger
          * /api/v1/pipeline/item/stage/client/{pipelineStageId}:
          *   get:
-         *     summary: get pipeline items(clients) by stage id 
+         *     summary: Get pipeline items (clients) by stage ID 
          *     tags: [PipelineItem]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/GetItemByStageIdParams'
+         *     parameters:
+         *       - in: path
+         *         name: pipelineStageId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The ID of the pipeline stage
          *     responses:
          *       201:
          *         description: Pipeline items fetched successfully
@@ -546,20 +552,22 @@ class PipelineRoutes {
          * @swagger
          * /api/v1/pipeline/item/{id}:
          *   get:
-         *     summary: get pipeline item by id
+         *     summary: Get pipeline item by ID
          *     tags: [PipelineItem]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/GetByIdParams'
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The ID of the pipeline item
          *     responses:
          *       201:
          *         description: Pipeline item fetched successfully
          *       400:
          *         description: Validation error
          */
+
         this.router.get("/item/:id", PipelineDto.getByIdDto, this.controller.getItemById);
 
         /**
@@ -582,24 +590,25 @@ class PipelineRoutes {
          */
         this.router.patch("/item/stage", PipelineDto.updateItemStageDto, this.controller.updateItem);
 
-        /**
-        * @swagger
-        * /api/v1/pipeline/stage/{id}:
-        *   delete:
-        *     summary: delete pipeline stage
-        *     tags: [PipelineStage]
-        *     requestBody:
-        *       required: true
-        *       content:
-        *         application/json:
-        *           schema:
-        *             $ref: '#/components/schemas/GetByIdParams'
-        *     responses:
-        *       201:
-        *         description: Pipeline stage deleted successfully
-        *       400:
-        *         description: Validation error
-        */
+       /**
+         * @swagger
+         * /api/v1/pipeline/stage/{id}:
+         *   delete:
+         *     summary: Delete pipeline stage
+         *     tags: [PipelineStage]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The ID of the pipeline stage to delete
+         *     responses:
+         *       201:
+         *         description: Pipeline stage deleted successfully
+         *       400:
+         *         description: Validation error
+         */
         this.router.delete("/stage/:id", PipelineDto.getByIdDto, this.controller.deleteStage);
 
         /**
