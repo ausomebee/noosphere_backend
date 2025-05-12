@@ -107,7 +107,7 @@ class AdminService {
             administratorPassword: hashedAdminPass,
             authType: data.authType || admin.authType,
             authQuestion: data.authQuestion || admin.authQuestion,
-            auth2FADone: data.auth2FADone || admin.auth2FADone,
+            auth2FADone: data.auth2FADone ?? admin.auth2FADone,
         });
 
         if (!update) {
