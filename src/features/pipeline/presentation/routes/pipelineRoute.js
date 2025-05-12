@@ -328,12 +328,12 @@ class PipelineRoutes {
          *   get:
          *     summary: get pipeline by module
          *     tags: [Pipeline]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
+         *     parameters:
+         *       - in: path
+         *           name: module
+         *           required: true
          *           schema:
-         *             $ref: '#/components/schemas/GetPipelinesByModuleParams'
+         *           type: string
          *     responses:
          *       201:
          *         description: Pipeline fetched successfully
