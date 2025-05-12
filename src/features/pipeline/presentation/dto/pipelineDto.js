@@ -241,6 +241,10 @@ class PipelineDto {
 
     static updateTasksDto = (req, res, next) => {
         const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID",
+            }),
             tasks: Joi.array().items(
                 Joi.object({
                     name: Joi.string().trim().required().messages({
@@ -260,6 +264,10 @@ class PipelineDto {
 
     static updateDocumentsDto = (req, res, next) => {
         const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID",
+            }),
             documents: Joi.array().items(
                 Joi.object({
                     name: Joi.string().trim().required().messages({
@@ -279,6 +287,10 @@ class PipelineDto {
 
     static assignCandidateDto = (req, res, next) => {
         const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID",
+            }),
             assignToStaff: Joi.string().uuid().required().messages({
                 "string.empty": "Staff ID is required",
                 "string.guid": "Staff ID must be a valid UUID",

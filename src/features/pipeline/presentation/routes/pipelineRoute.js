@@ -222,7 +222,11 @@ import PipelineController from "../controllers/pipeline.Controller.js";
  *       type: object
  *       required:
  *         - tasks
+ *         - id
  *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
  *         tasks:
  *           type: array
  *           items:
@@ -239,7 +243,11 @@ import PipelineController from "../controllers/pipeline.Controller.js";
  *       type: object
  *       required:
  *         - documents
+ *         - id
  *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
  *         documents:
  *           type: array
  *           items:
@@ -255,8 +263,12 @@ import PipelineController from "../controllers/pipeline.Controller.js";
  *     assignCandidate:
  *       type: object
  *       required:
+ *         - id
  *         - assignToStaff
  *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
  *         assignToStaff:
  *           type: string
  *           format: uuid
