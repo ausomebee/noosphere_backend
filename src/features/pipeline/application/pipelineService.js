@@ -188,21 +188,29 @@ class PipelineService {
             }
         });
 
-        if (!items) {
+        if (!items || items.length === 0) {
             throw new Error("Failed to fetch items.");
         }
 
-        // const stage = await this.stageRepository.findOne({id: items.pipelineId})
+        const stage = await this.stageRepository.findOne({id: items[0].pipelineId})
 
-        // if (!stage) {
-        //     throw new Error("Failed to fetch stage.");
-        // }
+        if (!stage) {
+            throw new Error("Failed to fetch stage.");
+        }
 
-        // const completion = stage.tasks.map((stage, index)=>{
-        //     if ()
-        // })
+        const updatedItems = items.map(item => {
+            const totalTasks = stage.tasks.length;
+            const completedTasks = stage.tasks.filter(task => item.doneTasks[task.name] === true).length;
+    
+            const completionPercentage = (completedTasks / totalTasks) * 100;
+    
+            return {
+                ...item,
+                completionPercentage
+            };
+        });
 
-        return items;
+        return updatedItems;
     }
 
     async getItemByStageIdClient(pipelineStageId) {
