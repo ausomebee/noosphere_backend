@@ -572,7 +572,7 @@ class PipelineRoutes {
 
         /**
          * @swagger
-         * /api/v1/item/stage:
+         * /api/v1/pipeline/item/stage:
          *   patch:
          *     summary: update activity
          *     tags: [PipelineItem]
