@@ -170,7 +170,14 @@ class PipelineService {
     }
 
     async getItemByStageIdTenant(pipelineStageId) {
-        const items = await this.itemRepository.findAllAndPopulate({ pipelineStageId: pipelineStageId }, { tenant: true });
+        const items = await this.itemRepository.findAllAndPopulate({ pipelineStageId: pipelineStageId }, { tenant: {select: {
+            companyName: true,
+            createdAt: true,
+            // createdBy: true,
+
+        }}, admin: {select:{
+            fullName: true
+        }} });
 
         if (!items) {
             throw new Error("Failed to fetch items.");
