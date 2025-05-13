@@ -4,14 +4,16 @@ import PipelineRepository from "../../infrastructure/pipelineRepository.js";
 import prismaService from "../../../../config/prisma.js";
 import StageRepository from "../../infrastructure/stageRepository.js";
 import ItemRepository from "../../infrastructure/itemRepository.js";
+import TenantRepository from "../../../tenant/infrastructure/tenantRepository.js";
 
 class PipelineController {
     constructor() {
         this.prisma = prismaService.getClient()
         this.pipelineRepository = new PipelineRepository(this.prisma.pipeline)
+        this.tenantRepository = new TenantRepository(this.prisma.tenant)
         this.stageRepository = new StageRepository(this.prisma.pipelineStage)
         this.itemRepository = new ItemRepository(this.prisma.pipelineItem)
-        this.service = new PipelineService({ pipelineRepository: this.pipelineRepository, stageRepository: this.stageRepository, itemRepository: this.itemRepository });
+        this.service = new PipelineService({ pipelineRepository: this.pipelineRepository, stageRepository: this.stageRepository, itemRepository: this.itemRepository, tenantRepository: this.tenantRepository });
     }
 
     createPipeline = expressAsyncHandler(async (req, res) => {
@@ -210,6 +212,19 @@ class PipelineController {
         });
     });
 
+    deleteTenantPipelineItem = expressAsyncHandler(async (req, res) => {
+        const item = await this.service.deleteitem(req.params.id);
+
+        if (!item) {
+            res.status(500).json({ message: 'Failed to delete item' });
+        }
+
+        return res.status(201).json({
+            message: "Item deleted successfully",
+            status: 'ok',
+            data: item
+        });
+    });
 }
 
 export default PipelineController;

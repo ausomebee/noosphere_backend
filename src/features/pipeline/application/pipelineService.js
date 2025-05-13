@@ -1,10 +1,11 @@
 import Pipeline from "../domain/pipeline.js";
 
 class PipelineService {
-    constructor({ pipelineRepository, stageRepository, itemRepository }) {
+    constructor({ pipelineRepository, stageRepository, itemRepository, tenantRepository }) {
         this.pipelineRepository = pipelineRepository;
         this.stageRepository = stageRepository;
-        this.itemRepository = itemRepository
+        this.itemRepository = itemRepository;
+        this.tenantRepository = tenantRepository;
     }
 
     async createPipeline(data) {
@@ -247,6 +248,37 @@ class PipelineService {
 
         if (!deleted) {
             throw new Error("Failed to delete stage");
+        }
+
+        return deleted;
+    }
+
+    async deleteTenantPipelineItem(id) {
+        const item = await this.itemRepository.findFirst({ id })
+
+        if (!item) {
+            throw new Error("item not found.");
+        }
+
+        const tenant = await this.tenantRepository.findOne({ id: item.tenantId })
+
+        if (!tenant) {
+            throw new Error("tenant not found.");
+        }
+
+        const updated = await this.tenantRepository.update(tenant.id, {
+            active: false,
+            stage: "UNVERIFIED"
+        })
+
+        if (!updated) {
+            throw new Error("Failed to update tenant");
+        }
+
+        const deleted = await this.itemRepository.delete(id);
+
+        if (!deleted) {
+            throw new Error("Failed to delete item");
         }
 
         return deleted;
