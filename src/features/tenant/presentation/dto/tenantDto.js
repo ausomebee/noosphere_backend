@@ -42,13 +42,13 @@ class TenantDto {
             contactPerson: Joi.string().trim().required(),
             companySize: Joi.string().trim().required(),
             organizationType: Joi.string().trim().required(),
-            location: Joi.string().trim().required(),
+            location: Joi.object(),
             leadSource: Joi.string().trim().required(),
             pipelineStageId: Joi.string().uuid().required().messages({
                 "string.empty": "Pipeline stage ID is required",
                 "string.guid": "Pipeline stage ID must be a valid UUID",
             }),
-            assignToStaff: Joi.string().uuid().required().messages({
+            assignToAdmin: Joi.string().uuid().required().messages({
                 "string.empty": "Pipeline stage ID is required",
                 "string.guid": "Pipeline stage ID must be a valid UUID",
             }),

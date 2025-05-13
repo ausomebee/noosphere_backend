@@ -152,7 +152,7 @@ class PipelineDto {
                 "string.empty": "Pipeline stage ID is required",
                 "string.guid": "Pipeline stage ID must be a valid UUID",
             }),
-            assignToStaff: Joi.string().uuid().required().messages({
+            assignToAdmin: Joi.string().uuid().required().messages({
                 "string.empty": "Staff ID is required",
                 "string.guid": "Staff ID must be a valid UUID",
             }),
@@ -171,7 +171,7 @@ class PipelineDto {
                 "string.empty": "Pipeline stage ID is required",
                 "string.guid": "Pipeline stage ID must be a valid UUID",
             }),
-            assignToStaff: Joi.string().uuid().required().messages({
+            assignToAdmin: Joi.string().uuid().required().messages({
                 "string.empty": "Staff ID is required",
                 "string.guid": "Staff ID must be a valid UUID",
             }),
@@ -291,7 +291,7 @@ class PipelineDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID",
             }),
-            assignToStaff: Joi.string().uuid().required().messages({
+            assignToAdmin: Joi.string().uuid().required().messages({
                 "string.empty": "Staff ID is required",
                 "string.guid": "Staff ID must be a valid UUID",
             }),

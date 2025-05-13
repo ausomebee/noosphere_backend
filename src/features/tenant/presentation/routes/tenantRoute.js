@@ -20,7 +20,7 @@ import TenantController from "../controllers/tenantController.js";
  *         - location
  *         - leadSource
  *         - pipelineStageId
- *         - assignToStaff
+ *         - assignToAdmin
  *       properties:
  *         fullName:
  *           type: string
@@ -55,8 +55,14 @@ import TenantController from "../controllers/tenantController.js";
  *           type: string
  *           example: Startup
  *         location:
- *           type: string
- *           example: Ikeja
+ *           type: object
+ *           properties:
+ *             city:
+ *               type: string
+ *               example: Ikeja
+ *             state:
+ *               type: string
+ *               example: Lagos
  *         leadSource:
  *           type: string
  *           example: LinkedIn
@@ -64,7 +70,7 @@ import TenantController from "../controllers/tenantController.js";
  *           type: string
  *           format: uuid
  *           example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
- *         assignToStaff:
+ *         assignToAdmin:
  *           type: string
  *           format: uuid
  *           example: d6c6f7b4-b2f9-4d76-9f9c-9b292d3a1cfa

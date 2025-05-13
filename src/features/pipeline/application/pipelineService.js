@@ -170,18 +170,37 @@ class PipelineService {
     }
 
     async getItemByStageIdTenant(pipelineStageId) {
-        const items = await this.itemRepository.findAllAndPopulate({ pipelineStageId: pipelineStageId }, { tenant: {select: {
-            companyName: true,
-            createdAt: true,
-            // createdBy: true,
-
-        }}, admin: {select:{
-            fullName: true
-        }} });
+        const items = await this.itemRepository.findAllAndPopulate({ pipelineStageId: pipelineStageId }, {
+            tenant: {
+                select: {
+                    companyName: true,
+                    createdAt: true,
+                    admin: {
+                        select: {
+                            fullName: true
+                        }
+                    }
+                }
+            }, admin: {
+                select: {
+                    fullName: true
+                }
+            }
+        });
 
         if (!items) {
             throw new Error("Failed to fetch items.");
         }
+
+        // const stage = await this.stageRepository.findOne({id: items.pipelineId})
+
+        // if (!stage) {
+        //     throw new Error("Failed to fetch stage.");
+        // }
+
+        // const completion = stage.tasks.map((stage, index)=>{
+        //     if ()
+        // })
 
         return items;
     }
@@ -215,7 +234,8 @@ class PipelineService {
 
         const update = await this.itemRepository.update(data.id, {
             pipelineStageId: data.pipelineStageId || item.pipelineStageId,
-            assignToStaff: data.assignToStaff || item.assignToStaff,
+            assignToAdmin: data.assignToAdmin || item.assignToAdmin,
+            assignToTenantStaff: data.assignToTenantStaff || item.assignToTenantStaff,
             doneTasks: data.doneTasks || item.doneTasks,
             sentDocuments: data.sentDocuments || item.sentDocuments
         });

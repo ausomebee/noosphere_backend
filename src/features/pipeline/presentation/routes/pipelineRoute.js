@@ -151,7 +151,7 @@ import PipelineController from "../controllers/pipeline.Controller.js";
  *       required:
  *         - tenantId
  *         - pipelineStageId
- *         - assignToStaff
+ *         - assignToAdmin
  *       properties:
  *         tenantId:
  *           type: string
@@ -159,7 +159,7 @@ import PipelineController from "../controllers/pipeline.Controller.js";
  *         pipelineStageId:
  *           type: string
  *           format: uuid
- *         assignToStaff:
+ *         assignToAdmin:
  *           type: string
  *           format: uuid
  *
@@ -168,7 +168,7 @@ import PipelineController from "../controllers/pipeline.Controller.js";
  *       required:
  *         - clientId
  *         - pipelineStageId
- *         - assignToStaff
+ *         - assignToAdmin
  *       properties:
  *         clientId:
  *           type: string
@@ -176,7 +176,7 @@ import PipelineController from "../controllers/pipeline.Controller.js";
  *         pipelineStageId:
  *           type: string
  *           format: uuid
- *         assignToStaff:
+ *         assignToAdmin:
  *           type: string
  *           format: uuid
  *
@@ -264,12 +264,12 @@ import PipelineController from "../controllers/pipeline.Controller.js";
  *       type: object
  *       required:
  *         - id
- *         - assignToStaff
+ *         - assignToAdmin
  *       properties:
  *         id:
  *           type: string
  *           format: uuid
- *         assignToStaff:
+ *         assignToAdmin:
  *           type: string
  *           format: uuid
  */

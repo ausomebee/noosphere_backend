@@ -42,7 +42,7 @@ class TenantService {
             const pipelineItem = await this.itemRepository.txCreate({
                 tenantId: tenant.id,
                 pipelineStageId: data.pipelineStageId,
-                assignToStaff: data.assignToStaff
+                assignToAdmin: data.assignToAdmin
             }, tx)
             const department = await this.departmentRepository.createTenantDepartment(tenant.id, tx);
             const role = await this.roleRepository.createTenantRole(department.id, tx);
