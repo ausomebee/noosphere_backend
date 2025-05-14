@@ -42,9 +42,10 @@ model Admin {
   authQuestion          String?
   auth2FADone           Boolean  @default(false)
 
-  roles       Role         @relation(fields: [roleId], references: [id])
-  pipelines   Pipeline[]
-  departments Department[]
+  roles        Role           @relation(fields: [roleId], references: [id])
+  pipelines    Pipeline[]
+  departments  Department[]
+  PipelineItem PipelineItem[]
 }
 
 model Auth {
@@ -208,6 +209,7 @@ model PipelineItem {
   client        Client?        @relation(fields: [clientId], references: [id])
   tenant        Tenant?        @relation(fields: [tenantId], references: [id])
   pipelineStage PipelineStage? @relation(fields: [pipelineStageId], references: [id])
+  admin         Admin?         @relation(fields: [assignToStaff], references: [id])
 }
 
 model BillingMetadata {
