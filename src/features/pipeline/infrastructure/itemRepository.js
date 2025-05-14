@@ -22,6 +22,13 @@ class ItemRepository extends BaseRepository {
             include: populate
         });
     }
+
+    async findOneAndPopulate(query, populate) {
+        return await this.model.findUnique({
+            where: query,
+            include: populate
+        });
+    }
 }
 
 export default ItemRepository;

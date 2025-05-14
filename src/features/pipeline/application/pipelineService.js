@@ -228,7 +228,9 @@ class PipelineService {
     }
 
     async getItemById(id) {
-        const item = await this.itemRepository.findOne({ id: id });
+        const item = await this.itemRepository.findOne({ id: id }, {
+            tenant: true, admin: true
+        });
 
         if (!item) {
             throw new Error("Failed to fetch item.");
