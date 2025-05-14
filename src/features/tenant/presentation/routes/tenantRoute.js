@@ -74,6 +74,10 @@ import TenantController from "../controllers/tenantController.js";
  *           type: string
  *           format: uuid
  *           example: d6c6f7b4-b2f9-4d76-9f9c-9b292d3a1cfa
+ *         createdBy:
+ *           type: string
+ *           format: uuid
+ *           example: d6c6f7b4-b2f9-4d76-9f9c-9b292d3a1cfa
  */
 
 class TenantRoutes {
