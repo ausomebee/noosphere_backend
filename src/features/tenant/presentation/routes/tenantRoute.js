@@ -171,7 +171,7 @@ class TenantRoutes {
         /**
          * @swagger
          * /api/v1/tenant:
-         *   put:
+         *   patch:
          *     summary: Update tenant details
          *     description: Update the details of an existing tenant by specifying the tenant ID.
          *     tags: [Tenants]
