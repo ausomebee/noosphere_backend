@@ -118,9 +118,14 @@ import TenantController from "../controllers/tenantController.js";
  *           description: The type of the organization
  *           example: "Non-Profit"
  *         location:
- *           type: string
- *           description: The location of the tenant
- *           example: "New York, USA"
+ *           type: object
+ *           properties:
+ *             city:
+ *               type: string
+ *               example: Ikeja
+ *             state:
+ *               type: string
+ *               example: Lagos
  *         leadSource:
  *           type: string
  *           description: The lead source for the tenant
