@@ -78,6 +78,66 @@ import TenantController from "../controllers/tenantController.js";
  *           type: string
  *           format: uuid
  *           example: d6c6f7b4-b2f9-4d76-9f9c-9b292d3a1cfa
+ *     TenantUpdate:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           description: The unique identifier of the tenant to update
+ *         email:
+ *           type: string
+ *           description: The email of the tenant
+ *           example: tenant@example.com
+ *         phoneNumber:
+ *           type: string
+ *           description: The phone number of the tenant
+ *           example: "+1234567890"
+ *         active:
+ *           type: boolean
+ *           description: Whether the tenant is active or not
+ *           example: true
+ *         isDeleted:
+ *           type: boolean
+ *           description: Whether the tenant is marked as deleted
+ *           example: false
+ *         companyName:
+ *           type: string
+ *           description: The name of the company
+ *           example: "Acme Corporation"
+ *         contactPerson:
+ *           type: string
+ *           description: The name of the contact person at the tenant
+ *           example: "John Doe"
+ *         companySize:
+ *           type: string
+ *           description: The size of the company (e.g., Small, Medium, Large)
+ *           example: "Medium"
+ *         organizationType:
+ *           type: string
+ *           description: The type of the organization
+ *           example: "Non-Profit"
+ *         location:
+ *           type: string
+ *           description: The location of the tenant
+ *           example: "New York, USA"
+ *         leadSource:
+ *           type: string
+ *           description: The lead source for the tenant
+ *           example: "Referral"
+ *         stage:
+ *           type: string
+ *           description: The current stage of the tenant
+ *           example: "Onboarding"
+ *       required:
+ *         - id
+ *         - email
+ *         - phoneNumber
+ *         - companyName
+ *         - contactPerson
+ *         - location
+ *         - leadSource
+ *         - stage
  */
 
 class TenantRoutes {
@@ -107,6 +167,35 @@ class TenantRoutes {
          *         description: Bad request
          */
         this.router.post("/candidate", TenantDto.createCandidateDto, this.controller.createCandidate);
+
+        /**
+         * @swagger
+         * /api/v1/tenant:
+         *   put:
+         *     summary: Update tenant details
+         *     description: Update the details of an existing tenant by specifying the tenant ID.
+         *     tags: [Tenants]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/TenantUpdate'
+         *     responses:
+         *       200:
+         *         description: Tenant updated successfully
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Tenant'
+         *       400:
+         *         description: Invalid input data
+         *       404:
+         *         description: Tenant not found
+         *       500:
+         *         description: Internal server error
+         */
+        this.router.patch("/", TenantDto.updateTenantDto, this.controller.updateTenant);
 
 
         // /**

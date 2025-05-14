@@ -61,6 +61,90 @@ class TenantDto {
         Validator.validateRequest(req, next, schema);
     };
 
+    static updateTenantDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID",
+            }),
+            email: Joi.string()
+                .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
+                .required()
+                .trim()
+                .lowercase()
+                .messages({
+                    "string.email": "Email must be a valid email",
+                    "string.empty": "Email is required",
+                    "any.required": "Email is a required field",
+                }),
+            phoneNumber: Joi.string()
+                .required()
+                .trim()
+                .min(10)
+                .max(15)
+                .messages({
+                    "string.empty": "Phone number is required",
+                    "string.min": "Phone number must be at least 10 characters long",
+                    "string.max": "Phone number must be at most 15 characters long"
+                }),
+            active: Joi.boolean()
+                .messages({
+                    "boolean.base": "Active status must be a boolean value",
+                }),
+            isDeleted: Joi.boolean()
+                .messages({
+                    "boolean.base": "Deleted status must be a boolean value",
+                }),
+            companyName: Joi.string()
+                .required()
+                .trim()
+                .max(255)
+                .messages({
+                    "string.empty": "Company name is required",
+                    "string.max": "Company name must not exceed 255 characters",
+                }),
+            contactPerson: Joi.string()
+                .required()
+                .trim()
+                .max(255)
+                .messages({
+                    "string.empty": "Contact person is required",
+                    "string.max": "Contact person must not exceed 255 characters",
+                }),
+            companySize: Joi.string()
+                .trim()
+                .messages({
+                    "string.empty": "Company size is required",
+                }),
+            organizationType: Joi.string()
+                .trim()
+                .messages({
+                    "string.empty": "Organization type is required",
+                }),
+            location: Joi.string()
+                .max(255)
+                .required()
+                .trim()
+                .messages({
+                    "string.empty": "Location is required",
+                    "string.max": "Location must not exceed 255 characters",
+                }),
+            leadSource: Joi.string()
+                .required()
+                .trim()
+                .messages({
+                    "string.empty": "Lead source is required",
+                }),
+            stage: Joi.string()
+                .required()
+                .trim()
+                .messages({
+                    "string.empty": "Stage is required",
+                }),
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
 
 
     // static createTenantStaffDto = (req, res, next) => {
