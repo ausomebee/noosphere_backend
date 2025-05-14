@@ -42,6 +42,20 @@ class TenantController {
         });
     });
 
+    updateTenant = expressAsyncHandler(async (req, res) => {
+        const tenant = await this.service.updateTenant(req.body);
+
+        if (!tenant) {
+            res.status(500).json({ message: 'Failed to update tenant.' });
+        }
+
+        return res.status(201).json({
+            message: "Candidate updated successfully",
+            status: 'ok',
+            data: tenant
+        });
+    });
+
     // createTenantStaff = expressAsyncHandler(async (req, res) => {
     //     const staffData = new Tenant(req.body);
     //     const staff = await this.service.createTenantStaff(staffData.createTenantStaff);

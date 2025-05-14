@@ -58,6 +58,36 @@ class TenantService {
 
         return newCandidate;
     }
+
+    async updateTenant(data) {
+        const tenant = await this.tenantRepository.findOne({ id: data.id })
+
+        if (!tenant) {
+            throw new Error("tenant not found");
+        }
+
+        const update = await this.tenantRepository.update(data.id, {
+            email: data.email || tenant.email,
+            phoneNumber: data.phoneNumber || tenant.phoneNumber,
+            active: data.active ?? tenant.active,
+            isDeleted: data.isDeleted ?? tenant.isDeleted,
+            companyName: data.companyName || tenant.companyName,
+            contactPerson: data.contactPerson || tenant.contactPerson,
+            companySize: data.companySize || tenant.companySize,
+            organizationType: data.organizationType || tenant.organizationType,
+            location: data.location || tenant.location,
+            leadSource: data.leadSource || tenant.leadSource,
+            stage: data.stage || tenant.stage
+        });
+
+        if (!update) {
+            throw new Error("Failed to update tenant");
+        }
+
+        return update;
+    }
+   
+
     // constructor() {
     //     this.repository = new TenantRepository()
     //     this.departmentRepository = new DepartmentRepository()
