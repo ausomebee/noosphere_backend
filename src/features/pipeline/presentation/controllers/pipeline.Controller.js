@@ -213,7 +213,7 @@ class PipelineController {
     });
 
     deleteTenantPipelineItem = expressAsyncHandler(async (req, res) => {
-        const item = await this.service.deleteitem(req.params.id);
+        const item = await this.service.deleteTenantPipelineItem(req.params.id);
 
         if (!item) {
             res.status(500).json({ message: 'Failed to delete item' });
