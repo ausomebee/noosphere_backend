@@ -204,7 +204,7 @@ class PipelineService {
 
         const updatedItems = items.map(item => {
             const totalTasks = stage.tasks.length;
-            const completedTasks = stage.tasks.filter(task => item.doneTasks[task.name] === true).length;
+            const completedTasks = stage.tasks?.filter(task => item.doneTasks && item.doneTasks[task.name] === true).length;
 
             const completionPercentage = (completedTasks / totalTasks) * 100;
 
