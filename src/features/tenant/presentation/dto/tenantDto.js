@@ -121,14 +121,7 @@ class TenantDto {
                 .messages({
                     "string.empty": "Organization type is required",
                 }),
-            location: Joi.string()
-                .max(255)
-                .required()
-                .trim()
-                .messages({
-                    "string.empty": "Location is required",
-                    "string.max": "Location must not exceed 255 characters",
-                }),
+            location: Joi.object(),
             leadSource: Joi.string()
                 .required()
                 .trim()
