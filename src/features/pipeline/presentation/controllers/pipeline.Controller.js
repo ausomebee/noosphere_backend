@@ -225,6 +225,20 @@ class PipelineController {
             data: item
         });
     });
+
+    deleteMultipleTenantPipelineItems = expressAsyncHandler(async (req, res) => {
+        const item = await this.service.deleteMultipleTenantPipelineItems(req.body);
+
+        if (!item) {
+            res.status(500).json({ message: 'Failed to delete items' });
+        }
+
+        return res.status(201).json({
+            message: "Items deleted successfully",
+            status: 'ok',
+            data: item
+        });
+    });
 }
 
 export default PipelineController;

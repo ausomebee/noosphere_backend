@@ -272,6 +272,17 @@ import PipelineController from "../controllers/pipeline.Controller.js";
  *         assignToAdmin:
  *           type: string
  *           format: uuid
+ *     DeleteMultipleItemsDto:
+ *       type: object
+ *       required:
+ *         - ids
+ *       properties:
+ *         ids:
+ *           type: array
+ *           items:
+ *             type: string
+ *             format: uuid
+ *           example: ["550e8400-e29b-41d4-a716-446655440000", "123e4567-e89b-12d3-a456-426614174000"]
  */
 
 class PipelineRoutes {
@@ -731,6 +742,27 @@ class PipelineRoutes {
          *         description: Validation error
          */
         this.router.delete("/tenant/item/:id", PipelineDto.deleteTenantPipelineItemDto, this.controller.deleteTenantPipelineItem);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/multi/tenant/item:
+         *   delete:
+         *     summary: Delete multiple tenant pipeline items
+         *     tags:
+         *       - Pipeline
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/DeleteMultipleItemsDto'
+         *     responses:
+         *       200:
+         *         description: Successfully deleted items
+         *       400:
+         *         description: Validation error
+         */
+        this.router.delete("/multi/tenant/item", PipelineDto.deleteMultipleItemsDto, this.controller.deleteMultipleTenantPipelineItems);
 
     }
 
