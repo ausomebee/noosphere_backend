@@ -52,6 +52,10 @@ class TenantDto {
                 "string.empty": "Pipeline stage ID is required",
                 "string.guid": "Pipeline stage ID must be a valid UUID",
             }),
+            createdBy: Joi.string().uuid().required().messages({
+                "string.empty": "created by ID is required",
+                "string.guid": "created by ID must be a valid UUID",
+            }),
         });
 
         Validator.validateRequest(req, next, schema);
