@@ -187,18 +187,10 @@ class TenantRoutes {
          *           schema:
          *             $ref: '#/components/schemas/TenantUpdate'
          *     responses:
-         *       200:
+         *       201:
          *         description: Tenant updated successfully
-         *         content:
-         *           application/json:
-         *             schema:
-         *               $ref: '#/components/schemas/Tenant'
          *       400:
-         *         description: Invalid input data
-         *       404:
-         *         description: Tenant not found
-         *       500:
-         *         description: Internal server error
+         *         description: Bad request
          */
         this.router.patch("/", TenantDto.updateTenantDto, this.controller.updateTenant);
 
