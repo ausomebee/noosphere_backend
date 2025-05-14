@@ -730,7 +730,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.delete("tenant/item/:id", PipelineDto.deleteTenantPipelineItemDto, this.controller.deleteTenantPipelineItem);
+        this.router.delete("/tenant/item/:id", PipelineDto.deleteTenantPipelineItemDto, this.controller.deleteTenantPipelineItem);
 
     }
 
