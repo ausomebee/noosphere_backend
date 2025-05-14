@@ -298,11 +298,9 @@ import PipelineController from "../controllers/pipeline.Controller.js";
 *           type: object
 *           description: Key-value object where keys are task names and values indicate completion (true/false)
 *           example:
-*             doneTasks: {
 *               "design": true,
 *               "development": false,
 *               "testing": true
-*             }
 
 *     UpdateItemSentDocumentsDto:
 *       type: object
@@ -319,11 +317,11 @@ import PipelineController from "../controllers/pipeline.Controller.js";
 *           type: object
 *           description: Object representing documents that have been sent
 *           example:
-*             sentDocuments: {
+*             
 *               "invoice": true,
 *               "contract": true,
 *               "NDA": false
-*             }
+*             
 */
 
 class PipelineRoutes {
