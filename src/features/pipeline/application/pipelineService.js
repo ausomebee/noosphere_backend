@@ -192,7 +192,11 @@ class PipelineService {
             throw new Error("Failed to fetch items.");
         }
 
-        const stage = await this.stageRepository.findOne({ id: items[0].pipelineId })
+        if (items.length === 0) {
+            return [];
+        }
+
+        const stage = await this.stageRepository.findOne({ id: items[0]?.pipelineStageId })
 
         if (!stage) {
             throw new Error("Failed to fetch stage.");
