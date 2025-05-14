@@ -711,6 +711,27 @@ class PipelineRoutes {
         */
         this.router.patch("/item/assign", PipelineDto.assignCandidateDto, this.controller.updateItem);
 
+        /**
+         * @swagger
+         * /api/v1/pipeline/tenant/item/{id}:
+         *   delete:
+         *     summary: Delete item
+         *     tags: [PipelineItem]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The ID of the pipeline item to delete
+         *     responses:
+         *       201:
+         *         description: Pipeline item deleted successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.delete("tenant/item/:id", PipelineDto.deleteTenantPipelineItemDto, this.controller.deleteTenantPipelineItem);
+
     }
 
     getRouter() {
