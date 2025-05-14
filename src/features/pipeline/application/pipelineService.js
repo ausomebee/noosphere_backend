@@ -228,7 +228,7 @@ class PipelineService {
     }
 
     async getItemById(id) {
-        const item = await this.itemRepository.findOne({ id: id }, {
+        const item = await this.itemRepository.findOneAndPopulate({ id: id }, {
             tenant: true, admin: true
         });
 
