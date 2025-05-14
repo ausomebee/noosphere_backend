@@ -283,6 +283,23 @@ import PipelineController from "../controllers/pipeline.Controller.js";
  *             type: string
  *             format: uuid
  *           example: ["550e8400-e29b-41d4-a716-446655440000", "123e4567-e89b-12d3-a456-426614174000"]
+ *     UpdateItemDoneTasksDto:
+ *       type: object
+ *       required:
+ *         - doneTasks
+ *       properties:
+ *         doneTasks:
+ *           type: object
+ *           description: Key-value object where keys are task names and values indicate completion (true/false)
+
+ *     UpdateItemSentDocumentsDto:
+ *       type: object
+ *       required:
+ *         - sentDocuments
+ *       properties:
+ *         sentDocuments:
+ *           type: object
+ *           description: Object representing documents that have been sent
  */
 
 class PipelineRoutes {
@@ -763,6 +780,46 @@ class PipelineRoutes {
          *         description: Validation error
          */
         this.router.delete("/multi/tenant/item", PipelineDto.deleteMultipleItemsDto, this.controller.deleteMultipleTenantPipelineItems);
+
+        /**
+        * @swagger
+        * /api/v1/pipeline/item/task:
+        *   patch:
+        *     summary: update task done
+        *     tags: [PipelineItem]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/UpdateItemDoneTasksDto'
+        *     responses:
+        *       201:
+        *         description: updated task successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.patch("/item/task", PipelineDto.updateItemDoneTasksDto, this.controller.updateItem);
+
+        /**
+        * @swagger
+        * /api/v1/pipeline/item/document:
+        *   patch:
+        *     summary: update documents sent
+        *     tags: [PipelineItem]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/UpdateItemSentDocumentsDto'
+        *     responses:
+        *       201:
+        *         description: updated documents successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.patch("/item/document", PipelineDto.updateItemSentDocumentsDto, this.controller.updateItem);
 
     }
 
