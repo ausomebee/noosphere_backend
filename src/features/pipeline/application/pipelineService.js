@@ -188,11 +188,11 @@ class PipelineService {
             }
         });
 
-        if (!items || items.length === 0) {
+        if (!items) {
             throw new Error("Failed to fetch items.");
         }
 
-        const stage = await this.stageRepository.findOne({id: items[0].pipelineId})
+        const stage = await this.stageRepository.findOne({ id: items[0].pipelineId })
 
         if (!stage) {
             throw new Error("Failed to fetch stage.");
@@ -201,9 +201,9 @@ class PipelineService {
         const updatedItems = items.map(item => {
             const totalTasks = stage.tasks.length;
             const completedTasks = stage.tasks.filter(task => item.doneTasks[task.name] === true).length;
-    
+
             const completionPercentage = (completedTasks / totalTasks) * 100;
-    
+
             return {
                 ...item,
                 completionPercentage
@@ -318,6 +318,40 @@ class PipelineService {
 
         return deleted;
     }
+
+    async deleteMultipleTenantPipelineItems(ids) {
+        if (!Array.isArray(ids) || ids.length === 0) {
+            throw new Error("No item IDs provided.");
+        }
+
+        const results = await Promise.all(
+            ids.map(async (id) => {
+                try {
+                    const item = await this.itemRepository.findFirst({ id });
+                    if (!item) throw new Error(`Item ${id} not found.`);
+
+                    const tenant = await this.tenantRepository.findOne({ id: item.tenantId });
+                    if (!tenant) throw new Error(`Tenant ${item.tenantId} not found.`);
+
+                    const updated = await this.tenantRepository.update(tenant.id, {
+                        active: false,
+                        stage: "UNVERIFIED"
+                    });
+                    if (!updated) throw new Error(`Failed to update tenant ${tenant.id}`);
+
+                    const deleted = await this.itemRepository.delete(id);
+                    if (!deleted) throw new Error(`Failed to delete item ${id}`);
+
+                    return { id, status: 'success' };
+                } catch (error) {
+                    return { id, status: 'error', message: error.message };
+                }
+            })
+        );
+
+        return results;
+    }
+
 }
 
 export default PipelineService;

@@ -310,6 +310,17 @@ class PipelineDto {
 
         Validator.validateRequest(req, next, schema, req.params);
     };
+
+    static deleteMultipleItemsDto = (req, res, next) => {
+        const schema = Joi.object({
+            ids: Joi.array()
+                .items(Joi.string().uuid().required())
+                .min(1)
+                .required()
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
 }
 
 export default PipelineDto;    
