@@ -321,6 +321,22 @@ class PipelineDto {
 
         Validator.validateRequest(req, next, schema);
     };
+
+    static updateItemDoneTasksDto = (req, res, next) => {
+        const schema = Joi.object({
+            doneTasks: Joi.object().required()
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateItemSentDocumentsDto = (req, res, next) => {
+        const schema = Joi.object({
+            sentDocuments: Joi.object().required()
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
 }
 
 export default PipelineDto;    
