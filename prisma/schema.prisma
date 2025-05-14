@@ -46,6 +46,7 @@ model Admin {
   pipelines    Pipeline[]
   departments  Department[]
   PipelineItem PipelineItem[]
+  Tenant       Tenant[]
 }
 
 model Auth {
@@ -97,9 +98,10 @@ model Tenant {
   contactPerson    String
   companySize      String
   organizationType String
-  location         String
+  location         Json
   leadSource       String
-  stage            String
+  stage            String   @default("UNVERIFIED")
+  createdBy        String
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -110,6 +112,7 @@ model Tenant {
   TenantStaff     TenantStaff[]
   BillingMetadata BillingMetadata?
   Subscription    Subscription[]
+  admin           Admin            @relation(fields: [createdBy], references: [id])
 }
 
 model TenantStaff {
@@ -126,8 +129,9 @@ model TenantStaff {
   updatedAt   DateTime @updatedAt
   password    String?
 
-  roles  Role   @relation(fields: [roleId], references: [id])
-  tenant Tenant @relation(fields: [tenantId], references: [id])
+  roles        Role           @relation(fields: [roleId], references: [id])
+  tenant       Tenant         @relation(fields: [tenantId], references: [id])
+  PipelineItem PipelineItem[]
 }
 
 model Client {
@@ -196,20 +200,22 @@ model PipelineStage {
 }
 
 model PipelineItem {
-  id              String   @id @default(uuid())
-  tenantId        String?
-  clientId        String?
-  pipelineStageId String
-  assignToStaff   String
-  doneTasks       Json?
-  sentDocuments   Json?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                  String   @id @default(uuid())
+  tenantId            String?
+  clientId            String?
+  pipelineStageId     String
+  assignToAdmin       String?
+  assignToTenantStaff String?
+  doneTasks           Json?
+  sentDocuments       Json?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   client        Client?        @relation(fields: [clientId], references: [id])
   tenant        Tenant?        @relation(fields: [tenantId], references: [id])
   pipelineStage PipelineStage? @relation(fields: [pipelineStageId], references: [id])
-  admin         Admin?         @relation(fields: [assignToStaff], references: [id])
+  tenantStaff   TenantStaff?   @relation(fields: [assignToTenantStaff], references: [id])
+  admin         Admin?         @relation(fields: [assignToAdmin], references: [id])
 }
 
 model BillingMetadata {

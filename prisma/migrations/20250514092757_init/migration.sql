@@ -71,12 +71,18 @@ CREATE TABLE "Role" (
 -- CreateTable
 CREATE TABLE "Tenant" (
     "id" TEXT NOT NULL,
-    "fullName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "stage" TEXT NOT NULL DEFAULT 'DEFAULT',
     "phoneNumber" TEXT NOT NULL,
     "active" BOOLEAN NOT NULL DEFAULT true,
     "isDeleted" BOOLEAN NOT NULL DEFAULT false,
+    "companyName" TEXT NOT NULL,
+    "contactPerson" TEXT NOT NULL,
+    "companySize" TEXT NOT NULL,
+    "organizationType" TEXT NOT NULL,
+    "location" JSONB NOT NULL,
+    "leadSource" TEXT NOT NULL,
+    "stage" TEXT NOT NULL DEFAULT 'UNVERIFIED',
+    "createdBy" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -151,8 +157,12 @@ CREATE TABLE "PipelineStage" (
     "id" TEXT NOT NULL,
     "pipelineId" TEXT NOT NULL,
     "tasks" JSONB NOT NULL,
+    "documents" JSONB NOT NULL,
     "name" TEXT NOT NULL,
+    "colourCode" TEXT NOT NULL,
     "order" INTEGER NOT NULL,
+    "description" TEXT,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -165,7 +175,10 @@ CREATE TABLE "PipelineItem" (
     "tenantId" TEXT,
     "clientId" TEXT,
     "pipelineStageId" TEXT NOT NULL,
-    "doneTasks" JSONB NOT NULL,
+    "assignToAdmin" TEXT,
+    "assignToTenantStaff" TEXT,
+    "doneTasks" JSONB,
+    "sentDocuments" JSONB,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -296,6 +309,9 @@ ALTER TABLE "Department" ADD CONSTRAINT "Department_createdByTenantId_fkey" FORE
 ALTER TABLE "Role" ADD CONSTRAINT "Role_departmentId_fkey" FOREIGN KEY ("departmentId") REFERENCES "Department"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Tenant" ADD CONSTRAINT "Tenant_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "Admin"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "TenantStaff" ADD CONSTRAINT "TenantStaff_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -324,6 +340,12 @@ ALTER TABLE "PipelineItem" ADD CONSTRAINT "PipelineItem_tenantId_fkey" FOREIGN K
 
 -- AddForeignKey
 ALTER TABLE "PipelineItem" ADD CONSTRAINT "PipelineItem_pipelineStageId_fkey" FOREIGN KEY ("pipelineStageId") REFERENCES "PipelineStage"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PipelineItem" ADD CONSTRAINT "PipelineItem_assignToTenantStaff_fkey" FOREIGN KEY ("assignToTenantStaff") REFERENCES "TenantStaff"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PipelineItem" ADD CONSTRAINT "PipelineItem_assignToAdmin_fkey" FOREIGN KEY ("assignToAdmin") REFERENCES "Admin"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "BillingMetadata" ADD CONSTRAINT "BillingMetadata_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
