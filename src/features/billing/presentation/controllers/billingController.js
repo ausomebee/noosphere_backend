@@ -1,10 +1,31 @@
 import expressAsyncHandler from "express-async-handler";
 import BillingService from "../../application/billingService.js";
 import Billing from "../../domain/billing.js";
+import prismaService from "../../../../config/prisma.js";
+import TransactionRepository from "../../infrastructure/transactionsRepository.js";
+import BillingRepository from "../../infrastructure/billingRepository.js";
+import SubscriptionRepository from "../../infrastructure/subscriptionRepository.js";
+import PlanRepository from "../../infrastructure/planRepositiory.js";
+import PaymentRepository from "../../infrastructure/paymentRepository.js";
+import FeatureRepository from "../../infrastructure/featureRepository.js";
 
 class BillingController {
     constructor() {
-        this.service = new BillingService();
+        this.prisma = prismaService.getClient()
+        this.transactionsRepository = new TransactionRepository(this.prisma.transactions);
+        this.billingRepository = new BillingRepository(this.prisma.billingMetadata);
+        this.subscriptionRepository = new SubscriptionRepository(this.prisma.subscription);
+        this.planRepository = new PlanRepository(this.prisma.billingPlan);
+        this.paymentRepository = new PaymentRepository(this.prisma.payment);
+        this.featureRepository = new FeatureRepository(this.prisma.feature);
+        this.service = new BillingService({
+            transactionsRepository: this.transactionsRepository,
+            billingRepository: this.billingRepository,
+            subscriptionRepository: this.subscriptionRepository,
+            planRepository: this.planRepository,
+            paymentRepository: this.paymentRepository,
+            featureRepository: this.featureRepository
+        });
     }
 
     createBillingMetadata = expressAsyncHandler(async (req, res) => {
@@ -289,6 +310,63 @@ class BillingController {
             message: "feature fetched successfully",
             status: 'ok',
             data: feature
+        });
+    });
+
+    createPayment = expressAsyncHandler(async (req, res) => {
+        const paymentData = new Billing(req.body);
+        const payment = await this.service.createPayment(paymentData.createPayment);
+
+        if (!payment) {
+            res.status(500).json({ message: 'Failed to create payment' });
+        }
+
+        return res.status(201).json({
+            message: "Payment created successfully",
+            status: 'ok',
+            data: payment
+        });
+    });
+
+    updatePayment = expressAsyncHandler(async (req, res) => {
+        const payment = await this.service.updatePayment(req.body);
+
+        if (!payment) {
+            res.status(500).json({ message: 'Failed to update payment' });
+        }
+
+        return res.status(201).json({
+            message: "Payment updated successfully",
+            status: 'ok',
+            data: payment
+        });
+    });
+
+    getSinglePayment = expressAsyncHandler(async (req, res) => {
+        const payment = await this.service.getSinglePayment(req.params);
+
+        if (!payment) {
+            res.status(500).json({ message: 'Failed to fetch payment' });
+        }
+
+        return res.status(201).json({
+            message: "Payment fetched successfully",
+            status: 'ok',
+            data: payment
+        });
+    });
+
+    getAllPayment = expressAsyncHandler(async (req, res) => {
+        const payment = await this.service.getAllPayment();
+
+        if (!payment) {
+            res.status(500).json({ message: 'Failed to fetch payment' });
+        }
+
+        return res.status(201).json({
+            message: "Payment fetched successfully",
+            status: 'ok',
+            data: payment
         });
     });
 }

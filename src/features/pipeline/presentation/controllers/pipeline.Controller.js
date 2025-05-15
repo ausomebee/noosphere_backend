@@ -239,6 +239,34 @@ class PipelineController {
             data: item
         });
     });
+
+    moveMultipleTenantPipelineItems = expressAsyncHandler(async (req, res) => {
+        const item = await this.service.moveMultipleTenantPipelineItems(req.body);
+
+        if (!item) {
+            res.status(500).json({ message: 'Failed to move items' });
+        }
+
+        return res.status(201).json({
+            message: "Items moved successfully",
+            status: 'ok',
+            data: item
+        });
+    });
+
+    assignMultipleTenantPipelineItems = expressAsyncHandler(async (req, res) => {
+        const item = await this.service.assignMultipleTenantPipelineItems(req.body);
+
+        if (!item) {
+            res.status(500).json({ message: 'Failed to assign items' });
+        }
+
+        return res.status(201).json({
+            message: "Items assigned successfully",
+            status: 'ok',
+            data: item
+        });
+    });
 }
 
 export default PipelineController;

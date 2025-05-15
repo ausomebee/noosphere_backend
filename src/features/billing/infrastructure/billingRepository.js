@@ -1,174 +1,178 @@
-import prismaService from "../../../config/prisma.js";
+import BaseRepository from "./baseRepository";
 
-class BillingRepository {
-    constructor() {
-        this.prisma = prismaService.getClient();
-        this.billingMetadata = this.prisma.billingMetadata;
-        this.transactions = this.prisma.transactions;
-        this.subscription = this.prisma.subscription;
-        this.billingPlan = this.prisma.billingPlan;
-        this.feature = this.prisma.feature;
+class BillingRepository extends BaseRepository {
+    constructor(model) {
+        super(model)
     }
 
-    async createBillingMetadata(data) {
-        return await this.billingMetadata.create({ data });
-    }
+    // constructor() {
+    //     this.prisma = prismaService.getClient();
+    //     this.billingMetadata = this.prisma.billingMetadata;
+    //     this.transactions = this.prisma.transactions;
+    //     this.subscription = this.prisma.subscription;
+    //     this.billingPlan = this.prisma.billingPlan;
+    //     this.feature = this.prisma.feature;
+    // }
 
-    async findOneBillingMetadata(query) {
-        return await this.billingMetadata.findUnique({ where: query });
-    }
+    // async createBillingMetadata(data) {
+    //     return await this.billingMetadata.create({ data });
+    // }
 
-    async findFirstBillingMetadata(query) {
-        const { where, include, select, orderBy, take, skip } = query;
-        return await this.billingMetadata.findFirst({ where, include, select, orderBy, take, skip });
-    }
+    // async findOneBillingMetadata(query) {
+    //     return await this.billingMetadata.findUnique({ where: query });
+    // }
 
-    async findAllBillingMetadata(query = {}) {
-        const { where, include, select, orderBy, take, skip } = query;
-        return await this.billingMetadata.findMany({ where, include, select, orderBy, take, skip });
-    }
+    // async findFirstBillingMetadata(query) {
+    //     const { where, include, select, orderBy, take, skip } = query;
+    //     return await this.billingMetadata.findFirst({ where, include, select, orderBy, take, skip });
+    // }
 
-    async updateBillingMetadata(id, data) {
-        return await this.billingMetadata.update({ where: { id }, data: { ...data } });
-    }
+    // async findAllBillingMetadata(query = {}) {
+    //     const { where, include, select, orderBy, take, skip } = query;
+    //     return await this.billingMetadata.findMany({ where, include, select, orderBy, take, skip });
+    // }
 
-    async updateBillingMetadataWithField(field, value, data) {
-        const record = await this.billingMetadata.findUnique({ where: { [field]: value } });
-        if (!record) return { count: 0 };
-        return await this.billingMetadata.update({ where: { [field]: value }, data });
-    }
+    // async updateBillingMetadata(id, data) {
+    //     return await this.billingMetadata.update({ where: { id }, data: { ...data } });
+    // }
 
-    async deleteBillingMetadata(id) {
-        return await this.billingMetadata.delete({ where: { id } });
-    }
+    // async updateBillingMetadataWithField(field, value, data) {
+    //     const record = await this.billingMetadata.findUnique({ where: { [field]: value } });
+    //     if (!record) return { count: 0 };
+    //     return await this.billingMetadata.update({ where: { [field]: value }, data });
+    // }
 
-    async createTransaction(data) {
-        return await this.transactions.create({ data });
-    }
+    // async deleteBillingMetadata(id) {
+    //     return await this.billingMetadata.delete({ where: { id } });
+    // }
 
-    async findOneTransaction(query) {
-        return await this.transactions.findUnique({ where: query });
-    }
+    // async createTransaction(data) {
+    //     return await this.transactions.create({ data });
+    // }
 
-    async findFirstTransaction(query) {
-        const { where, include, select, orderBy, take, skip } = query;
-        return await this.transactions.findFirst({ where, include, select, orderBy, take, skip });
-    }
+    // async findOneTransaction(query) {
+    //     return await this.transactions.findUnique({ where: query });
+    // }
 
-    async findAllTransactions(query = {}) {
-        const { where, include, select, orderBy, take, skip } = query;
-        return await this.transactions.findMany({ where, include, select, orderBy, take, skip });
-    }
+    // async findFirstTransaction(query) {
+    //     const { where, include, select, orderBy, take, skip } = query;
+    //     return await this.transactions.findFirst({ where, include, select, orderBy, take, skip });
+    // }
 
-    async updateTransaction(id, data) {
-        return await this.transactions.update({ where: { id }, data: { ...data } });
-    }
+    // async findAllTransactions(query = {}) {
+    //     const { where, include, select, orderBy, take, skip } = query;
+    //     return await this.transactions.findMany({ where, include, select, orderBy, take, skip });
+    // }
 
-    async updateTransactionWithField(field, value, data) {
-        const record = await this.transactions.findUnique({ where: { [field]: value } });
-        if (!record) return { count: 0 };
-        return await this.transactions.update({ where: { [field]: value }, data });
-    }
+    // async updateTransaction(id, data) {
+    //     return await this.transactions.update({ where: { id }, data: { ...data } });
+    // }
 
-    async deleteTransaction(id) {
-        return await this.transactions.delete({ where: { id } });
-    }
+    // async updateTransactionWithField(field, value, data) {
+    //     const record = await this.transactions.findUnique({ where: { [field]: value } });
+    //     if (!record) return { count: 0 };
+    //     return await this.transactions.update({ where: { [field]: value }, data });
+    // }
 
-    async createSubscription(data) {
-        return await this.subscription.create({ data });
-    }
+    // async deleteTransaction(id) {
+    //     return await this.transactions.delete({ where: { id } });
+    // }
 
-    async findOneSubscription(query) {
-        return await this.subscription.findUnique({ where: query });
-    }
+    // async createSubscription(data) {
+    //     return await this.subscription.create({ data });
+    // }
 
-    async findFirstSubscription(query) {
-        const { where, include, select, orderBy, take, skip } = query;
-        return await this.subscription.findFirst({ where, include, select, orderBy, take, skip });
-    }
+    // async findOneSubscription(query) {
+    //     return await this.subscription.findUnique({ where: query });
+    // }
 
-    async findAllSubscriptions(query = {}) {
-        const { where, include, select, orderBy, take, skip } = query;
-        return await this.subscription.findMany({ where, include, select, orderBy, take, skip });
-    }
+    // async findFirstSubscription(query) {
+    //     const { where, include, select, orderBy, take, skip } = query;
+    //     return await this.subscription.findFirst({ where, include, select, orderBy, take, skip });
+    // }
 
-    async updateSubscription(id, data) {
-        return await this.subscription.update({ where: { id }, data: { ...data } });
-    }
+    // async findAllSubscriptions(query = {}) {
+    //     const { where, include, select, orderBy, take, skip } = query;
+    //     return await this.subscription.findMany({ where, include, select, orderBy, take, skip });
+    // }
 
-    async updateSubscriptionWithField(field, value, data) {
-        const record = await this.subscription.findUnique({ where: { [field]: value } });
-        if (!record) return { count: 0 };
-        return await this.subscription.update({ where: { [field]: value }, data });
-    }
+    // async updateSubscription(id, data) {
+    //     return await this.subscription.update({ where: { id }, data: { ...data } });
+    // }
 
-    async deleteSubscription(id) {
-        return await this.subscription.delete({ where: { id } });
-    }
+    // async updateSubscriptionWithField(field, value, data) {
+    //     const record = await this.subscription.findUnique({ where: { [field]: value } });
+    //     if (!record) return { count: 0 };
+    //     return await this.subscription.update({ where: { [field]: value }, data });
+    // }
 
-    async createBillingPlan(data) {
-        return await this.billingPlan.create({ data });
-    }
+    // async deleteSubscription(id) {
+    //     return await this.subscription.delete({ where: { id } });
+    // }
 
-    async findOneBillingPlan(query) {
-        return await this.billingPlan.findUnique({ where: query });
-    }
+    // async createBillingPlan(data) {
+    //     return await this.billingPlan.create({ data });
+    // }
 
-    async findFirstBillingPlan(query) {
-        const { where, include, select, orderBy, take, skip } = query;
-        return await this.billingPlan.findFirst({ where, include, select, orderBy, take, skip });
-    }
+    // async findOneBillingPlan(query) {
+    //     return await this.billingPlan.findUnique({ where: query });
+    // }
 
-    async findAllBillingPlans(query = {}) {
-        const { where, include, select, orderBy, take, skip } = query;
-        return await this.billingPlan.findMany({ where, include, select, orderBy, take, skip });
-    }
+    // async findFirstBillingPlan(query) {
+    //     const { where, include, select, orderBy, take, skip } = query;
+    //     return await this.billingPlan.findFirst({ where, include, select, orderBy, take, skip });
+    // }
 
-    async updateBillingPlan(id, data) {
-        return await this.billingPlan.update({ where: { id }, data: { ...data } });
-    }
+    // async findAllBillingPlans(query = {}) {
+    //     const { where, include, select, orderBy, take, skip } = query;
+    //     return await this.billingPlan.findMany({ where, include, select, orderBy, take, skip });
+    // }
 
-    async updateBillingPlanWithField(field, value, data) {
-        const record = await this.billingPlan.findUnique({ where: { [field]: value } });
-        if (!record) return { count: 0 };
-        return await this.billingPlan.update({ where: { [field]: value }, data });
-    }
+    // async updateBillingPlan(id, data) {
+    //     return await this.billingPlan.update({ where: { id }, data: { ...data } });
+    // }
 
-    async deleteBillingPlan(id) {
-        return await this.billingPlan.delete({ where: { id } });
-    }
+    // async updateBillingPlanWithField(field, value, data) {
+    //     const record = await this.billingPlan.findUnique({ where: { [field]: value } });
+    //     if (!record) return { count: 0 };
+    //     return await this.billingPlan.update({ where: { [field]: value }, data });
+    // }
 
-    async createFeature(data) {
-        return await this.feature.create({ data });
-    }
+    // async deleteBillingPlan(id) {
+    //     return await this.billingPlan.delete({ where: { id } });
+    // }
 
-    async findOneFeature(query) {
-        return await this.feature.findUnique({ where: query });
-    }
+    // async createFeature(data) {
+    //     return await this.feature.create({ data });
+    // }
 
-    async findFirstFeature(query) {
-        const { where, include, select, orderBy, take, skip } = query;
-        return await this.feature.findFirst({ where, include, select, orderBy, take, skip });
-    }
+    // async findOneFeature(query) {
+    //     return await this.feature.findUnique({ where: query });
+    // }
 
-    async findAllFeatures(query = {}) {
-        const { where, include, select, orderBy, take, skip } = query;
-        return await this.feature.findMany({ where, include, select, orderBy, take, skip });
-    }
+    // async findFirstFeature(query) {
+    //     const { where, include, select, orderBy, take, skip } = query;
+    //     return await this.feature.findFirst({ where, include, select, orderBy, take, skip });
+    // }
 
-    async updateFeature(id, data) {
-        return await this.feature.update({ where: { id }, data: { ...data } });
-    }
+    // async findAllFeatures(query = {}) {
+    //     const { where, include, select, orderBy, take, skip } = query;
+    //     return await this.feature.findMany({ where, include, select, orderBy, take, skip });
+    // }
 
-    async updateFeatureWithField(field, value, data) {
-        const record = await this.feature.findUnique({ where: { [field]: value } });
-        if (!record) return { count: 0 };
-        return await this.feature.update({ where: { [field]: value }, data });
-    }
+    // async updateFeature(id, data) {
+    //     return await this.feature.update({ where: { id }, data: { ...data } });
+    // }
 
-    async deleteFeature(id) {
-        return await this.feature.delete({ where: { id } });
-    }
+    // async updateFeatureWithField(field, value, data) {
+    //     const record = await this.feature.findUnique({ where: { [field]: value } });
+    //     if (!record) return { count: 0 };
+    //     return await this.feature.update({ where: { [field]: value }, data });
+    // }
+
+    // async deleteFeature(id) {
+    //     return await this.feature.delete({ where: { id } });
+    // }
 }
 
 export default BillingRepository;

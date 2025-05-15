@@ -358,6 +358,59 @@ class PipelineService {
         return results;
     }
 
+    async moveMultipleTenantPipelineItems(data) {
+        if (!Array.isArray(data.ids) || data.ids.length === 0) {
+            throw new Error("No item IDs provided.");
+        }
+
+        const results = await Promise.all(
+            data.ids.map(async (id) => {
+                try {
+                    const item = await this.itemRepository.findFirst({ id });
+                    if (!item) throw new Error(`Item ${id} not found.`);
+
+                    const update = await this.itemRepository.update(data.id, {
+                        pipelineStageId: data.pipelineStageId || item.pipelineStageId
+                    });
+                    
+                    if (!update) throw new Error(`Failed to move item ${id}`);
+
+                    return { id, status: 'success' };
+                } catch (error) {
+                    return { id, status: 'error', message: error.message };
+                }
+            })
+        );
+
+        return results;
+    }
+
+    async assignMultipleTenantPipelineItems(data) {
+        if (!Array.isArray(data.ids) || data.ids.length === 0) {
+            throw new Error("No item IDs provided.");
+        }
+
+        const results = await Promise.all(
+            data.ids.map(async (id) => {
+                try {
+                    const item = await this.itemRepository.findFirst({ id });
+                    if (!item) throw new Error(`Item ${id} not found.`);
+
+                    const update = await this.itemRepository.update(data.id, {
+                        assignToAdmin: data.assignToAdmin || item.assignToAdmin,
+                    });
+                    
+                    if (!update) throw new Error(`Failed to assign item ${id}`);
+
+                    return { id, status: 'success' };
+                } catch (error) {
+                    return { id, status: 'error', message: error.message };
+                }
+            })
+        );
+
+        return results;
+    }
 }
 
 export default PipelineService;

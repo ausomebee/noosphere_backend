@@ -68,6 +68,18 @@ class BillingDto {
         Validator.validateRequest(req, next, schema);
     };
 
+    static createPaymentDto = (req, res, next) => {
+        const schema = Joi.object({
+            paymentLink: Joi.string().trim().required(),
+            tenantId: Joi.string().uuid().required().messages({
+                "string.empty": "Tenant ID is required",
+                "string.guid": "Tenant ID must be a valid UUID",
+            })
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
     static checkIdDto = (req, res, next) => {
         const schema = Joi.object({
             id: Joi.string().uuid().required().messages({

@@ -322,6 +322,36 @@ class PipelineDto {
         Validator.validateRequest(req, next, schema);
     };
 
+    static assignMultipleItemsDto = (req, res, next) => {
+        const schema = Joi.object({
+            ids: Joi.array()
+                .items(Joi.string().uuid().required())
+                .min(1)
+                .required(),
+            assignToAdmin: Joi.string().uuid().required().messages({
+                "string.empty": "Staff ID is required",
+                "string.guid": "Staff ID must be a valid UUID",
+            }),
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static moveMultipleItemsDto = (req, res, next) => {
+        const schema = Joi.object({
+            ids: Joi.array()
+                .items(Joi.string().uuid().required())
+                .min(1)
+                .required(),
+            pipelineStageId: Joi.string().uuid().required().messages({
+                "string.empty": "Pipeline stage ID is required",
+                "string.guid": "Pipeline stage ID must be a valid UUID",
+            }),
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
     static updateItemDoneTasksDto = (req, res, next) => {
         const schema = Joi.object({
             doneTasks: Joi.object().required(),
