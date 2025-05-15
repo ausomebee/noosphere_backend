@@ -1,13 +1,17 @@
-import BillingRepository from "../infrastructure/billingRepository.js";
 
 class BillingService {
-    constructor() {
-        this.repository = new BillingRepository()
+    constructor({ transactionsRepository, billingRepository, subscriptionRepository, planRepository, paymentRepository, featureRepository }) {
+        this.transactionsRepository = transactionsRepository;
+        this.billingRepository = billingRepository;
+        this.subscriptionRepository = subscriptionRepository;
+        this.planRepository = planRepository;
+        this.paymentRepository = paymentRepository;
+        this.featureRepository = featureRepository;
     }
 
     async createBillingMetadata(data) {
-        const billingMetadataExists = await this.repository.findFirstBillingMetadata({
-            where: { OR: [{ tenantId: data.tenantId }] },
+        const billingMetadataExists = await this.billingRepository.findFirstDynamic({
+            where: { tenantId: data.tenantId },
             select: { tenantId: true }
         });
 
@@ -15,7 +19,7 @@ class BillingService {
             throw new Error("This BillingMetadata already exists.");
         }
 
-        const newBillingMetadata = await this.repository.createBillingMetadata(data);
+        const newBillingMetadata = await this.billingRepository.create(data);
 
         if (!newBillingMetadata) {
             throw new Error("Failed to create BillingMetadata");
@@ -25,13 +29,13 @@ class BillingService {
     }
 
     async updateBillingMetadata(data) {
-        const billingMetadata = await this.repository.findOneBillingMetadata({ id: data.id })
+        const billingMetadata = await this.billingRepository.findOne({ id: data.id })
 
         if (!billingMetadata) {
             throw new Error("Billing Metadata not found");
         }
 
-        const update = await this.repository.update(data.id, {
+        const update = await this.billingRepository.update(data.id, {
             paymentMethod: data.paymentMethod || billingMetadata.paymentMethod,
             billingAddress: data.billingAddress || billingMetadata.billingAddress
         });
@@ -44,9 +48,7 @@ class BillingService {
     }
 
     async getSingleBillingMetadata(data) {
-        const billingMetadata = await this.repository.findOneBillingMetadata({
-            id: data.id
-        });
+        const billingMetadata = await this.billingRepository.findOne({ id: data.id });
 
         if (!billingMetadata) {
             throw new Error("billingMetadata not found")
@@ -56,7 +58,7 @@ class BillingService {
     }
 
     async getAllBillingMetadata(data) {
-        const billingMetadata = await this.repository.findAllBillingMetadata({});
+        const billingMetadata = await this.billingRepository.findAll({});
 
         if (!billingMetadata) {
             throw new Error("billingMetadata not found")
@@ -66,7 +68,7 @@ class BillingService {
     }
 
     async createTransaction(data) {
-        const newTransaction = await this.repository.createTransaction(data);
+        const newTransaction = await this.transactionsRepository.create(data);
 
         if (!newTransaction) {
             throw new Error("Failed to create Transaction");
@@ -95,9 +97,7 @@ class BillingService {
     // }
 
     async getSingleTransaction(data) {
-        const Transaction = await this.repository.findOneTransaction({
-            id: data.id
-        });
+        const Transaction = await this.transactionsRepository.findOne({ id: data.id });
 
         if (!Transaction) {
             throw new Error("Transaction not found")
@@ -107,7 +107,7 @@ class BillingService {
     }
 
     async getAllTransaction(data) {
-        const Transaction = await this.repository.findAllTransactions({});
+        const Transaction = await this.transactionsRepository.findAll({});
 
         if (!Transaction) {
             throw new Error("Transaction not found")
@@ -117,7 +117,7 @@ class BillingService {
     }
 
     async createSubscription(data) {
-        const subscriptionExists = await this.repository.findFirstSubscription({
+        const subscriptionExists = await this.subscriptionRepository.findFirstDynamic({
             where: { OR: [{ tenantId: data.tenantId }] },
             select: { tenantId: true }
         });
@@ -126,7 +126,7 @@ class BillingService {
             throw new Error("This subscription already exists.");
         }
 
-        const newSubscription = await this.repository.createSubscription(data);
+        const newSubscription = await this.subscriptionRepository.create(data);
 
         if (!newSubscription) {
             throw new Error("Failed to create subscription");
@@ -136,13 +136,13 @@ class BillingService {
     }
 
     async updateSubscription(data) {
-        const subscription = await this.repository.findOneSubscription({ id: data.id })
+        const subscription = await this.subscriptionRepository.findOne({ id: data.id })
 
         if (!subscription) {
             throw new Error("Subscription not found");
         }
 
-        const update = await this.repository.update(data.id, {
+        const update = await this.subscriptionRepository.update(data.id, {
             planId: data.planId || subscription.planId,
             status: data.status || subscription.status,
             startDate: data.startDate || subscription.startDate,
@@ -157,9 +157,7 @@ class BillingService {
     }
 
     async getSingleSubscription(data) {
-        const subscription = await this.repository.findOneSubscription({
-            id: data.id
-        });
+        const subscription = await this.subscriptionRepository.findOne({ id: data.id });
 
         if (!subscription) {
             throw new Error("Subscription not found")
@@ -169,7 +167,7 @@ class BillingService {
     }
 
     async getAllSubscription(data) {
-        const subscription = await this.repository.findAllSubscriptions({});
+        const subscription = await this.subscriptionRepository.findAll({});
 
         if (!subscription) {
             throw new Error("Subscription not found")
@@ -179,7 +177,7 @@ class BillingService {
     }
 
     async createBillingPlan(data) {
-        const billingPlanExists = await this.repository.findFirstBillingPlan({
+        const billingPlanExists = await this.planRepository.findFirstDynamic({
             where: { name: data.name },
             select: { name: true }
         });
@@ -188,7 +186,7 @@ class BillingService {
             throw new Error("This billingPlan already exists.");
         }
 
-        const newBillingPlan = await this.repository.createBillingPlan(data);
+        const newBillingPlan = await this.planRepository.create(data);
 
         if (!newBillingPlan) {
             throw new Error("Failed to create BillingPlan");
@@ -198,19 +196,19 @@ class BillingService {
     }
 
     async updateBillingPlan(data) {
-        const billingPlan = await this.repository.findOneBillingPlan({ id: data.id })
+        const billingPlan = await this.planRepository.findOne({ id: data.id })
 
         if (!billingPlan) {
             throw new Error("BillingPlan not found");
         }
 
-        const update = await this.repository.update(data.id, {
+        const update = await this.planRepository.update(data.id, {
             name: data.name || billingPlan.name,
             description: data.description || billingPlan.description,
             price: data.price || billingPlan.price,
             billingCycle: data.billingCycle || billingPlan.billingCycle
         });
-        
+
         if (!update) {
             throw new Error("Failed to update Billing Plan");
         }
@@ -219,9 +217,7 @@ class BillingService {
     }
 
     async getSingleBillingPlan(data) {
-        const billingPlan = await this.repository.findOneBillingPlan({
-            id: data.id
-        });
+        const billingPlan = await this.paymentRepository.findOne({ id: data.id });
 
         if (!billingPlan) {
             throw new Error("BillingPlan not found")
@@ -231,7 +227,7 @@ class BillingService {
     }
 
     async getAllBillingPlan(data) {
-        const billingPlan = await this.repository.findAllBillingPlans({});
+        const billingPlan = await this.planRepository.findAll({});
 
         if (!billingPlan) {
             throw new Error("BillingPlan not found")
@@ -241,7 +237,7 @@ class BillingService {
     }
 
     async createFeature(data) {
-        const featureExists = await this.repository.findFirstFeature({
+        const featureExists = await this.featureRepository.findFirstDynamic({
             where: { name: data.name },
             select: { name: true }
         });
@@ -250,7 +246,7 @@ class BillingService {
             throw new Error("This Feature already exists.");
         }
 
-        const newFeature = await this.repository.createFeature(data);
+        const newFeature = await this.featureRepository.create(data);
 
         if (!newFeature) {
             throw new Error("Failed to create Feature");
@@ -260,30 +256,28 @@ class BillingService {
     }
 
     async updateFeature(data) {
-        const feature = await this.repository.findOneFeature({ id: data.id })
+        const feature = await this.featureRepository.findOne({ id: data.id })
 
         if (!feature) {
             throw new Error("Feature not found");
         }
 
-        const update = await this.repository.update(data.id, {
+        const update = await this.featureRepository.update(data.id, {
             name: data.name || feature.name,
             description: data.description || feature.description,
             price: data.price || feature.price,
             billingCycle: data.billingCycle || feature.billingCycle
         });
-        
+
         if (!update) {
-            throw new Error("Failed to update Billing Plan");
+            throw new Error("Failed to update feature");
         }
 
         return update;
     }
 
     async getSingleFeature(data) {
-        const feature = await this.repository.findOneFeature({
-            id: data.id
-        });
+        const feature = await this.featureRepository.findOne({ id: data.id });
 
         if (!feature) {
             throw new Error("Feature not found")
@@ -293,13 +287,70 @@ class BillingService {
     }
 
     async getAllFeature(data) {
-        const feature = await this.repository.findAllFeatures({});
+        const feature = await this.featureRepository.findAll({});
 
         if (!feature) {
             throw new Error("Feature not found")
         }
 
         return feature;
+    }
+
+    async createPayment(data) {
+        const paymentExists = await this.paymentRepository.findFirstDynamic({
+            where: { tenantId: data.tenantId },
+            select: { tenantId: true }
+        });
+
+        if (paymentExists) {
+            throw new Error("This payment already exists.");
+        }
+
+        const newPayment = await this.paymentRepository.create(data);
+
+        if (!newPayment) {
+            throw new Error("Failed to create payment");
+        }
+
+        return newPayment;
+    }
+
+    async updatePayment(data) {
+        const payment = await this.paymentRepository.findOne({ id: data.id })
+
+        if (!payment) {
+            throw new Error("payment not found");
+        }
+
+        const update = await this.paymentRepository.update(data.id, {
+            paymentLink: data.paymentLink || payment.paymentLink
+        });
+
+        if (!update) {
+            throw new Error("Failed to update payment");
+        }
+
+        return update;
+    }
+
+    async getSinglePayment(data) {
+        const payment = await this.paymentRepository.findOne({ id: data.id });
+
+        if (!payment) {
+            throw new Error("Payment not found")
+        }
+
+        return payment;
+    }
+
+    async getAllPayment(data) {
+        const payment = await this.paymentRepository.findAll({});
+
+        if (!payment) {
+            throw new Error("Payment not found")
+        }
+
+        return payment;
     }
 }
 

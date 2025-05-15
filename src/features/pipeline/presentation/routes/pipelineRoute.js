@@ -283,6 +283,36 @@ import PipelineController from "../controllers/pipeline.Controller.js";
  *             type: string
  *             format: uuid
  *           example: ["550e8400-e29b-41d4-a716-446655440000", "123e4567-e89b-12d3-a456-426614174000"]
+ *     MoveMultipleItemsDto:
+ *       type: object
+ *       required:
+ *         - ids
+ *         - pipelineStageId
+ *       properties:
+ *         ids:
+ *           type: array
+ *           items:
+ *             type: string
+ *             format: uuid
+ *           example: ["550e8400-e29b-41d4-a716-446655440000", "123e4567-e89b-12d3-a456-426614174000"]
+ *         pipelineStageId:
+ *           type: string
+ *           format: uuid
+ *     AssignMultipleItemsDto:
+ *       type: object
+ *       required:
+ *         - ids
+ *         - assignToAdmin
+ *       properties:
+ *         ids:
+ *           type: array
+ *           items:
+ *             type: string
+ *             format: uuid
+ *           example: ["550e8400-e29b-41d4-a716-446655440000", "123e4567-e89b-12d3-a456-426614174000"]
+ *         assignToAdmin:
+ *           type: string
+ *           format: uuid
  *     UpdateItemDoneTasksDto:
 *       type: object
 *       required:
@@ -802,6 +832,48 @@ class PipelineRoutes {
          *         description: Validation error
          */
         this.router.delete("/multi/tenant/item", PipelineDto.deleteMultipleItemsDto, this.controller.deleteMultipleTenantPipelineItems);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/multi/move/tenant/item:
+         *   patch:
+         *     summary: Move multiple tenant pipeline items
+         *     tags:
+         *       - Pipeline
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/MoveMultipleItemsDto'
+         *     responses:
+         *       200:
+         *         description: Successfully moved items
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/multi/move/tenant/item", PipelineDto.moveMultipleItemsDto, this.controller.moveMultipleTenantPipelineItems);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/multi/assign/tenant/item:
+         *   patch:
+         *     summary: Assign multiple tenant pipeline items
+         *     tags:
+         *       - Pipeline
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/AssignMultipleItemsDto'
+         *     responses:
+         *       200:
+         *         description: Successfully assigned items
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/multi/assign/tenant/item", PipelineDto.assignMultipleItemsDto, this.controller.assignMultipleTenantPipelineItems);
 
         /**
         * @swagger

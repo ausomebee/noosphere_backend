@@ -34,6 +34,19 @@ import BillingDto from "../dto/billingDto.js";
  *           format: uuid
  *           example: "c0a8017e-7b68-11e9-8f9e-2a86e4085a59"
  *
+ *     CreatePaymentDto:
+ *       type: object
+ *       required:
+ *         - tenantId
+ *         - paymentLink
+ *       properties:
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *           example: "c0a8017e-7b68-11e9-8f9e-2a86e4085a59"
+ *         paymentLink:
+ *           type: string
+ *           example: "https://www.google.com/"
  *     CreateSubscriptionDto:
  *       type: object
  *       required:
@@ -351,6 +364,61 @@ class BillingRoutes {
          *         description: Bad request
          */
         this.router.get("/allfeature", this.controller.getAllFeature);
+
+        /**
+         * @swagger
+         * /api/v1/billing/payment:
+         *   post:
+         *     summary: Create payment
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/CreatePaymentDto'
+         *     responses:
+         *       201:
+         *         description: payment created successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/payment", BillingDto.createPaymentDto, this.controller.createPayment);
+
+        /**
+        * @swagger
+        * /api/v1/billing/payment/{id}:
+        *   get:
+        *     summary: gets single payment
+        *     tags: [billing]
+        *     parameters:
+        *       - in: path
+        *         name: id
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The ID of the payment
+        *     responses:
+        *       200:
+        *         description: Payment fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/payment/:id", BillingDto.checkIdDto, this.controller.getSinglePayment);
+
+        /**
+         * @swagger
+         * /api/v1/billing/allpayment:
+         *   get:
+         *     summary: Retrieve all payment
+         *     tags: [billing]
+         *     responses:
+         *       200:
+         *         description: all payment retrieved successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get("/allpayment", this.controller.getAllPayment);
 
     }
 
