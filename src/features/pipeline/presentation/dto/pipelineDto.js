@@ -324,7 +324,11 @@ class PipelineDto {
 
     static updateItemDoneTasksDto = (req, res, next) => {
         const schema = Joi.object({
-            doneTasks: Joi.object().required()
+            doneTasks: Joi.object().required(),
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID",
+            }),
         });
 
         Validator.validateRequest(req, next, schema);
@@ -332,7 +336,11 @@ class PipelineDto {
 
     static updateItemSentDocumentsDto = (req, res, next) => {
         const schema = Joi.object({
-            sentDocuments: Joi.object().required()
+            sentDocuments: Joi.object().required(),
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID",
+            }),
         });
 
         Validator.validateRequest(req, next, schema);

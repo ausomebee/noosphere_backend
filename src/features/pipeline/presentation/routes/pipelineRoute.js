@@ -284,23 +284,47 @@ import PipelineController from "../controllers/pipeline.Controller.js";
  *             format: uuid
  *           example: ["550e8400-e29b-41d4-a716-446655440000", "123e4567-e89b-12d3-a456-426614174000"]
  *     UpdateItemDoneTasksDto:
- *       type: object
- *       required:
- *         - doneTasks
- *       properties:
- *         doneTasks:
- *           type: object
- *           description: Key-value object where keys are task names and values indicate completion (true/false)
+*       type: object
+*       required:
+*         - id
+*         - doneTasks
+*       properties:
+*         id:
+*           type: string
+*           format: uuid
+*           description: UUID of the pipeline item
+*           example: "d3b07384-d9a7-4c9d-aafd-3d1f7c4e9a2a"
+*         doneTasks:
+*           type: object
+*           description: Key-value object where keys are task names and values indicate completion (true/false)
+*           example:
+*             doneTasks: {
+*               "design": true,
+*               "development": false,
+*               "testing": true
+*             }
 
- *     UpdateItemSentDocumentsDto:
- *       type: object
- *       required:
- *         - sentDocuments
- *       properties:
- *         sentDocuments:
- *           type: object
- *           description: Object representing documents that have been sent
- */
+*     UpdateItemSentDocumentsDto:
+*       type: object
+*       required:
+*         - id
+*         - sentDocuments
+*       properties:
+*         id:
+*           type: string
+*           format: uuid
+*           description: UUID of the pipeline item
+*           example: "4f1b2aa3-98a2-4ff1-a6b5-0b4f33b3a1cd"
+*         sentDocuments:
+*           type: object
+*           description: Object representing documents that have been sent
+*           example:
+*             sentDocuments: {
+*               "invoice": true,
+*               "contract": true,
+*               "NDA": false
+*             }
+*/
 
 class PipelineRoutes {
     constructor() {
@@ -618,25 +642,25 @@ class PipelineRoutes {
          */
         this.router.patch("/item/stage", PipelineDto.updateItemStageDto, this.controller.updateItem);
 
-       /**
-         * @swagger
-         * /api/v1/pipeline/stage/{id}:
-         *   delete:
-         *     summary: Delete pipeline stage
-         *     tags: [PipelineStage]
-         *     parameters:
-         *       - in: path
-         *         name: id
-         *         required: true
-         *         schema:
-         *           type: string
-         *         description: The ID of the pipeline stage to delete
-         *     responses:
-         *       201:
-         *         description: Pipeline stage deleted successfully
-         *       400:
-         *         description: Validation error
-         */
+        /**
+          * @swagger
+          * /api/v1/pipeline/stage/{id}:
+          *   delete:
+          *     summary: Delete pipeline stage
+          *     tags: [PipelineStage]
+          *     parameters:
+          *       - in: path
+          *         name: id
+          *         required: true
+          *         schema:
+          *           type: string
+          *         description: The ID of the pipeline stage to delete
+          *     responses:
+          *       201:
+          *         description: Pipeline stage deleted successfully
+          *       400:
+          *         description: Validation error
+          */
         this.router.delete("/stage/:id", PipelineDto.getByIdDto, this.controller.deleteStage);
 
         /**
