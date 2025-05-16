@@ -385,20 +385,16 @@ class PipelineService {
 
         const results = await Promise.all(
             data.ids.map(async (id) => {
-                try {
-                    const item = await this.itemRepository.findFirst({ id });
-                    if (!item) throw new Error(`Item ${id} not found.`);
+                const item = await this.itemRepository.findFirst({ id });
+                if (!item) throw new Error(`Item ${id} not found.`);
 
-                    const update = await this.itemRepository.update(data.id, {
-                        assignToAdmin: data.assignToAdmin || item.assignToAdmin,
-                    });
+                const update = await this.itemRepository.update(id, {
+                    assignToAdmin: data.assignToAdmin || item.assignToAdmin,
+                });
 
-                    if (!update) throw new Error(`Failed to assign item ${id}`);
+                if (!update) throw new Error(`Failed to assign item ${id}`);
 
-                    return { id, status: 'success' };
-                } catch (error) {
-                    return { id, status: 'error', message: error.message };
-                }
+                return { id, status: 'success' };
             })
         );
 
