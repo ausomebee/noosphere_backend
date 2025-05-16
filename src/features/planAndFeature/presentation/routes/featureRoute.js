@@ -32,6 +32,14 @@ import FeatureDto from "../dto/featureDto.js";
  *           items:
  *             type: string
  *           example: ["Enterprise", "pro"]
+ *     CreateFeatureGroupDto:
+ *       type: object
+ *       required:
+ *         - name
+ *       properties:
+ *         name:
+ *           type: string
+ *           example: "calling"
  */
 
 class FeatureRoutes {

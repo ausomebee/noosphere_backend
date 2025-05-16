@@ -7,12 +7,12 @@ class FeatureDto {
             name: Joi.string().trim().required(),
             description: Joi.string().trim().required(),
             featureGroupId: Joi.string().trim().required(),
-            applicablePlans: Joi.string().trim().required()
+            applicablePlans: Joi.array().items(Joi.string().trim()).required()
         });
 
         Validator.validateRequest(req, next, schema);
     };
-    
+
     static createFeatureGroupDto = (req, res, next) => {
         const schema = Joi.object({
             name: Joi.string().trim().required(),

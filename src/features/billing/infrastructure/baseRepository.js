@@ -40,7 +40,7 @@ class BaseRepository {
 
     async findFirstDynamic(query) {
         const { where, include, select, orderBy, take, skip } = query;
-        return await this.billingMetadata.findFirst({ where, include, select, orderBy, take, skip });
+        return await this.model.findFirst({ where, include, select, orderBy, take, skip });
     }
 }
 

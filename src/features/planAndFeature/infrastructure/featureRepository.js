@@ -1,4 +1,4 @@
-import BaseRepository from "../../billing/infrastructure/baseRepository.js";
+import BaseRepository from "./baseRepository.js";
 
 class FeatureRepository extends BaseRepository {
     constructor(model) {
