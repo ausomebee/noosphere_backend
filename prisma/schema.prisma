@@ -263,10 +263,27 @@ model BillingPlan {
 }
 
 model Feature {
-  id          String        @id @default(uuid())
-  name        String
-  description String
-  plans       BillingPlan[] @relation("PlanFeatures")
+  id              String   @id @default(uuid())
+  name            String
+  description     String?
+  featureGroupId  String
+  active          Boolean  @default(true)
+  applicablePlans Json
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  plans BillingPlan[] @relation("PlanFeatures")
+  group FeatureGroup? @relation(fields: [featureGroupId], references: [id])
+}
+
+model FeatureGroup {
+  id        String   @id @default(uuid())
+  name      String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Feature Feature[]
 }
 
 model SuperAdminChoices {

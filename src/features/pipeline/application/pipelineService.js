@@ -332,26 +332,23 @@ class PipelineService {
 
         const results = await Promise.all(
             ids.map(async (id) => {
-                try {
-                    const item = await this.itemRepository.findFirst({ id });
-                    if (!item) throw new Error(`Item ${id} not found.`);
+                const item = await this.itemRepository.findFirst({ id });
+                if (!item) throw new Error(`Item ${id} not found.`);
 
-                    const tenant = await this.tenantRepository.findOne({ id: item.tenantId });
-                    if (!tenant) throw new Error(`Tenant ${item.tenantId} not found.`);
+                const tenant = await this.tenantRepository.findOne({ id: item.tenantId });
+                if (!tenant) throw new Error(`Tenant ${item.tenantId} not found.`);
 
-                    const updated = await this.tenantRepository.update(tenant.id, {
-                        active: false,
-                        stage: "UNVERIFIED"
-                    });
-                    if (!updated) throw new Error(`Failed to update tenant ${tenant.id}`);
+                const updated = await this.tenantRepository.update(tenant.id, {
+                    active: false,
+                    stage: "UNVERIFIED",
+                    isDeleted: true
+                });
+                if (!updated) throw new Error(`Failed to update tenant ${tenant.id}`);
 
-                    const deleted = await this.itemRepository.delete(id);
-                    if (!deleted) throw new Error(`Failed to delete item ${id}`);
+                const deleted = await this.itemRepository.delete(id);
+                if (!deleted) throw new Error(`Failed to delete item ${id}`);
 
-                    return { id, status: 'success' };
-                } catch (error) {
-                    return { id, status: 'error', message: error.message };
-                }
+                return { id, status: 'success' };
             })
         );
 
@@ -365,20 +362,16 @@ class PipelineService {
 
         const results = await Promise.all(
             data.ids.map(async (id) => {
-                try {
-                    const item = await this.itemRepository.findFirst({ id });
-                    if (!item) throw new Error(`Item ${id} not found.`);
+                const item = await this.itemRepository.findFirst({ id });
+                if (!item) throw new Error(`Item ${id} not found.`);
 
-                    const update = await this.itemRepository.update(data.id, {
-                        pipelineStageId: data.pipelineStageId || item.pipelineStageId
-                    });
-                    
-                    if (!update) throw new Error(`Failed to move item ${id}`);
+                const update = await this.itemRepository.update(id, {
+                    pipelineStageId: data.pipelineStageId || item.pipelineStageId
+                });
 
-                    return { id, status: 'success' };
-                } catch (error) {
-                    return { id, status: 'error', message: error.message };
-                }
+                if (!update) throw new Error(`Failed to move item ${id}`);
+
+                return { id, status: 'success' };
             })
         );
 
@@ -399,7 +392,7 @@ class PipelineService {
                     const update = await this.itemRepository.update(data.id, {
                         assignToAdmin: data.assignToAdmin || item.assignToAdmin,
                     });
-                    
+
                     if (!update) throw new Error(`Failed to assign item ${id}`);
 
                     return { id, status: 'success' };
