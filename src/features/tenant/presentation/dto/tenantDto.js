@@ -10,7 +10,7 @@ class TenantDto {
             fullName: Joi.string()
                 .required()
                 .min(3)
-                .max(20)
+                .max(50)
                 .trim()
                 .messages({
                     "string.empty": "First name is required",
