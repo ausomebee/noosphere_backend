@@ -269,6 +269,7 @@ model Feature {
   featureGroupId  String
   active          Boolean  @default(true)
   applicablePlans Json
+  managedBy       String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
