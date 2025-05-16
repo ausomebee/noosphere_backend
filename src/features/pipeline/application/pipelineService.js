@@ -325,7 +325,7 @@ class PipelineService {
         return deleted;
     }
 
-    async deleteMultipleTenantPipelineItems(ids) {
+    async deleteMultipleTenantPipelineItems({ids}) {
         if (!Array.isArray(ids) || ids.length === 0) {
             throw new Error("No item IDs provided.");
         }
