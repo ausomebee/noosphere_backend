@@ -7,6 +7,7 @@ class FeatureDto {
             name: Joi.string().trim().required(),
             description: Joi.string().trim().required(),
             featureGroupId: Joi.string().trim().required(),
+            managedBy: Joi.string().trim().required(),
             applicablePlans: Joi.array().items(Joi.string().trim()).required()
         });
 

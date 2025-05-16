@@ -14,6 +14,7 @@ import FeatureDto from "../dto/featureDto.js";
  *         - featureGroupId
  *         - active
  *         - applicablePlans
+ *         - managedBy
  *       properties:
  *         featureGroupId:
  *           type: string
@@ -32,6 +33,9 @@ import FeatureDto from "../dto/featureDto.js";
  *           items:
  *             type: string
  *           example: ["Enterprise", "pro"]
+ *         managedBy:
+ *           type: string
+ *           example: "local govt"
  *     CreateFeatureGroupDto:
  *       type: object
  *       required:
