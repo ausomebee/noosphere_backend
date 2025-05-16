@@ -126,6 +126,34 @@ class FeatureController {
             data: featureGroup
         });
     });
+
+    deleteSingleFeatureGroup = expressAsyncHandler(async (req, res) => {
+        const featureGroup = await this.service.deleteSingleFeatureGroup(req.body);
+
+        if (!featureGroup) {
+            res.status(500).json({ message: 'Failed to delete feature group' });
+        }
+
+        return res.status(201).json({
+            message: "feature group deleted successfully",
+            status: 'ok',
+            data: featureGroup
+        });
+    });
+    
+    deleteSingleFeature = expressAsyncHandler(async (req, res) => {
+        const feature = await this.service.deleteSingleFeature(req.body);
+
+        if (!feature) {
+            res.status(500).json({ message: 'Failed to delete feature.' });
+        }
+
+        return res.status(201).json({
+            message: "feature deleted successfully",
+            status: 'ok',
+            data: feature
+        });
+    });
 }
 
 export default FeatureController;
