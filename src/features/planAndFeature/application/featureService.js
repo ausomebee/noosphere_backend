@@ -113,7 +113,7 @@ class FeatureService {
     }
 
     async getAllFeatureGroup(data) {
-        const featureGroup = await this.featureGroupRepository.findAll({});
+        const featureGroup = await this.featureGroupRepository.findAllAndPopulate({}, {Feature: true});
 
         if (!featureGroup) {
             throw new Error("Feature group not found")
