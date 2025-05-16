@@ -4,13 +4,15 @@ import FeatureRepository from "../../infrastructure/featureRepository.js";
 import FeatureGroupRepository from "../../infrastructure/featureGroupRepository.js";
 import FeatureService from "../../application/featureService.js";
 import Feature from "../../domain/feature.js";
+import AdminRepository from "../../../admin/infrastructure/adminRepository.js";
 
 class FeatureController {
     constructor() {
         this.prisma = prismaService.getClient()
         this.featureRepository = new FeatureRepository(this.prisma.feature)
+        this.adminRepository = new AdminRepository(this.prisma.admin)
         this.featureGroupRepository = new FeatureGroupRepository(this.prisma.featureGroup)
-        this.service = new FeatureService({ featureRepository: this.featureRepository, featureGroupRepository: this.featureGroupRepository });
+        this.service = new FeatureService({ featureRepository: this.featureRepository, featureGroupRepository: this.featureGroupRepository, adminRepository: this.adminRepository });
     }
 
     createFeature = expressAsyncHandler(async (req, res) => {
