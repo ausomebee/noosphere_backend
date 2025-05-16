@@ -1,4 +1,4 @@
-import BaseRepository from "./baseRepository.js";
+import BaseRepository from "../../billing/infrastructure/baseRepository.js";
 
 class SubscriptionRepository extends BaseRepository {
     constructor(model) {

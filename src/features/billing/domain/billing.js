@@ -31,33 +31,6 @@ class Billing {
         };
     }
 
-    get createSubscription() {
-        return {
-            tenantId: this.tenantId,
-            planId: this.planId,
-            status: this.status,
-            startDate: this.startDate,
-            endDate: this.endDate,
-            transactionId: this.transactionId
-        };
-    }
-
-    get createBillingPlan() {
-        return {
-            name: this.name,
-            description: this.description,
-            price: this.price,
-            billingCycle: this.billingCycle,
-        };
-    }
-
-    get createFeature() {
-        return {
-            name: this.name,
-            description: this.description
-        };
-    }
-
     get createPayment() {
         return {
             paymentLink: this.paymentLink,

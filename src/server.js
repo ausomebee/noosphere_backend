@@ -18,6 +18,9 @@ import tenant_route from "./features/tenant/presentation/routes/tenantRoute.js"
 import client_route from "./features/client/presentation/routes/clientRoute.js"
 import auth_route from "./features/auth/presentation/routes/authRoute.js"
 import billing_route from "./features/billing/presentation/routes/billingRoute.js"
+import feature_route from "./features/planAndFeature/presentation/routes/featureRoute.js"
+import plan_route from "./features/planAndFeature/presentation/routes/planRoute.js"
+import subscription_route from "./features/planAndFeature/presentation/routes/subscriptionRoute.js"
 
 
 class App {
@@ -43,7 +46,7 @@ class App {
         new PassportUtil(this.app)
         this.app.use(morgan("dev"));
         this.app.use(cors({
-            origin: ["http://127.0.0.1:5173", "http://localhost:5173", "http://127.0.0.1:5174", "http://localhost:5174", "http://127.0.0.1:5175", "http://localhost:5175", "http://ec2-54-193-53-214.us-west-1.compute.amazonaws.com:5000/"],
+            origin: ["http://127.0.0.1:5173", "http://localhost:5173", "http://127.0.0.1:5174", "http://localhost:5174", "http://127.0.0.1:5175", "http://localhost:5175", "http://ec2-54-193-53-214.us-west-1.compute.amazonaws.com:5000/", "http://localhost:5000/"],
             methods: "GET, POST, PATCH, DELETE, PUT",
             credentials: true,
         }));
@@ -65,6 +68,9 @@ class App {
         this.app.use("/api/v1/client", client_route);
         this.app.use("/api/v1/auth", auth_route);
         this.app.use("/api/v1/billing", billing_route);
+        this.app.use("/api/v1/feature", feature_route);
+        this.app.use("/api/v1/plan", plan_route);
+        this.app.use("/api/v1/subscription", subscription_route);
     }
 
     initializeErrorHandler() {
