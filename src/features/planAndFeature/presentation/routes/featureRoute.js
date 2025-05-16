@@ -44,6 +44,80 @@ import FeatureDto from "../dto/featureDto.js";
  *         name:
  *           type: string
  *           example: "calling"
+ *     UpdateFeatureGroupDto:
+ *       type: object
+ *       required:
+ *         - name
+ *         - id
+ *       properties:
+ *         name:
+ *           type: string
+ *           example: "calling"
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "c0a8017e-7b68-11e9-8f9e-2a86e4085a59"
+ *     deleteFeatureGroupDto:
+ *       type: object
+ *       required:
+ *         - administratorPassword
+ *         - id
+ *       properties:
+ *         administratorPassword:
+ *           type: string
+ *           format: password
+ *           minLength: 8
+ *           maxLength: 100
+ *           example: "StrongP@ssw0rd!"
+ *           description: administrator password
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "c0a8017e-7b68-11e9-8f9e-2a86e4085a59"
+ *     moveFeatureDto:
+ *       type: object
+ *       required:
+ *         - featureGroupId
+ *         - id
+ *       properties:
+ *         featureGroupId:
+ *           type: string
+ *           format: uuid
+ *           example: "c0a8017e-7b68-11e9-8f9e-2a86e4085a59"
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "c0a8017e-7b68-11e9-8f9e-2a86e4085a59"
+ *     updateFeatureDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - name
+ *         - description
+ *         - active
+ *         - applicablePlans
+ *         - managedBy
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "c0a8017e-7b68-11e9-8f9e-2a86e4085a59"
+ *         name:
+ *           type: string
+ *           example: "calling"
+ *         description:
+ *           type: string
+ *           example: "ability to make calls"
+ *         active:
+ *           type: boolean
+ *         applicablePlans:
+ *           type: array
+ *           items:
+ *             type: string
+ *           example: ["Enterprise", "pro"]
+ *         managedBy:
+ *           type: string
+ *           example: "local govt"
  */
 
 class FeatureRoutes {
@@ -163,6 +237,109 @@ class FeatureRoutes {
          *         description: Bad request
          */
         this.router.get("/allfeaturegroup", this.controller.getAllFeatureGroup);
+
+        /**
+        * @swagger
+        * /api/v1/feature/group:
+        *   patch:
+        *     summary: update feature group
+        *     tags: [feature]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/UpdateFeatureGroupDto'
+        *     responses:
+        *       201:
+        *         description: updated feature group successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.patch("/group", FeatureDto.updateFeatureGroupDto, this.controller.updateFeatureGroup);
+
+        /**
+         * @swagger
+         * /api/v1/feature/group:
+         *   delete:
+         *     summary: Delete a feature group
+         *     tags:
+         *       - feature
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/deleteFeatureGroupDto'
+         *     responses:
+         *       200:
+         *         description: Successfully deleted feature group
+         *       400:
+         *         description: Validation error
+         */
+        this.router.delete("/group", FeatureDto.deleteFeatureGroupDto, this.controller.deleteSingleFeatureGroup);
+
+        /**
+        * @swagger
+        * /api/v1/feature/move:
+        *   patch:
+        *     summary: move feature to another group
+        *     tags: [feature]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/moveFeatureDto'
+        *     responses:
+        *       201:
+        *         description: feature updated successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.patch("/move", FeatureDto.moveFeatureDto, this.controller.updateFeature);
+
+        /**
+        * @swagger
+        * /api/v1/feature/feature:
+        *   patch:
+        *     summary: update feature data
+        *     tags: [feature]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/updateFeatureDto'
+        *     responses:
+        *       201:
+        *         description: feature updated successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.patch("/feature", FeatureDto.updateFeatureDto, this.controller.updateFeature);
+
+        /**
+        * @swagger
+        * /api/v1/feature/feature:
+        *   delete:
+        *     summary: Delete a feature 
+        *     tags:
+        *       - feature
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/deleteFeatureGroupDto'
+        *     responses:
+        *       200:
+        *         description: Successfully deleted feature
+        *       400:
+        *         description: Validation error
+        */
+        this.router.delete("/feature", FeatureDto.deleteFeatureGroupDto, this.controller.deleteSingleFeature);
+
     }
 
     getRouter() {

@@ -5,6 +5,12 @@ class FeatureRepository extends BaseRepository {
         super(model)
     }
 
+    async updateWithGroup(featureGroupId, data) {
+        return await this.model.update({
+            where: { featureGroupId },
+            data,
+        });
+    }
     
 }
 
