@@ -154,7 +154,7 @@ class FeatureService {
             throw new Error("Extras group not found")
         }
 
-        const move = await this.featureRepository.updateWithGroup({ featureGroupId: featureGroup.id }, { featureGroupId: extras.id })
+        const move = await this.featureRepository.updateWithGroup(featureGroup.id, { featureGroupId: extras.id })
 
         if (!move) {
             throw new Error("Failed to move items to extras")
