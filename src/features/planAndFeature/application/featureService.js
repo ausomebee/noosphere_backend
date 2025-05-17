@@ -38,7 +38,7 @@ class FeatureService {
             description: data.description || feature.description,
             featureGroupId: data.featureGroupId || feature.featureGroupId,
             applicablePlans: data.applicablePlans || feature.applicablePlans,
-            active: data.active || feature.active,
+            active: data.active ?? feature.active,
             managedBy: data.managedBy || feature.managedBy
         });
         

@@ -94,8 +94,6 @@ import FeatureDto from "../dto/featureDto.js";
  *         - id
  *         - name
  *         - description
- *         - active
- *         - applicablePlans
  *         - managedBy
  *       properties:
  *         id:
@@ -108,16 +106,36 @@ import FeatureDto from "../dto/featureDto.js";
  *         description:
  *           type: string
  *           example: "ability to make calls"
- *         active:
- *           type: boolean
+ *         managedBy:
+ *           type: string
+ *           example: "local govt"
+ *     assignFeatureToPlanDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - applicablePlans
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "c0a8017e-7b68-11e9-8f9e-2a86e4085a59"
  *         applicablePlans:
  *           type: array
  *           items:
  *             type: string
  *           example: ["Enterprise", "pro"]
- *         managedBy:
+ *     updateActivityDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - active
+ *       properties:
+ *         id:
  *           type: string
- *           example: "local govt"
+ *           format: uuid
+ *           example: "c0a8017e-7b68-11e9-8f9e-2a86e4085a59"
+ *         active:
+ *           type: boolean
  */
 
 class FeatureRoutes {
@@ -339,6 +357,46 @@ class FeatureRoutes {
         *         description: Validation error
         */
         this.router.delete("/feature", FeatureDto.deleteFeatureGroupDto, this.controller.deleteSingleFeature);
+
+        /**
+        * @swagger
+        * /api/v1/feature/plan:
+        *   patch:
+        *     summary: assign feature to a plan
+        *     tags: [feature]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/assignFeatureToPlanDto'
+        *     responses:
+        *       201:
+        *         description: feature updated successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.patch("/plan", FeatureDto.assignFeatureToPlanDto, this.controller.updateFeature);
+
+        /**
+        * @swagger
+        * /api/v1/feature/active:
+        *   patch:
+        *     summary: update feature activity
+        *     tags: [feature]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/updateActivityDto'
+        *     responses:
+        *       201:
+        *         description: feature updated successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.patch("/active", FeatureDto.updateActivityDto, this.controller.updateFeature);
 
     }
 

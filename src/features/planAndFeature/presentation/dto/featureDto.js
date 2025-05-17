@@ -26,7 +26,30 @@ class FeatureDto {
             name: Joi.string().trim().optional(),
             description: Joi.string().trim().optional(),
             managedBy: Joi.string().trim().optional(),
-            applicablePlans: Joi.array().items(Joi.string().trim()).optional()
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static assignFeatureToPlanDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            applicablePlans: Joi.array().items(Joi.string().trim()).required()
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateActivityDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID",
+            }),
+            active: Joi.boolean().required()
         });
 
         Validator.validateRequest(req, next, schema);
