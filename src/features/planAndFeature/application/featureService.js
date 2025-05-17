@@ -144,11 +144,11 @@ class FeatureService {
             throw new Error("Feature group not found")
         }
 
-        if (featureGroup.name.toUpperCase() === "EXTRAS") {
+        if (featureGroup.name.toUpperCase() === "Extra Features") {
             throw new Error("you can't delete the extras group")
         }
 
-        const extras = await this.featureGroupRepository.findFirst({ name: "Extras" })
+        const extras = await this.featureGroupRepository.findFirst({ name: "Extra Features" })
 
         if (!extras) {
             throw new Error("Extras group not found")
