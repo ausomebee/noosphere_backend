@@ -144,7 +144,7 @@ class FeatureService {
             throw new Error("Feature group not found")
         }
 
-        if (featureGroup.name.toUpperCase() === "Extra Features") {
+        if (featureGroup.name.toUpperCase() === "EXTRA FEATURES") {
             throw new Error("you can't delete the extras group")
         }
 
