@@ -274,7 +274,7 @@ model Feature {
   updatedAt       DateTime @updatedAt
 
   plans BillingPlan[] @relation("PlanFeatures")
-  group FeatureGroup? @relation(fields: [featureGroupId], references: [id])
+  featureGroup FeatureGroup? @relation(fields: [featureGroupId], references: [id])
 }
 
 model FeatureGroup {
