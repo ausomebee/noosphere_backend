@@ -6,7 +6,7 @@ class FeatureRepository extends BaseRepository {
     }
 
     async updateWithGroup(featureGroupId, data) {
-        return await this.model.update({
+        return await this.model.updateMany({
             where: { featureGroupId },
             data,
         });
