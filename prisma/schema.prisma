@@ -47,6 +47,7 @@ model Admin {
   departments  Department[]
   PipelineItem PipelineItem[]
   Tenant       Tenant[]
+  logs         Logs[]
 }
 
 model Auth {
@@ -114,6 +115,7 @@ model Tenant {
   Subscription    Subscription[]
   admin           Admin            @relation(fields: [createdBy], references: [id])
   Payment         Payment?
+  logs            Logs[]
 }
 
 model TenantStaff {
@@ -149,6 +151,7 @@ model Client {
 
   pipelineItems PipelineItem[]
   tenantLinks   ClientTenant[]
+  logs          Logs[]
 }
 
 model ClientTenant {
@@ -273,8 +276,9 @@ model Feature {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  plans BillingPlan[] @relation("PlanFeatures")
+  plans        BillingPlan[] @relation("PlanFeatures")
   featureGroup FeatureGroup? @relation(fields: [featureGroupId], references: [id])
+  logs         Logs[]
 }
 
 model FeatureGroup {
@@ -304,4 +308,23 @@ model Payment {
   updatedAt   DateTime @updatedAt
 
   tenant Tenant? @relation(fields: [tenantId], references: [id])
+}
+
+model Logs {
+  logId     String   @id @default(uuid())
+  tenantId  String?
+  clientId  String?
+  adminId   String?
+  featureId String?
+  module    Module
+  action    String
+  details   String?
+  ipAddress String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant  Tenant?  @relation(fields: [tenantId], references: [id])
+  client  Client?  @relation(fields: [clientId], references: [id])
+  admin   Admin?   @relation(fields: [adminId], references: [id])
+  feature Feature? @relation(fields: [featureId], references: [id])
 }
