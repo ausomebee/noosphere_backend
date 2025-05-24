@@ -1,11 +1,10 @@
 class Feature {
-    constructor({ id, name, description, featureGroupId, active, applicablePlans, managedBy }) {
+    constructor({ id, name, description, featureGroupId, active, managedBy }) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.featureGroupId = featureGroupId;
         this.active = active;
-        this.applicablePlans = applicablePlans;
         this.managedBy = managedBy;
     }
 
@@ -14,7 +13,6 @@ class Feature {
             name: this.name,
             description: this.description,
             featureGroupId: this.featureGroupId,
-            applicablePlans: this.applicablePlans,
             managedBy: this.managedBy
         };
     }

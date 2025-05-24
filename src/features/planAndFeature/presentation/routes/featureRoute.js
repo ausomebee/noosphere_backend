@@ -13,7 +13,6 @@ import FeatureDto from "../dto/featureDto.js";
  *         - description
  *         - featureGroupId
  *         - active
- *         - applicablePlans
  *         - managedBy
  *       properties:
  *         featureGroupId:
@@ -28,11 +27,6 @@ import FeatureDto from "../dto/featureDto.js";
  *           example: "ability to make calls"
  *         active:
  *           type: boolean
- *         applicablePlans:
- *           type: array
- *           items:
- *             type: string
- *           example: ["Enterprise", "pro"]
  *         managedBy:
  *           type: string
  *           example: "local govt"

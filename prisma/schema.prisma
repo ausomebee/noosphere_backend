@@ -19,10 +19,9 @@ enum SubscriptionStatus {
   CANCELLED
 }
 
-enum BillingCycle {
-  MONTHLY
-  YEARLY
-  LIFETIME
+enum PlanType {
+  ENTERPRISE
+  STANDARD
 }
 
 model Admin {
@@ -48,6 +47,7 @@ model Admin {
   PipelineItem PipelineItem[]
   Tenant       Tenant[]
   logs         Logs[]
+  BillingPlan  BillingPlan[]
 }
 
 model Auth {
@@ -116,6 +116,7 @@ model Tenant {
   admin           Admin            @relation(fields: [createdBy], references: [id])
   Payment         Payment?
   logs            Logs[]
+  BillingPlan     BillingPlan[]
 }
 
 model TenantStaff {
@@ -255,28 +256,44 @@ model Subscription {
 }
 
 model BillingPlan {
-  id           String       @id @default(uuid())
-  name         String
-  description  String
-  price        Float
-  billingCycle BillingCycle
+  id                     String   @id @default(uuid())
+  planType               PlanType
+  name                   String
+  colourCode             String
+  description            String
+  pricePerMonth          Json
+  pricePerYear           Json
+  forClient              Int
+  extraFeaturesWithPrice Json?
+  forStaff               Int
+  forStorage             Float
+  extraFeaturesEnabled   Boolean  @default(false)
+  active                 Boolean  @default(true)
+  tenantId               String?
+  adminId                String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 
-  features      Feature[]      @relation("PlanFeatures")
-  subscriptions Subscription[]
+  features       Feature[]      @relation("PlanFeatures")
+  extraFeatures  Feature[]      @relation("ExtraFeatures")
+  subscriptions  Subscription[]
+  assignedTo     Tenant?        @relation(fields: [tenantId], references: [id])
+  accountManager Admin?         @relation(fields: [adminId], references: [id])
 }
 
 model Feature {
-  id              String   @id @default(uuid())
-  name            String
-  description     String?
-  featureGroupId  String
-  active          Boolean  @default(true)
-  applicablePlans Json
-  managedBy       String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(uuid())
+  name           String
+  description    String?
+  featureGroupId String
+  active         Boolean  @default(true)
+  // applicablePlans Json
+  managedBy      String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   plans        BillingPlan[] @relation("PlanFeatures")
+  extraPlans   BillingPlan[] @relation("ExtraFeatures")
   featureGroup FeatureGroup? @relation(fields: [featureGroupId], references: [id])
   logs         Logs[]
 }

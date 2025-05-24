@@ -63,6 +63,16 @@ class SubscriptionService {
         return subscription;
     }
 
+    async getSubscriptionByPlan(planId) {
+        const subscription = await this.subscriptionRepository.findAllAndPopulate({ planId }, { tenant: true });
+
+        if (!subscription) {
+            throw new Error("Subscriptions not found")
+        }
+
+        return subscription;
+    }
+
 }
 
 export default SubscriptionService;
