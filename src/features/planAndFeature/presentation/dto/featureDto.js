@@ -11,7 +11,6 @@ class FeatureDto {
             description: Joi.string().trim().required(),
             featureGroupId: Joi.string().trim().required(),
             managedBy: Joi.string().trim().required(),
-            applicablePlans: Joi.array().items(Joi.string().trim()).required()
         });
 
         Validator.validateRequest(req, next, schema);

@@ -35,6 +35,17 @@ class SubscriptionDto {
         Validator.validateRequest(req, next, schema, req.params);
     };
 
+    static checkPlanIdDto = (req, res, next) => {
+        const schema = Joi.object({
+            planId: Joi.string().uuid().required().messages({
+                "string.empty": "Plan ID is required",
+                "string.guid": "Plan ID must be a valid UUID"
+            })
+        });
+
+        Validator.validateRequest(req, next, schema, req.params);
+    };
+
 }
 
 export default SubscriptionDto;

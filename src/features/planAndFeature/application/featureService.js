@@ -60,7 +60,7 @@ class FeatureService {
     }
 
     async getAllFeature(data) {
-        const feature = await this.featureRepository.findAll({});
+        const feature = await this.featureRepository.findAllWithPlan();
 
         if (!feature) {
             throw new Error("Feature not found")

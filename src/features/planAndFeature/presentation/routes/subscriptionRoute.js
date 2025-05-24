@@ -104,6 +104,27 @@ class SubscriptionRoutes {
          */
         this.router.get("/", this.controller.getAllSubscription);
 
+        /**
+        * @swagger
+        * /api/v1/subscription/plan/{planId}:
+        *   get:
+        *     summary: gets Subscriptions by plan
+        *     tags: [subscription]
+        *     parameters:
+        *       - in: path
+        *         name: planId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The ID of the plan
+        *     responses:
+        *       200:
+        *         description: Subscriptions fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/plan/:planId", SubscriptionDto.checkPlanIdDto, this.controller.getSubscriptionByPlan);
+
     }
 
     getRouter() {
