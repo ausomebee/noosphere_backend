@@ -41,18 +41,15 @@ class PlanDto {
             }).required(),
             extraFeaturesWithPrice: Joi.array().items(
                 Joi.object({
-                    id: Joi.string().uuid().required().messages({
-                        "string.empty": "Feature ID is required",
-                        "string.guid": "Feature ID must be a valid UUID"
-                    }),
-                    price: Joi.number().required().messages({
-                        "number.base": "Price must be a number",
-                        "any.required": "Price is required"
-                    }),
-                    currency: Joi.string().required().messages({
-                        "string.empty": "Currency is required",
-                        "any.required": "Currency is required"
-                    }),
+                    id: Joi.string().uuid().required(),
+                    pricePerMonth: Joi.object({
+                        price: Joi.number().required(),
+                        currency: Joi.string().valid('USD').required()
+                    }).required(),
+                    pricePerYear: Joi.object({
+                        price: Joi.number().required(),
+                        currency: Joi.string().valid('USD').required()
+                    }).required()
                 })
             )
         });

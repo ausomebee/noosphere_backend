@@ -50,10 +50,6 @@ import PlanDto from "../dto/planDto.js";
  *     CreateEnterpriseBillingPlanDto:
  *       type: object
  *       properties:
- *         id:
- *           type: string
- *           format: uuid
- *           example: "a1b2c3d4-e5f6-7g8h-9i10-jk11lm12no13"
  *         planType:
  *           type: string
  *           example: "ENTERPRISE"
@@ -146,25 +142,42 @@ import PlanDto from "../dto/planDto.js";
  *                 - id: "extra-feature-id-1"
  *                 - id: "extra-feature-id-2"
  *         extraFeaturesWithPrice:
- *           type: array
- *           items:
- *             type: object
- *             required:
- *               - id
- *               - price
- *               - currency
- *             properties:
- *               id:
- *                 type: string
- *                 format: uuid
- *                 example: "ee297128-ee97-4677-a0a2-cc039a326023"
- *               price:
- *                 type: number
- *                 format: float
- *                 example: 22.5
- *               currency:
- *                 type: string
- *                 example: "usd"
+ *       type: object
+ *       required:
+ *         - id
+ *         - pricePerMonth
+ *         - pricePerYear
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "123e4567-e89b-12d3-a456-426614174000"
+ *          pricePerMonth:
+ *       type: object
+ *       required:
+ *         - price
+ *         - currency
+ *       properties:
+ *         price:
+ *           type: number
+ *           example: 8
+ *         currency:
+ *           type: string
+ *           enum: [USD]
+ *           example: USD
+ *          pricePerYear:
+ *       type: object
+ *       required:
+ *         - price
+ *         - currency
+ *       properties:
+ *         price:
+ *           type: number
+ *           example: 8
+ *         currency:
+ *           type: string
+ *           enum: [USD]
+ *           example: USD
  */
 
 class PlanRoutes {
