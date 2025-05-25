@@ -165,114 +165,6 @@ import PlanDto from "../dto/planDto.js";
  *               currency:
  *                 type: string
  *                 example: "usd"
- *     CreateStandardBillingPlanDto:
- *       type: object
- *       properties:
- *         id:
- *           type: string
- *           format: uuid
- *           example: "a1b2c3d4-e5f6-7g8h-9i10-jk11lm12no13"
- *         planType:
- *           type: string
- *           example: "STANDARD"
- *         name:
- *           type: string
- *           example: "Premium Plan"
- *         colourCode:
- *           type: string
- *           example: "#FF5733"
- *         description:
- *           type: string
- *           example: "Includes all advanced features and support"
- *         pricePerMonth:
- *           type: object
- *           required:
- *             - price
- *             - currency
- *           properties:
- *             price:
- *               type: number
- *               format: float
- *               example: 100
- *             currency:
- *               type: string
- *               example: "USD"
- *               description: "ISO 4217 currency code, e.g. USD, EUR"
- *         pricePerYear:
- *           type: object
- *           required:
- *             - price
- *             - currency
- *           properties:
- *             price:
- *               type: number
- *               format: float
- *               example: 100
- *             currency:
- *               type: string
- *               example: "USD"
- *               description: "ISO 4217 currency code, e.g. USD, EUR"
- *         forClient:
- *           type: integer
- *           example: 10
- *         forStaff:
- *           type: integer
- *           example: 50
- *         forStorage:
- *           type: number
- *           format: float
- *           example: 100.5
- *         extraFeaturesEnabled:
- *           type: boolean
- *           example: true
- *         features:
- *           type: object
- *           properties:
- *             connect:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                     format: uuid
- *               example:
- *                 - id: "feature-id-1"
- *                 - id: "feature-id-2"
- *         extraFeatures:
- *           type: object
- *           properties:
- *             connect:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                     format: uuid
- *               example:
- *                 - id: "extra-feature-id-1"
- *                 - id: "extra-feature-id-2"
- *         extraFeaturesWithPrice:
- *           type: array
- *           items:
- *             type: object
- *             required:
- *               - id
- *               - price
- *               - currency
- *             properties:
- *               id:
- *                 type: string
- *                 format: uuid
- *                 example: "ee297128-ee97-4677-a0a2-cc039a326023"
- *               price:
- *                 type: number
- *                 format: float
- *                 example: 22.5
- *               currency:
- *                 type: string
- *                 example: "usd"
  */
 
 class PlanRoutes {
@@ -286,9 +178,9 @@ class PlanRoutes {
 
         /**
          * @swagger
-         * /api/v1/plan/enterprise:
+         * /api/v1/plan/:
          *   post:
-         *     summary: Create enterprise billing plan
+         *     summary: Create billing plan
          *     tags: [plan]
          *     requestBody:
          *       required: true
@@ -302,27 +194,7 @@ class PlanRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/enterprise", PlanDto.createEnterpriseBillingPlanDto, this.controller.createBillingPlan);
-
-        /**
-         * @swagger
-         * /api/v1/plan/standard:
-         *   post:
-         *     summary: Create standard billing plan
-         *     tags: [plan]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/CreateStandardBillingPlanDto'
-         *     responses:
-         *       201:
-         *         description: billing plan created successfully
-         *       400:
-         *         description: Validation error
-         */
-        this.router.post("/standard", PlanDto.createStandardBillingPlanDto, this.controller.createBillingPlan);
+        this.router.post("/", PlanDto.createBillingPlanDto, this.controller.createBillingPlan);
 
         /**
          * @swagger
@@ -439,7 +311,7 @@ class PlanRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/", PlanDto.createEnterpriseBillingPlanDto, this.controller.updateBillingPlan);
+        this.router.patch("/", PlanDto.createBillingPlanDto, this.controller.updateBillingPlan);
 
         /**
          * @swagger

@@ -194,6 +194,20 @@ class TenantRoutes {
          */
         this.router.patch("/", TenantDto.updateTenantDto, this.controller.updateTenant);
 
+        /**
+         * @swagger
+         * /api/v1/tenant/:
+         *   get:
+         *     summary: Retrieve all tenants
+         *     tags: [tenant]
+         *     responses:
+         *       200:
+         *         description: all tenants retrieved successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get("/", this.controller.getAllTenant);
+
 
         // /**
         //  * @swagger

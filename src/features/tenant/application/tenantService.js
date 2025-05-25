@@ -30,7 +30,7 @@ class TenantService {
         }
 
         const createData = new Tenant(data)
-        
+
         const newCandidate = await this.prisma.$transaction(async (tx) => {
             const tenant = await this.tenantRepository.txCreate(createData.createTenant, tx);
             const pipeline = await this.pipelineRepository.txCreate({
@@ -86,7 +86,16 @@ class TenantService {
 
         return update;
     }
-   
+
+    async getAllTenant() {
+        const tenants = await this.tenantRepository.findAll({});
+
+        if (!tenants) {
+            throw new Error("Tenants not found")
+        }
+
+        return tenants;
+    }
 
     // constructor() {
     //     this.repository = new TenantRepository()

@@ -56,6 +56,20 @@ class TenantController {
         });
     });
 
+    getAllTenant = expressAsyncHandler(async (req, res) => {
+        const tenants = await this.service.getAllTenant();
+
+        if (!tenants) {
+            res.status(500).json({ message: 'Failed to fetch tenants.' });
+        }
+
+        return res.status(201).json({
+            message: "Tenants fetched successfully",
+            status: 'ok',
+            data: tenants
+        });
+    });
+
     // createTenantStaff = expressAsyncHandler(async (req, res) => {
     //     const staffData = new Tenant(req.body);
     //     const staff = await this.service.createTenantStaff(staffData.createTenantStaff);
