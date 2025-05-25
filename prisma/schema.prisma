@@ -260,7 +260,7 @@ model BillingPlan {
   planType               PlanType
   name                   String
   colourCode             String
-  description            String
+  description            String?
   pricePerMonth          Json
   pricePerYear           Json
   forClient              Int
