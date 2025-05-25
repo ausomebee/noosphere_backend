@@ -142,42 +142,44 @@ import PlanDto from "../dto/planDto.js";
  *                 - id: "extra-feature-id-1"
  *                 - id: "extra-feature-id-2"
  *         extraFeaturesWithPrice:
- *       type: object
- *       required:
- *         - id
- *         - pricePerMonth
- *         - pricePerYear
- *       properties:
- *         id:
- *           type: string
- *           format: uuid
- *           example: "123e4567-e89b-12d3-a456-426614174000"
- *          pricePerMonth:
- *       type: object
- *       required:
- *         - price
- *         - currency
- *       properties:
- *         price:
- *           type: number
- *           example: 8
- *         currency:
- *           type: string
- *           enum: [USD]
- *           example: USD
- *          pricePerYear:
- *       type: object
- *       required:
- *         - price
- *         - currency
- *       properties:
- *         price:
- *           type: number
- *           example: 8
- *         currency:
- *           type: string
- *           enum: [USD]
- *           example: USD
+ *           type: array
+ *           items:
+ *             type: object
+ *             required:
+ *               - id
+ *               - pricePerMonth
+ *               - pricePerYear
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 format: uuid
+ *                 example: "123e4567-e89b-12d3-a456-426614174000"
+ *               pricePerMonth:
+ *                 type: object
+ *                 required:
+ *                   - price
+ *                   - currency
+ *                 properties:
+ *                   price:
+ *                     type: number
+ *                     example: 8
+ *                   currency:
+ *                     type: string
+ *                     enum: [USD]
+ *                     example: USD
+ *               pricePerYear:
+ *                 type: object
+ *                 required:
+ *                   - price
+ *                   - currency
+ *                 properties:
+ *                   price:
+ *                     type: number
+ *                     example: 8
+ *                   currency:
+ *                     type: string
+ *                     enum: [USD]
+ *                     example: USD
  */
 
 class PlanRoutes {
