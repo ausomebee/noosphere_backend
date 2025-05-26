@@ -180,6 +180,143 @@ import PlanDto from "../dto/planDto.js";
  *                     type: string
  *                     enum: [USD]
  *                     example: USD
+ *     updateBillingPlanDto:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "123e4567-e89b-12d3-a456-426614174000"
+ *         planType:
+ *           type: string
+ *           example: "ENTERPRISE"
+ *         name:
+ *           type: string
+ *           example: "Premium Plan"
+ *         colourCode:
+ *           type: string
+ *           example: "#FF5733"
+ *         description:
+ *           type: string
+ *           example: "Includes all advanced features and support"
+ *         pricePerMonth:
+ *           type: object
+ *           required:
+ *             - price
+ *             - currency
+ *           properties:
+ *             price:
+ *               type: number
+ *               format: float
+ *               example: 100
+ *             currency:
+ *               type: string
+ *               example: "USD"
+ *               description: "ISO 4217 currency code, e.g. USD, EUR"
+ *         pricePerYear:
+ *           type: object
+ *           required:
+ *             - price
+ *             - currency
+ *           properties:
+ *             price:
+ *               type: number
+ *               format: float
+ *               example: 100
+ *             currency:
+ *               type: string
+ *               example: "USD"
+ *               description: "ISO 4217 currency code, e.g. USD, EUR"
+ *         forClient:
+ *           type: integer
+ *           example: 10
+ *         forStaff:
+ *           type: integer
+ *           example: 50
+ *         forStorage:
+ *           type: number
+ *           format: float
+ *           example: 100.5
+ *         extraFeaturesEnabled:
+ *           type: boolean
+ *           example: true
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *           nullable: true
+ *           example: "123e4567-e89b-12d3-a456-426614174000"
+ *         adminId:
+ *           type: string
+ *           format: uuid
+ *           nullable: true
+ *           example: "789e4567-e89b-12d3-a456-426614174999"
+ *         features:
+ *           type: object
+ *           properties:
+ *             connect:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     format: uuid
+ *               example:
+ *                 - id: "feature-id-1"
+ *                 - id: "feature-id-2"
+ *         extraFeatures:
+ *           type: object
+ *           properties:
+ *             connect:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     format: uuid
+ *               example:
+ *                 - id: "extra-feature-id-1"
+ *                 - id: "extra-feature-id-2"
+ *         extraFeaturesWithPrice:
+ *           type: array
+ *           items:
+ *             type: object
+ *             required:
+ *               - id
+ *               - pricePerMonth
+ *               - pricePerYear
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 format: uuid
+ *                 example: "123e4567-e89b-12d3-a456-426614174000"
+ *               pricePerMonth:
+ *                 type: object
+ *                 required:
+ *                   - price
+ *                   - currency
+ *                 properties:
+ *                   price:
+ *                     type: number
+ *                     example: 8
+ *                   currency:
+ *                     type: string
+ *                     enum: [USD]
+ *                     example: USD
+ *               pricePerYear:
+ *                 type: object
+ *                 required:
+ *                   - price
+ *                   - currency
+ *                 properties:
+ *                   price:
+ *                     type: number
+ *                     example: 8
+ *                   currency:
+ *                     type: string
+ *                     enum: [USD]
+ *                     example: USD
  */
 
 class PlanRoutes {
@@ -319,14 +456,14 @@ class PlanRoutes {
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/CreateEnterpriseBillingPlanDto'
+         *             $ref: '#/components/schemas/updateBillingPlanDto'
          *     responses:
          *       201:
          *         description: billing plan updated successfully
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/", PlanDto.createBillingPlanDto, this.controller.updateBillingPlan);
+        this.router.patch("/", PlanDto.updateBillingPlanDto, this.controller.updateBillingPlan);
 
         /**
          * @swagger
