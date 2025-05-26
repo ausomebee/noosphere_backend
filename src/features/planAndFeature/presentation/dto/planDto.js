@@ -111,6 +111,61 @@ class PlanDto {
         Validator.validateRequest(req, next, schema);
     };
 
+    static updateBillingPlanDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            name: Joi.string().required(),
+            planType: Joi.string().required(),
+            colourCode: Joi.string().required(),
+            description: Joi.string().required(),
+            pricePerMonth: Joi.object({
+                price: Joi.number().positive().required(),
+                currency: Joi.string().uppercase().length(3).required()
+            }).required(),
+            pricePerYear: Joi.object({
+                price: Joi.number().positive().required(),
+                currency: Joi.string().uppercase().length(3).required()
+            }).required(),
+            forClient: Joi.number().integer().min(0).required(),
+            forStaff: Joi.number().integer().min(0).required(),
+            forStorage: Joi.number().min(0).required(),
+            extraFeaturesEnabled: Joi.boolean().default(false),
+            tenantId: Joi.string().uuid().optional().allow(null),
+            adminId: Joi.string().uuid().optional().allow(null),
+            features: Joi.object({
+                connect: Joi.array().items(
+                    Joi.object({
+                        id: Joi.string().uuid().required()
+                    })
+                ).min(1).required()
+            }).required(),
+            extraFeatures: Joi.object({
+                connect: Joi.array().items(
+                    Joi.object({
+                        id: Joi.string().uuid().required()
+                    })
+                ).min(1).required()
+            }).required(),
+            extraFeaturesWithPrice: Joi.array().items(
+                Joi.object({
+                    id: Joi.string().uuid().required(),
+                    pricePerMonth: Joi.object({
+                        price: Joi.number().required(),
+                        currency: Joi.string().valid('USD').required()
+                    }).required(),
+                    pricePerYear: Joi.object({
+                        price: Joi.number().required(),
+                        currency: Joi.string().valid('USD').required()
+                    }).required()
+                })
+            )
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
 }
 
 export default PlanDto;
