@@ -30,7 +30,7 @@ class InvoiceService {
         const invoice = await this.invoiceRepository.findAll({});
 
         if (!invoice) {
-            throw new Error("Invoice not found")
+            throw new Error("Invoice not found");
         }
 
         return invoice;
