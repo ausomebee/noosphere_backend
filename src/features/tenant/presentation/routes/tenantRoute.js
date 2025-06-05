@@ -179,7 +179,7 @@ class TenantRoutes {
          *   patch:
          *     summary: Update tenant details
          *     description: Update the details of an existing tenant by specifying the tenant ID.
-         *     tags: [Tenants]
+         *     tags: [Tenant]
          *     requestBody:
          *       required: true
          *       content:
@@ -199,7 +199,7 @@ class TenantRoutes {
          * /api/v1/tenant/:
          *   get:
          *     summary: Retrieve all tenants
-         *     tags: [tenant]
+         *     tags: [Tenant]
          *     responses:
          *       200:
          *         description: all tenants retrieved successfully
@@ -207,6 +207,20 @@ class TenantRoutes {
          *         description: Bad request
          */
         this.router.get("/", this.controller.getAllTenant);
+
+        /**
+         * @swagger
+         * /api/v1/tenant/count:
+         *   get:
+         *     summary: Count all tenants
+         *     tags: [Tenant]
+         *     responses:
+         *       200:
+         *         description: all tenants counted successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get("/count", this.controller.countAllTenant);
 
 
         // /**

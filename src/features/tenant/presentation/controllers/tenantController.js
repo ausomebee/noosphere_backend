@@ -70,6 +70,20 @@ class TenantController {
         });
     });
 
+    countAllTenant = expressAsyncHandler(async (req, res) => {
+        const totalTenants = await this.service.countAllTenant();
+
+        if (!totalTenants) {
+            res.status(500).json({ message: 'Failed to fetch tenants.' });
+        }
+
+        return res.status(201).json({
+            message: "Tenants counted successfully",
+            status: 'ok',
+            data: totalTenants
+        });
+    });
+
     // createTenantStaff = expressAsyncHandler(async (req, res) => {
     //     const staffData = new Tenant(req.body);
     //     const staff = await this.service.createTenantStaff(staffData.createTenantStaff);

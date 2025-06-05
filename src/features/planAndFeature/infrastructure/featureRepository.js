@@ -11,13 +11,20 @@ class FeatureRepository extends BaseRepository {
             data,
         });
     }
-    
+
     async findAllWithPlan() {
         return await this.model.findMany({
             where: {},
-            include: {plans: true}
+            include: {
+                plans: {
+                    select: {
+                        name: true
+                    }
+                }
+            }
         });
     }
+
 }
 
 export default FeatureRepository;

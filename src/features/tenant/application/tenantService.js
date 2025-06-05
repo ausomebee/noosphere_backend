@@ -97,6 +97,16 @@ class TenantService {
         return tenants;
     }
 
+    async countAllTenant() {
+        const totalTenants = await this.tenantRepository.countAllTenants();
+
+        if (!totalTenants) {
+            throw new Error("Tenants not found")
+        }
+
+        return totalTenants;
+    }
+
     // constructor() {
     //     this.repository = new TenantRepository()
     //     this.departmentRepository = new DepartmentRepository()
