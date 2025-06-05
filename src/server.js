@@ -21,6 +21,7 @@ import billing_route from "./features/billing/presentation/routes/billingRoute.j
 import feature_route from "./features/planAndFeature/presentation/routes/featureRoute.js"
 import plan_route from "./features/planAndFeature/presentation/routes/planRoute.js"
 import subscription_route from "./features/planAndFeature/presentation/routes/subscriptionRoute.js"
+import invoice_route from "./features/invoice/presentation/routes/invoiceRoute.js"
 
 
 class App {
@@ -71,6 +72,7 @@ class App {
         this.app.use("/api/v1/feature", feature_route);
         this.app.use("/api/v1/plan", plan_route);
         this.app.use("/api/v1/subscription", subscription_route);
+        this.app.use("/api/v1/invoice", invoice_route);
     }
 
     initializeErrorHandler() {

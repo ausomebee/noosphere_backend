@@ -8,6 +8,12 @@ class TenantRepository extends BaseRepository {
     async txCreate(data, tx) {
         return await tx.tenant.create({ data });
     }
+
+    async countAllTenants() {
+        return await this.model.count();
+    }
+
+
     // async create(data) {
     //     return await this.model.create({ data });
     // }

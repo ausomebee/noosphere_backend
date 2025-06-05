@@ -24,6 +24,13 @@ enum PlanType {
   STANDARD
 }
 
+enum InvoiceStatus {
+  Paid
+  Upcoming
+  Due
+  Overdue
+}
+
 model Admin {
   id                    String   @id @default(uuid())
   fullName              String
@@ -117,6 +124,7 @@ model Tenant {
   Payment         Payment?
   logs            Logs[]
   BillingPlan     BillingPlan[]
+  Invoice         Invoice[]
 }
 
 model TenantStaff {
@@ -279,6 +287,7 @@ model BillingPlan {
   subscriptions  Subscription[]
   assignedTo     Tenant?        @relation(fields: [tenantId], references: [id])
   accountManager Admin?         @relation(fields: [adminId], references: [id])
+  Invoice        Invoice[]
 }
 
 model Feature {
@@ -344,4 +353,17 @@ model Logs {
   client  Client?  @relation(fields: [clientId], references: [id])
   admin   Admin?   @relation(fields: [adminId], references: [id])
   feature Feature? @relation(fields: [featureId], references: [id])
+}
+
+model Invoice {
+  id        String        @id @default(uuid())
+  tenantId  String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  dueDate   DateTime
+  status    InvoiceStatus
+  planId    String
+
+  tenant Tenant?      @relation(fields: [tenantId], references: [id])
+  plan   BillingPlan? @relation(fields: [planId], references: [id])
 }
