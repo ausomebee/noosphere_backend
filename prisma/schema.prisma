@@ -31,6 +31,11 @@ enum InvoiceStatus {
   Overdue
 }
 
+enum incoiceBillingFrequency {
+  Monthly
+  Yearly
+}
+
 model Admin {
   id                    String   @id @default(uuid())
   fullName              String
@@ -356,13 +361,16 @@ model Logs {
 }
 
 model Invoice {
-  id        String        @id @default(uuid())
-  tenantId  String
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  dueDate   DateTime
-  status    InvoiceStatus
-  planId    String
+  id               String                  @id @default(uuid())
+  tenantId         String
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+  dueDate          DateTime
+  status           InvoiceStatus
+  planId           String
+  quantity         Int
+  total            Int
+  billingFrequency incoiceBillingFrequency
 
   tenant Tenant?      @relation(fields: [tenantId], references: [id])
   plan   BillingPlan? @relation(fields: [planId], references: [id])

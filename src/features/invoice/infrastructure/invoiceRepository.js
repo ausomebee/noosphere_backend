@@ -39,6 +39,15 @@ class InvoiceRepository {
         });
     }
 
+    async totalBilled(query) {
+        return await this.model.aggregate({
+            where: query,
+            _sum: {
+                total: true,
+            },
+        });
+    }
+
 }
 
 export default InvoiceRepository;
