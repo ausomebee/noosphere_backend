@@ -29,11 +29,15 @@ import InvoiceDto from "../dto/invoiceDto.js";
  *           enum: [Paid, Upcoming, Due, Overdue]
  *           example: "Paid"
  *           description: The status of the invoice
- *         dueDate:
+ *         billingFrequency:
  *           type: string
- *           format: date
- *           example: "2025-12-31"
- *           description: The due date of the invoice
+ *           enum: [Monthly, Yearly]
+ *           example: "Monthly"
+ *           description: The billing frequency of the invoice
+ *         quantity:
+ *           type: number
+ *           example: 1
+ *           description: The quantity of the plan
  */
 
 class InvoiceRoutes {
@@ -99,6 +103,34 @@ class InvoiceRoutes {
          *         description: Bad request
          */
         this.router.get("/", this.controller.getAllInvoice);
+
+        /**
+         * @swagger
+         * /api/v1/invoice/billed/total:
+         *   get:
+         *     summary: Retrieve total billed
+         *     tags: [Invoice]
+         *     responses:
+         *       200:
+         *         description: total billed retrieved successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get("/billed/total", this.controller.getTotalBilled);
+
+        /**
+         * @swagger
+         * /api/v1/invoice/billed/due:
+         *   get:
+         *     summary: Retrieve total due invoices
+         *     tags: [Invoice]
+         *     responses:
+         *       200:
+         *         description: total billed retrieved successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get("/billed/due", this.controller.getTotalDueInvoice);
 
     }
 

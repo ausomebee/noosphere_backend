@@ -2,12 +2,14 @@ import expressAsyncHandler from "express-async-handler";
 import prismaService from "../../../../config/prisma.js";
 import InvoiceRepository from "../../infrastructure/invoiceRepository.js";
 import InvoiceService from "../../application/invoiceService.js";
+import PlanRepository from "../../../planAndFeature/infrastructure/planRepositiory.js";
 
 class InvoiceController {
     constructor() {
         this.prisma = prismaService.getClient()
         this.invoiceRepository = new InvoiceRepository(this.prisma.invoice);
-        this.service = new InvoiceService({ invoiceRepository: this.invoiceRepository });
+        this.planRepository = new PlanRepository(this.prisma.billingPlan)
+        this.service = new InvoiceService({ invoiceRepository: this.invoiceRepository, planRepository: this.planRepository });
     }
 
     createInvoice = expressAsyncHandler(async (req, res) => {
@@ -40,6 +42,34 @@ class InvoiceController {
 
     getAllInvoice = expressAsyncHandler(async (req, res) => {
         const invoice = await this.service.getAllInvoice();
+
+        if (!invoice) {
+            res.status(500).json({ message: 'Failed to fetch invoices' });
+        }
+
+        return res.status(201).json({
+            message: "Invoices fetched successfully",
+            status: 'ok',
+            data: invoice
+        });
+    });
+
+    getTotalBilled = expressAsyncHandler(async (req, res) => {
+        const invoice = await this.service.getTotalBilled();
+
+        if (!invoice) {
+            res.status(500).json({ message: 'Failed to fetch invoices' });
+        }
+
+        return res.status(201).json({
+            message: "Invoices fetched successfully",
+            status: 'ok',
+            data: invoice
+        });
+    });
+
+    getTotalDueInvoice = expressAsyncHandler(async (req, res) => {
+        const invoice = await this.service.getTotalDueInvoice();
 
         if (!invoice) {
             res.status(500).json({ message: 'Failed to fetch invoices' });

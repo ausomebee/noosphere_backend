@@ -12,8 +12,9 @@ class InvoiceDto {
                 "string.empty": "Plan ID is required",
                 "string.guid": "Plan ID must be a valid UUID"
             }),
+            quantity: Joi.number().required(),
             status: Joi.string().valid("Paid", "Upcoming", "Due", "Overdue").required(),
-            dueDate: Joi.date().required()
+            billingFrequency: Joi.string().valid("Monthly", "Yearly").required(),
         });
 
         Validator.validateRequest(req, next, schema);
