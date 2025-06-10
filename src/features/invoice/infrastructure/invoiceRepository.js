@@ -26,6 +26,13 @@ class InvoiceRepository {
         });
     }
 
+    async findOneAndPopulate(query, pop) {
+        return await this.model.findUnique({
+            where: query,
+            include: pop
+        });
+    }
+
     async update(id, data) {
         return await this.model.update({
             where: { id },
