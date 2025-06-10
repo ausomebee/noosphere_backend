@@ -39,12 +39,13 @@ class InvoiceService {
 
     async getSingleInvoice(id) {
         const invoice = await this.invoiceRepository.findOneAndPopulate({ id }, { tenant: true, plan: true });
-
         if (!invoice) {
             throw new Error("Invoice not found")
         }
 
-        return invoice;
+        const invoiceOutput = new Invoice(invoice)
+
+        return invoiceOutput.createSingleInvoiceOutput;
     }
 
     async getAllInvoice() {
@@ -134,6 +135,15 @@ class InvoiceService {
         return { total, thisWeek, thisMonth, thisYear };
     }
 
+    async getAllInvoiceByStatus(status) {
+        const invoices = await this.invoiceRepository.findAll({ status });
+
+        if (!invoices) {
+            throw new Error("Invoices not found");
+        }
+
+        return invoices;
+    }
 }
 
 export default InvoiceService;
