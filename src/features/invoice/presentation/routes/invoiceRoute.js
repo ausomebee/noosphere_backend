@@ -151,7 +151,7 @@ class InvoiceRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/:status", InvoiceDto.checkStatusDto, this.controller.getAllInvoiceByStatus);
+        this.router.get("/status/:status", InvoiceDto.checkStatusDto, this.controller.getAllInvoiceByStatus);
 
     }
 

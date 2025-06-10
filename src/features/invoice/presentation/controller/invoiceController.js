@@ -83,7 +83,7 @@ class InvoiceController {
     });
 
     getAllInvoiceByStatus = expressAsyncHandler(async (req, res) => {
-        const invoice = await this.service.getAllInvoiceByStatus(req.status);
+        const invoice = await this.service.getAllInvoiceByStatus(req.params.status);
 
         if (!invoice) {
             res.status(500).json({ message: 'Failed to fetch invoices' });
