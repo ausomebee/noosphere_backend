@@ -26,7 +26,11 @@ class Invoice {
 
     get createSingleInvoiceOutput() {
         return {
-            companyAddress: this.tenant.location,
+            companyAddress: {
+                street: "931 10th street",
+                suite: "Suite 776, Modesto",
+                state: "CA 95354",
+            },
             invoiceId: `INV${this.id}`,
             dueDate: this.dueDate,
             billingFrequency: this.billingFrequency,
