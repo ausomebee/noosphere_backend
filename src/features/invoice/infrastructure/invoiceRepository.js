@@ -20,6 +20,13 @@ class InvoiceRepository {
         });
     }
 
+    async findAllAndPopulate(filter = {}, pop) {
+        return await this.model.findMany({
+            where: filter,
+            include: pop
+        });
+    }
+
     async findOne(query) {
         return await this.model.findUnique({
             where: query,
