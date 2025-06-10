@@ -132,6 +132,27 @@ class InvoiceRoutes {
          */
         this.router.get("/billed/due", this.controller.getTotalDueInvoice);
 
+        /**
+        * @swagger
+        * /api/v1/invoice/status/{status}:
+        *   get:
+        *     summary: gets invoices by status
+        *     tags: [Invoice]
+        *     parameters:
+        *       - in: path
+        *         name: status
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The status of the invoices
+        *     responses:
+        *       200:
+        *         description: Invoice fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/:status", InvoiceDto.checkStatusDto, this.controller.getAllInvoiceByStatus);
+
     }
 
     getRouter() {
