@@ -141,7 +141,6 @@ class InvoiceRoutes {
         *     parameters:
         *       - in: path
         *         name: status
-        *         required: true
         *         schema:
         *           type: string
         *         description: The status of the invoices

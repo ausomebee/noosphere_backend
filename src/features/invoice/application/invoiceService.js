@@ -136,13 +136,22 @@ class InvoiceService {
     }
 
     async getAllInvoiceByStatus(status) {
-        const invoices = await this.invoiceRepository.findAll({ status });
-
+        const invoices = await this.invoiceRepository.findAllAndPopulate({ status }, { tenant: true });
         if (!invoices) {
             throw new Error("Invoices not found");
         }
 
-        return invoices;
+        const formated = invoices.map((invoice) => {
+            return {
+                invoiceId: `invoice_${invoice.id}`,
+                tenant: invoice.tenant.companyName,
+                createdAt: invoice.createdAt,
+                dueDate: invoice.dueDate,
+                status: invoice.status
+            };
+        });
+
+        return formated;
     }
 }
 
