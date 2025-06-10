@@ -38,7 +38,7 @@ class InvoiceService {
     }
 
     async getSingleInvoice(id) {
-        const invoice = await this.invoiceRepository.findOne({ id });
+        const invoice = await this.invoiceRepository.findOneAndPopulate({ id }, { tenant: true, plan: true });
 
         if (!invoice) {
             throw new Error("Invoice not found")
