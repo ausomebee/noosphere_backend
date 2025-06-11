@@ -332,7 +332,7 @@ model SuperAdminChoices {
 }
 
 model Payment {
-  id          String   @id @default(uuid())
+  id          Int      @id @default(autoincrement())
   paymentLink String
   tenantId    String   @unique
   createdAt   DateTime @default(now())
@@ -361,7 +361,7 @@ model Logs {
 }
 
 model Invoice {
-  id               Int                  @id @default(autoincrement())
+  id               Int                     @id @default(autoincrement())
   tenantId         String
   createdAt        DateTime                @default(now())
   updatedAt        DateTime                @updatedAt
