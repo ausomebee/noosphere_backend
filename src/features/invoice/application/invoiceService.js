@@ -161,12 +161,9 @@ class InvoiceService {
     }
 
     async getAllInvoiceByStatus(status) {
-        let invoices
-        if (status) {
-            invoices = await this.invoiceRepository.findAllAndPopulate({ status }, { tenant: true });
-        } else {
-            invoices = await this.invoiceRepository.findAllAndPopulate({}, { tenant: true });
-        }
+        const query = status ? { status } : {}
+        const invoices = await this.invoiceRepository.findAllAndPopulate(query, { tenant: true });
+
 
         if (!invoices) {
             throw new Error("Invoices not found");

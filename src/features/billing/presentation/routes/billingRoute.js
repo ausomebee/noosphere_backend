@@ -37,15 +37,24 @@ import BillingDto from "../dto/billingDto.js";
  *       type: object
  *       required:
  *         - tenantId
- *         - paymentLink
+ *         - status
+ *         - amount
+ *         - invoiceId
  *       properties:
  *         tenantId:
  *           type: string
  *           format: uuid
  *           example: "c0a8017e-7b68-11e9-8f9e-2a86e4085a59"
- *         paymentLink:
+ *         invoiceId:
  *           type: string
- *           example: "https://www.google.com/"
+ *           format: uuid
+ *           example: "c0a8017e-7b68-11e9-8f9e-2a86e4085a59"
+ *         status:
+ *           type: string
+ *           example: "Successful"
+ *         amount:
+ *           type: number
+ *           example: 1000
  */
 
 class BillingRoutes {
@@ -220,6 +229,27 @@ class BillingRoutes {
          *         description: Bad request
          */
         this.router.get("/allpayment", this.controller.getAllPayment);
+
+        /**
+        * @swagger
+        * /api/v1/billing/payment/status/{status}:
+        *   get:
+        *     summary: gets payments by status
+        *     tags: [billing]
+        *     parameters:
+        *       - in: path
+        *         name: status
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The status of the payments
+        *     responses:
+        *       200:
+        *         description: Payment fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/payment/status/:status", BillingDto.checkStatusDto, this.controller.getPaymentByStatus);
 
     }
 
