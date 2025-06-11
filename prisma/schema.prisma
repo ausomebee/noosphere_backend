@@ -333,12 +333,15 @@ model SuperAdminChoices {
 
 model Payment {
   id          Int      @id @default(autoincrement())
-  paymentLink String
   tenantId    String   @unique
+  status      String
+  amount      Int
+  invoiceId   Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  tenant Tenant? @relation(fields: [tenantId], references: [id])
+  tenant  Tenant?  @relation(fields: [tenantId], references: [id])
+  invoice Invoice? @relation(fields: [invoiceId], references: [id])
 }
 
 model Logs {
@@ -372,6 +375,7 @@ model Invoice {
   total            Int
   billingFrequency incoiceBillingFrequency
 
-  tenant Tenant?      @relation(fields: [tenantId], references: [id])
-  plan   BillingPlan? @relation(fields: [planId], references: [id])
+  tenant  Tenant?      @relation(fields: [tenantId], references: [id])
+  plan    BillingPlan? @relation(fields: [planId], references: [id])
+  Payment Payment[]
 }

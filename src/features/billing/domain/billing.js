@@ -1,5 +1,5 @@
 class Billing {
-    constructor({ id, tenantId, paymentMethod, billingAddress, billingMetadataId, planId, status, startDate, endDate, name, description, price, billingCycle, transactionId, paymentLink }) {
+    constructor({ id, tenantId, amount, paymentMethod, billingAddress, billingMetadataId, planId, status, startDate, endDate, name, description, price, billingCycle, transactionId, invoiceId }) {
         this.id = id;
         this.tenantId = tenantId;
         this.paymentMethod = paymentMethod;
@@ -14,7 +14,8 @@ class Billing {
         this.price = price;
         this.billingCycle = billingCycle;
         this.transactionId = transactionId;
-        this.paymentLink = paymentLink;
+        this.invoiceId = invoiceId;
+        this.amount = amount;
     }
 
     get createBillingMetadata() {
@@ -33,8 +34,10 @@ class Billing {
 
     get createPayment() {
         return {
-            paymentLink: this.paymentLink,
-            tenantId: this.tenantId
+            status: this.status,
+            tenantId: this.tenantId,
+            amount: this.amount,
+            invoiceId: this.invoiceId
         };
     }
 }

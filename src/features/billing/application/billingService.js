@@ -159,7 +159,7 @@ class BillingService {
         return payment;
     }
 
-    async getAllPayment(data) {
+    async getAllPayment() {
         const payment = await this.paymentRepository.findAll({});
 
         if (!payment) {
@@ -168,6 +168,18 @@ class BillingService {
 
         return payment;
     }
+
+    async getPaymentByStatus(status) {
+        const query = status === "all" ? {} : {status}
+        const payments = await this.paymentRepository.findAll(query);
+
+        if (!payments) {
+            throw new Error("Payments not found")
+        }
+
+        return payments;
+    }
+
 }
 
 export default BillingService;
