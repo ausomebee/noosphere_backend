@@ -22,10 +22,7 @@ class InvoiceDto {
 
     static checkIdDto = (req, res, next) => {
         const schema = Joi.object({
-            id: Joi.string().uuid().required().messages({
-                "string.empty": "ID is required",
-                "string.guid": "ID must be a valid UUID"
-            })
+            id: Joi.number().required()
         });
 
         Validator.validateRequest(req, next, schema, req.params);
