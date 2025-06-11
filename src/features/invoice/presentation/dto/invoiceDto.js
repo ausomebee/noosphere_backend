@@ -33,12 +33,20 @@ class InvoiceDto {
 
     static checkStatusDto = (req, res, next) => {
         const schema = Joi.object({
-            status: Joi.string().valid("Paid", "Upcoming", "Due", "Overdue").optional(),
+            status: Joi.string().valid("Paid", "Upcoming", "Due", "Overdue", "all"),
         });
 
         Validator.validateRequest(req, next, schema, req.params);
     };
 
+    static checkDurationDto = (req, res, next) => {
+        const schema = Joi.object({
+            from: Joi.alternatives().try(Joi.date(), Joi.string().valid("all")),
+            to: Joi.alternatives().try(Joi.date(), Joi.string().valid("all"))
+        });
+
+        Validator.validateRequest(req, next, schema, req.params);
+    };
 }
 
 export default InvoiceDto;

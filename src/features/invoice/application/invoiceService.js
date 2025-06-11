@@ -58,8 +58,20 @@ class InvoiceService {
         return invoice;
     }
 
-    async getTotalBilled() {
+    async getTotalBilled(data) {
         const now = new Date();
+
+        if (data) {
+            const custom = await this.invoiceRepository.totalBilled({
+                createdAt: {
+                    gte: data.from,
+                    lte: data.to,
+                },
+            });
+
+            return custom
+        }
+
         const startOfThisYear = new Date(now.getFullYear(), 0, 1);
         const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
         const dayOfWeek = now.getDay();
@@ -92,11 +104,24 @@ class InvoiceService {
             throw new Error("Invoice not found");
         }
 
-        return { total, thisWeek, thisMonth, thisYear };
+        return { allTime: total, thisWeek, thisMonth, thisYear };
     }
 
-    async getTotalDueInvoice() {
+    async getTotalDueInvoice(data) {
         const now = new Date();
+
+        if (data) {
+            const custom = await this.invoiceRepository.totalBilled({
+                createdAt: {
+                    gte: data.from,
+                    lte: data.to,
+                },
+                status: "Due"
+            });
+
+            return custom
+        }
+
         const startOfThisYear = new Date(now.getFullYear(), 0, 1);
         const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
         const dayOfWeek = now.getDay();
@@ -132,7 +157,7 @@ class InvoiceService {
             throw new Error("Invoice not found");
         }
 
-        return { total, thisWeek, thisMonth, thisYear };
+        return { allTime: total, thisWeek, thisMonth, thisYear };
     }
 
     async getAllInvoiceByStatus(status) {
@@ -153,6 +178,7 @@ class InvoiceService {
 
         return formated;
     }
+
 }
 
 export default InvoiceService;

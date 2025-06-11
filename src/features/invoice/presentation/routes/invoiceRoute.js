@@ -106,31 +106,57 @@ class InvoiceRoutes {
 
         /**
          * @swagger
-         * /api/v1/invoice/billed/total:
+         * /api/v1/invoice/billed/total/{from}/{to}:
          *   get:
          *     summary: Retrieve total billed
          *     tags: [Invoice]
+         *     parameters:
+         *       - in: path
+         *         name: from
+         *         schema:
+         *           type: string
+         *           format: date
+         *         description: Start date (e.g., 2024-01-01)
+         *       - in: path
+         *         name: to
+         *         schema:
+         *           type: string
+         *           format: date
+         *         description: End date (e.g., 2024-01-31)
          *     responses:
          *       200:
          *         description: total billed retrieved successfully
          *       400:
          *         description: Bad request
          */
-        this.router.get("/billed/total", this.controller.getTotalBilled);
+        this.router.get("/billed/total/:from/:to", InvoiceDto.checkDurationDto, this.controller.getTotalBilled);
 
         /**
          * @swagger
-         * /api/v1/invoice/billed/due:
+         * /api/v1/invoice/billed/due/{from}/{to}:
          *   get:
          *     summary: Retrieve total due invoices
          *     tags: [Invoice]
+         *     parameters:
+         *       - in: path
+         *         name: from
+         *         schema:
+         *           type: string
+         *           format: date
+         *         description: Start date (e.g., 2024-01-01)
+         *       - in: path
+         *         name: to
+         *         schema:
+         *           type: string
+         *           format: date
+         *         description: End date (e.g., 2024-01-31)
          *     responses:
          *       200:
          *         description: total billed retrieved successfully
          *       400:
          *         description: Bad request
          */
-        this.router.get("/billed/due", this.controller.getTotalDueInvoice);
+        this.router.get("/billed/due/:from/:to", InvoiceDto.checkDurationDto, this.controller.getTotalDueInvoice);
 
         /**
         * @swagger
