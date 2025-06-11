@@ -51,6 +51,14 @@ class BillingDto {
         Validator.validateRequest(req, next, schema, req.params);
     };
 
+    static checkIntIdDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.number().required()
+        });
+
+        Validator.validateRequest(req, next, schema, req.params);
+    };
+
     static checkStatusDto = (req, res, next) => {
         const schema = Joi.object({
             status: Joi.string().valid("Successful", "Failed", "In Progress", "all"),

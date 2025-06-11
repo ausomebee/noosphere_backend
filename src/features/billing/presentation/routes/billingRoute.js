@@ -214,7 +214,7 @@ class BillingRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/payment/:id", BillingDto.checkIdDto, this.controller.getSinglePayment);
+        this.router.get("/payment/:id", BillingDto.checkIntIdDto, this.controller.getSinglePayment);
 
         /**
          * @swagger
