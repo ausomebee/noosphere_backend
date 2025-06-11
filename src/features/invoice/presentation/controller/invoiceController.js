@@ -55,7 +55,8 @@ class InvoiceController {
     });
 
     getTotalBilled = expressAsyncHandler(async (req, res) => {
-        const invoice = await this.service.getTotalBilled();
+        const params = req.params.from === "all" ? null : req.params
+        const invoice = await this.service.getTotalBilled(params);
 
         if (!invoice) {
             res.status(500).json({ message: 'Failed to fetch invoices' });
@@ -69,7 +70,8 @@ class InvoiceController {
     });
 
     getTotalDueInvoice = expressAsyncHandler(async (req, res) => {
-        const invoice = await this.service.getTotalDueInvoice();
+        const params = req.params.from === "all" ? null : req.params
+        const invoice = await this.service.getTotalDueInvoice(params);
 
         if (!invoice) {
             res.status(500).json({ message: 'Failed to fetch invoices' });
@@ -83,7 +85,8 @@ class InvoiceController {
     });
 
     getAllInvoiceByStatus = expressAsyncHandler(async (req, res) => {
-        const invoice = await this.service.getAllInvoiceByStatus(req.params.status);
+        const params = req.params.status === "all" ? null : req.params.status
+        const invoice = await this.service.getAllInvoiceByStatus(params);
 
         if (!invoice) {
             res.status(500).json({ message: 'Failed to fetch invoices' });
