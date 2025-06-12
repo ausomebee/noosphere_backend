@@ -401,5 +401,6 @@ model PaymentMethod {
 
 model AutoBilling{
     id               String   @id @default(uuid())
+onPlanPurchase Boolean
 
 }
