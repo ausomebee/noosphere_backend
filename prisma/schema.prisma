@@ -345,7 +345,7 @@ model Payment {
   paymentMethodId String
 
   subscription  Subscription?
-  tenant        Tenant?        @relation(fields: [tenantId], references: [id])
+  tenant        Tenant?         @relation(fields: [tenantId], references: [id])
   invoice       Invoice?       @relation(fields: [invoiceId], references: [id])
   paymentMethod PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
 }
