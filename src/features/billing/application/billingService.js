@@ -1,3 +1,5 @@
+import Billing from "../domain/billing.js";
+
 class BillingService {
     constructor({ transactionsRepository, billingRepository, paymentRepository }) {
         this.transactionsRepository = transactionsRepository;
@@ -150,13 +152,14 @@ class BillingService {
     }
 
     async getSinglePayment(data) {
-        const payment = await this.paymentRepository.findOne({ id: data.id });
+        const payment = await this.paymentRepository.findFirstDynamic({ where: { id: data.id }, include: { tenant: true, invoice: { include: { plan: true } }, paymentMethod: true, subscription: true } });
+        const paymentOutput = new Billing(payment);
 
         if (!payment) {
             throw new Error("Payment not found")
         }
 
-        return payment;
+        return paymentOutput.paymentOutput;
     }
 
     async getAllPayment() {
@@ -170,7 +173,7 @@ class BillingService {
     }
 
     async getPaymentByStatus(status) {
-        const query = status === "all" ? {} : {status}
+        const query = status === "all" ? {} : { status }
         const payments = await this.paymentRepository.findAll(query);
 
         if (!payments) {
