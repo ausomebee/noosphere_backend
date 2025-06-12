@@ -46,15 +46,18 @@ import BillingDto from "../dto/billingDto.js";
  *           format: uuid
  *           example: "c0a8017e-7b68-11e9-8f9e-2a86e4085a59"
  *         invoiceId:
- *           type: string
- *           format: uuid
- *           example: "c0a8017e-7b68-11e9-8f9e-2a86e4085a59"
+ *           type: number
+ *           example: 1
  *         status:
  *           type: string
  *           example: "Successful"
  *         amount:
  *           type: number
  *           example: 1000
+ *         paymentMethodId:
+ *           type: string
+ *           format: uuid
+ *           example: "c0a8017e-7b68-11e9-8f9e-2a86e4085a59"
  */
 
 class BillingRoutes {
@@ -206,7 +209,7 @@ class BillingRoutes {
         *         name: id
         *         required: true
         *         schema:
-        *           type: string
+        *           type: number
         *         description: The ID of the payment
         *     responses:
         *       200:

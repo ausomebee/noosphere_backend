@@ -126,10 +126,11 @@ model Tenant {
   BillingMetadata BillingMetadata?
   Subscription    Subscription[]
   admin           Admin            @relation(fields: [createdBy], references: [id])
-  Payment         Payment?
+  Payment         Payment[]
   logs            Logs[]
   BillingPlan     BillingPlan[]
   Invoice         Invoice[]
+  PaymentMethod   PaymentMethod[]
 }
 
 model TenantStaff {
@@ -262,9 +263,11 @@ model Subscription {
   startDate     DateTime
   endDate       DateTime
   transactionId String             @unique
+  paymentId     Int                @unique
 
   tenant      Tenant       @relation(fields: [tenantId], references: [id])
   transaction Transactions @relation(fields: [transactionId], references: [id])
+  payment     Payment      @relation(fields: [paymentId], references: [id])
   plan        BillingPlan  @relation(fields: [planId], references: [id])
 }
 
@@ -332,16 +335,19 @@ model SuperAdminChoices {
 }
 
 model Payment {
-  id          Int      @id @default(autoincrement())
-  tenantId    String   @unique
-  status      String
-  amount      Int
-  invoiceId   Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              Int      @id @default(autoincrement())
+  tenantId        String
+  status          String
+  amount          Int
+  invoiceId       Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  paymentMethodId String
 
-  tenant  Tenant?  @relation(fields: [tenantId], references: [id])
-  invoice Invoice? @relation(fields: [invoiceId], references: [id])
+  subscription  Subscription?
+  tenant        Tenant?        @relation(fields: [tenantId], references: [id])
+  invoice       Invoice?       @relation(fields: [invoiceId], references: [id])
+  paymentMethod PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
 }
 
 model Logs {
@@ -378,4 +384,17 @@ model Invoice {
   tenant  Tenant?      @relation(fields: [tenantId], references: [id])
   plan    BillingPlan? @relation(fields: [planId], references: [id])
   Payment Payment[]
+}
+
+model PaymentMethod {
+  id             String   @id @default(uuid())
+  cardType       String
+  lastFourDigits String
+  tenantId       String
+  gatewayToken   String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  payment Payment[]
+  tenant  Tenant?   @relation(fields: [tenantId], references: [id])
 }

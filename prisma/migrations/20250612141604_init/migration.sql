@@ -5,7 +5,13 @@ CREATE TYPE "Module" AS ENUM ('ADMIN', 'TENANT', 'CLIENT');
 CREATE TYPE "SubscriptionStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'CANCELLED');
 
 -- CreateEnum
-CREATE TYPE "BillingCycle" AS ENUM ('MONTHLY', 'YEARLY', 'LIFETIME');
+CREATE TYPE "PlanType" AS ENUM ('ENTERPRISE', 'STANDARD');
+
+-- CreateEnum
+CREATE TYPE "InvoiceStatus" AS ENUM ('Paid', 'Upcoming', 'Due', 'Overdue');
+
+-- CreateEnum
+CREATE TYPE "incoiceBillingFrequency" AS ENUM ('Monthly', 'Yearly');
 
 -- CreateTable
 CREATE TABLE "Admin" (
@@ -213,6 +219,7 @@ CREATE TABLE "Subscription" (
     "startDate" TIMESTAMP(3) NOT NULL,
     "endDate" TIMESTAMP(3) NOT NULL,
     "transactionId" TEXT NOT NULL,
+    "paymentId" INTEGER NOT NULL,
 
     CONSTRAINT "Subscription_pkey" PRIMARY KEY ("id")
 );
@@ -220,10 +227,22 @@ CREATE TABLE "Subscription" (
 -- CreateTable
 CREATE TABLE "BillingPlan" (
     "id" TEXT NOT NULL,
+    "planType" "PlanType" NOT NULL,
     "name" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
-    "price" DOUBLE PRECISION NOT NULL,
-    "billingCycle" "BillingCycle" NOT NULL,
+    "colourCode" TEXT NOT NULL,
+    "description" TEXT,
+    "pricePerMonth" JSONB NOT NULL,
+    "pricePerYear" JSONB NOT NULL,
+    "forClient" INTEGER NOT NULL,
+    "extraFeaturesWithPrice" JSONB,
+    "forStaff" INTEGER NOT NULL,
+    "forStorage" DOUBLE PRECISION NOT NULL,
+    "extraFeaturesEnabled" BOOLEAN NOT NULL DEFAULT false,
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "tenantId" TEXT,
+    "adminId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "BillingPlan_pkey" PRIMARY KEY ("id")
 );
@@ -232,9 +251,25 @@ CREATE TABLE "BillingPlan" (
 CREATE TABLE "Feature" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
+    "description" TEXT,
+    "featureGroupId" TEXT NOT NULL,
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "managedBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Feature_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "FeatureGroup" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "FeatureGroup_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -250,11 +285,79 @@ CREATE TABLE "SuperAdminChoices" (
 );
 
 -- CreateTable
+CREATE TABLE "Payment" (
+    "id" SERIAL NOT NULL,
+    "tenantId" TEXT NOT NULL,
+    "status" TEXT NOT NULL,
+    "amount" INTEGER NOT NULL,
+    "invoiceId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "paymentMethodId" TEXT NOT NULL,
+
+    CONSTRAINT "Payment_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Logs" (
+    "logId" TEXT NOT NULL,
+    "tenantId" TEXT,
+    "clientId" TEXT,
+    "adminId" TEXT,
+    "featureId" TEXT,
+    "module" "Module" NOT NULL,
+    "action" TEXT NOT NULL,
+    "details" TEXT,
+    "ipAddress" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Logs_pkey" PRIMARY KEY ("logId")
+);
+
+-- CreateTable
+CREATE TABLE "Invoice" (
+    "id" SERIAL NOT NULL,
+    "tenantId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "dueDate" TIMESTAMP(3) NOT NULL,
+    "status" "InvoiceStatus" NOT NULL,
+    "planId" TEXT NOT NULL,
+    "quantity" INTEGER NOT NULL,
+    "total" INTEGER NOT NULL,
+    "billingFrequency" "incoiceBillingFrequency" NOT NULL,
+
+    CONSTRAINT "Invoice_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "PaymentMethod" (
+    "id" TEXT NOT NULL,
+    "cardType" TEXT NOT NULL,
+    "lastFourDigits" TEXT NOT NULL,
+    "tenantId" TEXT NOT NULL,
+    "gatewayToken" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "PaymentMethod_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "_PlanFeatures" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL,
 
     CONSTRAINT "_PlanFeatures_AB_pkey" PRIMARY KEY ("A","B")
+);
+
+-- CreateTable
+CREATE TABLE "_ExtraFeatures" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL,
+
+    CONSTRAINT "_ExtraFeatures_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateIndex
@@ -294,7 +397,13 @@ CREATE UNIQUE INDEX "BillingMetadata_tenantId_key" ON "BillingMetadata"("tenantI
 CREATE UNIQUE INDEX "Subscription_transactionId_key" ON "Subscription"("transactionId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Subscription_paymentId_key" ON "Subscription"("paymentId");
+
+-- CreateIndex
 CREATE INDEX "_PlanFeatures_B_index" ON "_PlanFeatures"("B");
+
+-- CreateIndex
+CREATE INDEX "_ExtraFeatures_B_index" ON "_ExtraFeatures"("B");
 
 -- AddForeignKey
 ALTER TABLE "Admin" ADD CONSTRAINT "Admin_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -360,10 +469,58 @@ ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_tenantId_fkey" FOREIGN K
 ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_transactionId_fkey" FOREIGN KEY ("transactionId") REFERENCES "Transactions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_paymentId_fkey" FOREIGN KEY ("paymentId") REFERENCES "Payment"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_planId_fkey" FOREIGN KEY ("planId") REFERENCES "BillingPlan"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "BillingPlan" ADD CONSTRAINT "BillingPlan_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "BillingPlan" ADD CONSTRAINT "BillingPlan_adminId_fkey" FOREIGN KEY ("adminId") REFERENCES "Admin"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Feature" ADD CONSTRAINT "Feature_featureGroupId_fkey" FOREIGN KEY ("featureGroupId") REFERENCES "FeatureGroup"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Payment" ADD CONSTRAINT "Payment_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Payment" ADD CONSTRAINT "Payment_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES "Invoice"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Payment" ADD CONSTRAINT "Payment_paymentMethodId_fkey" FOREIGN KEY ("paymentMethodId") REFERENCES "PaymentMethod"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Logs" ADD CONSTRAINT "Logs_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Logs" ADD CONSTRAINT "Logs_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "Client"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Logs" ADD CONSTRAINT "Logs_adminId_fkey" FOREIGN KEY ("adminId") REFERENCES "Admin"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Logs" ADD CONSTRAINT "Logs_featureId_fkey" FOREIGN KEY ("featureId") REFERENCES "Feature"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Invoice" ADD CONSTRAINT "Invoice_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Invoice" ADD CONSTRAINT "Invoice_planId_fkey" FOREIGN KEY ("planId") REFERENCES "BillingPlan"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PaymentMethod" ADD CONSTRAINT "PaymentMethod_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_PlanFeatures" ADD CONSTRAINT "_PlanFeatures_A_fkey" FOREIGN KEY ("A") REFERENCES "BillingPlan"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_PlanFeatures" ADD CONSTRAINT "_PlanFeatures_B_fkey" FOREIGN KEY ("B") REFERENCES "Feature"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_ExtraFeatures" ADD CONSTRAINT "_ExtraFeatures_A_fkey" FOREIGN KEY ("A") REFERENCES "BillingPlan"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_ExtraFeatures" ADD CONSTRAINT "_ExtraFeatures_B_fkey" FOREIGN KEY ("B") REFERENCES "Feature"("id") ON DELETE CASCADE ON UPDATE CASCADE;
