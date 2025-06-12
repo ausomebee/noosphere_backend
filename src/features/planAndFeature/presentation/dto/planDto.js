@@ -35,21 +35,21 @@ class PlanDto {
             extraFeatures: Joi.object({
                 connect: Joi.array().items(
                     Joi.object({
-                        id: Joi.string().uuid().required()
+                        id: Joi.string().uuid().optional()
                     })
-                ).min(1).required()
-            }).required(),
+                ).min(1).optional()
+            }).optional(),
             extraFeaturesWithPrice: Joi.array().items(
                 Joi.object({
-                    id: Joi.string().uuid().required(),
+                    id: Joi.string().uuid().optional(),
                     pricePerMonth: Joi.object({
-                        price: Joi.number().required(),
-                        currency: Joi.string().valid('USD').required()
-                    }).required(),
+                        price: Joi.number().optional(),
+                        currency: Joi.string().valid('USD').optional()
+                    }).optional(),
                     pricePerYear: Joi.object({
-                        price: Joi.number().required(),
-                        currency: Joi.string().valid('USD').required()
-                    }).required()
+                        price: Joi.number().optional(),
+                        currency: Joi.string().valid('USD').optional()
+                    }).optional()
                 })
             )
         });
