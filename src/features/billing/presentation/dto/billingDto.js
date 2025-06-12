@@ -34,7 +34,11 @@ class BillingDto {
                 "string.guid": "Tenant ID must be a valid UUID",
             }),
             amount: Joi.number().required(),
-            invoiceId: Joi.number().required()
+            invoiceId: Joi.number().required(),
+            paymentMethodId: Joi.string().uuid().required().messages({
+                "string.empty": "Payment method ID is required",
+                "string.guid": "Payment method ID must be a valid UUID"
+            })
         });
 
         Validator.validateRequest(req, next, schema);
