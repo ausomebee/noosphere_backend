@@ -58,6 +58,31 @@ import BillingDto from "../dto/billingDto.js";
  *           type: string
  *           format: uuid
  *           example: "c0a8017e-7b68-11e9-8f9e-2a86e4085a59"
+ *     CreatePaymentMethodDto:
+ *       type: object
+ *       required:
+ *         - cardType
+ *         - gatewayToken
+ *         - lastFourDigits
+ *         - tenantId
+ *       properties:
+ *         cardType:
+ *           type: string
+ *           example: "Visa"
+ *           description: Type of the card.
+ *         gatewayToken:
+ *           type: string
+ *           example: "tok_1Hh1YZKZ5lYnGNL9dhHbL6q2"
+ *           description: Token provided by the payment gateway.
+ *         lastFourDigits:
+ *           type: string
+ *           example: "1234"
+ *           description: Last 4 digits of the card.
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *           example: "c0a8017e-7b68-11e9-8f9e-2a86e4085a59"
+ *           description: UUID of the tenant.
  */
 
 class BillingRoutes {
@@ -253,6 +278,29 @@ class BillingRoutes {
         *         description: Validation error
         */
         this.router.get("/payment/status/:status", BillingDto.checkStatusDto, this.controller.getPaymentByStatus);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentmethod:
+         *   post:
+         *     summary: Create a new payment method
+         *     tags:
+         *       - billing
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/CreatePaymentMethodDto'
+         *     responses:
+         *       201:
+         *         description: Payment method created successfully
+         *       400:
+         *         description: Validation error
+         *       500:
+         *         description: Server error
+         */
+        this.router.post("/paymentmethod", BillingDto.createPaymentMethodDto, this.controller.createPaymentMethod);
 
     }
 

@@ -1,5 +1,5 @@
 class Billing {
-    constructor({ id, tenantId, subscription, createdAt, tenant, invoice, amount, paymentMethod, paymentMethodId, billingAddress, billingMetadataId, planId, status, startDate, endDate, name, description, price, billingCycle, transactionId, invoiceId }) {
+    constructor({ id, tenantId, gatewayToken, lastFourDigits, cardType, subscription, createdAt, tenant, invoice, amount, paymentMethod, paymentMethodId, billingAddress, billingMetadataId, planId, status, startDate, endDate, name, description, price, billingCycle, transactionId, invoiceId }) {
         this.id = id;
         this.tenantId = tenantId;
         this.paymentMethod = paymentMethod;
@@ -21,6 +21,9 @@ class Billing {
         this.invoice = invoice;
         this.subscription = subscription;
         this.createdAt = createdAt;
+        this.cardType = cardType;
+        this.lastFourDigits = lastFourDigits;
+        this.gatewayToken = gatewayToken;
     }
 
     get createBillingMetadata() {
@@ -63,6 +66,14 @@ class Billing {
         };
     }
 
+    get createPaymentMethod() {
+        return {
+            cardType: this.cardType,
+            tenantId: this.tenantId,
+            lastFourDigits: this.lastFourDigits,
+            gatewayToken: this.gatewayToken,
+        };
+    }
 }
 
 export default Billing;

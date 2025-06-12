@@ -398,3 +398,8 @@ model PaymentMethod {
   payment Payment[]
   tenant  Tenant?   @relation(fields: [tenantId], references: [id])
 }
+
+model AutoBilling{
+    id               String   @id @default(uuid())
+
+}
