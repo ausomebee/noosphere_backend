@@ -1,10 +1,11 @@
 import Billing from "../domain/billing.js";
 
 class BillingService {
-    constructor({ transactionsRepository, billingRepository, paymentRepository }) {
+    constructor({ transactionsRepository, billingRepository, paymentRepository, paymentMethodRepository }) {
         this.transactionsRepository = transactionsRepository;
         this.billingRepository = billingRepository;
         this.paymentRepository = paymentRepository;
+        this.paymentMethodRepository = paymentMethodRepository;
     }
 
     async createBillingMetadata(data) {
@@ -183,6 +184,15 @@ class BillingService {
         return payments;
     }
 
+    async createPaymentMethod(data) {
+        const newPaymentMethod = await this.paymentMethodRepository.create(data);
+
+        if (!newPaymentMethod) {
+            throw new Error("Failed to create payment method");
+        }
+
+        return newPaymentMethod;
+    }
 }
 
 export default BillingService;
