@@ -80,7 +80,7 @@ class SubscriptionDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
-            tenantId: Joi.string().uuid().required().messages({
+            adminId: Joi.string().uuid().required().messages({
                 "string.empty": "Tenant ID is required",
                 "string.guid": "Tenant ID must be a valid UUID"
             }),
@@ -98,7 +98,7 @@ class SubscriptionDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
-            tenantId: Joi.string().uuid().required().messages({
+            adminId: Joi.string().uuid().required().messages({
                 "string.empty": "Tenant ID is required",
                 "string.guid": "Tenant ID must be a valid UUID"
             }),
@@ -117,7 +117,7 @@ class SubscriptionDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
-            tenantId: Joi.string().uuid().required().messages({
+            adminId: Joi.string().uuid().required().messages({
                 "string.empty": "Tenant ID is required",
                 "string.guid": "Tenant ID must be a valid UUID"
             }),
@@ -134,7 +134,7 @@ class SubscriptionDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
-            tenantId: Joi.string().uuid().required().messages({
+            adminId: Joi.string().uuid().required().messages({
                 "string.empty": "Tenant ID is required",
                 "string.guid": "Tenant ID must be a valid UUID"
             }),
@@ -153,7 +153,7 @@ class SubscriptionDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
-            tenantId: Joi.string().uuid().required().messages({
+            adminId: Joi.string().uuid().required().messages({
                 "string.empty": "Tenant ID is required",
                 "string.guid": "Tenant ID must be a valid UUID"
             }),
@@ -172,7 +172,7 @@ class SubscriptionDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
-            tenantId: Joi.string().uuid().required().messages({
+            adminId: Joi.string().uuid().required().messages({
                 "string.empty": "Tenant ID is required",
                 "string.guid": "Tenant ID must be a valid UUID"
             }),
@@ -191,7 +191,7 @@ class SubscriptionDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
-            tenantId: Joi.string().uuid().required().messages({
+            adminId: Joi.string().uuid().required().messages({
                 "string.empty": "Tenant ID is required",
                 "string.guid": "Tenant ID must be a valid UUID"
             }),

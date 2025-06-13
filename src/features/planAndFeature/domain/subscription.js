@@ -28,7 +28,7 @@ class Subscription {
 
     get createLog() {
         return {
-            tenantId: this.tenantId,
+            adminId: this.adminId,
             reason: this.reason,
             action: "change subscription status",
             details: this.comment

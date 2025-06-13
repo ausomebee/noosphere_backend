@@ -67,7 +67,7 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *       required:
  *         - status
  *         - id
- *         - tenantId
+ *         - adminId
  *         - comment
  *         - reason
  *         - autoRenew
@@ -79,7 +79,7 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *         id:
  *           type: string
  *           format: uuid
- *         tenantId:
+ *         adminId:
  *           type: string
  *           format: uuid
  *         comment:
@@ -94,7 +94,7 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *       type: object
  *       required:
  *         - id
- *         - tenantId
+ *         - adminId
  *         - comment
  *         - reason
  *         - autoRenew
@@ -102,7 +102,7 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *         id:
  *           type: string
  *           format: uuid
- *         tenantId:
+ *         adminId:
  *           type: string
  *           format: uuid
  *         comment:
@@ -118,7 +118,7 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *       required:
  *         - status
  *         - id
- *         - tenantId
+ *         - adminId
  *         - comment
  *         - reason
  *       properties:
@@ -129,7 +129,7 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *         id:
  *           type: string
  *           format: uuid
- *         tenantId:
+ *         adminId:
  *           type: string
  *           format: uuid
  *         comment:
@@ -141,7 +141,7 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *       type: object
  *       required:
  *         - id
- *         - tenantId
+ *         - adminId
  *         - comment
  *         - reason
  *         - resumeShedule
@@ -149,7 +149,7 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *         id:
  *           type: string
  *           format: uuid
- *         tenantId:
+ *         adminId:
  *           type: string
  *           format: uuid
  *         comment:
@@ -165,7 +165,7 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *       required:
  *         - status
  *         - id
- *         - tenantId
+ *         - adminId
  *         - comment
  *         - reason
  *         - autoRenew
@@ -177,7 +177,7 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *         id:
  *           type: string
  *           format: uuid
- *         tenantId:
+ *         adminId:
  *           type: string
  *           format: uuid
  *         comment:
@@ -193,7 +193,7 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *       required:
  *         - status
  *         - id
- *         - tenantId
+ *         - adminId
  *         - comment
  *         - reason
  *         - resumeShedule
@@ -206,7 +206,7 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *         id:
  *           type: string
  *           format: uuid
- *         tenantId:
+ *         adminId:
  *           type: string
  *           format: uuid
  *         comment:
@@ -224,7 +224,7 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *       type: object
  *       required:
  *         - id
- *         - tenantId
+ *         - adminId
  *         - comment
  *         - reason
  *         - pauseSchedule
@@ -233,7 +233,7 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *         id:
  *           type: string
  *           format: uuid
- *         tenantId:
+ *         adminId:
  *           type: string
  *           format: uuid
  *         comment:
