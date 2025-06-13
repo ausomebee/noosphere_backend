@@ -302,6 +302,20 @@ class BillingRoutes {
          */
         this.router.post("/paymentmethod", BillingDto.createPaymentMethodDto, this.controller.createPaymentMethod);
 
+        /**
+         * @swagger
+         * /api/v1/billing/countpayment:
+         *   get:
+         *     summary: count all payment
+         *     tags: [billing]
+         *     responses:
+         *       200:
+         *         description: all payment counted successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get("/countpayment", this.controller.getTotalPaymentByStatus);
+
     }
 
     getRouter() {

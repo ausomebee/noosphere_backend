@@ -62,6 +62,16 @@ class InvoiceRepository {
         });
     }
 
+    async totalCount(query) {
+    return await this.model.aggregate({
+        where: query,
+        _count: {
+            _all: true,
+        },
+    });
+}
+
+
 }
 
 export default InvoiceRepository;

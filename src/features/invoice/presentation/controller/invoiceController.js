@@ -99,6 +99,20 @@ class InvoiceController {
         });
     });
 
+    getTotalByStatus = expressAsyncHandler(async (req, res) => {
+        const invoice = await this.service.getTotalByStatus();
+
+        if (!invoice) {
+            res.status(500).json({ message: 'Failed to count invoices' });
+        }
+
+        return res.status(201).json({
+            message: "Invoices counted successfully",
+            status: 'ok',
+            data: invoice
+        });
+    });
+
 }
 
 export default InvoiceController;
