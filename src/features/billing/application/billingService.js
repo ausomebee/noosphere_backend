@@ -175,7 +175,7 @@ class BillingService {
 
     async getPaymentByStatus(status) {
         const query = status === "all" ? {} : { status }
-        const payments = await this.paymentRepository.findAll(query);
+        const payments = await this.paymentRepository.findAllAndPopulate(query);
 
         if (!payments) {
             throw new Error("Payments not found")

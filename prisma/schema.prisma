@@ -345,7 +345,7 @@ model Payment {
   paymentMethodId String
 
   subscription  Subscription?
-  tenant        Tenant?         @relation(fields: [tenantId], references: [id])
+  tenant        Tenant?        @relation(fields: [tenantId], references: [id])
   invoice       Invoice?       @relation(fields: [invoiceId], references: [id])
   paymentMethod PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
 }
@@ -399,8 +399,44 @@ model PaymentMethod {
   tenant  Tenant?   @relation(fields: [tenantId], references: [id])
 }
 
-model AutoBilling{
-    id               String   @id @default(uuid())
-onPlanPurchase Boolean
+model InvoiceManagement {
+  id                        String  @id @default(uuid())
+  onPlanPurchase            Boolean
+  daysBeforeDueDate         Int
+  upcomingInvoiceHeader     String
+  upcomingInvoiceBody       String
+  onDueDate                 Boolean
+  dueInvoiceHeader          String
+  dueInvoiceBody            String
+  markOverDue               Int
+  unpaidReminderTimesBefore Int
+  attachInvoiceToReminder   Boolean
+  reminderEmailHeader       String
+  reminderEmailBody         String
+  unpaidReminderDaysAfter   Int
+  reminderEmailHeader2      String
+  reminderEmailBody2        String
+  unpaidReminderDaysAfter2  Int
+}
 
+model PaymentAndAccountAccess {
+  id                       String  @id @default(uuid())
+  chargeOnDueDate          Boolean
+  chargeLastUsedFirst      Boolean
+  chargeAlternative        Boolean
+  retryBefore              Boolean
+  retryAfter               Boolean
+  notifyTenant             Boolean
+  notificationEmailHeader  String
+  notificationEmailBody    String
+  cancelAfter              Int
+  manualCancel             Boolean
+  suspensionAction         String
+  errorMessage             String
+  emailAfterAttempts       Int
+  warningMailHeader        String
+  warningMailBody          String
+  sendOnSubscriptionCancel Boolean
+  cancelMailHeader         String
+  cancelMailBody           String
 }
