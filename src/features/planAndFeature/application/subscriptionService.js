@@ -32,8 +32,9 @@ class SubscriptionService {
         const update = await this.subscriptionRepository.update(data.id, {
             pauseSchedule: data.pauseSchedule || subscription.pauseSchedule,
             status: data.status || subscription.status,
-            autoRenew: data.autoRenew || subscription.autoRenew,
-            resumeShedule: data.resumeShedule || subscription.resumeShedule
+            autoRenew: data.autoRenew ?? subscription.autoRenew,
+            resumeShedule: data.resumeShedule || subscription.resumeShedule,
+            mailNotification: data.mailNotification ?? subscription.mailNotification
         });
 
         if (!update) {
