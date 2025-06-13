@@ -1,5 +1,24 @@
 class Billing {
-    constructor({ id, tenantId, gatewayToken, lastFourDigits, cardType, subscription, createdAt, tenant, invoice, amount, paymentMethod, paymentMethodId, billingAddress, billingMetadataId, planId, status, startDate, endDate, name, description, price, billingCycle, transactionId, invoiceId }) {
+    constructor({ id, tenantId,
+        chargeOnDueDate,
+        chargeLastUsedFirst,
+        chargeAlternative,
+        retryBefore,
+        retryAfter,
+        notifyTenant,
+        notificationEmailHeader,
+        notificationEmailBody,
+        cancelAfter,
+        manualCancel,
+        suspensionAction,
+        errorMessage,
+        emailAfterAttempts,
+        warningMailHeader,
+        warningMailBody,
+        sendOnSubscriptionCancel,
+        cancelMailHeader,
+        cancelMailBody,
+        gatewayToken, lastFourDigits, cardType, subscription, createdAt, tenant, invoice, amount, paymentMethod, paymentMethodId, billingAddress, billingMetadataId, planId, status, startDate, endDate, name, description, price, billingCycle, transactionId, invoiceId }) {
         this.id = id;
         this.tenantId = tenantId;
         this.paymentMethod = paymentMethod;
@@ -24,6 +43,24 @@ class Billing {
         this.cardType = cardType;
         this.lastFourDigits = lastFourDigits;
         this.gatewayToken = gatewayToken;
+        this.chargeOnDueDate = chargeOnDueDate;
+        this.chargeLastUsedFirst = chargeLastUsedFirst;
+        this.chargeAlternative = chargeAlternative;
+        this.retryBefore = retryBefore;
+        this.retryAfter = retryAfter;
+        this.notifyTenant = notifyTenant;
+        this.notificationEmailHeader = notificationEmailHeader;
+        this.notificationEmailBody = notificationEmailBody;
+        this.cancelAfter = cancelAfter;
+        this.manualCancel = manualCancel;
+        this.suspensionAction = suspensionAction;
+        this.errorMessage = errorMessage;
+        this.emailAfterAttempts = emailAfterAttempts;
+        this.warningMailHeader = warningMailHeader;
+        this.warningMailBody = warningMailBody;
+        this.sendOnSubscriptionCancel = sendOnSubscriptionCancel;
+        this.cancelMailHeader = cancelMailHeader;
+        this.cancelMailBody = cancelMailBody;
     }
 
     get createBillingMetadata() {
@@ -102,6 +139,29 @@ class Billing {
                 }
             ],
             total: this.invoice.total,
+        };
+    }
+
+    get createPaymentAccess() {
+        return {
+            chargeOnDueDate: this.chargeOnDueDate,
+            chargeLastUsedFirst: this.chargeLastUsedFirst,
+            chargeAlternative: this.chargeAlternative,
+            retryBefore: this.retryBefore,
+            retryAfter: this.retryAfter,
+            notifyTenant: this.notifyTenant,
+            notificationEmailHeader: this.notificationEmailHeader,
+            notificationEmailBody: this.notificationEmailBody,
+            cancelAfter: this.cancelAfter,
+            manualCancel: this.manualCancel,
+            suspensionAction: this.suspensionAction,
+            errorMessage: this.errorMessage,
+            emailAfterAttempts: this.emailAfterAttempts,
+            warningMailHeader: this.warningMailHeader,
+            warningMailBody: this.warningMailBody,
+            sendOnSubscriptionCancel: this.sendOnSubscriptionCancel,
+            cancelMailHeader: this.cancelMailHeader,
+            cancelMailBody: this.cancelMailBody
         };
     }
 }

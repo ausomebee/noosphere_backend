@@ -85,6 +85,31 @@ class BillingDto {
 
         Validator.validateRequest(req, next, schema);
     };
+
+    static createPaymentAceesDto = (req, res, next) => {
+        const schema = Joi.object({
+            chargeOnDueDate: Joi.boolean().required(),
+            chargeLastUsedFirst: Joi.boolean().required(),
+            chargeAlternative: Joi.boolean().required(),
+            retryBefore: Joi.boolean().required(),
+            retryAfter: Joi.boolean().required(),
+            notifyTenant: Joi.boolean().required(),
+            notificationEmailHeader: Joi.string().required(),
+            notificationEmailBody: Joi.string().required(),
+            cancelAfter: Joi.number().integer().required(),
+            manualCancel: Joi.boolean().required(),
+            suspensionAction: Joi.string().required(),
+            errorMessage: Joi.string().required(),
+            emailAfterAttempts: Joi.number().integer().required(),
+            warningMailHeader: Joi.string().required(),
+            warningMailBody: Joi.string().required(),
+            sendOnSubscriptionCancel: Joi.boolean().required(),
+            cancelMailHeader: Joi.string().required(),
+            cancelMailBody: Joi.string().required()
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
 }
 
 export default BillingDto;

@@ -83,6 +83,82 @@ import BillingDto from "../dto/billingDto.js";
  *           format: uuid
  *           example: "c0a8017e-7b68-11e9-8f9e-2a86e4085a59"
  *           description: UUID of the tenant.
+ *     CreatePaymentAccessDto:
+ *       type: object
+ *       required:
+ *         - chargeOnDueDate
+ *         - chargeLastUsedFirst
+ *         - chargeAlternative
+ *         - retryBefore
+ *         - retryAfter
+ *         - notifyTenant
+ *         - notificationEmailHeader
+ *         - notificationEmailBody
+ *         - cancelAfter
+ *         - manualCancel
+ *         - suspensionAction
+ *         - errorMessage
+ *         - emailAfterAttempts
+ *         - warningMailHeader
+ *         - warningMailBody
+ *         - sendOnSubscriptionCancel
+ *         - cancelMailHeader
+ *         - cancelMailBody
+ *       properties:
+ *         chargeOnDueDate:
+ *           type: boolean
+ *           example: true
+ *         chargeLastUsedFirst:
+ *           type: boolean
+ *           example: false
+ *         chargeAlternative:
+ *           type: boolean
+ *           example: true
+ *         retryBefore:
+ *           type: boolean
+ *           example: true
+ *         retryAfter:
+ *           type: boolean
+ *           example: false
+ *         notifyTenant:
+ *           type: boolean
+ *           example: true
+ *         notificationEmailHeader:
+ *           type: string
+ *           example: "Upcoming Payment Notification"
+ *         notificationEmailBody:
+ *           type: string
+ *           example: "Dear customer, your payment is due soon..."
+ *         cancelAfter:
+ *           type: integer
+ *           example: 5
+ *         manualCancel:
+ *           type: boolean
+ *           example: false
+ *         suspensionAction:
+ *           type: string
+ *           example: "SUSPEND_SERVICE"
+ *         errorMessage:
+ *           type: string
+ *           example: "Payment failed due to insufficient funds."
+ *         emailAfterAttempts:
+ *           type: integer
+ *           example: 3
+ *         warningMailHeader:
+ *           type: string
+ *           example: "Warning: Payment Issue Detected"
+ *         warningMailBody:
+ *           type: string
+ *           example: "Your recent payment could not be processed..."
+ *         sendOnSubscriptionCancel:
+ *           type: boolean
+ *           example: true
+ *         cancelMailHeader:
+ *           type: string
+ *           example: "Subscription Cancelled"
+ *         cancelMailBody:
+ *           type: string
+ *           example: "Your subscription has been cancelled due to payment issues."
  */
 
 class BillingRoutes {
@@ -315,6 +391,40 @@ class BillingRoutes {
          *         description: Bad request
          */
         this.router.get("/countpayment", this.controller.getTotalPaymentByStatus);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentaccess:
+         *   post:
+         *     summary: Create payment access
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/CreatePaymentAccessDto'
+         *     responses:
+         *       201:
+         *         description: payment access created successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/paymentaccess", BillingDto.createPaymentAceesDto, this.controller.createPaymentAccess);
+
+         /**
+         * @swagger
+         * /api/v1/billing/paymentaccess:
+         *   get:
+         *     summary: Retrieve payment access
+         *     tags: [billing]
+         *     responses:
+         *       200:
+         *         description: all payment retrieved successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get("/paymentaccess", this.controller.getPaymentAccess);
 
     }
 

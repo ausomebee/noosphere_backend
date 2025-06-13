@@ -38,6 +38,57 @@ import InvoiceDto from "../dto/invoiceDto.js";
  *           type: number
  *           example: 1
  *           description: The quantity of the plan
+ *     CreateInvoiceManagementDto:
+ *       type: object
+ *       required:
+ *         - onPlanPurchase
+ *         - daysBeforeDueDate
+ *         - upcomingInvoiceHeader
+ *         - upcomingInvoiceBody
+ *         - onDueDate
+ *         - dueInvoiceHeader
+ *         - dueInvoiceBody
+ *         - markOverDue
+ *         - unpaidReminderTimesBefore
+ *         - attachInvoiceToReminder
+ *         - reminderEmail
+ *       properties:
+ *         onPlanPurchase:
+ *           type: boolean
+ *           example: true
+ *         daysBeforeDueDate:
+ *           type: integer
+ *           example: 5
+ *         upcomingInvoiceHeader:
+ *           type: string
+ *           example: "Upcoming Invoice Notice"
+ *         upcomingInvoiceBody:
+ *           type: string
+ *           example: "This is a reminder that your invoice is due soon."
+ *         onDueDate:
+ *           type: boolean
+ *           example: true
+ *         dueInvoiceHeader:
+ *           type: string
+ *           example: "Invoice Due Today"
+ *         dueInvoiceBody:
+ *           type: string
+ *           example: "Please make payment to avoid service disruption."
+ *         markOverDue:
+ *           type: integer
+ *           example: 3
+ *         unpaidReminderTimesBefore:
+ *           type: integer
+ *           example: 2
+ *         attachInvoiceToReminder:
+ *           type: boolean
+ *           example: true
+ *         reminderEmail:
+ *           type: object
+ *           description: JSON object containing reminder email configuration
+ *           example:
+ *             subject: "Reminder Email"
+ *             body: "This is your reminder email content."
  */
 
 class InvoiceRoutes {
@@ -191,6 +242,41 @@ class InvoiceRoutes {
          *         description: Bad request
          */
         this.router.get("/total/status",  this.controller.getTotalByStatus);
+
+        /**
+         * @swagger
+         * /api/v1/invoice/management:
+         *   post:
+         *     summary: Create invoice management
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/CreateInvoiceManagementDto'
+         *     responses:
+         *       201:
+         *         description: Invoice management created successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/management", InvoiceDto.createInvoiceManagementDto, this.controller.createInvoiceManagement);
+
+        /**
+        * @swagger
+        * /api/v1/invoice/invoice/management:
+        *   get:
+        *     summary: gets invoice management
+        *     tags: [Invoice]
+        
+        *     responses:
+        *       200:
+        *         description: Invoice management fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/invoice/management", this.controller.getInvoiceManagement);
 
     }
 
