@@ -44,6 +44,24 @@ class InvoiceDto {
 
         Validator.validateRequest(req, next, schema, req.params);
     };
+
+    static createInvoiceManagementDto = (req, res, next) => {
+        const schema = Joi.object({
+            onPlanPurchase: Joi.boolean().required(),
+            daysBeforeDueDate: Joi.number().integer().required(),
+            upcomingInvoiceHeader: Joi.string().required(),
+            upcomingInvoiceBody: Joi.string().required(),
+            onDueDate: Joi.boolean().required(),
+            dueInvoiceHeader: Joi.string().required(),
+            dueInvoiceBody: Joi.string().required(),
+            markOverDue: Joi.number().integer().required(),
+            unpaidReminderTimesBefore: Joi.number().integer().required(),
+            attachInvoiceToReminder: Joi.boolean().required(),
+            reminderEmail: Joi.object().required()
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
 }
 
 export default InvoiceDto;

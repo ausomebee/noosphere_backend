@@ -3,13 +3,15 @@ import prismaService from "../../../../config/prisma.js";
 import InvoiceRepository from "../../infrastructure/invoiceRepository.js";
 import InvoiceService from "../../application/invoiceService.js";
 import PlanRepository from "../../../planAndFeature/infrastructure/planRepositiory.js";
+import InvoiceManagementRepository from "../../infrastructure/invoiceManagementRepository.js";
 
 class InvoiceController {
     constructor() {
         this.prisma = prismaService.getClient()
         this.invoiceRepository = new InvoiceRepository(this.prisma.invoice);
+        this.invoiceManagementRepository = new InvoiceManagementRepository(this.prisma.invoiceManagement);
         this.planRepository = new PlanRepository(this.prisma.billingPlan)
-        this.service = new InvoiceService({ invoiceRepository: this.invoiceRepository, planRepository: this.planRepository });
+        this.service = new InvoiceService({ invoiceRepository: this.invoiceRepository, planRepository: this.planRepository, invoiceManagementRepository: this.invoiceManagementRepository });
     }
 
     createInvoice = expressAsyncHandler(async (req, res) => {
@@ -108,6 +110,34 @@ class InvoiceController {
 
         return res.status(201).json({
             message: "Invoices counted successfully",
+            status: 'ok',
+            data: invoice
+        });
+    });
+
+    createInvoiceManagement = expressAsyncHandler(async (req, res) => {
+        const invoice = await this.service.createInvoiceManagement(req.body);
+
+        if (!invoice) {
+            res.status(500).json({ message: 'Failed to create invoice management' });
+        }
+
+        return res.status(201).json({
+            message: "Invoice management created successfully",
+            status: 'ok',
+            data: invoice
+        });
+    });
+
+    getInvoiceManagement = expressAsyncHandler(async (req, res) => {
+        const invoice = await this.service.getInvoiceManagement();
+
+        if (!invoice) {
+            res.status(500).json({ message: 'Failed to fetch invoice management' });
+        }
+
+        return res.status(201).json({
+            message: "Invoice management fetched successfully",
             status: 'ok',
             data: invoice
         });

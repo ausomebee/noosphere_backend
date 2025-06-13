@@ -1,5 +1,17 @@
 class Invoice {
-    constructor({ id, tenantId, dueDate, status, planId, total, quantity, billingFrequency, tenant, plan }) {
+    constructor({ id, tenantId,
+        onPlanPurchase,
+        daysBeforeDueDate,
+        upcomingInvoiceHeader,
+        upcomingInvoiceBody,
+        onDueDate,
+        dueInvoiceHeader,
+        dueInvoiceBody,
+        markOverDue,
+        unpaidReminderTimesBefore,
+        attachInvoiceToReminder,
+        reminderEmail,
+        dueDate, status, planId, total, quantity, billingFrequency, tenant, plan }) {
         this.id = id;
         this.tenantId = tenantId;
         this.dueDate = dueDate;
@@ -10,6 +22,17 @@ class Invoice {
         this.billingFrequency = billingFrequency;
         this.tenant = tenant;
         this.plan = plan;
+        this.onPlanPurchase = onPlanPurchase;
+        this.daysBeforeDueDate = daysBeforeDueDate;
+        this.upcomingInvoiceHeader = upcomingInvoiceHeader;
+        this.upcomingInvoiceBody = upcomingInvoiceBody;
+        this.onDueDate = onDueDate;
+        this.dueInvoiceHeader = dueInvoiceHeader;
+        this.dueInvoiceBody = dueInvoiceBody;
+        this.markOverDue = markOverDue;
+        this.unpaidReminderTimesBefore = unpaidReminderTimesBefore;
+        this.attachInvoiceToReminder = attachInvoiceToReminder;
+        this.reminderEmail = reminderEmail;
     }
 
     get createInvoice() {
@@ -52,6 +75,23 @@ class Invoice {
             total: this.total,
         };
     }
+
+    get createInvoiceManagement() {
+        return {
+            onPlanPurchase: this.onPlanPurchase,
+            daysBeforeDueDate: this.daysBeforeDueDate,
+            upcomingInvoiceHeader: this.upcomingInvoiceHeader,
+            upcomingInvoiceBody: this.upcomingInvoiceBody,
+            onDueDate: this.onDueDate,
+            dueInvoiceHeader: this.dueInvoiceHeader,
+            dueInvoiceBody: this.dueInvoiceBody,
+            markOverDue: this.markOverDue,
+            unpaidReminderTimesBefore: this.unpaidReminderTimesBefore,
+            attachInvoiceToReminder: this.attachInvoiceToReminder,
+            reminderEmail: this.reminderEmail
+        }
+    }
+
 }
 
 export default Invoice;

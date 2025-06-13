@@ -1,9 +1,10 @@
 import Invoice from "../domain/invoice.js";
 
 class InvoiceService {
-    constructor({ invoiceRepository, planRepository }) {
+    constructor({ invoiceRepository, planRepository, invoiceManagementRepository }) {
         this.invoiceRepository = invoiceRepository;
         this.planRepository = planRepository;
+        this.invoiceManagementRepository = invoiceManagementRepository;
     }
 
     async createInvoice(data) {
@@ -194,6 +195,27 @@ class InvoiceService {
         }
 
         return { All, Paid, Upcoming, Due, Overdue };
+    }
+
+    async createInvoiceManagement(data) {
+        const invoiceData = new Invoice(data)
+
+        const newInvoice = await this.invoiceManagementRepository.create(invoiceData.createInvoiceManagement);
+
+        if (!newInvoice) {
+            throw new Error("Failed to create invoice");
+        }
+
+        return newInvoice;
+    }
+
+    async getInvoiceManagement() {
+        const invoice = await this.invoiceManagementRepository.findFirst({});
+        if (!invoice) {
+            throw new Error("Invoice not found")
+        }
+
+        return invoice;
     }
 }
 

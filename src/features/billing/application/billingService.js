@@ -1,10 +1,11 @@
 import Billing from "../domain/billing.js";
 
 class BillingService {
-    constructor({ transactionsRepository, billingRepository, paymentRepository, paymentMethodRepository }) {
+    constructor({ transactionsRepository, paymentAccessRepository, billingRepository, paymentRepository, paymentMethodRepository }) {
         this.transactionsRepository = transactionsRepository;
         this.billingRepository = billingRepository;
         this.paymentRepository = paymentRepository;
+        this.paymentAccessRepository = paymentAccessRepository;
         this.paymentMethodRepository = paymentMethodRepository;
     }
 
@@ -207,34 +208,31 @@ class BillingService {
         return { All, Failed, Successful, InProgress };
     }
 
-    async createPayment(data) {
-        const paymentExists = await this.paymentRepository.findFirstDynamic({
-            where: { tenantId: data.tenantId },
-            select: { tenantId: true }
-        });
+    async createPaymentAccess(data) {
+        const paymentAccessExists = await this.paymentAccessRepository.findFirst({});
 
-        if (paymentExists) {
-            throw new Error("This payment already exists.");
+        if (paymentAccessExists) {
+            throw new Error("Payment access already exists.");
         }
 
-        const newPayment = await this.paymentRepository.create(data);
+        const paymentAccessData = new Billing(data)
+        const newPaymentAccess = await this.paymentAccessRepository.create(paymentAccessData.createPaymentAccess);
 
-        if (!newPayment) {
+        if (!newPaymentAccess) {
             throw new Error("Failed to create payment");
         }
 
-        return newPayment;
+        return newPaymentAccess;
     }
 
-    async getSinglePayment(data) {
-        const payment = await this.paymentRepository.findFirstDynamic({ where: { id: data.id }, include: { tenant: true, invoice: { include: { plan: true } }, paymentMethod: true, subscription: true } });
-        const paymentOutput = new Billing(payment);
+    async getPaymentAccess() {
+        const payment = await this.paymentAccessRepository.findFirst({});
 
         if (!payment) {
-            throw new Error("Payment not found")
+            throw new Error("Payment access not found")
         }
 
-        return paymentOutput.paymentOutput;
+        return payment;
     }
 }
 

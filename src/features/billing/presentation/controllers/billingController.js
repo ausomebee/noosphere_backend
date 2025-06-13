@@ -13,12 +13,14 @@ class BillingController {
         this.transactionsRepository = new TransactionRepository(this.prisma.transactions);
         this.billingRepository = new BillingRepository(this.prisma.billingMetadata);
         this.paymentRepository = new PaymentRepository(this.prisma.payment);
+        this.paymentAccessRepository = new PaymentRepository(this.prisma.paymentAndAccountAccess);
         this.paymentMethodRepository = new PaymentMethodRepository(this.prisma.paymentMethod);
         this.service = new BillingService({
             transactionsRepository: this.transactionsRepository,
             billingRepository: this.billingRepository,
             paymentRepository: this.paymentRepository,
-            paymentMethodRepository: this.paymentMethodRepository
+            paymentMethodRepository: this.paymentMethodRepository,
+            paymentAccessRepository: this.paymentAccessRepository
         });
     }
 
@@ -231,6 +233,34 @@ class BillingController {
 
         return res.status(201).json({
             message: "Payment counted successfully",
+            status: 'ok',
+            data: payment
+        });
+    });
+
+    createPaymentAccess = expressAsyncHandler(async (req, res) => {
+        const payment = await this.service.createPaymentAccess(req.body);
+
+        if (!payment) {
+            res.status(500).json({ message: 'Failed to create payment access' });
+        }
+
+        return res.status(201).json({
+            message: "Payment access created successfully",
+            status: 'ok',
+            data: payment
+        });
+    });
+
+    getPaymentAccess = expressAsyncHandler(async (req, res) => {
+        const payment = await this.service.getPaymentAccess();
+
+        if (!payment) {
+            res.status(500).json({ message: 'Failed to fetch payment access' });
+        }
+
+        return res.status(201).json({
+            message: "Payment access fetched successfully",
             status: 'ok',
             data: payment
         });
