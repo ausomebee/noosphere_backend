@@ -257,19 +257,23 @@ model Transactions {
 }
 
 model Subscription {
-  id                String             @id @default(uuid())
-  tenantId          String
-  planId            String
-  status            SubscriptionStatus
-  startDate         DateTime
-  billingCycle      String
+  id            String             @id @default(uuid())
+  tenantId      String
+  planId        String
+  status        SubscriptionStatus
+  startDate     DateTime
+  billingCycle  String
   // lastPaymentStatus String
   // amount            Int
-  endDate           DateTime
-  transactionId     String             @unique
-  paymentId         Int                @unique
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
+  pauseSchedule DateTime?
+  resumeShedule DateTime?
+  autoRenew     Boolean?            @default(true)
+  mailNotification Boolean?
+  endDate       DateTime
+  transactionId String             @unique
+  paymentId     Int                @unique
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
 
   tenant      Tenant       @relation(fields: [tenantId], references: [id])
   transaction Transactions @relation(fields: [transactionId], references: [id])
@@ -364,6 +368,7 @@ model Logs {
   featureId String?
   module    Module
   action    String
+  reason    String
   details   String?
   ipAddress String
   createdAt DateTime @default(now())
@@ -417,7 +422,7 @@ model InvoiceManagement {
   markOverDue               Int
   unpaidReminderTimesBefore Int
   attachInvoiceToReminder   Boolean
-  reminderEmai              Json
+  reminderEmail             Json
 }
 
 model PaymentAndAccountAccess {

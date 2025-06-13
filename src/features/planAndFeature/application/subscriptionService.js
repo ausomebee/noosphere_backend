@@ -30,7 +30,10 @@ class SubscriptionService {
         }
 
         const update = await this.subscriptionRepository.update(data.id, {
-            status: data.status || subscription.status
+            pauseSchedule: data.pauseSchedule || subscription.pauseSchedule,
+            status: data.status || subscription.status,
+            autoRenew: data.autoRenew || subscription.autoRenew,
+            resumeShedule: data.resumeShedule || subscription.resumeShedule
         });
 
         if (!update) {

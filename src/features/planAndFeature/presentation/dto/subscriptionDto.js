@@ -50,7 +50,7 @@ class SubscriptionDto {
 
     static checkStatusDto = (req, res, next) => {
         const schema = Joi.object({
-            status: Joi.string().valid("ACTIVE", "PAUSED", "PENDING", "CANCELLED"),
+            status: Joi.string().valid("ACTIVE", "PAUSED", "PENDING", "CANCELLED", "all"),
         });
 
         Validator.validateRequest(req, next, schema, req.params);
@@ -58,11 +58,121 @@ class SubscriptionDto {
 
     static updateStatusDto = (req, res, next) => {
         const schema = Joi.object({
-            status: Joi.string().valid("ACTIVE", "PAUSED", "PENDING", "CANCELLED"),
+            status: Joi.string().valid("ACTIVE", "PAUSED", "PENDING", "CANCELLED").required(),
             id: Joi.string().uuid().required().messages({
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
-            })
+            }),
+            comment: Joi.string().required(),
+            reason: Joi.string().required(),
+            pauseSchedule: Joi.date().optional(),
+            resumeShedule: Joi.date().optional(),
+            autoRenew: Joi.boolean().optional()
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static cancelNowDto = (req, res, next) => {
+        const schema = Joi.object({
+            status: Joi.string().valid("CANCELLED").required().default("CANCELLED"),
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            comment: Joi.string().required(),
+            reason: Joi.string().required(),
+            autoRenew: Joi.boolean().optional().default(false)
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static cancelAtEndDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            comment: Joi.string().required(),
+            reason: Joi.string().required(),
+            autoRenew: Joi.boolean().optional().default(false)
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static resumeNowDto = (req, res, next) => {
+        const schema = Joi.object({
+            status: Joi.string().valid("ACTIVE").required().default("ACTIVE"),
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            comment: Joi.string().required(),
+            reason: Joi.string().required()
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static resumeLaterDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            comment: Joi.string().required(),
+            reason: Joi.string().required(),
+            resumeShedule: Joi.date().optional(),
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static pauseNowDto = (req, res, next) => {
+        const schema = Joi.object({
+            status: Joi.string().valid("PAUSED").required().default("PAUSED"),
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            comment: Joi.string().required(),
+            reason: Joi.string().required(),
+            autoRenew: Joi.boolean().optional().default(false)
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static pauseUntilDto = (req, res, next) => {
+        const schema = Joi.object({
+            status: Joi.string().valid("PAUSED").required().default("PAUSED"),
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            comment: Joi.string().required(),
+            reason: Joi.string().required(),
+            resumeShedule: Joi.date().optional(),
+            autoRenew: Joi.boolean().optional().default(false)
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static pauseScheduleDto = (req, res, next) => {
+        const schema = Joi.object({
+            status: Joi.string().valid("ACTIVE", "PAUSED", "PENDING", "CANCELLED").required(),
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            comment: Joi.string().required(),
+            reason: Joi.string().required(),
+            pauseSchedule: Joi.date().optional(),
+            resumeShedule: Joi.date().optional(),
+            autoRenew: Joi.boolean().optional()
         });
 
         Validator.validateRequest(req, next, schema);
