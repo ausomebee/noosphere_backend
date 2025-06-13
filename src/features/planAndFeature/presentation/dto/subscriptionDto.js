@@ -122,7 +122,8 @@ class SubscriptionDto {
                 "string.guid": "Tenant ID must be a valid UUID"
             }),
             comment: Joi.string().required(),
-            reason: Joi.string().required()
+            reason: Joi.string().required(),
+            mailNotification: Joi.boolean().required()
         });
 
         Validator.validateRequest(req, next, schema);
@@ -141,6 +142,7 @@ class SubscriptionDto {
             comment: Joi.string().required(),
             reason: Joi.string().required(),
             resumeShedule: Joi.date().required(),
+            mailNotification: Joi.boolean().required()
         });
 
         Validator.validateRequest(req, next, schema);
@@ -159,7 +161,8 @@ class SubscriptionDto {
             }),
             comment: Joi.string().required(),
             reason: Joi.string().required(),
-            autoRenew: Joi.boolean().required().default(false)
+            autoRenew: Joi.boolean().required().default(false),
+            mailNotification: Joi.boolean().required()
         });
 
         Validator.validateRequest(req, next, schema);
@@ -179,7 +182,8 @@ class SubscriptionDto {
             comment: Joi.string().required(),
             reason: Joi.string().required(),
             resumeShedule: Joi.date().required(),
-            autoRenew: Joi.boolean().required().default(false)
+            autoRenew: Joi.boolean().required().default(false),
+            mailNotification: Joi.boolean().required()
         });
 
         Validator.validateRequest(req, next, schema);
@@ -198,7 +202,8 @@ class SubscriptionDto {
             comment: Joi.string().required(),
             reason: Joi.string().required(),
             pauseSchedule: Joi.date().required(),
-            autoRenew: Joi.boolean().required().default(true)
+            autoRenew: Joi.boolean().required().default(true),
+            mailNotification: Joi.boolean().required()
         });
 
         Validator.validateRequest(req, next, schema);

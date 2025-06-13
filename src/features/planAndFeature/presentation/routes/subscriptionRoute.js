@@ -121,6 +121,7 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *         - adminId
  *         - comment
  *         - reason
+ *         -mailNotification
  *       properties:
  *         status:
  *           type: string
@@ -136,6 +137,8 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *           type: string
  *         reason:
  *           type: string
+ *         mailNotification
+ *           type: boolean
 
  *     ResumeLaterDto:
  *       type: object
@@ -145,6 +148,7 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *         - comment
  *         - reason
  *         - resumeShedule
+ *         - mailNotification
  *       properties:
  *         id:
  *           type: string
@@ -159,6 +163,8 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *         resumeShedule:
  *           type: string
  *           format: date-time
+ *         mailNotification
+ *           type: boolean
 
  *     PauseNowDto:
  *       type: object
@@ -169,6 +175,7 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *         - comment
  *         - reason
  *         - autoRenew
+ *         - mailNotification
  *       properties:
  *         status:
  *           type: string
@@ -187,6 +194,8 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *         autoRenew:
  *           type: boolean
  *           default: false
+ *         mailNotification
+ *           type: boolean
 
  *     PauseUntilDto:
  *       type: object
@@ -198,6 +207,7 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *         - reason
  *         - resumeShedule
  *         - autoRenew
+ *         - mailNotification
  *       properties:
  *         status:
  *           type: string
@@ -219,6 +229,8 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *         autoRenew:
  *           type: boolean
  *           default: false
+ *         mailNotification
+ *           type: boolean
 
  *     PauseScheduleDto:
  *       type: object
@@ -229,6 +241,7 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *         - reason
  *         - pauseSchedule
  *         - autoRenew
+ *         - mailNotification
  *       properties:
  *         id:
  *           type: string
@@ -246,6 +259,8 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *         autoRenew:
  *           type: boolean
  *           default: true
+ *         mailNotification
+ *           type: boolean
  */
 
 class SubscriptionRoutes {
