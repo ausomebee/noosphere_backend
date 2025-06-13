@@ -15,6 +15,8 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *         - tenantId
  *         - planId
  *         - transactionId
+ *         - billingCycle
+ *         - paymentId
  *       properties:
  *         startDate:
  *           type: string
@@ -39,6 +41,27 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *           type: string
  *           format: uuid
  *           example: "fbc8f9da-06df-4787-9cd5-0bcb8a493f94"
+ *         paymentId:
+ *           type: number
+ *           example: 1
+ *         billingCycle:
+ *           type: string
+ *           example: "Monthly"
+ *     UpdateStatusDto:
+ *       type: object
+ *       required:
+ *         - id
+ *       properties:
+ *         status:
+ *           type: string
+ *           enum: [ACTIVE, PAUSED, PENDING, CANCELLED]
+ *           description: Status of the item
+ *           example: ACTIVE
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           description: Unique identifier
+ *           example: 123e4567-e89b-12d3-a456-426614174000
  */
 
 class SubscriptionRoutes {
@@ -124,6 +147,62 @@ class SubscriptionRoutes {
         *         description: Validation error
         */
         this.router.get("/plan/:planId", SubscriptionDto.checkPlanIdDto, this.controller.getSubscriptionByPlan);
+
+        /**
+         * @swagger
+         * /api/v1/subscription/count/total:
+         *   get:
+         *     summary: counted all subscription
+         *     tags: [subscription]
+         *     responses:
+         *       200:
+         *         description: all subscription counted successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get("/count/total", this.controller.getTotalSubscriptionByStatus);
+
+        /**
+        * @swagger
+        * /api/v1/subscription/status/{status}:
+        *   get:
+        *     summary: gets subscription by status
+        *     tags: [subscription]
+        *     parameters:
+        *       - in: path
+        *         name: status
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The status of the subscription
+        *     responses:
+        *       200:
+        *         description: subscription fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/status/:status", SubscriptionDto.checkStatusDto, this.controller.getSubscriptionByStatus);
+
+        /**
+         * @swagger
+         * /api/v1/subscription/:
+         *   patch:
+         *     summary: Update the status of a subscription
+         *     tags:
+         *       - subscription
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateStatusDto'
+         *     responses:
+         *       200:
+         *         description: Status updated successfully
+         *       400:
+         *         description: Invalid input
+         */
+        this.router.patch("/", SubscriptionDto.updateStatusDto, this.controller.updateSubscription);
 
     }
 

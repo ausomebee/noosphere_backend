@@ -30,10 +30,7 @@ class SubscriptionService {
         }
 
         const update = await this.subscriptionRepository.update(data.id, {
-            planId: data.planId || subscription.planId,
-            status: data.status || subscription.status,
-            startDate: data.startDate || subscription.startDate,
-            endDate: data.endDate || subscription.endDate
+            status: data.status || subscription.status
         });
 
         if (!update) {
@@ -71,6 +68,31 @@ class SubscriptionService {
         }
 
         return subscription;
+    }
+
+    async getTotalSubscriptionByStatus() {
+        const All = await this.subscriptionRepository.totalCount({});
+        const ACTIVE = await this.subscriptionRepository.totalCount({ status: "ACTIVE" });
+        const PAUSED = await this.subscriptionRepository.totalCount({ status: "PAUSED" });
+        const PENDING = await this.subscriptionRepository.totalCount({ status: "PENDING" });
+        const CANCELLED = await this.subscriptionRepository.totalCount({ status: "CANCELLED" });
+
+        if (!All || !ACTIVE || !PAUSED || !PENDING || !CANCELLED) {
+            throw new Error("Failed to count payment");
+        }
+
+        return { All, ACTIVE, PAUSED, PENDING, CANCELLED };
+    }
+
+    async getSubscriptionByStatus(status) {
+        const query = status === "all" ? {} : { status }
+        const subscriptions = await this.subscriptionRepository.findAllAndPopulate(query);
+
+        if (!subscriptions) {
+            throw new Error("subscriptions not found")
+        }
+
+        return subscriptions;
     }
 
 }

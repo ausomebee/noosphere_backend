@@ -17,10 +17,11 @@ class BillingDto {
 
     static createTransactionDto = (req, res, next) => {
         const schema = Joi.object({
-            billingMetadataId: Joi.string().uuid().required().messages({
+            billingMetadataId: Joi.string().uuid().optional().messages({
                 "string.empty": "billing Metadata ID is required",
                 "string.guid": "billing Metadata ID must be a valid UUID",
-            })
+            }),
+            status: Joi.string().trim().required()
         });
 
         Validator.validateRequest(req, next, schema);

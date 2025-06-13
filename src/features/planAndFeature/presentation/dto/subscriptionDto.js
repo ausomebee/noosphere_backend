@@ -6,7 +6,7 @@ class SubscriptionDto {
         const schema = Joi.object({
             startDate: Joi.date().required(),
             endDate: Joi.date().required(),
-            status: Joi.string().trim().required(),
+            status: Joi.string().valid("ACTIVE", "PAUSED", "PENDING", "CANCELLED").trim().required(),
             tenantId: Joi.string().uuid().required().messages({
                 "string.empty": "Tenant ID is required",
                 "string.guid": "Tenant ID must be a valid UUID",
@@ -18,7 +18,9 @@ class SubscriptionDto {
             transactionId: Joi.string().uuid().required().messages({
                 "string.empty": "transaction ID is required",
                 "string.guid": "transaction ID must be a valid UUID",
-            })
+            }),
+            paymentId: Joi.number().required(),
+            billingCycle: Joi.string().trim().required(),
         });
 
         Validator.validateRequest(req, next, schema);
@@ -46,6 +48,25 @@ class SubscriptionDto {
         Validator.validateRequest(req, next, schema, req.params);
     };
 
+    static checkStatusDto = (req, res, next) => {
+        const schema = Joi.object({
+            status: Joi.string().valid("ACTIVE", "PAUSED", "PENDING", "CANCELLED"),
+        });
+
+        Validator.validateRequest(req, next, schema, req.params);
+    };
+
+    static updateStatusDto = (req, res, next) => {
+        const schema = Joi.object({
+            status: Joi.string().valid("ACTIVE", "PAUSED", "PENDING", "CANCELLED"),
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            })
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
 }
 
 export default SubscriptionDto;

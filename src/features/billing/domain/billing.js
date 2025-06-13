@@ -36,7 +36,8 @@ class Billing {
 
     get createTransaction() {
         return {
-            billingMetadataId: this.billingMetadataId
+            billingMetadataId: this.billingMetadataId,
+            status: this.status
         };
     }
 

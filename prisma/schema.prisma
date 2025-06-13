@@ -15,7 +15,8 @@ enum Module {
 
 enum SubscriptionStatus {
   ACTIVE
-  INACTIVE
+  PAUSED
+  PENDING
   CANCELLED
 }
 
@@ -256,14 +257,19 @@ model Transactions {
 }
 
 model Subscription {
-  id            String             @id @default(uuid())
-  tenantId      String
-  planId        String
-  status        SubscriptionStatus
-  startDate     DateTime
-  endDate       DateTime
-  transactionId String             @unique
-  paymentId     Int                @unique
+  id                String             @id @default(uuid())
+  tenantId          String
+  planId            String
+  status            SubscriptionStatus
+  startDate         DateTime
+  billingCycle      String
+  // lastPaymentStatus String
+  // amount            Int
+  endDate           DateTime
+  transactionId     String             @unique
+  paymentId         Int                @unique
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
 
   tenant      Tenant       @relation(fields: [tenantId], references: [id])
   transaction Transactions @relation(fields: [transactionId], references: [id])
@@ -411,12 +417,7 @@ model InvoiceManagement {
   markOverDue               Int
   unpaidReminderTimesBefore Int
   attachInvoiceToReminder   Boolean
-  reminderEmailHeader       String
-  reminderEmailBody         String
-  unpaidReminderDaysAfter   Int
-  reminderEmailHeader2      String
-  reminderEmailBody2        String
-  unpaidReminderDaysAfter2  Int
+  reminderEmai              Json
 }
 
 model PaymentAndAccountAccess {

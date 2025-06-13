@@ -11,7 +11,31 @@ class SubscriptionRepository extends BaseRepository {
             include: populate
         });
     }
-    
+
+    async totalCount(query) {
+        return await this.model.aggregate({
+            where: query,
+            _count: {
+                _all: true,
+            },
+        });
+    }
+
+    async findAllAndPopulate(filter = {}) {
+        return await this.model.findMany({
+            where: filter,
+            include: {
+                tenant: true,
+                plan: {
+                    select: {
+                        name: true
+                    }
+                },
+                payment: true
+            }
+        });
+    }
+
 }
 
 export default SubscriptionRepository;
