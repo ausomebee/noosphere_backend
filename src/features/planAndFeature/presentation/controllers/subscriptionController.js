@@ -3,12 +3,16 @@ import prismaService from "../../../../config/prisma.js";
 import SubscriptionRepository from "../../../planAndFeature/infrastructure/subscriptionRepository.js";
 import Subscription from "../../domain/subscription.js";
 import SubscriptionService from "../../application/subscriptionService.js";
+import LogsService from "../../../logs/application/logsService.js";
+import LogsRepository from "../../../logs/infrastructure/logsRepository.js";
 
 class SubscriptionController {
     constructor() {
         this.prisma = prismaService.getClient()
         this.subscriptionRepository = new SubscriptionRepository(this.prisma.subscription);
+        this.logsRepository = new LogsRepository(this.prisma.logs);
         this.service = new SubscriptionService({ subscriptionRepository: this.subscriptionRepository });
+        this.logService = new LogsService({ logsRepository: this.logsRepository });
     }
 
     createSubscription = expressAsyncHandler(async (req, res) => {
@@ -27,10 +31,18 @@ class SubscriptionController {
     });
 
     updateSubscription = expressAsyncHandler(async (req, res) => {
+        const subscriptionData = new Subscription(req.body);
+
         const subscription = await this.service.updateSubscription(req.body);
 
         if (!subscription) {
             res.status(500).json({ message: 'Failed to update subscription' });
+        }
+
+        const log = await this.logService.createLog(subscriptionData.createLog);
+
+        if (!log) {
+            res.status(500).json({ message: 'Failed to log action' });
         }
 
         return res.status(201).json({

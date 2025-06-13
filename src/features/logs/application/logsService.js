@@ -1,4 +1,4 @@
-import Logs from "../domain/logs";
+import Logs from "../domain/logs.js";
 
 class LogsService {
     constructor({ logsRepository }) {
