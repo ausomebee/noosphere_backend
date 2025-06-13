@@ -366,11 +366,11 @@ model Logs {
   clientId  String?
   adminId   String?
   featureId String?
-  module    Module
+  module    Module?
   action    String
   reason    String
   details   String?
-  ipAddress String
+  ipAddress String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

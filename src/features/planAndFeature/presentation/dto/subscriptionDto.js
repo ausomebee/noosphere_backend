@@ -56,22 +56,22 @@ class SubscriptionDto {
         Validator.validateRequest(req, next, schema, req.params);
     };
 
-    static updateStatusDto = (req, res, next) => {
-        const schema = Joi.object({
-            status: Joi.string().valid("ACTIVE", "PAUSED", "PENDING", "CANCELLED").required(),
-            id: Joi.string().uuid().required().messages({
-                "string.empty": "ID is required",
-                "string.guid": "ID must be a valid UUID"
-            }),
-            comment: Joi.string().required(),
-            reason: Joi.string().required(),
-            pauseSchedule: Joi.date().optional(),
-            resumeShedule: Joi.date().optional(),
-            autoRenew: Joi.boolean().optional()
-        });
+    // static updateStatusDto = (req, res, next) => {
+    //     const schema = Joi.object({
+    //         status: Joi.string().valid("ACTIVE", "PAUSED", "PENDING", "CANCELLED").required(),
+    //         id: Joi.string().uuid().required().messages({
+    //             "string.empty": "ID is required",
+    //             "string.guid": "ID must be a valid UUID"
+    //         }),
+    //         comment: Joi.string().required(),
+    //         reason: Joi.string().required(),
+    //         pauseSchedule: Joi.date().optional(),
+    //         resumeShedule: Joi.date().optional(),
+    //         autoRenew: Joi.boolean().optional()
+    //     });
 
-        Validator.validateRequest(req, next, schema);
-    };
+    //     Validator.validateRequest(req, next, schema);
+    // };
 
     static cancelNowDto = (req, res, next) => {
         const schema = Joi.object({
@@ -80,9 +80,13 @@ class SubscriptionDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
+            tenantId: Joi.string().uuid().required().messages({
+                "string.empty": "Tenant ID is required",
+                "string.guid": "Tenant ID must be a valid UUID"
+            }),
             comment: Joi.string().required(),
             reason: Joi.string().required(),
-            autoRenew: Joi.boolean().optional().default(false)
+            autoRenew: Joi.boolean().required().default(false)
         });
 
         Validator.validateRequest(req, next, schema);
@@ -94,9 +98,13 @@ class SubscriptionDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
+            tenantId: Joi.string().uuid().required().messages({
+                "string.empty": "Tenant ID is required",
+                "string.guid": "Tenant ID must be a valid UUID"
+            }),
             comment: Joi.string().required(),
             reason: Joi.string().required(),
-            autoRenew: Joi.boolean().optional().default(false)
+            autoRenew: Joi.boolean().required().default(false)
         });
 
         Validator.validateRequest(req, next, schema);
@@ -108,6 +116,10 @@ class SubscriptionDto {
             id: Joi.string().uuid().required().messages({
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
+            }),
+            tenantId: Joi.string().uuid().required().messages({
+                "string.empty": "Tenant ID is required",
+                "string.guid": "Tenant ID must be a valid UUID"
             }),
             comment: Joi.string().required(),
             reason: Joi.string().required()
@@ -122,9 +134,13 @@ class SubscriptionDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
+            tenantId: Joi.string().uuid().required().messages({
+                "string.empty": "Tenant ID is required",
+                "string.guid": "Tenant ID must be a valid UUID"
+            }),
             comment: Joi.string().required(),
             reason: Joi.string().required(),
-            resumeShedule: Joi.date().optional(),
+            resumeShedule: Joi.date().required(),
         });
 
         Validator.validateRequest(req, next, schema);
@@ -137,9 +153,13 @@ class SubscriptionDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
+            tenantId: Joi.string().uuid().required().messages({
+                "string.empty": "Tenant ID is required",
+                "string.guid": "Tenant ID must be a valid UUID"
+            }),
             comment: Joi.string().required(),
             reason: Joi.string().required(),
-            autoRenew: Joi.boolean().optional().default(false)
+            autoRenew: Joi.boolean().required().default(false)
         });
 
         Validator.validateRequest(req, next, schema);
@@ -152,10 +172,14 @@ class SubscriptionDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
+            tenantId: Joi.string().uuid().required().messages({
+                "string.empty": "Tenant ID is required",
+                "string.guid": "Tenant ID must be a valid UUID"
+            }),
             comment: Joi.string().required(),
             reason: Joi.string().required(),
-            resumeShedule: Joi.date().optional(),
-            autoRenew: Joi.boolean().optional().default(false)
+            resumeShedule: Joi.date().required(),
+            autoRenew: Joi.boolean().required().default(false)
         });
 
         Validator.validateRequest(req, next, schema);
@@ -163,16 +187,18 @@ class SubscriptionDto {
 
     static pauseScheduleDto = (req, res, next) => {
         const schema = Joi.object({
-            status: Joi.string().valid("ACTIVE", "PAUSED", "PENDING", "CANCELLED").required(),
             id: Joi.string().uuid().required().messages({
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
+            tenantId: Joi.string().uuid().required().messages({
+                "string.empty": "Tenant ID is required",
+                "string.guid": "Tenant ID must be a valid UUID"
+            }),
             comment: Joi.string().required(),
             reason: Joi.string().required(),
-            pauseSchedule: Joi.date().optional(),
-            resumeShedule: Joi.date().optional(),
-            autoRenew: Joi.boolean().optional()
+            pauseSchedule: Joi.date().required(),
+            autoRenew: Joi.boolean().required().default(true)
         });
 
         Validator.validateRequest(req, next, schema);

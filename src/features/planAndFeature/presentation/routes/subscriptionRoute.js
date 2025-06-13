@@ -62,6 +62,190 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *           format: uuid
  *           description: Unique identifier
  *           example: 123e4567-e89b-12d3-a456-426614174000
+ *     CancelNowDto:
+ *       type: object
+ *       required:
+ *         - status
+ *         - id
+ *         - tenantId
+ *         - comment
+ *         - reason
+ *         - autoRenew
+ *       properties:
+ *         status:
+ *           type: string
+ *           enum: [CANCELLED]
+ *           default: CANCELLED
+ *         id:
+ *           type: string
+ *           format: uuid
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *         comment:
+ *           type: string
+ *         reason:
+ *           type: string
+ *         autoRenew:
+ *           type: boolean
+ *           default: false
+
+ *     CancelAtEndDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - tenantId
+ *         - comment
+ *         - reason
+ *         - autoRenew
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *         comment:
+ *           type: string
+ *         reason:
+ *           type: string
+ *         autoRenew:
+ *           type: boolean
+ *           default: false
+
+ *     ResumeNowDto:
+ *       type: object
+ *       required:
+ *         - status
+ *         - id
+ *         - tenantId
+ *         - comment
+ *         - reason
+ *       properties:
+ *         status:
+ *           type: string
+ *           enum: [ACTIVE]
+ *           default: ACTIVE
+ *         id:
+ *           type: string
+ *           format: uuid
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *         comment:
+ *           type: string
+ *         reason:
+ *           type: string
+
+ *     ResumeLaterDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - tenantId
+ *         - comment
+ *         - reason
+ *         - resumeShedule
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *         comment:
+ *           type: string
+ *         reason:
+ *           type: string
+ *         resumeShedule:
+ *           type: string
+ *           format: date-time
+
+ *     PauseNowDto:
+ *       type: object
+ *       required:
+ *         - status
+ *         - id
+ *         - tenantId
+ *         - comment
+ *         - reason
+ *         - autoRenew
+ *       properties:
+ *         status:
+ *           type: string
+ *           enum: [PAUSED]
+ *           default: PAUSED
+ *         id:
+ *           type: string
+ *           format: uuid
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *         comment:
+ *           type: string
+ *         reason:
+ *           type: string
+ *         autoRenew:
+ *           type: boolean
+ *           default: false
+
+ *     PauseUntilDto:
+ *       type: object
+ *       required:
+ *         - status
+ *         - id
+ *         - tenantId
+ *         - comment
+ *         - reason
+ *         - resumeShedule
+ *         - autoRenew
+ *       properties:
+ *         status:
+ *           type: string
+ *           enum: [PAUSED]
+ *           default: PAUSED
+ *         id:
+ *           type: string
+ *           format: uuid
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *         comment:
+ *           type: string
+ *         reason:
+ *           type: string
+ *         resumeShedule:
+ *           type: string
+ *           format: date-time
+ *         autoRenew:
+ *           type: boolean
+ *           default: false
+
+ *     PauseScheduleDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - tenantId
+ *         - comment
+ *         - reason
+ *         - pauseSchedule
+ *         - autoRenew
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *         comment:
+ *           type: string
+ *         reason:
+ *           type: string
+ *         pauseSchedule:
+ *           type: string
+ *           format: date-time
+ *         autoRenew:
+ *           type: boolean
+ *           default: true
  */
 
 class SubscriptionRoutes {
@@ -185,7 +369,7 @@ class SubscriptionRoutes {
 
         /**
          * @swagger
-         * /api/v1/subscription/:
+         * /api/v1/subscription/cancelnow:
          *   patch:
          *     summary: Update the status of a subscription
          *     tags:
@@ -195,14 +379,140 @@ class SubscriptionRoutes {
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/UpdateStatusDto'
+         *             $ref: '#/components/schemas/CancelNowDto'
          *     responses:
          *       200:
          *         description: Status updated successfully
          *       400:
          *         description: Invalid input
          */
-        this.router.patch("/", SubscriptionDto.updateStatusDto, this.controller.updateSubscription);
+        this.router.patch("/cancelnow", SubscriptionDto.cancelNowDto, this.controller.updateSubscription);
+
+        /**
+         * @swagger
+         * /api/v1/subscription/cancelatend:
+         *   patch:
+         *     summary: Update the status of a subscription
+         *     tags:
+         *       - subscription
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/CancelAtEndDto'
+         *     responses:
+         *       200:
+         *         description: Status updated successfully
+         *       400:
+         *         description: Invalid input
+         */
+        this.router.patch("/cancelatend", SubscriptionDto.cancelAtEndDto, this.controller.updateSubscription);
+
+        /**
+         * @swagger
+         * /api/v1/subscription/resumenow:
+         *   patch:
+         *     summary: Update the status of a subscription
+         *     tags:
+         *       - subscription
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/ResumeNowDto'
+         *     responses:
+         *       200:
+         *         description: Status updated successfully
+         *       400:
+         *         description: Invalid input
+         */
+        this.router.patch("/resumenow", SubscriptionDto.resumeNowDto, this.controller.updateSubscription);
+
+        /**
+         * @swagger
+         * /api/v1/subscription/resumelater:
+         *   patch:
+         *     summary: Update the status of a subscription
+         *     tags:
+         *       - subscription
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/ResumeLaterDto'
+         *     responses:
+         *       200:
+         *         description: Status updated successfully
+         *       400:
+         *         description: Invalid input
+         */
+        this.router.patch("/resumelater", SubscriptionDto.resumeLaterDto, this.controller.updateSubscription);
+
+        /**
+         * @swagger
+         * /api/v1/subscription/pausenow:
+         *   patch:
+         *     summary: Update the status of a subscription
+         *     tags:
+         *       - subscription
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/PauseNowDto'
+         *     responses:
+         *       200:
+         *         description: Status updated successfully
+         *       400:
+         *         description: Invalid input
+         */
+        this.router.patch("/pausenow", SubscriptionDto.pauseNowDto, this.controller.updateSubscription);
+
+        /**
+         * @swagger
+         * /api/v1/subscription/pauseuntil:
+         *   patch:
+         *     summary: Update the status of a subscription
+         *     tags:
+         *       - subscription
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/PauseUntilDto'
+         *     responses:
+         *       200:
+         *         description: Status updated successfully
+         *       400:
+         *         description: Invalid input
+         */
+        this.router.patch("/pauseuntil", SubscriptionDto.pauseUntilDto, this.controller.updateSubscription);
+
+        /**
+         * @swagger
+         * /api/v1/subscription/pauseschedule:
+         *   patch:
+         *     summary: Update the status of a subscription
+         *     tags:
+         *       - subscription
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/PauseScheduleDto'
+         *     responses:
+         *       200:
+         *         description: Status updated successfully
+         *       400:
+         *         description: Invalid input
+         */
+        this.router.patch("/pauseschedule", SubscriptionDto.pauseScheduleDto, this.controller.updateSubscription);
 
     }
 

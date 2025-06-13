@@ -1,5 +1,5 @@
 class Logs {
-    constructor({ logId, tenantId, clientId, adminId, featureId, module, action, details, ipAddress }) {
+    constructor({ logId, tenantId, reason, clientId, adminId, featureId, module, action, details, ipAddress }) {
         this.logId = logId;
         this.tenantId = tenantId;
         this.clientId = clientId;
@@ -9,6 +9,7 @@ class Logs {
         this.action = action;
         this.details = details;
         this.ipAddress = ipAddress;
+        this.reason = reason;
     }
   
     get createLog() {
@@ -20,7 +21,8 @@ class Logs {
             module: this.module,
             action: this.action,
             details: this.details,
-            ipAddress: this.ipAddress
+            ipAddress: this.ipAddress,
+            reason: this.reason
         };
     }
 
