@@ -206,6 +206,36 @@ class BillingService {
 
         return { All, Failed, Successful, InProgress };
     }
+
+    async createPayment(data) {
+        const paymentExists = await this.paymentRepository.findFirstDynamic({
+            where: { tenantId: data.tenantId },
+            select: { tenantId: true }
+        });
+
+        if (paymentExists) {
+            throw new Error("This payment already exists.");
+        }
+
+        const newPayment = await this.paymentRepository.create(data);
+
+        if (!newPayment) {
+            throw new Error("Failed to create payment");
+        }
+
+        return newPayment;
+    }
+
+    async getSinglePayment(data) {
+        const payment = await this.paymentRepository.findFirstDynamic({ where: { id: data.id }, include: { tenant: true, invoice: { include: { plan: true } }, paymentMethod: true, subscription: true } });
+        const paymentOutput = new Billing(payment);
+
+        if (!payment) {
+            throw new Error("Payment not found")
+        }
+
+        return paymentOutput.paymentOutput;
+    }
 }
 
 export default BillingService;
