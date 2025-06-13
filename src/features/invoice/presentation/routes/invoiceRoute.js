@@ -178,6 +178,20 @@ class InvoiceRoutes {
         */
         this.router.get("/status/:status", InvoiceDto.checkStatusDto, this.controller.getAllInvoiceByStatus);
 
+        /**
+         * @swagger
+         * /api/v1/invoice/total/status:
+         *   get:
+         *     summary: Retrieve total by status
+         *     tags: [Invoice]
+         *     responses:
+         *       200:
+         *         description: total invoices counted successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get("/total/status",  this.controller.getTotalByStatus);
+
     }
 
     getRouter() {

@@ -182,6 +182,19 @@ class InvoiceService {
         return formated;
     }
 
+    async getTotalByStatus() {
+        const All = await this.invoiceRepository.totalCount({});
+        const Paid = await this.invoiceRepository.totalCount({status: "Paid"});
+        const Upcoming = await this.invoiceRepository.totalCount({status: "Upcoming"});
+        const Due = await this.invoiceRepository.totalCount({status: "Due"});
+        const Overdue = await this.invoiceRepository.totalCount({status: "Overdue"});
+
+        if (!All || !Paid || !Upcoming || !Due || !Overdue) {
+            throw new Error("Failed to count invoice");
+        }
+
+        return { All, Paid, Upcoming, Due, Overdue };
+    }
 }
 
 export default InvoiceService;

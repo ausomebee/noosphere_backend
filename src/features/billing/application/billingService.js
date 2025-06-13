@@ -193,6 +193,19 @@ class BillingService {
 
         return newPaymentMethod;
     }
+
+    async getTotalPaymentByStatus() {
+        const All = await this.paymentRepository.totalCount({});
+        const Failed = await this.paymentRepository.totalCount({ status: "Failed" });
+        const Successful = await this.paymentRepository.totalCount({ status: "Successful" });
+        const InProgress = await this.paymentRepository.totalCount({ status: "In Progress" });
+
+        if (!All || !Failed || !Successful || !InProgress) {
+            throw new Error("Failed to count payment");
+        }
+
+        return { All, Failed, Successful, InProgress };
+    }
 }
 
 export default BillingService;

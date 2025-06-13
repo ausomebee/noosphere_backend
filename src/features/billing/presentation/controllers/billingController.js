@@ -221,6 +221,20 @@ class BillingController {
             data: payment
         });
     });
+
+    getTotalPaymentByStatus = expressAsyncHandler(async (req, res) => {
+        const payment = await this.service.getTotalPaymentByStatus();
+
+        if (!payment) {
+            res.status(500).json({ message: 'Failed to count payment' });
+        }
+
+        return res.status(201).json({
+            message: "Payment counted successfully",
+            status: 'ok',
+            data: payment
+        });
+    });
 }
 
 export default BillingController;
