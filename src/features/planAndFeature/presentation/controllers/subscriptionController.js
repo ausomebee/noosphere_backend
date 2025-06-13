@@ -82,6 +82,34 @@ class SubscriptionController {
         });
     });
 
+    getTotalSubscriptionByStatus = expressAsyncHandler(async (req, res) => {
+        const subscription = await this.service.getTotalSubscriptionByStatus();
+
+        if (!subscription) {
+            res.status(500).json({ message: 'Failed to count subscription' });
+        }
+
+        return res.status(201).json({
+            message: "subscription counted successfully",
+            status: 'ok',
+            data: subscription
+        });
+    });
+
+    getSubscriptionByStatus = expressAsyncHandler(async (req, res) => {
+        const subscription = await this.service.getSubscriptionByStatus();
+
+        if (!subscription) {
+            res.status(500).json({ message: 'Failed to count subscription' });
+        }
+
+        return res.status(201).json({
+            message: "subscription counted successfully",
+            status: 'ok',
+            data: subscription
+        });
+    });
+
 }
 
 export default SubscriptionController;
