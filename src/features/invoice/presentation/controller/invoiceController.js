@@ -143,6 +143,19 @@ class InvoiceController {
         });
     });
 
+    updateInvoiceManagement = expressAsyncHandler(async (req, res) => {
+        const invoice = await this.service.updateInvoiceManagement(req.body);
+
+        if (!invoice) {
+            res.status(500).json({ message: 'Failed to update invoice management' });
+        }
+
+        return res.status(201).json({
+            message: "Invoice management updated successfully",
+            status: 'ok',
+            data: invoice
+        });
+    });
 }
 
 export default InvoiceController;

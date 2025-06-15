@@ -265,6 +265,20 @@ class BillingController {
             data: payment
         });
     });
+
+    updatePaymentAccess = expressAsyncHandler(async (req, res) => {
+        const paymentAccess = await this.service.updatePaymentAccess(req.body);
+
+        if (!paymentAccess) {
+            res.status(500).json({ message: 'Failed to update payment Access' });
+        }
+
+        return res.status(201).json({
+            message: "payment Access updated successfully",
+            status: 'ok',
+            data: paymentAccess
+        });
+    });
 }
 
 export default BillingController;

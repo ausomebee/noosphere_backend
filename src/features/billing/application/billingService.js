@@ -234,6 +234,41 @@ class BillingService {
 
         return payment;
     }
+
+    async updatePaymentAccess(data) {
+        const paymentAccess = await this.paymentAccessRepository.findOne({ id: data.id })
+
+        if (!paymentAccess) {
+            throw new Error("Payment Access not found");
+        }
+
+        const update = await this.paymentAccessRepository.update(data.id, {
+            chargeOnDueDate: data.chargeOnDueDate ?? paymentAccess.chargeOnDueDate,
+            chargeLastUsedFirst: data.chargeLastUsedFirst ?? paymentAccess.chargeLastUsedFirst,
+            chargeAlternative: data.chargeAlternative ?? paymentAccess.chargeAlternative,
+            retryBefore: data.retryBefore ?? paymentAccess.retryBefore,
+            retryAfter: data.retryAfter ?? paymentAccess.retryAfter,
+            notifyTenant: data.notifyTenant ?? paymentAccess.notifyTenant,
+            notificationEmailHeader: data.notificationEmailHeader || paymentAccess.notificationEmailHeader,
+            notificationEmailBody: data.notificationEmailBody || paymentAccess.notificationEmailBody,
+            cancelAfter: data.cancelAfter || paymentAccess.cancelAfter,
+            manualCancel: data.manualCancel ?? paymentAccess.manualCancel,
+            suspensionAction: data.suspensionAction || paymentAccess.suspensionAction,
+            errorMessage: data.errorMessage || paymentAccess.errorMessage,
+            emailAfterAttempts: data.emailAfterAttempts || paymentAccess.emailAfterAttempts,
+            warningMailHeader: data.warningMailHeader || paymentAccess.warningMailHeader,
+            warningMailBody: data.warningMailBody || paymentAccess.warningMailBody,
+            sendOnSubscriptionCancel: data.sendOnSubscriptionCancel ?? paymentAccess.sendOnSubscriptionCancel,
+            cancelMailHeader: data.cancelMailHeader || paymentAccess.cancelMailHeader,
+            cancelMailBody: data.cancelMailBody || paymentAccess.cancelMailBody
+        });
+
+        if (!update) {
+            throw new Error("Failed to update Payment Access");
+        }
+
+        return update;
+    }
 }
 
 export default BillingService;

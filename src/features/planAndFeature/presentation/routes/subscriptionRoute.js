@@ -58,204 +58,218 @@ import SubscriptionDto from "../dto/subscriptionDto.js";
  *           format: uuid
 
  *     CancelNowDto:
- *       type: object
- *       required:
- *         - status
- *         - id
- *         - adminId
- *         - comment
- *         - reason
- *         - autoRenew
- *       properties:
- *         status:
- *           type: string
- *           enum: [CANCELLED]
- *           default: CANCELLED
- *         id:
- *           type: string
- *           format: uuid
- *         adminId:
- *           type: string
- *           format: uuid
- *         comment:
- *           type: string
- *         reason:
- *           type: string
- *         autoRenew:
- *           type: boolean
- *           default: false
+ *       type: array
+ *       items:
+ *         type: object
+ *         required:
+ *           - id
+ *           - adminId
+ *           - comment
+ *           - reason
+ *           - status
+ *           - autoRenew
+ *         properties:
+ *           id:
+ *             type: string
+ *             format: uuid
+ *           adminId:
+ *             type: string
+ *             format: uuid
+ *           comment:
+ *             type: string
+ *           reason:
+ *             type: string
+ *           status:
+ *             type: string
+ *             enum: [CANCELLED]
+ *             default: CANCELLED
+ *           autoRenew:
+ *             type: boolean
+ *             default: false
 
  *     CancelAtEndDto:
- *       type: object
- *       required:
- *         - id
- *         - adminId
- *         - comment
- *         - reason
- *         - autoRenew
- *       properties:
- *         id:
- *           type: string
- *           format: uuid
- *         adminId:
- *           type: string
- *           format: uuid
- *         comment:
- *           type: string
- *         reason:
- *           type: string
- *         autoRenew:
- *           type: boolean
- *           default: false
+ *       type: array
+ *       items:
+ *         type: object
+ *         required:
+ *           - id
+ *           - adminId
+ *           - comment
+ *           - reason
+ *           - autoRenew
+ *         properties:
+ *           id:
+ *             type: string
+ *             format: uuid
+ *           adminId:
+ *             type: string
+ *             format: uuid
+ *           comment:
+ *             type: string
+ *           reason:
+ *             type: string
+ *           autoRenew:
+ *             type: boolean
+ *             default: false
 
  *     ResumeNowDto:
- *       type: object
- *       required:
- *         - status
- *         - id
- *         - adminId
- *         - comment
- *         - reason
- *         - mailNotification
- *       properties:
- *         status:
- *           type: string
- *           enum: [ACTIVE]
- *           default: ACTIVE
- *         id:
- *           type: string
- *           format: uuid
- *         adminId:
- *           type: string
- *           format: uuid
- *         comment:
- *           type: string
- *         reason:
- *           type: string
- *         mailNotification:
- *           type: boolean
+ *       type: array
+ *       items:
+ *         type: object
+ *         required:
+ *           - id
+ *           - adminId
+ *           - comment
+ *           - reason
+ *           - status
+ *           - mailNotification
+ *         properties:
+ *           id:
+ *             type: string
+ *             format: uuid
+ *           adminId:
+ *             type: string
+ *             format: uuid
+ *           comment:
+ *             type: string
+ *           reason:
+ *             type: string
+ *           status:
+ *             type: string
+ *             enum: [ACTIVE]
+ *             default: ACTIVE
+ *           mailNotification:
+ *             type: boolean
 
  *     ResumeLaterDto:
- *       type: object
- *       required:
- *         - id
- *         - adminId
- *         - comment
- *         - reason
- *         - resumeShedule
- *         - mailNotification
- *       properties:
- *         id:
- *           type: string
- *           format: uuid
- *         adminId:
- *           type: string
- *           format: uuid
- *         comment:
- *           type: string
- *         reason:
- *           type: string
- *         resumeShedule:
- *           type: string
- *           format: date-time
- *         mailNotification:
- *           type: boolean
+ *       type: array
+ *       items:
+ *         type: object
+ *         required:
+ *           - id
+ *           - adminId
+ *           - comment
+ *           - reason
+ *           - resumeShedule
+ *           - mailNotification
+ *         properties:
+ *           id:
+ *             type: string
+ *             format: uuid
+ *           adminId:
+ *             type: string
+ *             format: uuid
+ *           comment:
+ *             type: string
+ *           reason:
+ *             type: string
+ *           resumeShedule:
+ *             type: string
+ *             format: date-time
+ *           mailNotification:
+ *             type: boolean
 
  *     PauseNowDto:
- *       type: object
- *       required:
- *         - status
- *         - id
- *         - adminId
- *         - comment
- *         - reason
- *         - autoRenew
- *         - mailNotification
- *       properties:
- *         status:
- *           type: string
- *           enum: [PAUSED]
- *           default: PAUSED
- *         id:
- *           type: string
- *           format: uuid
- *         adminId:
- *           type: string
- *           format: uuid
- *         comment:
- *           type: string
- *         reason:
- *           type: string
- *         autoRenew:
- *           type: boolean
- *           default: false
- *         mailNotification:
- *           type: boolean
+ *       type: array
+ *       items:
+ *         type: object
+ *         required:
+ *           - id
+ *           - adminId
+ *           - comment
+ *           - reason
+ *           - status
+ *           - autoRenew
+ *           - mailNotification
+ *         properties:
+ *           id:
+ *             type: string
+ *             format: uuid
+ *           adminId:
+ *             type: string
+ *             format: uuid
+ *           comment:
+ *             type: string
+ *           reason:
+ *             type: string
+ *           status:
+ *             type: string
+ *             enum: [PAUSED]
+ *             default: PAUSED
+ *           autoRenew:
+ *             type: boolean
+ *             default: false
+ *           mailNotification:
+ *             type: boolean
 
  *     PauseUntilDto:
- *       type: object
- *       required:
- *         - status
- *         - id
- *         - adminId
- *         - comment
- *         - reason
- *         - resumeShedule
- *         - autoRenew
- *         - mailNotification
- *       properties:
- *         status:
- *           type: string
- *           enum: [PAUSED]
- *           default: PAUSED
- *         id:
- *           type: string
- *           format: uuid
- *         adminId:
- *           type: string
- *           format: uuid
- *         comment:
- *           type: string
- *         reason:
- *           type: string
- *         resumeShedule:
- *           type: string
- *           format: date-time
- *         autoRenew:
- *           type: boolean
- *           default: false
- *         mailNotification:
- *           type: boolean
+ *       type: array
+ *       items:
+ *         type: object
+ *         required:
+ *           - id
+ *           - adminId
+ *           - comment
+ *           - reason
+ *           - resumeShedule
+ *           - status
+ *           - autoRenew
+ *           - mailNotification
+ *         properties:
+ *           id:
+ *             type: string
+ *             format: uuid
+ *           adminId:
+ *             type: string
+ *             format: uuid
+ *           comment:
+ *             type: string
+ *           reason:
+ *             type: string
+ *           resumeShedule:
+ *             type: string
+ *             format: date-time
+ *           status:
+ *             type: string
+ *             enum: [PAUSED]
+ *             default: PAUSED
+ *           autoRenew:
+ *             type: boolean
+ *             default: false
+ *           mailNotification:
+ *             type: boolean
 
  *     PauseScheduleDto:
- *       type: object
- *       required:
- *         - id
- *         - adminId
- *         - comment
- *         - reason
- *         - pauseSchedule
- *         - autoRenew
- *         - mailNotification
- *       properties:
- *         id:
- *           type: string
- *           format: uuid
- *         adminId:
- *           type: string
- *           format: uuid
- *         comment:
- *           type: string
- *         reason:
- *           type: string
- *         pauseSchedule:
- *           type: string
- *           format: date-time
- *         autoRenew:
- *           type: boolean
- *           default: true
- *         mailNotification:
- *           type: boolean
+ *       type: array
+ *       items:
+ *         type: object
+ *         required:
+ *           - id
+ *           - adminId
+ *           - comment
+ *           - reason
+ *           - pauseSchedule
+ *           - autoRenew
+ *           - mailNotification
+ *         properties:
+ *           id:
+ *             type: string
+ *             format: uuid
+ *           adminId:
+ *             type: string
+ *             format: uuid
+ *           comment:
+ *             type: string
+ *           reason:
+ *             type: string
+ *           pauseSchedule:
+ *             type: string
+ *             format: date-time
+ *           autoRenew:
+ *             type: boolean
+ *             default: true
+ *           mailNotification:
+ *             type: boolean
  */
 
 class SubscriptionRoutes {

@@ -84,11 +84,190 @@ import InvoiceDto from "../dto/invoiceDto.js";
  *           type: boolean
  *           example: true
  *         reminderEmail:
- *           type: object
- *           description: JSON object containing reminder email configuration
- *           example:
- *             subject: "Reminder Email"
- *             body: "This is your reminder email content."
+ *           type: array
+ *           description: Array of reminder email configurations
+ *           items:
+ *             type: object
+ *             properties:
+ *               header:
+ *                 type: string
+ *                 example: "Reminder Email Header"
+ *               body:
+ *                 type: string
+ *                 example: "This is your reminder email content."
+ *               sendOn:
+ *                 type: number
+ *                 example: 3
+ 
+ *     UpdateOnPlanPurchaseDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - onPlanPurchase
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "550e8400-e29b-41d4-a716-446655440000"
+ *         onPlanPurchase:
+ *           type: boolean
+ *           example: true
+
+ *     UpdateDaysBeforeDueDateDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - daysBeforeDueDate
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "550e8400-e29b-41d4-a716-446655440001"
+ *         daysBeforeDueDate:
+ *           type: integer
+ *           example: 5
+
+ *     UpdateUpcomingInvoiceHeaderDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - upcomingInvoiceHeader
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "550e8400-e29b-41d4-a716-446655440002"
+ *         upcomingInvoiceHeader:
+ *           type: string
+ *           example: "Upcoming Invoice Notice"
+
+ *     UpdateUpcomingInvoiceBodyDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - upcomingInvoiceBody
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "550e8400-e29b-41d4-a716-446655440003"
+ *         upcomingInvoiceBody:
+ *           type: string
+ *           example: "Your invoice is due soon. Please review and make payment."
+
+ *     UpdateOnDueDateDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - onDueDate
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "550e8400-e29b-41d4-a716-446655440004"
+ *         onDueDate:
+ *           type: boolean
+ *           example: true
+
+ *     UpdateDueInvoiceHeaderDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - dueInvoiceHeader
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "550e8400-e29b-41d4-a716-446655440005"
+ *         dueInvoiceHeader:
+ *           type: string
+ *           example: "Invoice Due Today"
+
+ *     UpdateDueInvoiceBodyDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - dueInvoiceBody
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "550e8400-e29b-41d4-a716-446655440006"
+ *         dueInvoiceBody:
+ *           type: string
+ *           example: "Please make payment to avoid service disruption."
+
+ *     UpdateMarkOverDueDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - markOverDue
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "550e8400-e29b-41d4-a716-446655440007"
+ *         markOverDue:
+ *           type: integer
+ *           example: 3
+
+ *     UpdateUnpaidReminderTimesBeforeDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - unpaidReminderTimesBefore
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "550e8400-e29b-41d4-a716-446655440008"
+ *         unpaidReminderTimesBefore:
+ *           type: integer
+ *           example: 2
+
+ *     UpdateAttachInvoiceToReminderDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - attachInvoiceToReminder
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "550e8400-e29b-41d4-a716-446655440009"
+ *         attachInvoiceToReminder:
+ *           type: boolean
+ *           example: true
+
+ *     UpdateReminderEmailDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - reminderEmail
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "550e8400-e29b-41d4-a716-446655440010"
+ *         reminderEmail:
+ *           type: array
+ *           description: Array of reminder email configurations
+ *           items:
+ *             type: object
+ *             required:
+ *               - header
+ *               - body
+ *               - sendOn
+ *             properties:
+ *               header:
+ *                 type: string
+ *                 example: "Reminder Email Header"
+ *               body:
+ *                 type: string
+ *                 example: "This is your reminder email content."
+ *               sendOn:
+ *                 type: number
+ *                 example: 3
  */
 
 class InvoiceRoutes {
@@ -241,7 +420,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/total/status",  this.controller.getTotalByStatus);
+        this.router.get("/total/status", this.controller.getTotalByStatus);
 
         /**
          * @swagger
@@ -277,6 +456,226 @@ class InvoiceRoutes {
         *         description: Validation error
         */
         this.router.get("/invoice/management", this.controller.getInvoiceManagement);
+
+        /**
+         * @swagger
+         * /api/v1/invoice/invoice/management/on-plan-purchase:
+         *   patch:
+         *     summary: Update onPlanPurchase flag
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateOnPlanPurchaseDto'
+         *     responses:
+         *       200:
+         *         description: onPlanPurchase updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/invoice/management/on-plan-purchase", InvoiceDto.updateOnPlanPurchaseDto, this.controller.updateInvoiceManagement);
+
+        /**
+         * @swagger
+         * /api/v1/invoice/invoice/management/days-before-due-date:
+         *   patch:
+         *     summary: Update days before due date
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateDaysBeforeDueDateDto'
+         *     responses:
+         *       200:
+         *         description: daysBeforeDueDate updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/invoice/management/days-before-due-date", InvoiceDto.updateDaysBeforeDueDateDto, this.controller.updateInvoiceManagement);
+
+        /**
+         * @swagger
+         * /api/v1/invoice/invoice/management/upcoming-invoice-header:
+         *   patch:
+         *     summary: Update upcoming invoice header
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateUpcomingInvoiceHeaderDto'
+         *     responses:
+         *       200:
+         *         description: upcomingInvoiceHeader updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/invoice/management/upcoming-invoice-header", InvoiceDto.updateUpcomingInvoiceHeaderDto, this.controller.updateInvoiceManagement);
+
+        /**
+         * @swagger
+         * /api/v1/invoice/invoice/management/upcoming-invoice-body:
+         *   patch:
+         *     summary: Update upcoming invoice body
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateUpcomingInvoiceBodyDto'
+         *     responses:
+         *       200:
+         *         description: upcomingInvoiceBody updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/invoice/management/upcoming-invoice-body", InvoiceDto.updateUpcomingInvoiceBodyDto, this.controller.updateInvoiceManagement);
+
+        /**
+         * @swagger
+         * /api/v1/invoice/invoice/management/on-due-date:
+         *   patch:
+         *     summary: Update onDueDate flag
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateOnDueDateDto'
+         *     responses:
+         *       200:
+         *         description: onDueDate updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/invoice/management/on-due-date", InvoiceDto.updateOnDueDateDto, this.controller.updateInvoiceManagement);
+
+        /**
+         * @swagger
+         * /api/v1/invoice/invoice/management/due-invoice-header:
+         *   patch:
+         *     summary: Update due invoice header
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateDueInvoiceHeaderDto'
+         *     responses:
+         *       200:
+         *         description: dueInvoiceHeader updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/invoice/management/due-invoice-header", InvoiceDto.updateDueInvoiceHeaderDto, this.controller.updateInvoiceManagement);
+
+        /**
+         * @swagger
+         * /api/v1/invoice/invoice/management/due-invoice-body:
+         *   patch:
+         *     summary: Update due invoice body
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateDueInvoiceBodyDto'
+         *     responses:
+         *       200:
+         *         description: dueInvoiceBody updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/invoice/management/due-invoice-body", InvoiceDto.updateDueInvoiceBodyDto, this.controller.updateInvoiceManagement);
+
+        /**
+         * @swagger
+         * /api/v1/invoice/invoice/management/mark-over-due:
+         *   patch:
+         *     summary: Update markOverDue value
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateMarkOverDueDto'
+         *     responses:
+         *       200:
+         *         description: markOverDue updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/invoice/management/mark-over-due", InvoiceDto.updateMarkOverDueDto, this.controller.updateInvoiceManagement);
+
+        /**
+         * @swagger
+         * /api/v1/invoice/invoice/management/unpaid-reminder-times-before:
+         *   patch:
+         *     summary: Update unpaid reminder times before
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateUnpaidReminderTimesBeforeDto'
+         *     responses:
+         *       200:
+         *         description: unpaidReminderTimesBefore updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/invoice/management/unpaid-reminder-times-before", InvoiceDto.updateUnpaidReminderTimesBeforeDto, this.controller.updateInvoiceManagement);
+
+        /**
+         * @swagger
+         * /api/v1/invoice/invoice/management/attach-invoice-to-reminder:
+         *   patch:
+         *     summary: Update attach invoice to reminder flag
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateAttachInvoiceToReminderDto'
+         *     responses:
+         *       200:
+         *         description: attachInvoiceToReminder updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/invoice/management/attach-invoice-to-reminder", InvoiceDto.updateAttachInvoiceToReminderDto, this.controller.updateInvoiceManagement);
+
+        /**
+         * @swagger
+         * /api/v1/invoice/invoice/management/reminder-email:
+         *   patch:
+         *     summary: Update reminder email configuration
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateReminderEmailDto'
+         *     responses:
+         *       200:
+         *         description: reminderEmail updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/invoice/management/reminder-email", InvoiceDto.updateReminderEmailDto, this.controller.updateInvoiceManagement);
 
     }
 

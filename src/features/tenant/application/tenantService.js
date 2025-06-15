@@ -47,7 +47,6 @@ class TenantService {
             const department = await this.departmentRepository.createTenantDepartment(tenant.id, tx);
             const role = await this.roleRepository.createTenantRole(department.id, tx);
             const staff = await this.staffRepository.txCreate({ ...createData.createTenantStaff, tenantId: tenant.id, roleId: role.id }, tx);
-            console.log("first")
 
             return pipelineItem;
         }, { timeout: 10_000 });

@@ -185,10 +185,10 @@ class InvoiceService {
 
     async getTotalByStatus() {
         const All = await this.invoiceRepository.totalCount({});
-        const Paid = await this.invoiceRepository.totalCount({status: "Paid"});
-        const Upcoming = await this.invoiceRepository.totalCount({status: "Upcoming"});
-        const Due = await this.invoiceRepository.totalCount({status: "Due"});
-        const Overdue = await this.invoiceRepository.totalCount({status: "Overdue"});
+        const Paid = await this.invoiceRepository.totalCount({ status: "Paid" });
+        const Upcoming = await this.invoiceRepository.totalCount({ status: "Upcoming" });
+        const Due = await this.invoiceRepository.totalCount({ status: "Due" });
+        const Overdue = await this.invoiceRepository.totalCount({ status: "Overdue" });
 
         if (!All || !Paid || !Upcoming || !Due || !Overdue) {
             throw new Error("Failed to count invoice");
@@ -216,6 +216,33 @@ class InvoiceService {
         }
 
         return invoice;
+    }
+
+    async updateInvoiceManagement(data) {
+        const invoiceManagement = await this.invoiceManagementRepository.findOne({ id: data.id })
+        if (!invoiceManagement) {
+            throw new Error("Invoice Management not found");
+        }
+
+        const update = await this.invoiceManagementRepository.update(data.id, {
+            onPlanPurchase: data.onPlanPurchase ?? invoiceManagement.onPlanPurchase,
+            daysBeforeDueDate: data.daysBeforeDueDate || invoiceManagement.daysBeforeDueDate,
+            upcomingInvoiceHeader: data.upcomingInvoiceHeader || invoiceManagement.upcomingInvoiceHeader,
+            upcomingInvoiceBody: data.upcomingInvoiceBody || invoiceManagement.upcomingInvoiceBody,
+            onDueDate: data.onDueDate ?? invoiceManagement.onDueDate,
+            dueInvoiceHeader: data.dueInvoiceHeader || invoiceManagement.dueInvoiceHeader,
+            dueInvoiceBody: data.dueInvoiceBody || invoiceManagement.dueInvoiceBody,
+            markOverDue: data.markOverDue || invoiceManagement.markOverDue,
+            unpaidReminderTimesBefore: data.unpaidReminderTimesBefore || invoiceManagement.unpaidReminderTimesBefore,
+            attachInvoiceToReminder: data.attachInvoiceToReminder ?? invoiceManagement.attachInvoiceToReminder,
+            reminderEmail: data.reminderEmail || invoiceManagement.reminderEmail
+        });
+
+        if (!update) {
+            throw new Error("Failed to update Invoice Management");
+        }
+
+        return update;
     }
 }
 

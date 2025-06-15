@@ -74,7 +74,7 @@ class SubscriptionDto {
     // };
 
     static cancelNowDto = (req, res, next) => {
-        const schema = Joi.object({
+        const schema = Joi.array().items(Joi.object({
             status: Joi.string().valid("CANCELLED").required().default("CANCELLED"),
             id: Joi.string().uuid().required().messages({
                 "string.empty": "ID is required",
@@ -87,13 +87,13 @@ class SubscriptionDto {
             comment: Joi.string().required(),
             reason: Joi.string().required(),
             autoRenew: Joi.boolean().required().default(false)
-        });
+        }));
 
         Validator.validateRequest(req, next, schema);
     };
 
     static cancelAtEndDto = (req, res, next) => {
-        const schema = Joi.object({
+        const schema = Joi.array().items(Joi.object({
             id: Joi.string().uuid().required().messages({
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
@@ -105,13 +105,13 @@ class SubscriptionDto {
             comment: Joi.string().required(),
             reason: Joi.string().required(),
             autoRenew: Joi.boolean().required().default(false)
-        });
+        }));
 
         Validator.validateRequest(req, next, schema);
     };
 
     static resumeNowDto = (req, res, next) => {
-        const schema = Joi.object({
+        const schema = Joi.array().items(Joi.object({
             status: Joi.string().valid("ACTIVE").required().default("ACTIVE"),
             id: Joi.string().uuid().required().messages({
                 "string.empty": "ID is required",
@@ -124,13 +124,13 @@ class SubscriptionDto {
             comment: Joi.string().required(),
             reason: Joi.string().required(),
             mailNotification: Joi.boolean().required()
-        });
+        }));
 
         Validator.validateRequest(req, next, schema);
     };
 
     static resumeLaterDto = (req, res, next) => {
-        const schema = Joi.object({
+        const schema = Joi.array().items(Joi.object({
             id: Joi.string().uuid().required().messages({
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
@@ -143,13 +143,13 @@ class SubscriptionDto {
             reason: Joi.string().required(),
             resumeShedule: Joi.date().required(),
             mailNotification: Joi.boolean().required()
-        });
+        }));
 
         Validator.validateRequest(req, next, schema);
     };
 
     static pauseNowDto = (req, res, next) => {
-        const schema = Joi.object({
+        const schema = Joi.array().items(Joi.object({
             status: Joi.string().valid("PAUSED").required().default("PAUSED"),
             id: Joi.string().uuid().required().messages({
                 "string.empty": "ID is required",
@@ -163,13 +163,13 @@ class SubscriptionDto {
             reason: Joi.string().required(),
             autoRenew: Joi.boolean().required().default(false),
             mailNotification: Joi.boolean().required()
-        });
+        }));
 
         Validator.validateRequest(req, next, schema);
     };
 
     static pauseUntilDto = (req, res, next) => {
-        const schema = Joi.object({
+        const schema = Joi.array().items(Joi.object({
             status: Joi.string().valid("PAUSED").required().default("PAUSED"),
             id: Joi.string().uuid().required().messages({
                 "string.empty": "ID is required",
@@ -184,13 +184,13 @@ class SubscriptionDto {
             resumeShedule: Joi.date().required(),
             autoRenew: Joi.boolean().required().default(false),
             mailNotification: Joi.boolean().required()
-        });
+        }));
 
         Validator.validateRequest(req, next, schema);
     };
 
     static pauseScheduleDto = (req, res, next) => {
-        const schema = Joi.object({
+        const schema = Joi.array().items(Joi.object({
             id: Joi.string().uuid().required().messages({
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
@@ -204,10 +204,11 @@ class SubscriptionDto {
             pauseSchedule: Joi.date().required(),
             autoRenew: Joi.boolean().required().default(true),
             mailNotification: Joi.boolean().required()
-        });
+        }));
 
         Validator.validateRequest(req, next, schema);
     };
+
 }
 
 export default SubscriptionDto;

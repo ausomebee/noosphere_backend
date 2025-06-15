@@ -22,26 +22,32 @@ class SubscriptionService {
         return newSubscription;
     }
 
-    async updateSubscription(data) {
-        const subscription = await this.subscriptionRepository.findOne({ id: data.id })
+    async updateSubscriptions(dataArray) {
+        const results = await Promise.all(
+            dataArray.map(async (data) => {
+                const subscription = await this.subscriptionRepository.findOne({ id: data.id });
 
-        if (!subscription) {
-            throw new Error("Subscription not found");
-        }
+                if (!subscription) {
+                    throw new Error(`Subscription with ID ${data.id} not found`);
+                }
 
-        const update = await this.subscriptionRepository.update(data.id, {
-            pauseSchedule: data.pauseSchedule || subscription.pauseSchedule,
-            status: data.status || subscription.status,
-            autoRenew: data.autoRenew ?? subscription.autoRenew,
-            resumeShedule: data.resumeShedule || subscription.resumeShedule,
-            mailNotification: data.mailNotification ?? subscription.mailNotification
-        });
+                const update = await this.subscriptionRepository.update(data.id, {
+                    pauseSchedule: data.pauseSchedule || subscription.pauseSchedule,
+                    status: data.status || subscription.status,
+                    autoRenew: data.autoRenew ?? subscription.autoRenew,
+                    resumeShedule: data.resumeShedule || subscription.resumeShedule,
+                    mailNotification: data.mailNotification ?? subscription.mailNotification
+                });
 
-        if (!update) {
-            throw new Error("Failed to update Subscription");
-        }
+                if (!update) {
+                    throw new Error(`Failed to update Subscription with ID ${data.id}`);
+                }
 
-        return update;
+                return update;
+            })
+        );
+
+        return results;
     }
 
     async getSingleSubscription(data) {

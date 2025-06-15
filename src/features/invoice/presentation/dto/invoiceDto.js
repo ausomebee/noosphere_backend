@@ -57,11 +57,145 @@ class InvoiceDto {
             markOverDue: Joi.number().integer().required(),
             unpaidReminderTimesBefore: Joi.number().integer().required(),
             attachInvoiceToReminder: Joi.boolean().required(),
-            reminderEmail: Joi.object().required()
+            reminderEmail: Joi.array().items(
+                Joi.object({
+                    header: Joi.string().required(),
+                    body: Joi.string().required(),
+                    sendOn: Joi.number().required()
+                })
+            ).required()
         });
 
         Validator.validateRequest(req, next, schema);
     };
+
+    static updateOnPlanPurchaseDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            onPlanPurchase: Joi.boolean().required(),
+        });
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateDaysBeforeDueDateDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            daysBeforeDueDate: Joi.number().integer().required(),
+        });
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateUpcomingInvoiceHeaderDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            upcomingInvoiceHeader: Joi.string().required(),
+        });
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateUpcomingInvoiceBodyDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            upcomingInvoiceBody: Joi.string().required(),
+        });
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateOnDueDateDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            onDueDate: Joi.boolean().required(),
+        });
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateDueInvoiceHeaderDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            dueInvoiceHeader: Joi.string().required(),
+        });
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateDueInvoiceBodyDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            dueInvoiceBody: Joi.string().required(),
+        });
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateMarkOverDueDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            markOverDue: Joi.number().integer().required(),
+        });
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateUnpaidReminderTimesBeforeDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            unpaidReminderTimesBefore: Joi.number().integer().required(),
+        });
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateAttachInvoiceToReminderDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            attachInvoiceToReminder: Joi.boolean().required(),
+        });
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateReminderEmailDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            reminderEmail: Joi.array().items(
+                Joi.object({
+                    header: Joi.string().required(),
+                    body: Joi.string().required(),
+                    sendOn: Joi.number().required(),
+                })
+            ).required(),
+        });
+        Validator.validateRequest(req, next, schema);
+    };
+
 }
 
 export default InvoiceDto;
