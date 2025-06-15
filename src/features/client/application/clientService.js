@@ -19,7 +19,7 @@ class ClientService {
                 tenantLinks: true
             }
         });
-console.log(clientExists)
+
         if (clientExists && !clientExists?.tenantLinks.includes(data.tenantId)) {
             const addClient = await this.repository.createClientTenant({ ...data.createClientTenant, clientId: clientExists.id })
 

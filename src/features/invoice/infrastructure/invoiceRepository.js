@@ -8,7 +8,6 @@ class InvoiceRepository {
     }
 
     async findFirst(query) {
-        console.log(this.model)
         return await this.model.findFirst({
             where: query,
         });

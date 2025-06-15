@@ -159,6 +159,257 @@ import BillingDto from "../dto/billingDto.js";
  *         cancelMailBody:
  *           type: string
  *           example: "Your subscription has been cancelled due to payment issues."
+ *     UpdateChargeOnDueDateDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - chargeOnDueDate
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "a4b1c3d2-e4f1-5678-9101-123456789abc"
+ *         chargeOnDueDate:
+ *           type: boolean
+ *           example: true
+
+ *     UpdateChargeLastUsedFirstDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - chargeLastUsedFirst
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "bd6d9a21-f3c4-46e2-9c00-0b1c4d23f321"
+ *         chargeLastUsedFirst:
+ *           type: boolean
+ *           example: false
+
+ *     UpdateChargeAlternativeDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - chargeAlternative
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "cafebabe-1234-5678-9999-deadbeef0001"
+ *         chargeAlternative:
+ *           type: boolean
+ *           example: true
+
+ *     UpdateRetryBeforeDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - retryBefore
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "7e9847f6-5e34-4b00-8870-adafbcf67991"
+ *         retryBefore:
+ *           type: boolean
+ *           example: true
+
+ *     UpdateRetryAfterDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - retryAfter
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "197ce012-8df0-4f3e-b989-cc7ecf39cc94"
+ *         retryAfter:
+ *           type: boolean
+ *           example: false
+
+ *     UpdateNotifyTenantDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - notifyTenant
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "499c66a6-9be0-4c68-a58f-f0f9b507e91b"
+ *         notifyTenant:
+ *           type: boolean
+ *           example: true
+
+ *     UpdateNotificationEmailHeaderDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - notificationEmailHeader
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "845f7de3-d6c4-431b-bf5d-b9f29a9e5c10"
+ *         notificationEmailHeader:
+ *           type: string
+ *           example: "Payment Failed Notification"
+
+ *     UpdateNotificationEmailBodyDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - notificationEmailBody
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "1227a540-b9ea-4c9a-9211-3cf79a41fa5c"
+ *         notificationEmailBody:
+ *           type: string
+ *           example: "Your payment attempt failed. Please update your billing info."
+
+ *     UpdateCancelAfterDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - cancelAfter
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "3aa09877-3ea6-4f67-8e18-06cf3281adf3"
+ *         cancelAfter:
+ *           type: integer
+ *           example: 5
+
+ *     UpdateManualCancelDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - manualCancel
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "0fd8dfb2-3fbc-403e-9604-f4959b2c4b6c"
+ *         manualCancel:
+ *           type: boolean
+ *           example: false
+
+ *     UpdateSuspensionActionDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - suspensionAction
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "2ec5dcf6-6e1c-4b4a-b5d5-d18b12410ef3"
+ *         suspensionAction:
+ *           type: string
+ *           example: "Suspend Account"
+
+ *     UpdateErrorMessageDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - errorMessage
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "1b91cdee-6cc7-42bc-a3ab-07ea1e9c33de"
+ *         errorMessage:
+ *           type: string
+ *           example: "Payment processing error"
+
+ *     UpdateEmailAfterAttemptsDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - emailAfterAttempts
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "b021bcba-c85f-4469-b6a5-885b18d6bc32"
+ *         emailAfterAttempts:
+ *           type: integer
+ *           example: 3
+
+ *     UpdateWarningMailHeaderDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - warningMailHeader
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "ca4f9c43-d2dc-4633-b3a2-e84f5c8b5735"
+ *         warningMailHeader:
+ *           type: string
+ *           example: "Warning: Payment Issue Detected"
+
+ *     UpdateWarningMailBodyDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - warningMailBody
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "d7c9856b-2542-4c37-a066-c4fcac3e98c9"
+ *         warningMailBody:
+ *           type: string
+ *           example: "You have one more chance to update your payment method."
+
+ *     UpdateSendOnSubscriptionCancelDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - sendOnSubscriptionCancel
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "a89239c3-009e-4387-bb2a-913c2a1119cd"
+ *         sendOnSubscriptionCancel:
+ *           type: boolean
+ *           example: true
+
+ *     UpdateCancelMailHeaderDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - cancelMailHeader
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "51c92c86-06a1-4146-97cc-4ec81bcb5dc7"
+ *         cancelMailHeader:
+ *           type: string
+ *           example: "Subscription Cancelled"
+
+ *     UpdateCancelMailBodyDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - cancelMailBody
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "2b8fd6c1-c14a-4659-ae00-4c9cbd78d61f"
+ *         cancelMailBody:
+ *           type: string
+ *           example: "Your subscription has been cancelled due to non-payment."
  */
 
 class BillingRoutes {
@@ -425,6 +676,366 @@ class BillingRoutes {
          *         description: Bad request
          */
         this.router.get("/paymentaccess", this.controller.getPaymentAccess);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentaccess/charge-on-due-date:
+         *   patch:
+         *     summary: Update charge on due date
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateChargeOnDueDateDto'
+         *     responses:
+         *       200:
+         *         description: Updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/paymentaccess/charge-on-due-date", BillingDto.updateChargeOnDueDateDto, this.controller.updatePaymentAccess);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentaccess/charge-last-used-first:
+         *   patch:
+         *     summary: Update charge last used first
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateChargeLastUsedFirstDto'
+         *     responses:
+         *       200:
+         *         description: Updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/paymentaccess/charge-last-used-first", BillingDto.updateChargeLastUsedFirstDto, this.controller.updatePaymentAccess);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentaccess/charge-alternative:
+         *   patch:
+         *     summary: Update charge alternative method
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateChargeAlternativeDto'
+         *     responses:
+         *       200:
+         *         description: Updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/paymentaccess/charge-alternative", BillingDto.updateChargeAlternativeDto, this.controller.updatePaymentAccess);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentaccess/retry-before:
+         *   patch:
+         *     summary: Update retry before due date
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateRetryBeforeDto'
+         *     responses:
+         *       200:
+         *         description: Updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/paymentaccess/retry-before", BillingDto.updateRetryBeforeDto, this.controller.updatePaymentAccess);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentaccess/retry-after:
+         *   patch:
+         *     summary: Update retry after due date
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateRetryAfterDto'
+         *     responses:
+         *       200:
+         *         description: Updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/paymentaccess/retry-after", BillingDto.updateRetryAfterDto, this.controller.updatePaymentAccess);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentaccess/notify-tenant:
+         *   patch:
+         *     summary: Update notify tenant
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateNotifyTenantDto'
+         *     responses:
+         *       200:
+         *         description: Updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/paymentaccess/notify-tenant", BillingDto.updateNotifyTenantDto, this.controller.updatePaymentAccess);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentaccess/notification-email-header:
+         *   patch:
+         *     summary: Update notification email header
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateNotificationEmailHeaderDto'
+         *     responses:
+         *       200:
+         *         description: Updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/paymentaccess/notification-email-header", BillingDto.updateNotificationEmailHeaderDto, this.controller.updatePaymentAccess);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentaccess/notification-email-body:
+         *   patch:
+         *     summary: Update notification email body
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateNotificationEmailBodyDto'
+         *     responses:
+         *       200:
+         *         description: Updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/paymentaccess/notification-email-body", BillingDto.updateNotificationEmailBodyDto, this.controller.updatePaymentAccess);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentaccess/cancel-after:
+         *   patch:
+         *     summary: Update cancel after attempts
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateCancelAfterDto'
+         *     responses:
+         *       200:
+         *         description: Updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/paymentaccess/cancel-after", BillingDto.updateCancelAfterDto, this.controller.updatePaymentAccess);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentaccess/manual-cancel:
+         *   patch:
+         *     summary: Update manual cancel option
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateManualCancelDto'
+         *     responses:
+         *       200:
+         *         description: Updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/paymentaccess/manual-cancel", BillingDto.updateManualCancelDto, this.controller.updatePaymentAccess);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentaccess/suspension-action:
+         *   patch:
+         *     summary: Update suspension action
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateSuspensionActionDto'
+         *     responses:
+         *       200:
+         *         description: Updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/paymentaccess/suspension-action", BillingDto.updateSuspensionActionDto, this.controller.updatePaymentAccess);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentaccess/error-message:
+         *   patch:
+         *     summary: Update error message
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateErrorMessageDto'
+         *     responses:
+         *       200:
+         *         description: Updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/paymentaccess/error-message", BillingDto.updateErrorMessageDto, this.controller.updatePaymentAccess);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentaccess/email-after-attempts:
+         *   patch:
+         *     summary: Update number of attempts before email
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateEmailAfterAttemptsDto'
+         *     responses:
+         *       200:
+         *         description: Updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/paymentaccess/email-after-attempts", BillingDto.updateEmailAfterAttemptsDto, this.controller.updatePaymentAccess);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentaccess/warning-mail-header:
+         *   patch:
+         *     summary: Update warning mail header
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateWarningMailHeaderDto'
+         *     responses:
+         *       200:
+         *         description: Updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/paymentaccess/warning-mail-header", BillingDto.updateWarningMailHeaderDto, this.controller.updatePaymentAccess);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentaccess/warning-mail-body:
+         *   patch:
+         *     summary: Update warning mail body
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateWarningMailBodyDto'
+         *     responses:
+         *       200:
+         *         description: Updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/paymentaccess/warning-mail-body", BillingDto.updateWarningMailBodyDto, this.controller.updatePaymentAccess);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentaccess/send-on-subscription-cancel:
+         *   patch:
+         *     summary: Update send on subscription cancel
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateSendOnSubscriptionCancelDto'
+         *     responses:
+         *       200:
+         *         description: Updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/paymentaccess/send-on-subscription-cancel", BillingDto.updateSendOnSubscriptionCancelDto, this.controller.updatePaymentAccess);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentaccess/cancel-mail-header:
+         *   patch:
+         *     summary: Update cancel mail header
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateCancelMailHeaderDto'
+         *     responses:
+         *       200:
+         *         description: Updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/paymentaccess/cancel-mail-header", BillingDto.updateCancelMailHeaderDto, this.controller.updatePaymentAccess);
+
+        /**
+         * @swagger
+         * /api/v1/billing/paymentaccess/cancel-mail-body:
+         *   patch:
+         *     summary: Update cancel mail body
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateCancelMailBodyDto'
+         *     responses:
+         *       200:
+         *         description: Updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/paymentaccess/cancel-mail-body", BillingDto.updateCancelMailBodyDto, this.controller.updatePaymentAccess);
 
     }
 
