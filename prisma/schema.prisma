@@ -61,6 +61,7 @@ model Admin {
   Tenant       Tenant[]
   logs         Logs[]
   BillingPlan  BillingPlan[]
+  issues       Issue[]
 }
 
 model Auth {
@@ -132,6 +133,7 @@ model Tenant {
   BillingPlan     BillingPlan[]
   Invoice         Invoice[]
   PaymentMethod   PaymentMethod[]
+  issues          Issue[]
 }
 
 model TenantStaff {
@@ -151,6 +153,7 @@ model TenantStaff {
   roles        Role           @relation(fields: [roleId], references: [id])
   tenant       Tenant         @relation(fields: [tenantId], references: [id])
   PipelineItem PipelineItem[]
+  issues       Issue[]
 }
 
 model Client {
@@ -257,28 +260,29 @@ model Transactions {
 }
 
 model Subscription {
-  id            String             @id @default(uuid())
-  tenantId      String
-  planId        String
-  status        SubscriptionStatus
-  startDate     DateTime
-  billingCycle  String
+  id               String             @id @default(uuid())
+  tenantId         String
+  planId           String
+  status           SubscriptionStatus
+  startDate        DateTime
+  billingCycle     String
   // lastPaymentStatus String
   // amount            Int
-  pauseSchedule DateTime?
-  resumeShedule DateTime?
-  autoRenew     Boolean?            @default(true)
+  pauseSchedule    DateTime?
+  resumeShedule    DateTime?
+  autoRenew        Boolean?           @default(true)
   mailNotification Boolean?
-  endDate       DateTime
-  transactionId String             @unique
-  paymentId     Int                @unique
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
+  endDate          DateTime
+  transactionId    String             @unique
+  paymentId        Int                @unique
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 
   tenant      Tenant       @relation(fields: [tenantId], references: [id])
   transaction Transactions @relation(fields: [transactionId], references: [id])
   payment     Payment      @relation(fields: [paymentId], references: [id])
   plan        BillingPlan  @relation(fields: [planId], references: [id])
+  Logs        Logs[]
 }
 
 model BillingPlan {
@@ -361,23 +365,27 @@ model Payment {
 }
 
 model Logs {
-  logId     String   @id @default(uuid())
-  tenantId  String?
-  clientId  String?
-  adminId   String?
-  featureId String?
-  module    Module?
-  action    String
-  reason    String
-  details   String?
-  ipAddress String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  logId          String   @id @default(uuid())
+  tenantId       String?
+  clientId       String?
+  adminId        String?
+  featureId      String?
+  module         Module?
+  action         String
+  reason         String
+  details        String?
+  ipAddress      String?
+  subscriptionId String?
+  issueId        String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  tenant  Tenant?  @relation(fields: [tenantId], references: [id])
-  client  Client?  @relation(fields: [clientId], references: [id])
-  admin   Admin?   @relation(fields: [adminId], references: [id])
-  feature Feature? @relation(fields: [featureId], references: [id])
+  tenant       Tenant?       @relation(fields: [tenantId], references: [id])
+  client       Client?       @relation(fields: [clientId], references: [id])
+  admin        Admin?        @relation(fields: [adminId], references: [id])
+  feature      Feature?      @relation(fields: [featureId], references: [id])
+  issue        Issue?        @relation(fields: [issueId], references: [id])
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
 }
 
 model Invoice {
@@ -445,4 +453,37 @@ model PaymentAndAccountAccess {
   sendOnSubscriptionCancel Boolean
   cancelMailHeader         String
   cancelMailBody           String
+}
+
+model Issue {
+  id                    String   @id @default(uuid())
+  category              String
+  priority              String
+  tenantId              String
+  adminId               String
+  title                 String
+  tenantStaffId         String?
+  status                String
+  resolutionDeadline    DateTime
+  attachments           Json
+  description           String
+  resolutionDescription String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  assignedTo Admin          @relation(fields: [adminId], references: [id])
+  tenant     Tenant         @relation(fields: [tenantId], references: [id])
+  loggedBy   TenantStaff?    @relation(fields: [tenantStaffId], references: [id])
+  comments   IssueComment[]
+  Logs       Logs[]
+}
+
+model IssueComment {
+  id        String   @id @default(uuid())
+  issueId   String
+  comment   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  issue Issue @relation(fields: [issueId], references: [id])
 }

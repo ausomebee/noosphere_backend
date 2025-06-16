@@ -132,6 +132,7 @@ import InvoiceDto from "../dto/invoiceDto.js";
  *       required:
  *         - id
  *         - upcomingInvoiceHeader
+ *         - upcomingInvoiceBody
  *       properties:
  *         id:
  *           type: string
@@ -140,17 +141,6 @@ import InvoiceDto from "../dto/invoiceDto.js";
  *         upcomingInvoiceHeader:
  *           type: string
  *           example: "Upcoming Invoice Notice"
-
- *     UpdateUpcomingInvoiceBodyDto:
- *       type: object
- *       required:
- *         - id
- *         - upcomingInvoiceBody
- *       properties:
- *         id:
- *           type: string
- *           format: uuid
- *           example: "550e8400-e29b-41d4-a716-446655440003"
  *         upcomingInvoiceBody:
  *           type: string
  *           example: "Your invoice is due soon. Please review and make payment."
@@ -174,6 +164,7 @@ import InvoiceDto from "../dto/invoiceDto.js";
  *       required:
  *         - id
  *         - dueInvoiceHeader
+ *         - dueInvoiceBody
  *       properties:
  *         id:
  *           type: string
@@ -182,17 +173,6 @@ import InvoiceDto from "../dto/invoiceDto.js";
  *         dueInvoiceHeader:
  *           type: string
  *           example: "Invoice Due Today"
-
- *     UpdateDueInvoiceBodyDto:
- *       type: object
- *       required:
- *         - id
- *         - dueInvoiceBody
- *       properties:
- *         id:
- *           type: string
- *           format: uuid
- *           example: "550e8400-e29b-41d4-a716-446655440006"
  *         dueInvoiceBody:
  *           type: string
  *           example: "Please make payment to avoid service disruption."
@@ -499,43 +479,23 @@ class InvoiceRoutes {
 
         /**
          * @swagger
-         * /api/v1/invoice/invoice/management/upcoming-invoice-header:
+         * /api/v1/invoice/invoice/management/upcoming-invoice:
          *   patch:
-         *     summary: Update upcoming invoice header
+         *     summary: Update upcoming invoice 
          *     tags: [Invoice]
          *     requestBody:
          *       required: true
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/UpdateUpcomingInvoiceHeaderDto'
+         *             $ref: '#/components/schemas/UpdateUpcomingInvoiceDto'
          *     responses:
          *       200:
-         *         description: upcomingInvoiceHeader updated successfully
+         *         description: upcomingInvoice updated successfully
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/invoice/management/upcoming-invoice-header", InvoiceDto.updateUpcomingInvoiceHeaderDto, this.controller.updateInvoiceManagement);
-
-        /**
-         * @swagger
-         * /api/v1/invoice/invoice/management/upcoming-invoice-body:
-         *   patch:
-         *     summary: Update upcoming invoice body
-         *     tags: [Invoice]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/UpdateUpcomingInvoiceBodyDto'
-         *     responses:
-         *       200:
-         *         description: upcomingInvoiceBody updated successfully
-         *       400:
-         *         description: Validation error
-         */
-        this.router.patch("/invoice/management/upcoming-invoice-body", InvoiceDto.updateUpcomingInvoiceBodyDto, this.controller.updateInvoiceManagement);
+        this.router.patch("/invoice/management/upcoming-invoice", InvoiceDto.updateUpcomingInvoiceDto, this.controller.updateInvoiceManagement);
 
         /**
          * @swagger
@@ -559,43 +519,23 @@ class InvoiceRoutes {
 
         /**
          * @swagger
-         * /api/v1/invoice/invoice/management/due-invoice-header:
+         * /api/v1/invoice/invoice/management/due-invoice:
          *   patch:
-         *     summary: Update due invoice header
+         *     summary: Update due invoice 
          *     tags: [Invoice]
          *     requestBody:
          *       required: true
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/UpdateDueInvoiceHeaderDto'
+         *             $ref: '#/components/schemas/UpdateDueInvoiceDto'
          *     responses:
          *       200:
-         *         description: dueInvoiceHeader updated successfully
+         *         description: dueInvoice updated successfully
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/invoice/management/due-invoice-header", InvoiceDto.updateDueInvoiceHeaderDto, this.controller.updateInvoiceManagement);
-
-        /**
-         * @swagger
-         * /api/v1/invoice/invoice/management/due-invoice-body:
-         *   patch:
-         *     summary: Update due invoice body
-         *     tags: [Invoice]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/UpdateDueInvoiceBodyDto'
-         *     responses:
-         *       200:
-         *         description: dueInvoiceBody updated successfully
-         *       400:
-         *         description: Validation error
-         */
-        this.router.patch("/invoice/management/due-invoice-body", InvoiceDto.updateDueInvoiceBodyDto, this.controller.updateInvoiceManagement);
+        this.router.patch("/invoice/management/due-invoice", InvoiceDto.updateDueInvoiceDto, this.controller.updateInvoiceManagement);
 
         /**
          * @swagger

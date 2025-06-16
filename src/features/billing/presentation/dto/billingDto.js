@@ -177,23 +177,13 @@ class BillingDto {
         Validator.validateRequest(req, next, schema);
     };
 
-    static updateNotificationEmailHeaderDto = (req, res, next) => {
+    static updateNotificationEmailDto = (req, res, next) => {
         const schema = Joi.object({
             id: Joi.string().uuid().required().messages({
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
             notificationEmailHeader: Joi.string().required(),
-        });
-        Validator.validateRequest(req, next, schema);
-    };
-
-    static updateNotificationEmailBodyDto = (req, res, next) => {
-        const schema = Joi.object({
-            id: Joi.string().uuid().required().messages({
-                "string.empty": "ID is required",
-                "string.guid": "ID must be a valid UUID"
-            }),
             notificationEmailBody: Joi.string().required(),
         });
         Validator.validateRequest(req, next, schema);
@@ -254,23 +244,13 @@ class BillingDto {
         Validator.validateRequest(req, next, schema);
     };
 
-    static updateWarningMailHeaderDto = (req, res, next) => {
+    static updateWarningMailDto = (req, res, next) => {
         const schema = Joi.object({
             id: Joi.string().uuid().required().messages({
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
             warningMailHeader: Joi.string().required(),
-        });
-        Validator.validateRequest(req, next, schema);
-    };
-
-    static updateWarningMailBodyDto = (req, res, next) => {
-        const schema = Joi.object({
-            id: Joi.string().uuid().required().messages({
-                "string.empty": "ID is required",
-                "string.guid": "ID must be a valid UUID"
-            }),
             warningMailBody: Joi.string().required(),
         });
         Validator.validateRequest(req, next, schema);
@@ -287,23 +267,13 @@ class BillingDto {
         Validator.validateRequest(req, next, schema);
     };
 
-    static updateCancelMailHeaderDto = (req, res, next) => {
+    static updateCancelMailDto = (req, res, next) => {
         const schema = Joi.object({
             id: Joi.string().uuid().required().messages({
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
             cancelMailHeader: Joi.string().required(),
-        });
-        Validator.validateRequest(req, next, schema);
-    };
-
-    static updateCancelMailBodyDto = (req, res, next) => {
-        const schema = Joi.object({
-            id: Joi.string().uuid().required().messages({
-                "string.empty": "ID is required",
-                "string.guid": "ID must be a valid UUID"
-            }),
             cancelMailBody: Joi.string().required(),
         });
         Validator.validateRequest(req, next, schema);

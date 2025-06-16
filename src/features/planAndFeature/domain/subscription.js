@@ -31,7 +31,8 @@ class Subscription {
             adminId: this.adminId,
             reason: this.reason,
             action: "change subscription status",
-            details: this.comment
+            details: this.comment,
+            subscriptionId: this.id
         };
     }
 

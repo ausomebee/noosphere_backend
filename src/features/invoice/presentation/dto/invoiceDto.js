@@ -91,23 +91,13 @@ class InvoiceDto {
         Validator.validateRequest(req, next, schema);
     };
 
-    static updateUpcomingInvoiceHeaderDto = (req, res, next) => {
+    static updateUpcomingInvoiceDto = (req, res, next) => {
         const schema = Joi.object({
             id: Joi.string().uuid().required().messages({
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
             upcomingInvoiceHeader: Joi.string().required(),
-        });
-        Validator.validateRequest(req, next, schema);
-    };
-
-    static updateUpcomingInvoiceBodyDto = (req, res, next) => {
-        const schema = Joi.object({
-            id: Joi.string().uuid().required().messages({
-                "string.empty": "ID is required",
-                "string.guid": "ID must be a valid UUID"
-            }),
             upcomingInvoiceBody: Joi.string().required(),
         });
         Validator.validateRequest(req, next, schema);
@@ -124,23 +114,13 @@ class InvoiceDto {
         Validator.validateRequest(req, next, schema);
     };
 
-    static updateDueInvoiceHeaderDto = (req, res, next) => {
+    static updateDueInvoiceDto = (req, res, next) => {
         const schema = Joi.object({
             id: Joi.string().uuid().required().messages({
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
             dueInvoiceHeader: Joi.string().required(),
-        });
-        Validator.validateRequest(req, next, schema);
-    };
-
-    static updateDueInvoiceBodyDto = (req, res, next) => {
-        const schema = Joi.object({
-            id: Joi.string().uuid().required().messages({
-                "string.empty": "ID is required",
-                "string.guid": "ID must be a valid UUID"
-            }),
             dueInvoiceBody: Joi.string().required(),
         });
         Validator.validateRequest(req, next, schema);
