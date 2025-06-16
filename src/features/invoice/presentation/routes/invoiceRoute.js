@@ -127,7 +127,7 @@ import InvoiceDto from "../dto/invoiceDto.js";
  *           type: integer
  *           example: 5
 
- *     UpdateUpcomingInvoiceHeaderDto:
+ *     UpdateUpcomingInvoiceDto:
  *       type: object
  *       required:
  *         - id
@@ -159,7 +159,7 @@ import InvoiceDto from "../dto/invoiceDto.js";
  *           type: boolean
  *           example: true
 
- *     UpdateDueInvoiceHeaderDto:
+ *     UpdateDueInvoiceDto:
  *       type: object
  *       required:
  *         - id
