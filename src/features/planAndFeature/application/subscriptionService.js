@@ -22,16 +22,16 @@ class SubscriptionService {
         return newSubscription;
     }
 
-    async updateSubscriptions(dataArray) {
+    async updateSubscriptions(data) {
         const results = await Promise.all(
-            dataArray.map(async (data) => {
-                const subscription = await this.subscriptionRepository.findOne({ id: data.id });
+            data.id.map(async (id) => {
+                const subscription = await this.subscriptionRepository.findOne({ id: id });
 
                 if (!subscription) {
-                    throw new Error(`Subscription with ID ${data.id} not found`);
+                    throw new Error(`Subscription with ID ${id} not found`);
                 }
 
-                const update = await this.subscriptionRepository.update(data.id, {
+                const update = await this.subscriptionRepository.update(id, {
                     pauseSchedule: data.pauseSchedule || subscription.pauseSchedule,
                     status: data.status || subscription.status,
                     autoRenew: data.autoRenew ?? subscription.autoRenew,
@@ -40,7 +40,7 @@ class SubscriptionService {
                 });
 
                 if (!update) {
-                    throw new Error(`Failed to update Subscription with ID ${data.id}`);
+                    throw new Error(`Failed to update Subscription with ID ${id}`);
                 }
 
                 return update;
