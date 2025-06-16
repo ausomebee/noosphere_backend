@@ -33,7 +33,7 @@ class SubscriptionController {
     updateSubscription = expressAsyncHandler(async (req, res) => {
         const subscriptionData = new Subscription(req.body);
 
-        const subscription = await this.service.updateSubscription(req.body);
+        const subscription = await this.service.updateSubscriptions(req.body);
 
         if (!subscription) {
             res.status(500).json({ message: 'Failed to update subscription' });
