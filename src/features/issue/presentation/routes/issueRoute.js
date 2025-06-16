@@ -88,13 +88,10 @@ class IssueRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", this.S3Service.single("attachment"), this.log, this.controller.createIssue);
+        this.router.post("/", IssueDto.createIssueDto, this.S3Service.single("attachment"), this.controller.createIssue);
 
     }
-    log = (req, res, next) => {
-        console.log("Uploaded file:", req.file);
-        next();
-    };
+
     getRouter() {
         return this.router;
     }
