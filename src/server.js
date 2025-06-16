@@ -23,6 +23,8 @@ import plan_route from "./features/planAndFeature/presentation/routes/planRoute.
 import subscription_route from "./features/planAndFeature/presentation/routes/subscriptionRoute.js"
 import invoice_route from "./features/invoice/presentation/routes/invoiceRoute.js"
 import log_route from "./features/logs/presentation/routes/logRoute.js"
+import performance_route from "./features/performance/presentation/routes/performanceRoute.js"
+import issue_route from "./features/issue/presentation/routes/issueRoute.js"
 
 
 class App {
@@ -75,6 +77,8 @@ class App {
         this.app.use("/api/v1/subscription", subscription_route);
         this.app.use("/api/v1/invoice", invoice_route);
         this.app.use("/api/v1/log", log_route);
+        this.app.use("/api/v1/performance", performance_route);
+        this.app.use("/api/v1/issue", issue_route);
     }
 
     initializeErrorHandler() {

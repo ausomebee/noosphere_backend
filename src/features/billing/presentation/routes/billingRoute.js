@@ -243,11 +243,12 @@ import BillingDto from "../dto/billingDto.js";
  *           type: boolean
  *           example: true
 
- *     UpdateNotificationEmailHeaderDto:
+ *     UpdateNotificationEmailDto:
  *       type: object
  *       required:
  *         - id
  *         - notificationEmailHeader
+ *         - notificationEmailBody
  *       properties:
  *         id:
  *           type: string
@@ -256,17 +257,6 @@ import BillingDto from "../dto/billingDto.js";
  *         notificationEmailHeader:
  *           type: string
  *           example: "Payment Failed Notification"
-
- *     UpdateNotificationEmailBodyDto:
- *       type: object
- *       required:
- *         - id
- *         - notificationEmailBody
- *       properties:
- *         id:
- *           type: string
- *           format: uuid
- *           example: "1227a540-b9ea-4c9a-9211-3cf79a41fa5c"
  *         notificationEmailBody:
  *           type: string
  *           example: "Your payment attempt failed. Please update your billing info."
@@ -341,11 +331,12 @@ import BillingDto from "../dto/billingDto.js";
  *           type: integer
  *           example: 3
 
- *     UpdateWarningMailHeaderDto:
+ *     UpdateWarningMailDto:
  *       type: object
  *       required:
  *         - id
  *         - warningMailHeader
+ *         - warningMailBody
  *       properties:
  *         id:
  *           type: string
@@ -354,17 +345,6 @@ import BillingDto from "../dto/billingDto.js";
  *         warningMailHeader:
  *           type: string
  *           example: "Warning: Payment Issue Detected"
-
- *     UpdateWarningMailBodyDto:
- *       type: object
- *       required:
- *         - id
- *         - warningMailBody
- *       properties:
- *         id:
- *           type: string
- *           format: uuid
- *           example: "d7c9856b-2542-4c37-a066-c4fcac3e98c9"
  *         warningMailBody:
  *           type: string
  *           example: "You have one more chance to update your payment method."
@@ -383,11 +363,12 @@ import BillingDto from "../dto/billingDto.js";
  *           type: boolean
  *           example: true
 
- *     UpdateCancelMailHeaderDto:
+ *     UpdateCancelMailDto:
  *       type: object
  *       required:
  *         - id
  *         - cancelMailHeader
+ *         - cancelMailBody
  *       properties:
  *         id:
  *           type: string
@@ -396,17 +377,6 @@ import BillingDto from "../dto/billingDto.js";
  *         cancelMailHeader:
  *           type: string
  *           example: "Subscription Cancelled"
-
- *     UpdateCancelMailBodyDto:
- *       type: object
- *       required:
- *         - id
- *         - cancelMailBody
- *       properties:
- *         id:
- *           type: string
- *           format: uuid
- *           example: "2b8fd6c1-c14a-4659-ae00-4c9cbd78d61f"
  *         cancelMailBody:
  *           type: string
  *           example: "Your subscription has been cancelled due to non-payment."
@@ -799,43 +769,23 @@ class BillingRoutes {
 
         /**
          * @swagger
-         * /api/v1/billing/paymentaccess/notification-email-header:
+         * /api/v1/billing/paymentaccess/notification-email:
          *   patch:
-         *     summary: Update notification email header
+         *     summary: Update notification email 
          *     tags: [billing]
          *     requestBody:
          *       required: true
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/UpdateNotificationEmailHeaderDto'
+         *             $ref: '#/components/schemas/UpdateNotificationEmailDto'
          *     responses:
          *       200:
          *         description: Updated successfully
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/paymentaccess/notification-email-header", BillingDto.updateNotificationEmailHeaderDto, this.controller.updatePaymentAccess);
-
-        /**
-         * @swagger
-         * /api/v1/billing/paymentaccess/notification-email-body:
-         *   patch:
-         *     summary: Update notification email body
-         *     tags: [billing]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/UpdateNotificationEmailBodyDto'
-         *     responses:
-         *       200:
-         *         description: Updated successfully
-         *       400:
-         *         description: Validation error
-         */
-        this.router.patch("/paymentaccess/notification-email-body", BillingDto.updateNotificationEmailBodyDto, this.controller.updatePaymentAccess);
+        this.router.patch("/paymentaccess/notification-email", BillingDto.updateNotificationEmailDto, this.controller.updatePaymentAccess);
 
         /**
          * @swagger
@@ -939,43 +889,23 @@ class BillingRoutes {
 
         /**
          * @swagger
-         * /api/v1/billing/paymentaccess/warning-mail-header:
+         * /api/v1/billing/paymentaccess/warning-mail:
          *   patch:
-         *     summary: Update warning mail header
+         *     summary: Update warning mail
          *     tags: [billing]
          *     requestBody:
          *       required: true
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/UpdateWarningMailHeaderDto'
+         *             $ref: '#/components/schemas/UpdateWarningMailDto'
          *     responses:
          *       200:
          *         description: Updated successfully
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/paymentaccess/warning-mail-header", BillingDto.updateWarningMailHeaderDto, this.controller.updatePaymentAccess);
-
-        /**
-         * @swagger
-         * /api/v1/billing/paymentaccess/warning-mail-body:
-         *   patch:
-         *     summary: Update warning mail body
-         *     tags: [billing]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/UpdateWarningMailBodyDto'
-         *     responses:
-         *       200:
-         *         description: Updated successfully
-         *       400:
-         *         description: Validation error
-         */
-        this.router.patch("/paymentaccess/warning-mail-body", BillingDto.updateWarningMailBodyDto, this.controller.updatePaymentAccess);
+        this.router.patch("/paymentaccess/warning-mail", BillingDto.updateWarningMailDto, this.controller.updatePaymentAccess);
 
         /**
          * @swagger
@@ -999,43 +929,23 @@ class BillingRoutes {
 
         /**
          * @swagger
-         * /api/v1/billing/paymentaccess/cancel-mail-header:
+         * /api/v1/billing/paymentaccess/cancel-mail:
          *   patch:
-         *     summary: Update cancel mail header
+         *     summary: Update cancel mail 
          *     tags: [billing]
          *     requestBody:
          *       required: true
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/UpdateCancelMailHeaderDto'
+         *             $ref: '#/components/schemas/UpdateCancelMailDto'
          *     responses:
          *       200:
          *         description: Updated successfully
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/paymentaccess/cancel-mail-header", BillingDto.updateCancelMailHeaderDto, this.controller.updatePaymentAccess);
-
-        /**
-         * @swagger
-         * /api/v1/billing/paymentaccess/cancel-mail-body:
-         *   patch:
-         *     summary: Update cancel mail body
-         *     tags: [billing]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/UpdateCancelMailBodyDto'
-         *     responses:
-         *       200:
-         *         description: Updated successfully
-         *       400:
-         *         description: Validation error
-         */
-        this.router.patch("/paymentaccess/cancel-mail-body", BillingDto.updateCancelMailBodyDto, this.controller.updatePaymentAccess);
+        this.router.patch("/paymentaccess/cancel-mail", BillingDto.updateCancelMailDto, this.controller.updatePaymentAccess);
 
     }
 
