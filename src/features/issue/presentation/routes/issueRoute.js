@@ -88,7 +88,28 @@ class IssueRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", IssueDto.createIssueDto, this.S3Service.single("attachment"), this.controller.createIssue);
+        this.router.post("/", IssueDto.createIssueDto, this.controller.createIssue);
+
+        /**
+        * @swagger
+        * /api/v1/issue/{id}:
+        *   get:
+        *     summary: gets single issue
+        *     tags: [Issue]
+        *     parameters:
+        *       - in: path
+        *         name: id
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The ID of the issue
+        *     responses:
+        *       200:
+        *         description: issue fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/:id", IssueDto.checkIdDto, this.controller.getSingleIssue);
 
     }
 

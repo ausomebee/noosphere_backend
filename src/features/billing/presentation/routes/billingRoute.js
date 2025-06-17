@@ -115,11 +115,11 @@ import BillingDto from "../dto/billingDto.js";
  *           type: boolean
  *           example: true
  *         retryBefore:
- *           type: boolean
- *           example: true
+ *           type: integer
+ *           example: 5
  *         retryAfter:
- *           type: boolean
- *           example: false
+ *           type: integer
+ *           example: 7
  *         notifyTenant:
  *           type: boolean
  *           example: true

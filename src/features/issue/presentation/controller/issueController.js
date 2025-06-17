@@ -13,8 +13,6 @@ class IssueController {
     }
 
     createIssue = expressAsyncHandler(async (req, res) => {
-        console.log(req.file)
-        console.log(req.body)
         const issue = await this.service.createIssue(req.body);
 
         if (!issue) {
@@ -23,6 +21,20 @@ class IssueController {
 
         return res.status(201).json({
             message: "Issue created successfully",
+            status: 'ok',
+            data: issue
+        });
+    });
+
+    getSingleIssue = expressAsyncHandler(async (req, res) => {
+        const issue = await this.service.getSingleIssue(req.params.id);
+
+        if (!issue) {
+            res.status(500).json({ message: 'Failed to get issue' });
+        }
+
+        return res.status(201).json({
+            message: "Issue fetched successfully",
             status: 'ok',
             data: issue
         });
