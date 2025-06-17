@@ -150,7 +150,7 @@ class BillingDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
-            retryBefore: Joi.boolean().required(),
+            retryBefore: Joi.number().required(),
         });
         Validator.validateRequest(req, next, schema);
     };
@@ -161,7 +161,7 @@ class BillingDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
-            retryAfter: Joi.boolean().required(),
+            retryAfter: Joi.number().required(),
         });
         Validator.validateRequest(req, next, schema);
     };
