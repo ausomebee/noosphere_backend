@@ -438,8 +438,8 @@ model PaymentAndAccountAccess {
   chargeOnDueDate          Boolean
   chargeLastUsedFirst      Boolean
   chargeAlternative        Boolean
-  retryBefore              Boolean
-  retryAfter               Boolean
+  retryBefore              Int
+  retryAfter               Int
   notifyTenant             Boolean
   notificationEmailHeader  String
   notificationEmailBody    String

@@ -212,8 +212,8 @@ import BillingDto from "../dto/billingDto.js";
  *           format: uuid
  *           example: "7e9847f6-5e34-4b00-8870-adafbcf67991"
  *         retryBefore:
- *           type: boolean
- *           example: true
+ *           type: integer
+ *           example: 6
 
  *     UpdateRetryAfterDto:
  *       type: object
@@ -226,8 +226,8 @@ import BillingDto from "../dto/billingDto.js";
  *           format: uuid
  *           example: "197ce012-8df0-4f3e-b989-cc7ecf39cc94"
  *         retryAfter:
- *           type: boolean
- *           example: false
+ *           type: integer
+ *           example: 5
 
  *     UpdateNotifyTenantDto:
  *       type: object
