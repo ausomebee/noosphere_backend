@@ -839,26 +839,6 @@ class BillingRoutes {
 
         /**
          * @swagger
-         * /api/v1/billing/paymentaccess/error-message:
-         *   patch:
-         *     summary: Update error message
-         *     tags: [billing]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/UpdateErrorMessageDto'
-         *     responses:
-         *       200:
-         *         description: Updated successfully
-         *       400:
-         *         description: Validation error
-         */
-        this.router.patch("/paymentaccess/error-message", BillingDto.updateErrorMessageDto, this.controller.updatePaymentAccess);
-
-        /**
-         * @swagger
          * /api/v1/billing/paymentaccess/email-after-attempts:
          *   patch:
          *     summary: Update number of attempts before email
