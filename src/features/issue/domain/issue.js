@@ -40,7 +40,9 @@ class Issue {
             priority: this.priority,
             adminId: this.adminId,
             resolutionDeadline: this.resolutionDeadline,
-            attachments: this.attachments,
+            attachments: [{
+                attachment: "url"
+            }],
             tenantStaffId: this.tenantStaffId,
             status: this.adminId ? "Not Started" : "Unassigned",
         };

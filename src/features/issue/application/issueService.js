@@ -18,6 +18,16 @@ class IssueService {
         return newIssue;
     }
 
+    async getSingleIssue(id) {
+        const issue = await this.issueRepository.findOneAndPopulate({ id });
+
+        if (!issue) {
+            throw new Error("Failed to fetch issue");
+        }
+
+        return issue;
+    }
+
 }
 
 export default IssueService;
