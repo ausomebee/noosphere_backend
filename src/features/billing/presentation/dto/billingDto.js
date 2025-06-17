@@ -218,16 +218,6 @@ class BillingDto {
                 "string.guid": "ID must be a valid UUID"
             }),
             suspensionAction: Joi.string().required(),
-        });
-        Validator.validateRequest(req, next, schema);
-    };
-
-    static updateErrorMessageDto = (req, res, next) => {
-        const schema = Joi.object({
-            id: Joi.string().uuid().required().messages({
-                "string.empty": "ID is required",
-                "string.guid": "ID must be a valid UUID"
-            }),
             errorMessage: Joi.string().required(),
         });
         Validator.validateRequest(req, next, schema);
