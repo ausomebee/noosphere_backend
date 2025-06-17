@@ -294,6 +294,7 @@ import BillingDto from "../dto/billingDto.js";
  *       required:
  *         - id
  *         - suspensionAction
+ *         - errorMessage
  *       properties:
  *         id:
  *           type: string
@@ -302,17 +303,6 @@ import BillingDto from "../dto/billingDto.js";
  *         suspensionAction:
  *           type: string
  *           example: "Suspend Account"
-
- *     UpdateErrorMessageDto:
- *       type: object
- *       required:
- *         - id
- *         - errorMessage
- *       properties:
- *         id:
- *           type: string
- *           format: uuid
- *           example: "1b91cdee-6cc7-42bc-a3ab-07ea1e9c33de"
  *         errorMessage:
  *           type: string
  *           example: "Payment processing error"
