@@ -195,6 +195,20 @@ class IssueRoutes {
         */
         this.router.get("/percent/assignee", this.controller.getAssigneePercentages);
 
+        /**
+        * @swagger
+        * /api/v1/issue/percent/priority:
+        *   get:
+        *     summary: get issue priority percentage
+        *     tags: [Issue]
+        *     responses:
+        *       200:
+        *         description: issue priority percentage fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/percent/priority", this.controller.getPriorityPercentages);
+
     }
 
     getRouter() {
