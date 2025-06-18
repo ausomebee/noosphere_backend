@@ -30,7 +30,7 @@ class IssueRepository extends BaseRepository {
         });
     }
 
-    async totalCount(query) {
+    async totalCountDynamic(query) {
         return await this.model.aggregate({
             where: query,
             _count: {

@@ -29,11 +29,11 @@ class IssueService {
     }
 
     async getTotalByStatus() {
-        const All = await this.issueRepository.totalCount({});
-        const Resolved = await this.issueRepository.totalCount({ status: "Resolved" });
-        const InProgress = await this.issueRepository.totalCount({ status: "In Progress" });
-        const NotStarted = await this.issueRepository.totalCount({ status: "Not Started" });
-        const Unassigned = await this.issueRepository.totalCount({ status: "Unassigned" });
+        const All = await this.issueRepository.totalCountDynamic({});
+        const Resolved = await this.issueRepository.totalCountDynamic({ status: "Resolved" });
+        const InProgress = await this.issueRepository.totalCountDynamic({ status: "In Progress" });
+        const NotStarted = await this.issueRepository.totalCountDynamic({ status: "Not Started" });
+        const Unassigned = await this.issueRepository.totalCountDynamic({ status: "Unassigned" });
 
         if (!All || !Resolved || !InProgress || !NotStarted || !Unassigned) {
             throw new Error("Failed to count invoice");
