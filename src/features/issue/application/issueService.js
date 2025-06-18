@@ -186,6 +186,45 @@ class IssueService {
         return issue;
     }
 
+    async updateIssue(data) {
+        const issue = await this.issueRepository.findOne({ id: data.id })
+        if (!issue) {
+            throw new Error("Issue not found");
+        }
+
+        const update = await this.issueRepository.update(data.id, {
+            category: data.category || issue.category,
+            priority: data.priority || issue.priority,
+            tenantId: data.tenantId || issue.tenantId,
+            adminId: data.adminId || issue.adminId,
+            title: data.title || issue.title,
+            adminLoggedById: data.adminLoggedById || issue.adminLoggedById,
+            status: data.status || issue.status,
+            resolutionDeadline: data.resolutionDeadline || issue.resolutionDeadline,
+            attachments: data.attachments ? [...issue.attachments, ...data.attachments] : issue.attachments,
+            description: data.description || issue.description,
+            resolutionDescription: data.resolutionDescription || issue.resolutionDescription
+        });
+
+        if (!update) {
+            throw new Error("Failed to update issue");
+        }
+
+        return update;
+    }
+
+    async createIssueComment(data) {
+        const issueCommentData = new Issue(data)
+
+        const newIssueComment = await this.issueCommentRepository.create(issueCommentData.createIssueComment);
+
+        if (!newIssueComment) {
+            throw new Error("Failed to create issue comment");
+        }
+
+        return newIssueComment;
+    }
+
 }
 
 export default IssueService;

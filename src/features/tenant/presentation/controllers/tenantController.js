@@ -84,48 +84,24 @@ class TenantController {
         });
     });
 
-    // createTenantStaff = expressAsyncHandler(async (req, res) => {
-    //     const staffData = new Tenant(req.body);
-    //     const staff = await this.service.createTenantStaff(staffData.createTenantStaff);
+    contactTenantByEmail = expressAsyncHandler(async (req, res) => {
+        const data = req.file ? {
+            ...req.body,
+            attachments: req.file
+        } : req.body
+        const tenant = await this.service.contactTenantByEmail(data);
 
-    //     if (!staff) {
-    //         res.status(500).json({ message: 'Failed to create tenant staff' });
-    //     }
+        if (!tenant) {
+            res.status(500).json({ message: 'Failed to contact tenant.' });
+        }
 
-    //     return res.status(201).json({
-    //         message: "Tenant staff created successfully",
-    //         status: 'ok',
-    //         data: staff
-    //     });
-    // });
+        return res.status(201).json({
+            message: "Tenant contacted successfully",
+            status: 'ok',
+            data: tenant
+        });
+    });
 
-    // staffSignin = expressAsyncHandler(async (req, res) => {
-    //     const staff = await this.service.staffSignin(req.body);
-
-    //     if (!staff) {
-    //         res.status(500).json({ message: 'Failed to signin staff' });
-    //     }
-
-    //     return res.status(201).json({
-    //         message: "staff login successfully",
-    //         status: 'ok',
-    //         data: staff
-    //     });
-    // });
-
-    // getSingleStaff = expressAsyncHandler(async (req, res) => {
-    //     const staff = await this.service.getSingleStaff(req.params);
-
-    //     if (!staff) {
-    //         res.status(500).json({ message: 'Failed to get staff' });
-    //     }
-
-    //     return res.status(201).json({
-    //         message: "Staff fetched successfully",
-    //         status: 'ok',
-    //         data: staff
-    //     });
-    // });
 }
 
 export default TenantController;
