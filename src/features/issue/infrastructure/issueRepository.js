@@ -29,6 +29,53 @@ class IssueRepository extends BaseRepository {
             }
         });
     }
+
+    async totalCount(query) {
+        return await this.model.aggregate({
+            where: query,
+            _count: {
+                _all: true,
+            },
+        });
+    }
+
+    async averageResolutionTime() {
+        return await this.model.findMany({
+            where: { status: "Resolved" },
+            select: {
+                createdAt: true,
+                updatedAt: true,
+            },
+        });
+    }
+
+    async totalCount() {
+        return await this.model.count();
+    }
+
+    async groupedCounts(by, count) {
+        return await this.model.groupBy({
+            by: [by],
+            _count: count,
+        });
+    }
+
+    async tenants(adminIds) {
+        return await this.model.findMany({
+            where: {
+                adminId: { in: adminIds },
+            },
+            include: {
+                assignedTo: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                    },
+                },
+            },
+        });
+    }
+
 }
 
 export default IssueRepository;

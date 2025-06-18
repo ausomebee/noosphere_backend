@@ -40,6 +40,89 @@ class IssueController {
         });
     });
 
+    getTotalByStatus = expressAsyncHandler(async (req, res) => {
+        const issue = await this.service.getTotalByStatus();
+
+        if (!issue) {
+            res.status(500).json({ message: 'Failed to count issues' });
+        }
+
+        return res.status(201).json({
+            message: "Issue counted successfully",
+            status: 'ok',
+            data: issue
+        });
+    });
+
+    getAverageDurationInHours = expressAsyncHandler(async (req, res) => {
+        const issue = await this.service.getAverageDurationInHours();
+
+        if (!issue) {
+            res.status(500).json({ message: 'Failed to get issue duration' });
+        }
+
+        return res.status(201).json({
+            message: "Issue duration fetched successfully",
+            status: 'ok',
+            data: issue
+        });
+    });
+
+    getStatusPercentages = expressAsyncHandler(async (req, res) => {
+        const issue = await this.service.getStatusPercentages();
+
+        if (!issue) {
+            res.status(500).json({ message: 'Failed to get issue status percentage' });
+        }
+
+        return res.status(201).json({
+            message: "Issue status percentage fetched successfully",
+            status: 'ok',
+            data: issue
+        });
+    });
+
+    getCategoriesPercentages = expressAsyncHandler(async (req, res) => {
+        const issue = await this.service.getCategoriesPercentages();
+
+        if (!issue) {
+            res.status(500).json({ message: 'Failed to get issue category percentage' });
+        }
+
+        return res.status(201).json({
+            message: "Issue category percentage fetched successfully",
+            status: 'ok',
+            data: issue
+        });
+    });
+
+    getCreatedAtPercentages = expressAsyncHandler(async (req, res) => {
+        const issue = await this.service.getCreatedAtPercentages();
+
+        if (!issue) {
+            res.status(500).json({ message: 'Failed to get issue time percentage' });
+        }
+
+        return res.status(201).json({
+            message: "Issue time percentage fetched successfully",
+            status: 'ok',
+            data: issue
+        });
+    });
+
+    getAssigneePercentages = expressAsyncHandler(async (req, res) => {
+        const issue = await this.service.getAssigneePercentages();
+
+        if (!issue) {
+            res.status(500).json({ message: 'Failed to get issue assignee percentage' });
+        }
+
+        return res.status(201).json({
+            message: "Issue assignee percentage fetched successfully",
+            status: 'ok',
+            data: issue
+        });
+    });
 }
 
 export default IssueController;
