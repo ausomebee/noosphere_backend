@@ -48,6 +48,14 @@ class IssueDto {
         Validator.validateRequest(req, next, schema, req.params);
     };
     
+    static checkStatusDto = (req, res, next) => {
+        const schema = Joi.object({
+            status: Joi.string().valid("all", "Resolved", "In Progress", "Not Started", "Unassigned"),
+        });
+
+        Validator.validateRequest(req, next, schema, req.params);
+    };
+
 }
 
 export default IssueDto;

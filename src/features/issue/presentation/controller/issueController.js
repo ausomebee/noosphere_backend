@@ -138,6 +138,20 @@ class IssueController {
         });
     });
 
+    getIssueByStatus = expressAsyncHandler(async (req, res) => {
+        const issue = await this.service.getIssueByStatus(req.params.status);
+
+        if (!issue) {
+            res.status(500).json({ message: 'Failed to get issue' });
+        }
+
+        return res.status(201).json({
+            message: "Issue fetched successfully",
+            status: 'ok',
+            data: issue
+        });
+    });
+
 }
 
 export default IssueController;

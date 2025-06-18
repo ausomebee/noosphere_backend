@@ -30,6 +30,31 @@ class IssueRepository extends BaseRepository {
         });
     }
 
+    async findAllAndPopulate(query) {
+        return await this.model.findMany({
+            where: query,
+            include: {
+                assignedTo: {
+                    select: {
+                        fullName: true
+                    }
+                },
+                tenant: {
+                    select: {
+                        companyName: true
+                    }
+                },
+                loggedBy: {
+                    select: {
+                        fullName: true
+                    }
+                },
+                comments: true,
+                Logs: true
+            }
+        });
+    }
+
     async totalCountDynamic(query) {
         return await this.model.aggregate({
             where: query,
