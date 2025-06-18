@@ -111,6 +111,90 @@ class IssueRoutes {
         */
         this.router.get("/:id", IssueDto.checkIdDto, this.controller.getSingleIssue);
 
+        /**
+        * @swagger
+        * /api/v1/issue/resolution/time:
+        *   get:
+        *     summary: gets issue resolution time
+        *     tags: [Issue]
+        *     responses:
+        *       200:
+        *         description: issue resolution time fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/resolution/time", this.controller.getAverageDurationInHours);
+
+        /**
+        * @swagger
+        * /api/v1/issue/count/status:
+        *   get:
+        *     summary: count issue by status
+        *     tags: [Issue]
+        *     responses:
+        *       200:
+        *         description: issue counted successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/count/status", this.controller.getTotalByStatus);
+
+        /**
+        * @swagger
+        * /api/v1/issue/percent/status:
+        *   get:
+        *     summary: get issue status percentage
+        *     tags: [Issue]
+        *     responses:
+        *       200:
+        *         description: issue status percentage fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/percent/status", this.controller.getStatusPercentages);
+
+        /**
+        * @swagger
+        * /api/v1/issue/percent/category:
+        *   get:
+        *     summary: get issue category percentage
+        *     tags: [Issue]
+        *     responses:
+        *       200:
+        *         description: issue category percentage fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/percent/category", this.controller.getCategoriesPercentages);
+
+        /**
+        * @swagger
+        * /api/v1/issue/percent/time:
+        *   get:
+        *     summary: get issue time percentage
+        *     tags: [Issue]
+        *     responses:
+        *       200:
+        *         description: issue time percentage fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/percent/time", this.controller.getCreatedAtPercentages);
+
+        /**
+        * @swagger
+        * /api/v1/issue/percent/assignee:
+        *   get:
+        *     summary: get issue assignee percentage
+        *     tags: [Issue]
+        *     responses:
+        *       200:
+        *         description: issue assignee percentage fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/percent/assignee", this.controller.getAssigneePercentages);
+
     }
 
     getRouter() {

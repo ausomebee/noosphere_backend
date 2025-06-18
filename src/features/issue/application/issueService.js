@@ -28,6 +28,122 @@ class IssueService {
         return issue;
     }
 
+    async getTotalByStatus() {
+        const All = await this.issueRepository.totalCount({});
+        const Resolved = await this.issueRepository.totalCount({ status: "Resolved" });
+        const InProgress = await this.issueRepository.totalCount({ status: "In Progress" });
+        const NotStarted = await this.issueRepository.totalCount({ status: "Not Started" });
+        const Unassigned = await this.issueRepository.totalCount({ status: "Unassigned" });
+
+        if (!All || !Resolved || !InProgress || !NotStarted || !Unassigned) {
+            throw new Error("Failed to count invoice");
+        }
+
+        return { All, Resolved, InProgress, NotStarted, Unassigned };
+    }
+
+    async getAverageDurationInHours() {
+        const issues = await this.issueRepository.averageResolutionTime()
+
+        const durationsInHours = issues.map(issue => {
+            const created = new Date(issue.createdAt);
+            const updated = new Date(issue.updatedAt);
+            const diffMs = updated.getTime() - created.getTime();
+            return diffMs / (1000 * 60 * 60);
+        });
+
+        const total = durationsInHours.reduce((acc, val) => acc + val, 0);
+        const average = durationsInHours.length ? total / durationsInHours.length : 0;
+
+        console.log(`Average time between createdAt and updatedAt: ${average.toFixed(2)} hours`);
+        return average.toFixed(2);
+    }
+
+    async getStatusPercentages() {
+        const totalCount = await this.issueRepository.totalCount();
+
+        if (totalCount === 0) {
+            return {};
+        }
+
+        const groupedCounts = await this.issueRepository.groupedCounts("status", { status: true, });
+
+        const percentages = groupedCounts.map(group => ({
+            status: group.status,
+            count: group._count.status,
+            percentage: ((group._count.status / totalCount) * 100).toFixed(2),
+        }));
+
+        return percentages;
+    }
+
+    async getCategoriesPercentages() {
+        const totalCount = await this.issueRepository.totalCount();
+
+        if (totalCount === 0) {
+            return {};
+        }
+
+        const groupedCounts = await this.issueRepository.groupedCounts("category", { category: true, });
+
+        const percentages = groupedCounts.map(group => ({
+            category: group.category,
+            count: group._count.category,
+            percentage: ((group._count.category / totalCount) * 100).toFixed(2),
+        }));
+
+        return percentages;
+    }
+
+    async getAssigneePercentages() {
+        const totalCount = await this.issueRepository.totalCount();
+
+        if (totalCount === 0) {
+            return [];
+        }
+
+        const groupedCounts = await this.issueRepository.groupedCounts("adminId", { adminId: true, });
+
+        const adminIds = groupedCounts.map(g => g.adminId).filter(id => id !== null);
+
+        const assignees = await this.issueRepository.tenants(adminIds);
+
+        const nameMap = Object.fromEntries(
+            assignees.map(user => [user.assignedTo.id, user.assignedTo.fullName])
+        );
+
+        const percentages = groupedCounts.map(group => {
+            const fullName = group.adminId ? nameMap[group.adminId] : 'Unassigned';
+
+            return {
+                assignedTo: fullName,
+                count: group._count.adminId,
+                percentage: ((group._count.adminId / totalCount) * 100).toFixed(2),
+            };
+        });
+
+        return percentages;
+    }
+
+
+    async getCreatedAtPercentages() {
+        const totalCount = await this.issueRepository.totalCount();
+
+        if (totalCount === 0) {
+            return {};
+        }
+
+        const groupedCounts = await this.issueRepository.groupedCounts("createdAt", { createdAt: true, });
+
+        const percentages = groupedCounts.map(group => ({
+            createdAt: group.createdAt,
+            count: group._count.createdAt,
+            percentage: ((group._count.createdAt / totalCount) * 100).toFixed(2),
+        }));
+
+        return percentages;
+    }
+
 }
 
 export default IssueService;
