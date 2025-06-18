@@ -6,14 +6,19 @@ class Issue {
         tenantId,
         adminId,
         title,
-        tenantStaffId,
+        adminLoggedById,
         status,
         resolutionDeadline,
         attachments,
         description,
         resolutionDescription,
         createdAt,
-        updatedAt
+        updatedAt,
+        issueId,
+        action,
+        reason,
+        details,
+        comment
     }) {
         this.id = id;
         this.category = category;
@@ -21,7 +26,7 @@ class Issue {
         this.tenantId = tenantId;
         this.adminId = adminId;
         this.title = title;
-        this.tenantStaffId = tenantStaffId;
+        this.adminLoggedById = adminLoggedById;
         this.status = status;
         this.resolutionDeadline = resolutionDeadline;
         this.attachments = attachments;
@@ -29,6 +34,11 @@ class Issue {
         this.resolutionDescription = resolutionDescription;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.issueId = issueId;
+        this.details = details;
+        this.reason = reason;
+        this.action = action;
+        this.comment = comment;
     }
 
     get createIssue() {
@@ -40,12 +50,28 @@ class Issue {
             priority: this.priority,
             adminId: this.adminId,
             resolutionDeadline: this.resolutionDeadline,
-            attachments: [{
-                attachment: "url"
-            }],
-            tenantStaffId: this.tenantStaffId,
+            attachments: this.attachments,
+            adminLoggedById: this.adminLoggedById,
             status: this.adminId ? "Not Started" : "Unassigned",
         };
+    }
+
+    get createIssueComment() {
+        return {
+            issueId: this.issueId,
+            comment: this.comment,
+            adminId: this.adminId
+        };
+    }
+
+    get createLog() {
+        return {
+            issueId: this.issueId,
+            action: this.action,
+            adminId: this.adminId,
+            reason: this.reason,
+            details: this.details
+        }
     }
 
 }

@@ -1,3 +1,4 @@
+import MailService from '../../../utilities/nodemailer.js';
 import Tenant from '../domain/tenant.js';
 
 class TenantService {
@@ -106,6 +107,28 @@ class TenantService {
         return totalTenants;
     }
 
+    async contactTenantByEmail(data) {
+        const tenant = await this.tenantRepository.findFirst({ id: data.id });
+
+        if (!tenant) {
+            throw new Error("Tenant not found.");
+        }
+
+        const attachments = data.attachments
+            ? [{
+                filename: data.attachments.originalname,
+                content: data.attachments.buffer,
+                contentType: data.attachments.mimetype,
+            }]
+            : []
+
+        const sendMail = MailService.sendMail(tenant.email, data.header, data.body, null, attachments)
+        if (!sendMail) {
+            throw new Error("Failed to send mail");
+        }
+
+        return true;
+    }
 }
 
 export default TenantService;

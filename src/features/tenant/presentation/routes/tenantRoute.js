@@ -1,6 +1,7 @@
 import express from "express";
 import TenantDto from "../dto/tenantDto.js";
 import TenantController from "../controllers/tenantController.js";
+import multer from "multer";
 
 /**
  * @swagger
@@ -143,12 +144,37 @@ import TenantController from "../controllers/tenantController.js";
  *         - location
  *         - leadSource
  *         - stage
+ *     ContactTenantDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - header
+ *         - body
+ *         - attachment
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           description: Unique ID of the tenant to contact
+ *           example: "e95fbc1e-8833-4c44-a4d5-2fdc98a0c455"
+ *         header:
+ *           type: string
+ *           description: Subject or header of the message
+ *           example: "Request for additional services"
+ *         body:
+ *           type: string
+ *           description: Message body to be sent to the tenant
+ *           example: "We would like to discuss additional features for our current plan."
+ *         attachment:
+ *           type: string
+ *           format: binary
  */
 
 class TenantRoutes {
     constructor() {
         this.controller = new TenantController();
         this.router = express.Router();
+        this.memoryUpload = multer({ storage: multer.memoryStorage() });
         this.initializeRoutes();
     }
 
@@ -222,87 +248,25 @@ class TenantRoutes {
          */
         this.router.get("/count", this.controller.countAllTenant);
 
-
-        // /**
-        //  * @swagger
-        //  * /api/v1/tenant/createtenant:
-        //  *   post:
-        //  *     summary: Create a new tenant
-        //  *     tags: [Tenant]
-        //  *     requestBody:
-        //  *       required: true
-        //  *       content:
-        //  *         application/json:
-        //  *           schema:
-        //  *             $ref: '#/components/schemas/CreateTenantDto'
-        //  *     responses:
-        //  *       201:
-        //  *         description: Tenant created successfully
-        //  *       400:
-        //  *         description: Validation error
-        //  */
-        // this.router.post("/createtenant", TenantDto.createTenantDto, this.controller.createTenant);
-
-        // /**
-        //  * @swagger
-        //  * /api/v1/tenant/createtenantstaff:
-        //  *   post:
-        //  *     summary: Create a new tenant staff
-        //  *     tags: [Tenant]
-        //  *     requestBody:
-        //  *       required: true
-        //  *       content:
-        //  *         application/json:
-        //  *           schema:
-        //  *             $ref: '#/components/schemas/CreateTenantStaffDto'
-        //  *     responses:
-        //  *       201:
-        //  *         description: Tenant staff created successfully
-        //  *       400:
-        //  *         description: Validation error
-        //  */
-        // this.router.post("/createtenantstaff", TenantDto.createTenantStaffDto, this.controller.createTenantStaff);
-
-        // /**
-        //  * @swagger
-        //  * /api/v1/tenant/staffsignin:
-        //  *   post:
-        //  *     summary: Staff sign in
-        //  *     tags: [Tenant]
-        //  *     requestBody:
-        //  *       required: true
-        //  *       content:
-        //  *         application/json:
-        //  *           schema:
-        //  *             $ref: '#/components/schemas/StaffSigninDto'
-        //  *     responses:
-        //  *       200:
-        //  *         description: Sign-in successful
-        //  *       401:
-        //  *         description: Invalid credentials
-        //  */
-        // this.router.post("/staffsignin", TenantDto.staffSigninDto, this.controller.staffSignin);
-
-        // /**
-        //  * @swagger
-        //  * /api/v1/tenant/getstaff/{id}:
-        //  *   get:
-        //  *     summary: gets single staff
-        //  *     tags: [staff]
-        //  *     parameters:
-        //  *       - in: path
-        //  *         name: id
-        //  *         required: true
-        //  *         schema:
-        //  *           type: string
-        //  *         description: The ID of the staff
-        //  *     responses:
-        //  *       200:
-        //  *         description: staff fetched successfully
-        //  *       400:
-        //  *         description: Validation error
-        //  */
-        // this.router.get("/getstaff/:id", TenantDto.getSingleStaffDto, this.controller.getSingleStaff);
+        /**
+         * @swagger
+         * /api/v1/tenant/contact:
+         *   post:
+         *     summary: Contact tenant by email
+         *     tags: [Tenant]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         multipart/form-data:
+         *           schema:
+         *             $ref: '#/components/schemas/ContactTenantDto'
+         *     responses:
+         *       201:
+         *         description: Tenant contacted successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.post("/contact", this.memoryUpload.single("attachment"), TenantDto.contactTenantDto, this.controller.contactTenantByEmail);
 
     }
 

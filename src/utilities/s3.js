@@ -1,4 +1,4 @@
-import AWS from "aws-sdk";
+import { S3Client, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import multer from "multer";
 import multerS3 from "multer-s3";
 
@@ -6,23 +6,25 @@ class S3Service {
   constructor() {
     this.bucketName = process.env.S3_BUCKET_NAME;
 
-    this.s3 = new AWS.S3({
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    this.s3 = new S3Client({
+      region: process.env.AWS_REGION,
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      },
       endpoint: process.env.AWS_ENDPOINT,
-      s3ForcePathStyle: true,
+      forcePathStyle: true,
     });
 
     this.upload = multer({
       storage: multerS3({
         s3: this.s3,
         bucket: this.bucketName,
-        acl: "public-read",
         contentType: multerS3.AUTO_CONTENT_TYPE,
-        key: function (req, file, cb) {
-          cb(null, Date.now().toString() + "-" + file.originalname);
+        key: (req, file, cb) => {
+          cb(null, `${Date.now()}-${file.originalname}`);
         },
-      }),
+      })
     });
   }
 
@@ -30,28 +32,23 @@ class S3Service {
     return this.upload;
   }
 
-  getKey(key) {
-    const downloadParams = {
+  async getObjectStream(key) {
+    const command = new GetObjectCommand({
       Bucket: this.bucketName,
       Key: key,
-    };
-    return this.s3.getObject(downloadParams).createReadStream();
+    });
+
+    const { Body } = await this.s3.send(command);
+    return Body;
   }
 
-  deleteImage(key) {
-    this.s3.deleteObject(
-      {
-        Bucket: this.bucketName,
-        Key: key,
-      },
-      (err, data) => {
-        if (err) {
-          console.error("Error deleting file:", err);
-        } else {
-          console.log("File deleted successfully:", data);
-        }
-      }
-    );
+  async deleteObject(key) {
+    const command = new DeleteObjectCommand({
+      Bucket: this.bucketName,
+      Key: key,
+    });
+
+    await this.s3.send(command);
   }
 }
 

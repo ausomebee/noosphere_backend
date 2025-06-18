@@ -3,7 +3,6 @@ import express from "express";
 import http from "http";
 import cors from "cors";
 import morgan from "morgan";
-import fileUpload from 'express-fileupload';
 import swaggerUi from 'swagger-ui-express';
 import { specs } from './config/swagger.js';
 import errorHandler from "./middleware/error-handler.js";
@@ -56,7 +55,6 @@ class App {
         }));
         this.app.use(express.json({ limit: "50mb" }));
         this.app.use(express.urlencoded({ extended: true, limit: "50mb" }));
-        this.app.use(fileUpload());
     }
 
     initializeSwagger() {

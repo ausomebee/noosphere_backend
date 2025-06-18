@@ -54,14 +54,16 @@ model Admin {
   authQuestion          String?
   auth2FADone           Boolean  @default(false)
 
-  roles        Role           @relation(fields: [roleId], references: [id])
-  pipelines    Pipeline[]
-  departments  Department[]
-  PipelineItem PipelineItem[]
-  Tenant       Tenant[]
-  logs         Logs[]
-  BillingPlan  BillingPlan[]
-  issues       Issue[]
+  roles          Role           @relation(fields: [roleId], references: [id])
+  pipelines      Pipeline[]
+  departments    Department[]
+  PipelineItem   PipelineItem[]
+  Tenant         Tenant[]
+  logs           Logs[]
+  BillingPlan    BillingPlan[]
+  IssueComment   IssueComment[]
+  assignedIssues Issue[]        @relation("AssignedAdmin")
+  loggedIssues   Issue[]        @relation("LoggedByAdmin")
 }
 
 model Auth {
@@ -153,7 +155,6 @@ model TenantStaff {
   roles        Role           @relation(fields: [roleId], references: [id])
   tenant       Tenant         @relation(fields: [tenantId], references: [id])
   PipelineItem PipelineItem[]
-  issues       Issue[]
 }
 
 model Client {
@@ -462,7 +463,7 @@ model Issue {
   tenantId              String
   adminId               String
   title                 String
-  tenantStaffId         String?
+  adminLoggedById       String?
   status                String
   resolutionDeadline    DateTime
   attachments           Json
@@ -471,19 +472,22 @@ model Issue {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
-  assignedTo Admin          @relation(fields: [adminId], references: [id])
-  tenant     Tenant         @relation(fields: [tenantId], references: [id])
-  loggedBy   TenantStaff?    @relation(fields: [tenantStaffId], references: [id])
-  comments   IssueComment[]
-  Logs       Logs[]
+  tenant     Tenant @relation(fields: [tenantId], references: [id])
+  assignedTo Admin  @relation("AssignedAdmin", fields: [adminId], references: [id])
+  loggedBy   Admin? @relation("LoggedByAdmin", fields: [adminLoggedById], references: [id])
+
+  comments IssueComment[]
+  Logs     Logs[]
 }
 
 model IssueComment {
   id        String   @id @default(uuid())
   issueId   String
   comment   String
+  adminId   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  issue Issue @relation(fields: [issueId], references: [id])
+  issue     Issue @relation(fields: [issueId], references: [id])
+  commentBy Admin @relation(fields: [adminId], references: [id])
 }
