@@ -466,7 +466,7 @@ model Issue {
   adminLoggedById       String?
   status                String
   resolutionDeadline    DateTime
-  attachments           Json
+  attachments           Json?
   description           String
   resolutionDescription String?
   createdAt             DateTime @default(now())
