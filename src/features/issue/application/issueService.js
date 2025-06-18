@@ -39,7 +39,11 @@ class IssueService {
             throw new Error("Failed to count invoice");
         }
 
-        return { All, Resolved, InProgress, NotStarted, Unassigned };
+        const sorted = Object.fromEntries(
+            Object.entries({ All, Resolved, InProgress, NotStarted, Unassigned }).sort(([, a], [, b]) => b._count._all - a._count._all)
+        );
+
+        return sorted;
     }
 
     async getAverageDurationInHours() {
@@ -74,7 +78,9 @@ class IssueService {
             percentage: ((group._count.status / totalCount) * 100).toFixed(2),
         }));
 
-        return percentages;
+        const sorted = percentages.sort((x, y) => parseFloat(y.percentage) - parseFloat(x.percentage));
+
+        return sorted;
     }
 
     async getCategoriesPercentages() {
@@ -92,7 +98,9 @@ class IssueService {
             percentage: ((group._count.category / totalCount) * 100).toFixed(2),
         }));
 
-        return percentages;
+        const sorted = percentages.sort((x, y) => parseFloat(y.percentage) - parseFloat(x.percentage));
+
+        return sorted;
     }
 
     async getAssigneePercentages() {
@@ -122,9 +130,10 @@ class IssueService {
             };
         });
 
-        return percentages;
-    }
+        const sorted = percentages.sort((x, y) => parseFloat(y.percentage) - parseFloat(x.percentage));
 
+        return sorted;
+    }
 
     async getCreatedAtPercentages() {
         const totalCount = await this.issueRepository.totalCount();
@@ -141,7 +150,9 @@ class IssueService {
             percentage: ((group._count.createdAt / totalCount) * 100).toFixed(2),
         }));
 
-        return percentages;
+        const sorted = percentages.sort((x, y) => parseFloat(y.percentage) - parseFloat(x.percentage));
+
+        return sorted;
     }
 
 }
