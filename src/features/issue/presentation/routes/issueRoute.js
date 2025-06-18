@@ -209,6 +209,27 @@ class IssueRoutes {
         */
         this.router.get("/percent/priority", this.controller.getPriorityPercentages);
 
+        /**
+        * @swagger
+        * /api/v1/issue/status/{status}:
+        *   get:
+        *     summary: gets issues by status
+        *     tags: [Issue]
+        *     parameters:
+        *       - in: path
+        *         name: status
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The status of the issue
+        *     responses:
+        *       200:
+        *         description: issue fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/status/:status", IssueDto.checkStatusDto, this.controller.getIssueByStatus);
+
     }
 
     getRouter() {

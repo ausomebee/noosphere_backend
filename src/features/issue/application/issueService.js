@@ -174,6 +174,18 @@ class IssueService {
 
         return sorted;
     }
+
+    async getIssueByStatus(status) {
+        const query = status === "all" ? {} : { status }
+        const issue = await this.issueRepository.findAllAndPopulate(query);
+
+        if (!issue) {
+            throw new Error("Failed to fetch issue");
+        }
+
+        return issue;
+    }
+
 }
 
 export default IssueService;
