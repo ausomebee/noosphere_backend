@@ -123,6 +123,21 @@ class IssueController {
             data: issue
         });
     });
+
+    getPriorityPercentages = expressAsyncHandler(async (req, res) => {
+        const issue = await this.service.getPriorityPercentages();
+
+        if (!issue) {
+            res.status(500).json({ message: 'Failed to get issue priority percentage' });
+        }
+
+        return res.status(201).json({
+            message: "Issue priority percentage fetched successfully",
+            status: 'ok',
+            data: issue
+        });
+    });
+
 }
 
 export default IssueController;

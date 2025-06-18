@@ -155,6 +155,25 @@ class IssueService {
         return sorted;
     }
 
+    async getPriorityPercentages() {
+        const totalCount = await this.issueRepository.totalCount();
+
+        if (totalCount === 0) {
+            return {};
+        }
+
+        const groupedCounts = await this.issueRepository.groupedCounts("priority", { priority: true, });
+
+        const percentages = groupedCounts.map(group => ({
+            priority: group.priority,
+            count: group._count.priority,
+            percentage: ((group._count.priority / totalCount) * 100).toFixed(2),
+        }));
+
+        const sorted = percentages.sort((x, y) => parseFloat(y.percentage) - parseFloat(x.percentage));
+
+        return sorted;
+    }
 }
 
 export default IssueService;
