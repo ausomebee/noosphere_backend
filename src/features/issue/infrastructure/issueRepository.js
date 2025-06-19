@@ -49,8 +49,24 @@ class IssueRepository extends BaseRepository {
                         fullName: true
                     }
                 },
-                comments: true,
-                Logs: true
+                comments: {
+                    select: {
+                        commentBy: {
+                            select: {
+                                fullName: true
+                            }
+                        }
+                    }
+                },
+                Logs: {
+                    select: {
+                        admin: {
+                            select: {
+                                fullName: true
+                            }
+                        }
+                    }
+                },
             }
         });
     }

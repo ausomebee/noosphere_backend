@@ -461,7 +461,7 @@ model Issue {
   category              String
   priority              String
   tenantId              String
-  adminId               String
+  adminId               String?
   title                 String
   adminLoggedById       String?
   status                String
@@ -473,7 +473,7 @@ model Issue {
   updatedAt             DateTime @updatedAt
 
   tenant     Tenant @relation(fields: [tenantId], references: [id])
-  assignedTo Admin  @relation("AssignedAdmin", fields: [adminId], references: [id])
+  assignedTo Admin?  @relation("AssignedAdmin", fields: [adminId], references: [id])
   loggedBy   Admin? @relation("LoggedByAdmin", fields: [adminLoggedById], references: [id])
 
   comments IssueComment[]
