@@ -162,6 +162,127 @@ class TenantDto {
         Validator.validateRequest(req, next, schema);
     };
 
+    static createStaffDto = (req, res, next) => {
+        const schema = Joi.object({
+            fullName: Joi.string()
+                .required()
+                .min(3)
+                .max(20)
+                .trim()
+                .messages({
+                    "string.empty": "First name is required",
+                    "string.min": "First name must be at least 3 characters",
+                    "string.max": "First name must not exceed 20 characters",
+                }),
+            email: Joi.string()
+                .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
+                .required()
+                .trim()
+                .lowercase()
+                .messages({
+                    "string.email": "Email must be a valid email",
+                    "string.empty": "Email is required",
+                    "any.required": "Email is a required field",
+                }),
+            phoneNumber: Joi.string()
+                .required()
+                .trim()
+                .min(10)
+                .max(15)
+                .messages({
+                    "string.empty": "Phone number is required",
+                    "string.min": "Phone number must be at least 10 characters long",
+                    "string.max": "Phone number must be at most 15 characters long"
+                }),
+            roleId: Joi.string().uuid().required().messages({
+                "string.empty": "role ID is required",
+                "string.guid": "role ID must be a valid UUID",
+            }),
+            tenantId: Joi.string().uuid().required().messages({
+                "string.empty": "tenant ID is required",
+                "string.guid": "tenant ID must be a valid UUID",
+            }),
+            stage: Joi.string().trim().required()
+
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateStaffPasswordDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID",
+            }),
+            password: Joi.string()
+                .regex(strongPasswordRegex)
+                .trim().required()
+                .messages({
+                    "string.pattern.base": stringPasswordError,
+                }),
+            currentPassword: Joi.string()
+                .regex(strongPasswordRegex)
+                .trim().required()
+                .messages({
+                    "string.pattern.base": stringPasswordError,
+                })
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static staffSigninDto = (req, res, next) => {
+        const schema = Joi.object({
+            email: Joi.string()
+                .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
+                .required()
+                .trim()
+                .lowercase()
+                .messages({
+                    "string.email": "Email must be a valid email",
+                    "string.empty": "Email is required",
+                    "any.required": "Email is a required field",
+                }),
+            password: Joi.string()
+                .regex(strongPasswordRegex)
+                .required()
+                .messages({
+                    "string.empty": "Password is required",
+                    "string.pattern.base": stringPasswordError,
+                })
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static tenantAdminChoicesDto = (req, res, next) => {
+        const schema = Joi.object({
+            Authenticator2FA: Joi.boolean().required(),
+            securityQuestion: Joi.boolean().required(),
+            setForAll: Joi.boolean().required()
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static forgotPasswordDto = (req, res, next) => {
+        const schema = Joi.object({
+            email: Joi.string()
+                .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
+                .required()
+                .trim()
+                .lowercase()
+                .messages({
+                    "string.email": "Email must be a valid email",
+                    "string.empty": "Email is required",
+                    "any.required": "Email is a required field",
+                }),
+        });
+
+        Validator.validateRequest(req, next, schema, req.params);
+    };
+
 }
 
 export default TenantDto;

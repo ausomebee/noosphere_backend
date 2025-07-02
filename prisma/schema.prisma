@@ -151,8 +151,11 @@ model TenantStaff {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   password    String?
+  authType              String?
+  authQuestion          String?
+  auth2FADone           Boolean  @default(false)
 
-  roles        Role           @relation(fields: [roleId], references: [id])
+  role        Role           @relation(fields: [roleId], references: [id])
   tenant       Tenant         @relation(fields: [tenantId], references: [id])
   PipelineItem PipelineItem[]
 }
@@ -341,6 +344,15 @@ model FeatureGroup {
 }
 
 model SuperAdminChoices {
+  id               String   @id @default(uuid())
+  Authenticator2FA Boolean
+  securityQuestion Boolean
+  setForAll        Boolean
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model TenantAdminChoices {
   id               String   @id @default(uuid())
   Authenticator2FA Boolean
   securityQuestion Boolean

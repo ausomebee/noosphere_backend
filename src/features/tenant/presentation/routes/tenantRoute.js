@@ -168,6 +168,90 @@ import multer from "multer";
  *         attachment:
  *           type: string
  *           format: binary
+ *     CreateStaffDto:
+ *       type: object
+ *       required:
+ *         - fullName
+ *         - email
+ *         - phoneNumber
+ *         - roleId
+ *         - tenantId
+ *         - stage
+ *       properties:
+ *         fullName:
+ *           type: string
+ *           minLength: 3
+ *           maxLength: 20
+ *           example: "John Doe"
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: "john@example.com"
+ *         phoneNumber:
+ *           type: string
+ *           minLength: 10
+ *           maxLength: 15
+ *           example: "08012345678"
+ *         roleId:
+ *           type: string
+ *           format: uuid
+ *           example: "a1b2c3d4-e5f6-7g8h-9i0j-k1l2m3n4o5p6"
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *           example: "p0o9i8u7-y6t5-r4e3-w2q1-1234567890ab"
+ *         stage:
+ *           type: string
+ *           example: "ONBOARDING"
+ *     UpdateStaffPasswordDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - password
+ *         - currentPassword
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "7f0e1c72-abb9-4c43-91f0-df1ed39f2eaa"
+ *         password:
+ *           type: string
+ *           format: password
+ *           example: "StrongPassw0rd!"
+ *         currentPassword:
+ *           type: string
+ *           format: password
+ *           example: "CurrentPassw0rd!"
+ *     StaffSigninDto:
+ *       type: object
+ *       required:
+ *         - email
+ *         - password
+ *       properties:
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: "admin@noosphere.com"
+ *         password:
+ *           type: string
+ *           format: password
+ *           example: "LoginStrongP@ss1"
+ *     TenantAdminChoicesDto:
+ *       type: object
+ *       required:
+ *         - Authenticator2FA
+ *         - securityQuestion
+ *         - setForAll
+ *       properties:
+ *         Authenticator2FA:
+ *           type: boolean
+ *           example: true
+ *         securityQuestion:
+ *           type: boolean
+ *           example: false
+ *         setForAll:
+ *           type: boolean
+ *           example: true
  */
 
 class TenantRoutes {
@@ -267,6 +351,132 @@ class TenantRoutes {
          *         description: Bad request
          */
         this.router.post("/contact", this.memoryUpload.single("attachment"), TenantDto.contactTenantDto, this.controller.contactTenantByEmail);
+
+        /**
+         * @swagger
+         * /api/v1/tenant/createstaff:
+         *   post:
+         *     summary: create a new Tenant
+         *     tags: [Tenant]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/CreateStaffDto'
+         *     responses:
+         *       201:
+         *         description: super Admin created successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/createstaff", TenantDto.createStaffDto, this.controller.createTenantStaff);
+
+        /**
+        * @swagger
+        * /api/v1/tenant/signin:
+        *   post:
+        *     summary: tenant login
+        *     tags: [Tenant]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/StaffSigninDto'
+        *     responses:
+        *       201:
+        *         description: Tenant login successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.post("/signin", TenantDto.staffSigninDto, this.controller.tenantStaffLogin);
+
+        /**
+        * @swagger
+        * /api/v1/tenant/setpassword:
+        *   patch:
+        *     summary: set a new tenant password
+        *     tags: [Tenant]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/UpdateStaffPasswordDto'
+        *     responses:
+        *       201:
+        *         description: password updated successfully successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.patch("/setpassword", TenantDto.updateStaffPasswordDto, this.controller.updateStaff);
+
+        /**
+        * @swagger
+        * /api/v1/tenant/tenantadminchoices:
+        *   post:
+        *     summary: set tenant admin choices
+        *     tags: [choice]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/TenantAdminChoicesDto'
+        *     responses:
+        *       201:
+        *         description: Choice created successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.post("/tenantadminchoices", TenantDto.tenantAdminChoicesDto, this.controller.tenantAdminChoices);
+
+        /**
+         * @swagger
+         * /api/v1/tenant/tenantadminchoices:
+         *   get:
+         *     summary: Retrieve tenantadmin choices
+         *     tags: [choice]
+         *     responses:
+         *       200:
+         *         description: Choices retrieved successfully
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 Authenticator2FA:
+         *                   type: boolean
+         *                 securityQuestion:
+         *                   type: boolean
+         *                 setForAll:
+         *                   type: boolean
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get("/tenantadminchoices", this.controller.getChoices);
+
+        /**
+         * @swagger
+         * /api/v1/tenant/forgotpassword/{email}:
+         *   get:
+         *     summary: send forgot password mail
+         *     tags: [Tenant]
+         *     parameters:
+         *       - in: path
+         *         name: email
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The email of the staff to send the reset link to
+         *     responses:
+         *       200:
+         *         description: email sent successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/forgotpassword/:email", TenantDto.forgotPasswordDto, this.controller.forgotPassword);
 
     }
 

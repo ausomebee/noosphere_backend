@@ -146,8 +146,6 @@ class AdminService {
         const generatedAdminPass = this.generateCode.generateStrongPassword()
         const hashedAdminPass = await argon2.hash(generatedAdminPass)
 
-        // const newAdmin = await this.repository.create({ ...data, password: hashedPass, administratorPassword: hashedAdminPass });
-
         const attachments = [
             {
                 filename: "logo.png",
