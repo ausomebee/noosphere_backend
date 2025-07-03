@@ -39,7 +39,8 @@ class Tenant {
             phoneNumber: this.phoneNumber,
             roleId: this.roleId,
             tenantId: this.tenantId,
-            stage: this.stage
+            stage: this.stage,
+            password: this.password
         };
     }
 
