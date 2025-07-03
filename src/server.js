@@ -32,7 +32,7 @@ class App {
         this.server = http.createServer(this.app);
 
         this.prisma = prismaService;
-        this.port = process.env.PORT || 5000;
+        this.port = process.env.PORT || 5001;
 
         this.initializeDatabase();
         this.initializeMiddlewares();
@@ -49,7 +49,7 @@ class App {
         new PassportUtil(this.app)
         this.app.use(morgan("dev"));
         this.app.use(cors({
-            origin: ["http://127.0.0.1:5173", "http://localhost:5173", "http://127.0.0.1:5174", "http://localhost:5174", "http://127.0.0.1:5175", "http://localhost:5175", "http://ec2-54-193-53-214.us-west-1.compute.amazonaws.com:5000/", "http://localhost:5000/"],
+            origin: ["http://127.0.0.1:5173", "http://localhost:5173", "http://127.0.0.1:5174", "http://localhost:5174", "http://127.0.0.1:5175", "http://localhost:5175", "http://ec2-54-193-53-214.us-west-1.compute.amazonaws.com:5000/", "http://localhost:5001/"],
             methods: "GET, POST, PATCH, DELETE, PUT",
             credentials: true,
         }));

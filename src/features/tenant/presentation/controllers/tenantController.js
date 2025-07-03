@@ -112,7 +112,7 @@ class TenantController {
     });
 
     createTenantStaff = expressAsyncHandler(async (req, res) => {
-        const newStaff = await service.createTenantStaff(req.body);
+        const newStaff = await this.service.createTenantStaff(req.body);
 
         if (!newStaff) {
             return res.status(500).json({ message: 'Failed to create tenant staff.' });
@@ -126,7 +126,7 @@ class TenantController {
     });
 
     tenantStaffLogin = expressAsyncHandler(async (req, res) => {
-        const staff = await service.tenantStaffLogin(req.body);
+        const staff = await this.service.tenantStaffLogin(req.body);
 
         if (!staff) {
             return res.status(500).json({ message: 'Failed to login tenant staff.' });
@@ -140,7 +140,7 @@ class TenantController {
     });
 
     tenantAdminChoices = expressAsyncHandler(async (req, res) => {
-        const choice = await service.tenantAdminChoices(req.body);
+        const choice = await this.service.tenantAdminChoices(req.body);
 
         if (!choice) {
             return res.status(500).json({ message: 'Failed to create tenant admin choices.' });
@@ -154,7 +154,7 @@ class TenantController {
     });
 
     getChoices = expressAsyncHandler(async (req, res) => {
-        const choice = await service.getChoices();
+        const choice = await this.service.getChoices();
 
         if (!choice) {
             return res.status(500).json({ message: 'Failed to get tenant admin choices.' });
@@ -168,7 +168,7 @@ class TenantController {
     });
 
     forgotPassword = expressAsyncHandler(async (req, res) => {
-        const result = await service.forgotPassword(req.body);
+        const result = await this.service.forgotPassword(req.body);
 
         if (!result) {
             return res.status(500).json({ message: 'Failed to send mail.' });
@@ -182,7 +182,7 @@ class TenantController {
     });
 
     updateStaff = expressAsyncHandler(async (req, res) => {
-        const updated = await service.updateStaff(req.body);
+        const updated = await this.service.updateStaff(req.body);
 
         if (!updated) {
             return res.status(500).json({ message: 'Failed to update staff.' });
