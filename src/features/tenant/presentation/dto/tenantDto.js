@@ -221,12 +221,6 @@ class TenantDto {
                 .messages({
                     "string.pattern.base": stringPasswordError,
                 }),
-            currentPassword: Joi.string()
-                .regex(strongPasswordRegex)
-                .trim().required()
-                .messages({
-                    "string.pattern.base": stringPasswordError,
-                })
         });
 
         Validator.validateRequest(req, next, schema);

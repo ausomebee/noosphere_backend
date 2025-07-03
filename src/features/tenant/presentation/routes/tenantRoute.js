@@ -208,7 +208,6 @@ import multer from "multer";
  *       required:
  *         - id
  *         - password
- *         - currentPassword
  *       properties:
  *         id:
  *           type: string
@@ -218,10 +217,6 @@ import multer from "multer";
  *           type: string
  *           format: password
  *           example: "StrongPassw0rd!"
- *         currentPassword:
- *           type: string
- *           format: password
- *           example: "CurrentPassw0rd!"
  *     StaffSigninDto:
  *       type: object
  *       required:
