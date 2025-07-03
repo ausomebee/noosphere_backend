@@ -210,6 +210,10 @@ class TenantService {
             throw new Error("Staff not found.");
         }
 
+        if (!tenantStaff.password) {
+            throw new Error("create your password.");
+        }
+
         const isPasswordValid = await argon2.verify(tenantStaff.password, data.password);
 
         if (!isPasswordValid) {
