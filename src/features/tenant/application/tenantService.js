@@ -142,10 +142,8 @@ class TenantService {
         }
 
         const tenantStaff = await this.staffRepository.findFirst({
-            where: {
-                email: data.email,
-                tenantId: data.tenantId
-            }
+            email: data.email,
+            tenantId: data.tenantId
         });
 
         if (tenantStaff) {
@@ -155,12 +153,6 @@ class TenantService {
         const generatedPass = this.generateCode.generateStrongPassword()
         const hashedPass = await argon2.hash(generatedPass)
         const createData = new Tenant({ ...data, password: hashedPass });
-
-        const newStaff = await this.staffRepository.create(createData.createTenantStaff);
-
-        if (!newStaff) {
-            throw new Error("Failed to create staff");
-        }
 
         const attachments = [
             {
@@ -176,30 +168,36 @@ class TenantService {
                 contentType: "mailHeader/png",
             },
         ]
-
+        
         const html = `
         <body style="margin: 0%; padding: 0%; box-sizing: border-box; background-color: white;">
-            <main>
-                <img src="cid:unique2@image" alt="" style="width: 100%; height: 70px; object-fit: cover;">
-                <div
-                    style="font-family: Arial, Helvetica, sans-serif; max-width: 820px; margin: auto; padding: 20px; padding-bottom: 50px;">
-                    <img src="cid:unique@image" alt="" style="width: 230px; margin-top: 50px;">
-                    <p class="head" style="font-size: 26px; font-weight: 700; margin-top: 30px;">Welcome to NooSphere</p>
-                    <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">You've been invited to
-                        join the NooSphere Control Platform as the Administrator. Click the button below to log in using your
-                        administrator credentials:<br><br>Email: ${data.email}<br>Password: ${generatedPass}</p>
-                    <a href="http://localhost:5173/" style="background-color: black; border-radius: 9999px; padding-top: 20px; padding-bottom: 20px; color: white; text-decoration: none; font-weight: 600; font-size: 18px; width: 90%; text-align: center; display: block; margin: auto;">Login as Administrator</a>
-                        <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">Once you're in, you'll be prompted to:<br><br>1. Set a new password<br>2. Configure 2-factor authentication<br>3. Set platform-wide preferences for your team<br><br>We recommend doing these right away to secure your account and prepare the system for other users.<br><br>Welcome aboard,<br>— The NooSphere Team</p>
-                        </div>
-                        </main>
+        <main>
+        <img src="cid:unique2@image" alt="" style="width: 100%; height: 70px; object-fit: cover;">
+        <div
+        style="font-family: Arial, Helvetica, sans-serif; max-width: 820px; margin: auto; padding: 20px; padding-bottom: 50px;">
+        <img src="cid:unique@image" alt="" style="width: 230px; margin-top: 50px;">
+        <p class="head" style="font-size: 26px; font-weight: 700; margin-top: 30px;">Welcome to NooSphere</p>
+        <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">You've been invited to
+        join the NooSphere Control Platform as the Administrator. Click the button below to log in using your
+        administrator credentials:<br><br>Email: ${data.email}<br>Password: ${generatedPass}</p>
+        <a href="http://localhost:5173/" style="background-color: black; border-radius: 9999px; padding-top: 20px; padding-bottom: 20px; color: white; text-decoration: none; font-weight: 600; font-size: 18px; width: 90%; text-align: center; display: block; margin: auto;">Login as Administrator</a>
+        <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">Once you're in, you'll be prompted to:<br><br>1. Set a new password<br>2. Configure 2-factor authentication<br>3. Set platform-wide preferences for your team<br><br>We recommend doing these right away to secure your account and prepare the system for other users.<br><br>Welcome aboard,<br>— The NooSphere Team</p>
+        </div>
+        </main>
         </body>
         `
         const sendMail = await MailService.sendMail(data.email, "Welcome to Noosphere", null, html, attachments)
-
+        
         if (!sendMail.success) {
             throw new Error("Failed to send mail");
         }
-
+        
+        const newStaff = await this.staffRepository.create(createData.createTenantStaff);
+        
+        if (!newStaff) {
+            throw new Error("Failed to create staff");
+        }
+        
         return newStaff;
     }
 
