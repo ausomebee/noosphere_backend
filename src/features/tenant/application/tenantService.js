@@ -205,10 +205,7 @@ class TenantService {
 
     async tenantStaffLogin(data) {
         const tenantStaff = await this.staffRepository.findFirst({
-            where: {
-                email: data.email,
-                tenantId: data.tenantId
-            }
+            email: data.email,
         });
 
         if (!tenantStaff) {
@@ -359,7 +356,7 @@ class TenantService {
             active: data.active ?? staff.active,
             isDeleted: data.isDeleted ?? staff.isDeleted,
         });
-  
+
         if (!update) {
             throw new Error("Failed to update admin");
         }
