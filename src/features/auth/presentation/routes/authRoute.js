@@ -263,7 +263,7 @@ class AuthRoutes {
 
         /**
         * @swagger
-        * /api/v1/auth/verifysecretmessage:
+        * /api/v1/auth/tenant/verifysecretmessage:
         *   post:
         *     summary: verify 2FA secret message
         *     description: verifies a user's 2FA secret using their user ID and secret.
