@@ -237,6 +237,7 @@ import multer from "multer";
  *         - Authenticator2FA
  *         - securityQuestion
  *         - setForAll
+ *         - tenantId
  *       properties:
  *         Authenticator2FA:
  *           type: boolean
@@ -247,6 +248,10 @@ import multer from "multer";
  *         setForAll:
  *           type: boolean
  *           example: true
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *           example: "d6c6f7b4-b2f9-4d76-9f9c-9b292d3a1cfa"
  */
 
 class TenantRoutes {
@@ -429,10 +434,18 @@ class TenantRoutes {
 
         /**
          * @swagger
-         * /api/v1/tenant/tenantadminchoices:
+         * /api/v1/tenant/tenantadminchoices/{tenantId}:
          *   get:
-         *     summary: Retrieve tenantadmin choices
+         *     summary: Retrieve tenant admin choices
          *     tags: [choice]
+         *     parameters:
+         *       - in: query
+         *         name: tenantId
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         required: true
+         *         description: The ID of the tenant to fetch choices for
          *     responses:
          *       200:
          *         description: Choices retrieved successfully
@@ -450,7 +463,7 @@ class TenantRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/tenantadminchoices", this.controller.getChoices);
+        this.router.get("/tenantadminchoices/:tenantId", TenantDto.checkIdDto, this.controller.getChoices);
 
         /**
          * @swagger

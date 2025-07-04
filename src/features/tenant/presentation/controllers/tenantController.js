@@ -154,7 +154,7 @@ class TenantController {
     });
 
     getChoices = expressAsyncHandler(async (req, res) => {
-        const choice = await this.service.getChoices();
+        const choice = await this.service.getChoices(req.params.tenantId);
 
         if (!choice) {
             return res.status(500).json({ message: 'Failed to get tenant admin choices.' });
