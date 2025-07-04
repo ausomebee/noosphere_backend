@@ -168,7 +168,7 @@ class TenantService {
                 contentType: "mailHeader/png",
             },
         ]
-        
+
         const html = `
         <body style="margin: 0%; padding: 0%; box-sizing: border-box; background-color: white;">
         <main>
@@ -187,24 +187,22 @@ class TenantService {
         </body>
         `
         const sendMail = await MailService.sendMail(data.email, "Welcome to Noosphere", null, html, attachments)
-        
+
         if (!sendMail.success) {
             throw new Error("Failed to send mail");
         }
-        
+
         const newStaff = await this.staffRepository.create(createData.createTenantStaff);
-        
+
         if (!newStaff) {
             throw new Error("Failed to create staff");
         }
-        
+
         return newStaff;
     }
 
     async tenantStaffLogin(data) {
-        const tenantStaff = await this.staffRepository.staffExistsWithRole({
-            email: data.email,
-        });
+        const tenantStaff = await this.staffRepository.staffExistsWithRole(data.email);
 
         if (!tenantStaff) {
             throw new Error("Staff not found.");
