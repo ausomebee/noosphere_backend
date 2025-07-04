@@ -149,7 +149,7 @@ class TenantController {
         return res.status(200).json({
             message: "Choices saved successfully",
             status: 'ok',
-            data: result
+            data: choice
         });
     });
 
