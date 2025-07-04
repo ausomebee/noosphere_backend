@@ -4,12 +4,21 @@ import AuthRepository from "../infrastructure/authRepository.js";
 import argon2 from "argon2";
 import AdminService from "../../admin/application/adminService.js";
 import TenantService from "../../tenant/application/tenantService.js";
+import prismaService from "../../../config/prisma.js";
+import TenantRepository from "../../tenant/infrastructure/tenantRepository.js";
+import StaffRepository from "../../tenant/infrastructure/staffRepository.js";
 
 class AuthService {
     constructor() {
         this.repository = new AuthRepository();
         this.adminService = new AdminService;
-        this.tenantService = new TenantService();
+        this.prisma = prismaService.getClient();
+        this.tenantRepository = new TenantRepository(this.prisma.tenant);
+        this.staffRepository = new StaffRepository(this.prisma.tenantStaff);
+        this.tenantService = new TenantService({
+            tenantRepository: this.tenantRepository,
+            staffRepository: this.staffRepository
+        });
     }
 
     async generateAuthenticator(data) {
