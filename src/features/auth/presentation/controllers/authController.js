@@ -64,6 +64,64 @@ class AuthController {
             data: auth
         });
     });
+
+    generateTenantAuthenticator = expressAsyncHandler(async (req, res) => {
+        const auth = await this.service.generateTenantAuthenticator(req.params);
+
+        if (!auth) {
+            res.status(500).json({ message: 'Failed to create auth' });
+        }
+
+        return res.status(201).json({
+            message: "auth created successfully",
+            status: 'ok',
+            data: auth
+        });
+    });
+
+    verifyStaffCode = expressAsyncHandler(async (req, res) => {
+        const auth = await this.service.verifyStaffCode(req.body);
+
+        if (!auth) {
+            res.status(500).json({ message: 'Failed to verify auth' });
+        }
+
+        return res.status(201).json({
+            message: "auth verified successfully",
+            status: 'ok',
+            data: auth
+        });
+    });
+
+    createStaffSecreteMessage = expressAsyncHandler(async (req, res) => {
+        const authData = new Auth(req.body);
+        const auth = await this.service.createStaffSecreteMessage(authData.secretPayload);
+
+        if (!auth) {
+            res.status(500).json({ message: 'Failed to create auth' });
+        }
+
+        return res.status(201).json({
+            message: "auth created successfully",
+            status: 'ok',
+            data: auth
+        });
+    });
+
+    verifyStaffSecretMessage = expressAsyncHandler(async (req, res) => {
+        const authData = new Auth(req.body);
+        const auth = await this.service.verifyStaffSecretMessage(authData.secretPayload);
+
+        if (!auth) {
+            res.status(500).json({ message: 'Failed to verify auth' });
+        }
+
+        return res.status(201).json({
+            message: "auth verified successfully",
+            status: 'ok',
+            data: auth
+        });
+    });
 }
 
 export default AuthController;
