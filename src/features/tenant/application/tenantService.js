@@ -202,7 +202,7 @@ class TenantService {
     }
 
     async tenantStaffLogin(data) {
-        const tenantStaff = await this.staffRepository.findFirst({
+        const tenantStaff = await this.staffRepository.staffExistsWithRole({
             email: data.email,
         });
 
