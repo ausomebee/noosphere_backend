@@ -222,11 +222,11 @@ class TenantService {
     }
 
     async tenantAdminChoices(data) {
-        const choiceExists = await this.choiceRepository.findFirst({});
+        const choiceExists = await this.choiceRepository.findFirst({ tenantId: data.tenantId });
 
         if (choiceExists) {
             if (data.setForAll && choiceExists && choiceExists.Authenticator2FA !== data.Authenticator2FA && choiceExists.securityQuestion !== data.securityQuestion) {
-                const reset = this.staffRepository.updateAll({
+                const reset = this.staffRepository.updateAll(data.tenantId, {
                     authType: data.Authenticator2FA ? "AUTHENTICATOR" : "SECRETMESSAGE",
                     authQuestion: null,
                     auth2FADone: false
@@ -265,8 +265,8 @@ class TenantService {
         return newChoice;
     }
 
-    async getChoices() {
-        const choice = await this.choiceRepository.findFirst({});
+    async getChoices(tenantId) {
+        const choice = await this.choiceRepository.findFirst({ tenantId });
 
         if (!choice) {
             throw new Error("choice not found")

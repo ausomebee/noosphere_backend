@@ -24,8 +24,9 @@ class StaffRepository extends BaseRepository {
         });
     }
 
-    async updateAll(data) {
+    async updateAll(tenantId, data) {
         return await this.model.updateMany({
+            where: { tenantId },
             data: { ...data },
         });
     }

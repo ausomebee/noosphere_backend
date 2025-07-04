@@ -254,7 +254,11 @@ class TenantDto {
         const schema = Joi.object({
             Authenticator2FA: Joi.boolean().required(),
             securityQuestion: Joi.boolean().required(),
-            setForAll: Joi.boolean().required()
+            setForAll: Joi.boolean().required(),
+            tenantId: Joi.string().uuid().required().messages({
+                "string.empty": "Tenant ID is required",
+                "string.guid": "Tenant ID must be a valid UUID",
+            }),
         });
 
         Validator.validateRequest(req, next, schema);
@@ -277,6 +281,16 @@ class TenantDto {
         Validator.validateRequest(req, next, schema, req.params);
     };
 
+    static checkIdDto = (req, res, next) => {
+        const schema = Joi.object({
+            tenantId: Joi.string().uuid().required().messages({
+                "string.empty": "tenant ID is required",
+                "string.guid": "tenant ID must be a valid UUID"
+            })
+        });
+
+        Validator.validateRequest(req, next, schema, req.params);
+    };
 }
 
 export default TenantDto;

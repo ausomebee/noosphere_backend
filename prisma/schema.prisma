@@ -136,6 +136,7 @@ model Tenant {
   Invoice         Invoice[]
   PaymentMethod   PaymentMethod[]
   issues          Issue[]
+  tenantAdminChoices TenantAdminChoices?
 }
 
 model TenantStaff {
@@ -354,11 +355,14 @@ model SuperAdminChoices {
 
 model TenantAdminChoices {
   id               String   @id @default(uuid())
+  tenantId         String   @unique
   Authenticator2FA Boolean
   securityQuestion Boolean
   setForAll        Boolean
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
 }
 
 model Payment {
