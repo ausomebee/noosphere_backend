@@ -343,7 +343,7 @@ class TenantService {
 
         const hashedPass = data.password ? await argon2.hash(data.password) : staff.password;
 
-        const update = await this.tenantRepository.update(data.id, {
+        const update = await this.staffRepository.update(data.id, {
             fullName: data.fullName || staff.fullName,
             email: data.email || staff.email,
             stage: data.stage || staff.stage,
