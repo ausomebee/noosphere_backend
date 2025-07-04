@@ -266,7 +266,7 @@ class TenantService {
     }
 
     async getChoices() {
-        const choice = await this.choiceRepository.findOne({});
+        const choice = await this.choiceRepository.findFirst({});
 
         if (!choice) {
             throw new Error("choice not found")
