@@ -122,41 +122,41 @@ model Tenant {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  pipelineItems   PipelineItem[]
-  clientLinks     ClientTenant[]
-  pipelines       Pipeline[]
-  departments     Department[]
-  TenantStaff     TenantStaff[]
-  BillingMetadata BillingMetadata?
-  Subscription    Subscription[]
-  admin           Admin            @relation(fields: [createdBy], references: [id])
-  Payment         Payment[]
-  logs            Logs[]
-  BillingPlan     BillingPlan[]
-  Invoice         Invoice[]
-  PaymentMethod   PaymentMethod[]
-  issues          Issue[]
+  pipelineItems      PipelineItem[]
+  clientLinks        ClientTenant[]
+  pipelines          Pipeline[]
+  departments        Department[]
+  TenantStaff        TenantStaff[]
+  BillingMetadata    BillingMetadata?
+  Subscription       Subscription[]
+  admin              Admin               @relation(fields: [createdBy], references: [id])
+  Payment            Payment[]
+  logs               Logs[]
+  BillingPlan        BillingPlan[]
+  Invoice            Invoice[]
+  PaymentMethod      PaymentMethod[]
+  issues             Issue[]
   tenantAdminChoices TenantAdminChoices?
 }
 
 model TenantStaff {
-  id          String   @id @default(uuid())
-  fullName    String
-  email       String   @unique
-  stage       String
-  roleId      String
-  tenantId    String
-  phoneNumber String   @unique
-  active      Boolean  @default(true)
-  isDeleted   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  password    String?
-  authType              String?
-  authQuestion          String?
-  auth2FADone           Boolean  @default(false)
+  id           String   @id @default(uuid())
+  fullName     String
+  email        String   @unique
+  stage        String
+  roleId       String
+  tenantId     String
+  phoneNumber  String   @unique
+  active       Boolean  @default(true)
+  isDeleted    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  password     String?
+  authType     String?
+  authQuestion String?
+  auth2FADone  Boolean  @default(false)
 
-  role        Role           @relation(fields: [roleId], references: [id])
+  role         Role           @relation(fields: [roleId], references: [id])
   tenant       Tenant         @relation(fields: [tenantId], references: [id])
   PipelineItem PipelineItem[]
 }
@@ -362,7 +362,7 @@ model TenantAdminChoices {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  tenant Tenant @relation(fields: [tenantId], references: [id])
 }
 
 model Payment {
@@ -489,7 +489,7 @@ model Issue {
   updatedAt             DateTime @updatedAt
 
   tenant     Tenant @relation(fields: [tenantId], references: [id])
-  assignedTo Admin?  @relation("AssignedAdmin", fields: [adminId], references: [id])
+  assignedTo Admin? @relation("AssignedAdmin", fields: [adminId], references: [id])
   loggedBy   Admin? @relation("LoggedByAdmin", fields: [adminLoggedById], references: [id])
 
   comments IssueComment[]

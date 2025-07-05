@@ -168,7 +168,7 @@ class TenantController {
     });
 
     forgotPassword = expressAsyncHandler(async (req, res) => {
-        const result = await this.service.forgotPassword(req.body);
+        const result = await this.service.forgotPassword(req.params.email);
 
         if (!result) {
             return res.status(500).json({ message: 'Failed to send mail.' });
