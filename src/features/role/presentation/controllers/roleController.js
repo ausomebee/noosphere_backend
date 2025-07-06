@@ -38,7 +38,7 @@ class RoleController {
 
     createTenantRole = expressAsyncHandler(async (req, res) => {
         const roleData = new Role(req.body);
-        const role = await this.service.createAdminRole(roleData.tenantCreateRole);
+        const role = await this.service.createTenantRole(roleData.tenantCreateRole);
 
         if (!role) {
             res.status(500).json({ message: 'Failed to create role' });

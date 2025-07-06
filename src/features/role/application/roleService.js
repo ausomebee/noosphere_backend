@@ -8,7 +8,7 @@ class RoleService {
     async createAdminRole(data) {
         const roleExist = await this.repository.findFirst({
             where: {
-                OR: [
+                AND: [
                     { name: data.name },
                     { departmentId: data.departmentId }
                 ]
@@ -32,7 +32,7 @@ class RoleService {
     }
 
     async getRoles(data) {
-        const role = await this.repository.findAll({departmentId: data.departmentId});
+        const role = await this.repository.findAll({ departmentId: data.departmentId });
 
         if (!role) {
             throw new Error("Failed to fetch roles");
@@ -43,10 +43,12 @@ class RoleService {
 
     async createTenantRole(data) {
         const roleExist = await this.repository.findFirst({
-            OR: [
-                { name: data.name },
-                { departmentId: data.departmentId },
-            ]
+            where: {
+                AND: [
+                    { name: data.name },
+                    { departmentId: data.departmentId }
+                ]
+            }
         });
 
         if (roleExist) {

@@ -7,7 +7,7 @@ class DepartmentService {
 
     async createAdminDepartment(data) {
         const departmentExist = await this.repository.findFirst({
-            OR: [
+            AND: [
                 { name: data.name },
                 { module: "ADMIN" }
             ]
@@ -37,11 +37,12 @@ class DepartmentService {
     }
 
     async tenantCreateDepartment(data) {
+        console.log(data)
         const departmentExist = await this.repository.findFirst({
-            OR: [
+            AND: [
                 { name: data.name },
-                { module: module },
-                { createdByTenantId: data.tenantId }
+                { module: "TENANT" },
+                { createdByTenantId: data.createdByTenantId }
             ]
         });
 
