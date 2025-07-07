@@ -64,36 +64,291 @@ class TenantService {
 
         const attachments = [
             {
-                filename: "logo.png",
-                path: "logo.png",
+                filename: "Logowrap.png",
+                path: "Logowrap.png",
                 cid: "unique@image",
-                contentType: "logo/png",
-            },
-            {
-                filename: "mailHeader.png",
-                path: "mailHeader.png",
-                cid: "unique2@image",
-                contentType: "mailHeader/png",
-            },
+                contentType: "Logowrap/png",
+            }
         ]
 
         const html = `
-        <body style="margin: 0%; padding: 0%; box-sizing: border-box; background-color: white;">
-        <main>
-        <img src="cid:unique2@image" alt="" style="width: 100%; height: 70px; object-fit: cover;">
-        <div
-        style="font-family: Arial, Helvetica, sans-serif; max-width: 820px; margin: auto; padding: 20px; padding-bottom: 50px;">
-        <img src="cid:unique@image" alt="" style="width: 230px; margin-top: 50px;">
-        <p class="head" style="font-size: 26px; font-weight: 700; margin-top: 30px;">Welcome to NooSphere</p>
-        <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">You've been invited to
-        join the NooSphere Control Platform as the Administrator. Click the button below to log in using your
-        administrator credentials:<br><br>Email: ${data.email}<br>Password: ${generatedPass}</p>
-        <a href="http://localhost:5173/auth/initial-login" style="background-color: black; border-radius: 9999px; padding-top: 20px; padding-bottom: 20px; color: white; text-decoration: none; font-weight: 600; font-size: 18px; width: 90%; text-align: center; display: block; margin: auto;">Login as Administrator</a>
-        <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">Once you're in, you'll be prompted to:<br><br>1. Set a new password<br>2. Configure 2-factor authentication<br>3. Set platform-wide preferences for your team<br><br>We recommend doing these right away to secure your account and prepare the system for other users.<br><br>Welcome aboard,<br>— The NooSphere Team</p>
-        </div>
-        </main>
-        </body>
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Welcome to Noosphere!</title>
+                <style>
+                    /* Reset styles for email clients */
+                    body, table, td, p, a {
+                        margin: 0;
+                        padding: 0;
+                        border: 0;
+                        font-size: 100%;
+                        font: inherit;
+                        vertical-align: baseline;
+                    }
+                    
+                    body {
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                        line-height: 1.6;
+                        color: #333333;
+                        background-color: #f5f5f5;
+                        margin: 0;
+                        padding: 20px;
+                    }
+                    
+                    .email-container {
+                        max-width: 600px;
+                        margin: 0 auto;
+                        background-color: #ffffff;
+                        border-radius: 12px;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                        overflow: hidden;
+                    }
+                    
+                    .email-content {
+                        padding: 40px 30px;
+                        text-align: center;
+                    }
+                    
+                    .logo-container {
+                        margin-bottom: 30px;
+                    }
+                    
+                    .logo {
+                        display: inline-flex;
+                        align-items: center;
+                        font-size: 40px;
+                        font-weight: 600;
+                        color: #000000;
+                        text-decoration: none;
+                    }
+                    
+                    
+                    .welcome-title {
+                        font-size: 24px;
+                        font-weight: 600;
+                        color: #004ABA;
+                        margin-bottom: 25px;
+                    }
+                    
+                    .welcome-text {
+                        font-size: 16px;
+                        color: #475467;
+                        margin-bottom: 8px;
+                        line-height: 1.5;
+                    }
+                    
+                    .company-name {
+                        color: #004ABA;
+                        font-weight: 600;
+                    }
+                    
+                    .instruction-text {
+                        font-size: 16px;
+                        color: #475467;
+                        margin: 25px 0 30px 0;
+                    }
+                    
+                    .credentials-container {
+
+                        padding: 25px;
+                        margin: 25px 0;
+                    }
+                    
+                    .credential-row {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        margin-bottom: 12px;
+                        text-align: left;
+                    }
+                    
+                    .credential-row:last-child {
+                        margin-bottom: 0;
+                    }
+                    
+                    .credential-label {
+                        font-weight: 600;
+                        color: #333333;
+                        font-size: 16px;
+                        min-width: 90px;
+                    }
+                    
+                    .credential-value {
+                        color: #666666;
+                        font-size: 16px;
+                        flex: 1;
+                        text-align: right;
+                    }
+                    
+                    .login-button {
+                        display: inline-block;
+                        background-color: #004ABA;
+                        color: white;
+                        text-decoration: none;
+                        padding: 14px 32px;
+                        border-radius: 25px;
+                        font-size: 16px;
+                        font-weight: 600;
+                        margin: 25px 0;
+                        transition: background-color 0.3s ease;
+                    }
+                    
+                    .login-button:hover {
+                        background-color: #1565C0;
+                    }
+                    
+                    .info-box {
+                        background-color: #E3F2FD;
+                        border-radius: 8px;
+                        padding: 20px;
+                        margin: 25px 0;
+                        border: 1px solid #99C2FF;
+                    }
+                    
+                    .info-title {
+                        font-size: 16px;
+                        color: #666666;
+                        margin-bottom: 15px;
+                    }
+                    
+                    .info-list {
+                        text-align: left;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    
+                    .info-item {
+                        color: #666666;
+                        font-size: 16px;
+                        margin-bottom: 8px;
+                        padding-left: 0;
+                        list-style: none;
+                        position: relative;
+                    }
+                    
+                    .info-item::before {
+                        content: counter(item-counter) ". ";
+                        counter-increment: item-counter;
+                        font-weight: 600;
+                    }
+                    
+                    .info-list {
+                        counter-reset: item-counter;
+                    }
+                    
+                    .footer {
+                        margin-top: 40px;
+                        padding-top: 20px;
+                    
+                    }
+                    
+                    .footer-text {
+                        color: #1976D2;
+                        font-size: 16px;
+                        margin-bottom: 5px;
+                    }
+                    
+                    .team-signature {
+                        color: #1976D2;
+                        font-size: 16px;
+                        font-weight: 600;
+                    }
+                    
+                    /* Mobile responsive */
+                    @media only screen and (max-width: 600px) {
+                        .email-container {
+                            margin: 0;
+                            border-radius: 0;
+                        }
+                        
+                        .email-content {
+                            padding: 30px 20px;
+                        }
+                        
+                        .credentials-container {
+                            padding: 20px 15px;
+                        }
+                        
+                        .credential-row {
+                            flex-direction: column;
+                            align-items: flex-start;
+                            gap: 5px;
+                        }
+                        
+                        .credential-value {
+                            text-align: left;
+                        }
+                        
+                        .welcome-title {
+                            font-size: 22px;
+                        }
+                        
+                        .logo {
+                            font-size: 24px;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="email-container">
+                    <div class="email-content">
+                        <!-- Logo -->
+                        <div class="logo-container">
+                            <div class="logo">
+                            <img src="cid:unique@image" alt="" srcset="">
+                            </div>
+                        </div>
+                        
+                        <!-- Welcome Title -->
+                        <h1 class="welcome-title">Welcome to Noosphere!</h1>
+                        
+                        <!-- Welcome Text -->
+                        <p class="welcome-text">
+                            Your company account <span class="company-name">${data.companyName}</span> has been created on<br>
+                            Noosphere, and you've been designated as the administrator.
+                        </p>
+                        
+                        <!-- Instruction Text -->
+                        <p class="instruction-text">
+                            Use the credentials below to log in and complete your setup:
+                        </p>
+                        
+                        <!-- Credentials -->
+                        <div class="credentials-container">
+                            <div class="credential-row">
+                                <span class="credential-label">Email: ${data.email}</span>
+                            </div>
+                            <div class="credential-row">
+                                <span class="credential-label">Password: ${generatedPass}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Login Button -->
+                        <a href="http://localhost:5173/auth/initial-login" class="login-button">Login to my account</a>
+                        
+                        <!-- Info Box -->
+                        <div class="info-box">
+                            <p class="info-title">Once you're in, you'll be prompted to:</p>
+                            <ol class="info-list">
+                                <li class="info-item">Set a new password.</li>
+                                <li class="info-item">Configure 2-factor authentication for your and your organization.</li>
+                            </ol>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="footer">
+                            <p class="footer-text">Welcome aboard,</p>
+                            <p class="team-signature">The NoSphere Team</p>
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>
         `
+
         const sendMail = await MailService.sendMail(data.email, "Welcome to Noosphere", null, html, attachments)
 
         if (!sendMail.success) {
@@ -190,8 +445,6 @@ class TenantService {
             throw new Error("Staff already exists.");
         }
 
-        // const generatedPass = this.generateCode.generateStrongPassword()
-        // const hashedPass = await argon2.hash(generatedPass)
         const createData = new Tenant(data);
 
         const newStaff = await this.staffRepository.create(createData.createTenantStaff);
@@ -202,36 +455,290 @@ class TenantService {
 
         const attachments = [
             {
-                filename: "logo.png",
-                path: "logo.png",
+                filename: "Logowrap.png",
+                path: "Logowrap.png",
                 cid: "unique@image",
-                contentType: "logo/png",
-            },
-            {
-                filename: "mailHeader.png",
-                path: "mailHeader.png",
-                cid: "unique2@image",
-                contentType: "mailHeader/png",
-            },
+                contentType: "Logowrap/png",
+            }
         ]
 
         const html = `
-        <body style="margin: 0%; padding: 0%; box-sizing: border-box; background-color: white;">
-        <main>
-        <img src="cid:unique2@image" alt="" style="width: 100%; height: 70px; object-fit: cover;">
-        <div
-        style="font-family: Arial, Helvetica, sans-serif; max-width: 820px; margin: auto; padding: 20px; padding-bottom: 50px;">
-        <img src="cid:unique@image" alt="" style="width: 230px; margin-top: 50px;">
-        <p class="head" style="font-size: 26px; font-weight: 700; margin-top: 30px;">Welcome to NooSphere</p>
-        <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">You've been invited to
-        join the NooSphere Control Platform as the Administrator. Click the button below to log in using your
-        administrator credentials:<br><br>Email: ${data.email}</p>
-        <a href="http://localhost:5173/auth/staff/onboarding/${newStaff.email}/${newStaff.id}" style="background-color: black; border-radius: 9999px; padding-top: 20px; padding-bottom: 20px; color: white; text-decoration: none; font-weight: 600; font-size: 18px; width: 90%; text-align: center; display: block; margin: auto;">Login as Administrator</a>
-        <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">Once you're in, you'll be prompted to:<br><br>1. Set a new password<br>2. Configure 2-factor authentication<br>3. Set platform-wide preferences for your team<br><br>We recommend doing these right away to secure your account and prepare the system for other users.<br><br>Welcome aboard,<br>— The NooSphere Team</p>
-        </div>
-        </main>
-        </body>
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Welcome to Noosphere!</title>
+                <style>
+                    /* Reset styles for email clients */
+                    body, table, td, p, a {
+                        margin: 0;
+                        padding: 0;
+                        border: 0;
+                        font-size: 100%;
+                        font: inherit;
+                        vertical-align: baseline;
+                    }
+                    
+                    body {
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                        line-height: 1.6;
+                        color: #333333;
+                        background-color: #f5f5f5;
+                        margin: 0;
+                        padding: 20px;
+                    }
+                    
+                    .email-container {
+                        max-width: 600px;
+                        margin: 0 auto;
+                        background-color: #ffffff;
+                        border-radius: 12px;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                        overflow: hidden;
+                    }
+                    
+                    .email-content {
+                        padding: 40px 30px;
+                        text-align: center;
+                    }
+                    
+                    .logo-container {
+                        margin-bottom: 30px;
+                    }
+                    
+                    .logo {
+                        display: inline-flex;
+                        align-items: center;
+                        font-size: 40px;
+                        font-weight: 600;
+                        color: #000000;
+                        text-decoration: none;
+                    }
+                    
+                    
+                    .welcome-title {
+                        font-size: 24px;
+                        font-weight: 600;
+                        color: #004ABA;
+                        margin-bottom: 25px;
+                    }
+                    
+                    .welcome-text {
+                        font-size: 16px;
+                        color: #475467;
+                        margin-bottom: 8px;
+                        line-height: 1.5;
+                    }
+                    
+                    .company-name {
+                        color: #004ABA;
+                        font-weight: 600;
+                    }
+                    
+                    .instruction-text {
+                        font-size: 16px;
+                        color: #475467;
+                        margin: 25px 0 30px 0;
+                    }
+                    
+                    .credentials-container {
+
+                        padding: 25px;
+                        margin: 25px 0;
+                    }
+                    
+                    .credential-row {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        margin-bottom: 12px;
+                        text-align: left;
+                    }
+                    
+                    .credential-row:last-child {
+                        margin-bottom: 0;
+                    }
+                    
+                    .credential-label {
+                        font-weight: 600;
+                        color: #333333;
+                        font-size: 16px;
+                        min-width: 90px;
+                    }
+                    
+                    .credential-value {
+                        color: #666666;
+                        font-size: 16px;
+                        flex: 1;
+                        text-align: right;
+                    }
+                    
+                    .login-button {
+                        display: inline-block;
+                        background-color: #004ABA;
+                        color: white;
+                        text-decoration: none;
+                        padding: 14px 32px;
+                        border-radius: 25px;
+                        font-size: 16px;
+                        font-weight: 600;
+                        margin: 25px 0;
+                        transition: background-color 0.3s ease;
+                    }
+                    
+                    .login-button:hover {
+                        background-color: #1565C0;
+                    }
+                    
+                    .info-box {
+                        background-color: #E3F2FD;
+                        border-radius: 8px;
+                        padding: 20px;
+                        margin: 25px 0;
+                        border: 1px solid #99C2FF;
+                    }
+                    
+                    .info-title {
+                        font-size: 16px;
+                        color: #666666;
+                        margin-bottom: 15px;
+                    }
+                    
+                    .info-list {
+                        text-align: left;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    
+                    .info-item {
+                        color: #666666;
+                        font-size: 16px;
+                        margin-bottom: 8px;
+                        padding-left: 0;
+                        list-style: none;
+                        position: relative;
+                    }
+                    
+                    .info-item::before {
+                        content: counter(item-counter) ". ";
+                        counter-increment: item-counter;
+                        font-weight: 600;
+                    }
+                    
+                    .info-list {
+                        counter-reset: item-counter;
+                    }
+                    
+                    .footer {
+                        margin-top: 40px;
+                        padding-top: 20px;
+                    
+                    }
+                    
+                    .footer-text {
+                        color: #1976D2;
+                        font-size: 16px;
+                        margin-bottom: 5px;
+                    }
+                    
+                    .team-signature {
+                        color: #1976D2;
+                        font-size: 16px;
+                        font-weight: 600;
+                    }
+                    
+                    /* Mobile responsive */
+                    @media only screen and (max-width: 600px) {
+                        .email-container {
+                            margin: 0;
+                            border-radius: 0;
+                        }
+                        
+                        .email-content {
+                            padding: 30px 20px;
+                        }
+                        
+                        .credentials-container {
+                            padding: 20px 15px;
+                        }
+                        
+                        .credential-row {
+                            flex-direction: column;
+                            align-items: flex-start;
+                            gap: 5px;
+                        }
+                        
+                        .credential-value {
+                            text-align: left;
+                        }
+                        
+                        .welcome-title {
+                            font-size: 22px;
+                        }
+                        
+                        .logo {
+                            font-size: 24px;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="email-container">
+                    <div class="email-content">
+                        <!-- Logo -->
+                        <div class="logo-container">
+                            <div class="logo">
+                            <img src="cid:unique@image" alt="" srcset="">
+                            </div>
+                        </div>
+                        
+                        <!-- Welcome Title -->
+                        <h1 class="welcome-title">Welcome to Noosphere!</h1>
+                        
+                        <!-- Welcome Text -->
+                        <p class="welcome-text">
+                            Your company account <span class="company-name">${tenant.companyName}</span> has been created on<br>
+                            Noosphere, and you've been designated as the administrator.
+                        </p>
+                        
+                        <!-- Instruction Text -->
+                        <p class="instruction-text">
+                            Use the credentials below to log in and complete your setup:
+                        </p>
+                        
+                        <!-- Credentials -->
+                        <div class="credentials-container">
+                            <div class="credential-row">
+                                <span class="credential-label">Email: ${newStaff.email}</span>
+                            
+                            </div>
+                            
+                        </div>
+                        
+                        <!-- Login Button -->
+                        <a href="http://localhost:5173/auth/staff/onboarding/${newStaff.email}/${newStaff.id}" class="login-button">Login to my account</a>
+                        
+                        <!-- Info Box -->
+                        <div class="info-box">
+                            <p class="info-title">Once you're in, you'll be prompted to:</p>
+                            <ol class="info-list">
+                                <li class="info-item">Set a new password.</li>
+                                <li class="info-item">Configure 2-factor authentication for your and your organization.</li>
+                            </ol>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="footer">
+                            <p class="footer-text">Welcome aboard,</p>
+                            <p class="team-signature">The NoSphere Team</p>
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>
         `
+
         const sendMail = await MailService.sendMail(data.email, "Welcome to Noosphere", null, html, attachments)
 
         if (!sendMail.success) {
