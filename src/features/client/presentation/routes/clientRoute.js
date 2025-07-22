@@ -11,75 +11,75 @@ import ClientDto from "../dto/clientDto.js";
  *       required:
  *         - fullName
  *         - email
- *         - password
+ *         - streetAdress
+ *         - city
+ *         - state
+ *         - country
+ *         - zipCode
  *         - phoneNumber
  *         - stage
  *         - gender
  *         - DOB
  *         - tenantId
+ *         - pipelineStageId
+ *         - assignToTenantStaff
  *         - dbAccess
  *       properties:
  *         fullName:
  *           type: string
  *           minLength: 3
  *           maxLength: 20
+ *           example: John Doe
  *         email:
  *           type: string
  *           format: email
- *         password:
+ *           example: johndoe@example.com
+ *         streetAdress:
  *           type: string
- *           pattern: "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"
- *           description: Must include uppercase, lowercase, number, special char and be at least 8 characters
+ *           example: 123 Banana Street
+ *         city:
+ *           type: string
+ *           example: Lagos
+ *         state:
+ *           type: string
+ *           example: Lagos State
+ *         country:
+ *           type: string
+ *           example: Nigeria
+ *         zipCode:
+ *           type: string
+ *           example: 100001
  *         phoneNumber:
  *           type: string
  *           minLength: 10
  *           maxLength: 15
+ *           example: "+2348123456789"
  *         stage:
  *           type: string
+ *           example: onboarding
  *         gender:
  *           type: string
  *           enum: [male, female, other]
+ *           example: male
  *         DOB:
  *           type: string
  *           format: date
+ *           example: 1995-06-15
  *         tenantId:
  *           type: string
  *           format: uuid
- *         dbAccess:
- *           type: boolean
- *
- *     CreateClientTenantDto:
- *       type: object
- *       required:
- *         - dbAccess
- *         - stage
- *         - clientId
- *         - tenantId
- *       properties:
- *         dbAccess:
- *           type: boolean
- *         stage:
- *           type: string
- *         clientId:
+ *           example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *         pipelineStageId:
  *           type: string
  *           format: uuid
- *         tenantId:
+ *           example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *         assignToTenantStaff:
  *           type: string
  *           format: uuid
- *
- *     ClientSigninDto:
- *       type: object
- *       required:
- *         - email
- *         - password
- *       properties:
- *         email:
- *           type: string
- *           format: email
- *         password:
- *           type: string
- *           pattern: "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"
- *           description: Must include uppercase, lowercase, number, special char and be at least 8 characters
+ *           example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *         dbAccess:
+ *           type: boolean
+ *           example: true
  */
 
 class ClientRoutes {
@@ -92,10 +92,10 @@ class ClientRoutes {
     initializeRoutes() {
         /**
          * @swagger
-         * /api/v1/client/createclient:
+         * /api/v1/client/:
          *   post:
-         *     summary: Create a new client
-         *     tags: [Client]
+         *     summary: Create a new client candidate
+         *     tags: [Client candidate]
          *     requestBody:
          *       required: true
          *       content:
@@ -108,47 +108,7 @@ class ClientRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/createclient", ClientDto.createClientDto, this.controller.createClient);
-
-        /**
-         * @swagger
-         * /api/v1/client/createclienttenant:
-         *   post:
-         *     summary: Create a new tenant client staff
-         *     tags: [Client]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/CreateClientTenantDto'
-         *     responses:
-         *       201:
-         *         description: Tenant client created successfully
-         *       400:
-         *         description: Validation error
-         */
-        this.router.post("/createclienttenant", ClientDto.createClientTenantDto, this.controller.createClientTenant);
-
-        /**
-         * @swagger
-         * /api/v1/client/clientsignindto:
-         *   post:
-         *     summary: Client sign in
-         *     tags: [Client]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/ClientSigninDto'
-         *     responses:
-         *       200:
-         *         description: Sign-in successful
-         *       401:
-         *         description: Invalid credentials
-         */
-        this.router.post("/clientsignindto", ClientDto.clientSigninDto, this.controller.clientSignin);
+        this.router.post("/", ClientDto.createClientDto, this.controller.createClientCandidate);
 
     }
 

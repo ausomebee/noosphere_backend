@@ -27,13 +27,11 @@ class ClientDto {
                     "string.empty": "Email is required",
                     "any.required": "Email is a required field",
                 }),
-            password: Joi.string()
-                .regex(strongPasswordRegex)
-                .required()
-                .messages({
-                    "string.empty": "Password is required",
-                    "string.pattern.base": stringPasswordError,
-                }),
+            streetAdress: Joi.string().required(),
+            city: Joi.string().required(),
+            state: Joi.string().required(),
+            country: Joi.string().required(),
+            zipCode: Joi.string().required(),
             phoneNumber: Joi.string()
                 .required()
                 .trim()
@@ -57,24 +55,15 @@ class ClientDto {
                 "string.empty": "Tenant ID is required",
                 "string.guid": "Tenant ID must be a valid UUID",
             }),
-            dbAccess: Joi.boolean().required()
-        });
-
-        Validator.validateRequest(req, next, schema);
-    };
-
-    static createClientTenantDto = (req, res, next) => {
-        const schema = Joi.object({
-            dbAccess: Joi.boolean().required(),
-            stage: Joi.string().trim().required(),
-            clientId: Joi.string().uuid().required().messages({
-                "string.empty": "Client ID is required",
-                "string.guid": "Client ID must be a valid UUID",
+            pipelineStageId: Joi.string().uuid().required().messages({
+                "string.empty": "Pipeline stage ID is required",
+                "string.guid": "Pipeline stage ID must be a valid UUID",
             }),
-            tenantId: Joi.string().uuid().required().messages({
-                "string.empty": "Tenant ID is required",
-                "string.guid": "Tenant ID must be a valid UUID",
-            })
+            assignToTenantStaff: Joi.string().uuid().required().messages({
+                "string.empty": "tenant staff ID is required",
+                "string.guid": "tenant staff ID must be a valid UUID",
+            }),
+            dbAccess: Joi.boolean().required()
         });
 
         Validator.validateRequest(req, next, schema);

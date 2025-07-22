@@ -168,6 +168,11 @@ model Client {
   phoneNumber String   @unique
   DOB         DateTime
   gender      String
+  streetAdress String
+  city        String
+  state       String
+  country     String
+  zipCode     String
   isDeleted   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
