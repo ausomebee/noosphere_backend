@@ -37,6 +37,7 @@ class RoleController {
     });
 
     createTenantRole = expressAsyncHandler(async (req, res) => {
+        console.log(req.body)
         const roleData = new Role(req.body);
         const role = await this.service.createTenantRole(roleData.tenantCreateRole);
 

@@ -1,5 +1,5 @@
 class Client {
-    constructor({ id, fullName, email, phoneNumber, stage, password, tenantId, DOB, gender, clientId, dbAccess }) {
+    constructor({ id, fullName, email, phoneNumber, stage, password, tenantId, DOB, gender, clientId, dbAccess, streetAdress, city, state, country, zipCode, pipelineStageId, ass }) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
@@ -11,6 +11,12 @@ class Client {
         this.gender = gender;
         this.clientId = clientId;
         this.dbAccess = dbAccess;
+        this.streetAdress = streetAdress;
+        this.city = city;
+        this.state = state;
+        this.country = country;
+        this.zipCode = zipCode;
+        this.pipelineStageId = pipelineStageId;
     }
 
     get createClient() {
@@ -21,6 +27,11 @@ class Client {
             password: this.password,
             DOB: this.DOB,
             gender: this.gender,
+            streetAdress: this.streetAdress,
+            city: this.city,
+            state: this.state,
+            country: this.country,
+            zipCode: this.zipCode
         };
     }
 

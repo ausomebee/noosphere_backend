@@ -1,55 +1,35 @@
 import expressAsyncHandler from "express-async-handler";
+import prismaService from "../../../../config/prisma.js";
+import ClientRepository from "../../infrastructure/clientRepository.js";
 import ClientService from "../../application/clientService.js";
-import Client from "../../domain/client.js";
+import ReferralCodeGenerator from "../../../../utilities/generateCode.js";
+import ClientTenantRepository from "../../infrastructure/clientTenantRepository.js";
+import ItemRepository from "../../../pipeline/infrastructure/itemRepository.js";
 
 class ClientController {
     constructor() {
-        this.service = new ClientService();
+        this.prisma = prismaService.getClient()
+        this.clientRepository = new ClientRepository(this.prisma.client);
+        this.clientTenantRepository = new ClientTenantRepository(this.prisma.clientTenant);
+        this.itemRepository = new ItemRepository(this.prisma.pipelineItem);
+        this.generateCode = new ReferralCodeGenerator(12);
+        this.service = new ClientService({ clientRepository: this.clientRepository, clientTenantRepository: this.clientTenantRepository, generateCode: this.generateCode, prisma: this.prisma, itemRepository: this.itemRepository });
     }
 
-    createClient = expressAsyncHandler(async (req, res) => {
-        const clientData = new Client(req.body);
-        const client = await this.service.createCient(clientData);
+    createClientCandidate = expressAsyncHandler(async (req, res) => {
+        const candidate = await this.service.createClientCandidate(req.body);
 
-        if (!client) {
-            res.status(500).json({ message: 'Failed to create client' });
+        if (!candidate) {
+            res.status(500).json({ message: 'Failed to create client candidate' });
         }
 
         return res.status(201).json({
-            message: "Client created successfully",
+            message: "candidate created successfully",
             status: 'ok',
-            data: client
+            data: candidate
         });
     });
 
-    createClientTenant = expressAsyncHandler(async (req, res) => {
-        const clientData = new Client(req.body);
-        const client = await this.service.createClientTenant(clientData.createClientTenant);
-
-        if (!client) {
-            res.status(500).json({ message: 'Failed to create tenant client' });
-        }
-
-        return res.status(201).json({
-            message: "Tenant client created successfully",
-            status: 'ok',
-            data: client
-        });
-    });
-
-    clientSignin = expressAsyncHandler(async (req, res) => {
-        const client = await this.service.clientSignin(req.body);
-
-        if (!client) {
-            res.status(500).json({ message: 'Failed to signin client' });
-        }
-
-        return res.status(201).json({
-            message: "client login successfully",
-            status: 'ok',
-            data: client
-        });
-    });
 }
 
 export default ClientController;
