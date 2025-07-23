@@ -766,7 +766,7 @@ class TenantService {
             throw new Error("Invalid password.");
         }
 
-        return {...tenantStaff, token: this.token.generateToken(admin.id)};
+        return {...tenantStaff, token: this.token.generateToken(tenantStaff.id)};
     }
 
     async tenantAdminChoices(data) {
