@@ -10,6 +10,7 @@ import ItemRepository from "../../../pipeline/infrastructure/itemRepository.js";
 import ReferralCodeGenerator from "../../../../utilities/generateCode.js";
 import ChoiceRepository from "../../infrastructure/choiceRepository.js";
 import AuthRepository from "../../../auth/infrastructure/authRepository.js";
+import TokenService from "../../../../utilities/generate_token.js";
 
 class TenantController {
     constructor() {
@@ -23,6 +24,7 @@ class TenantController {
         this.choiceRepository = new ChoiceRepository(this.prisma.tenantAdminChoices);
         this.authRepository = new AuthRepository(this.prisma.auth);
         this.generateCode = new ReferralCodeGenerator(12);
+        this.token = new TokenService()
         this.service = new TenantService({
             tenantRepository: this.tenantRepository,
             prisma: this.prisma,
@@ -33,7 +35,8 @@ class TenantController {
             itemRepository: this.itemRepository,
             generateCode: this.generateCode,
             choiceRepository: this.choiceRepository,
-            authRepository: this.prisma.authenticator
+            authRepository: this.prisma.authenticator,
+            tokenService: this.token
         });
     }
 

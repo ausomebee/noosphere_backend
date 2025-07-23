@@ -3,7 +3,7 @@ import Tenant from '../domain/tenant.js';
 import argon2 from "argon2";
 
 class TenantService {
-    constructor({ tenantRepository, prisma, departmentRepository, roleRepository, staffRepository, pipelineRepository, itemRepository, generateCode, choiceRepository, authRepository }) {
+    constructor({ tenantRepository, prisma, tokenService, departmentRepository, roleRepository, staffRepository, pipelineRepository, itemRepository, generateCode, choiceRepository, authRepository }) {
         this.tenantRepository = tenantRepository;
         this.prisma = prisma;
         this.departmentRepository = departmentRepository;
@@ -14,6 +14,7 @@ class TenantService {
         this.generateCode = generateCode;
         this.choiceRepository = choiceRepository;
         this.authRepository = authRepository;
+        this.token = tokenService;
     }
 
     async createCandidate(data) {
@@ -765,7 +766,7 @@ class TenantService {
             throw new Error("Invalid password.");
         }
 
-        return tenantStaff;
+        return {...tenantStaff, token: this.token.generateToken(admin.id)};
     }
 
     async tenantAdminChoices(data) {
