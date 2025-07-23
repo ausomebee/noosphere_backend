@@ -43,7 +43,7 @@ class TenantService {
             const tenant = await this.tenantRepository.txCreate(createData.createTenant, tx);
             const pipeline = await this.pipelineRepository.txCreate({
                 module: "CLIENT",
-                name: "Client Onboarding",
+                name: "Pipeline",
                 description: "Manage your client intake process seamlessly",
                 createdByTenantId: tenant.id
             }, tx);

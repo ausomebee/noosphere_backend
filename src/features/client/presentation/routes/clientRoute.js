@@ -11,7 +11,7 @@ import ClientDto from "../dto/clientDto.js";
  *       required:
  *         - fullName
  *         - email
- *         - streetAdress
+ *         - streetAddress
  *         - city
  *         - state
  *         - country
@@ -34,7 +34,7 @@ import ClientDto from "../dto/clientDto.js";
  *           type: string
  *           format: email
  *           example: johndoe@example.com
- *         streetAdress:
+ *         streetAddress:
  *           type: string
  *           example: 123 Banana Street
  *         city:

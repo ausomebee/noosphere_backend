@@ -168,7 +168,7 @@ model Client {
   phoneNumber String   @unique
   DOB         DateTime
   gender      String
-  streetAdress String
+  streetAddress String
   city        String
   state       String
   country     String
