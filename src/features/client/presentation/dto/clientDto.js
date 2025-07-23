@@ -27,7 +27,7 @@ class ClientDto {
                     "string.empty": "Email is required",
                     "any.required": "Email is a required field",
                 }),
-            streetAdress: Joi.string().required(),
+            streetAddress: Joi.string().required(),
             city: Joi.string().required(),
             state: Joi.string().required(),
             country: Joi.string().required(),
