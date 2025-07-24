@@ -5,6 +5,8 @@ import prismaService from "../../../../config/prisma.js";
 import StageRepository from "../../infrastructure/stageRepository.js";
 import ItemRepository from "../../infrastructure/itemRepository.js";
 import TenantRepository from "../../../tenant/infrastructure/tenantRepository.js";
+import ClientRepository from "../../../client/infrastructure/clientRepository.js";
+import ClientService from "../../../client/application/clientService.js";
 
 class PipelineController {
     constructor() {
@@ -14,6 +16,8 @@ class PipelineController {
         this.stageRepository = new StageRepository(this.prisma.pipelineStage)
         this.itemRepository = new ItemRepository(this.prisma.pipelineItem)
         this.service = new PipelineService({ pipelineRepository: this.pipelineRepository, stageRepository: this.stageRepository, itemRepository: this.itemRepository, tenantRepository: this.tenantRepository });
+        this.clientRepository = new ClientRepository(this.prisma.client);
+        this.clientService = new ClientService({ clientRepository: this.clientRepository });
     }
 
     createPipeline = expressAsyncHandler(async (req, res) => {
@@ -212,6 +216,35 @@ class PipelineController {
         });
     });
 
+    updateItemSentDocuments = expressAsyncHandler(async (req, res) => {
+        const files = req.files || [];
+        const groupedFiles = {};
+
+        files.forEach(file => {
+            if (!groupedFiles[file.fieldname]) {
+                groupedFiles[file.fieldname] = [];
+            }
+            groupedFiles[file.fieldname].push(file.location);
+        });
+
+        const data = {
+            id: req.params.id,
+            sentDocuments: groupedFiles
+        }
+        
+        const item = await this.service.updateItem(data);
+
+        if (!item) {
+            res.status(500).json({ message: 'Failed to update item' });
+        }
+
+        return res.status(201).json({
+            message: "Item updated successfully",
+            status: 'ok',
+            data: item
+        });
+    });
+
     deleteStage = expressAsyncHandler(async (req, res) => {
         const stage = await this.service.deleteStage(req.params.id);
 
@@ -235,6 +268,26 @@ class PipelineController {
 
         return res.status(201).json({
             message: "Item deleted successfully",
+            status: 'ok',
+            data: item
+        });
+    });
+
+    moveToClient = expressAsyncHandler(async (req, res) => {
+        const item = await this.service.moveToClient(req.params.id);
+
+        if (!item) {
+            res.status(500).json({ message: 'Failed to delete item' });
+        }
+
+        const client = await this.clientService.updateClient({ id: item.clientId, isVerified: true });
+
+        if (!client) {
+            res.status(500).json({ message: 'Failed to update client' });
+        }
+
+        return res.status(201).json({
+            message: "Moved to client successfully",
             status: 'ok',
             data: item
         });

@@ -222,7 +222,7 @@ class PipelineService {
             client: {
                 select: {
                     id: true,
-                    fullName: true, 
+                    fullName: true,
                     createdAt: true,
                     tenantLinks: {
                         select: {
@@ -269,7 +269,7 @@ class PipelineService {
 
         return updatedItems;
     }
-    
+
     async getItemById(id) {
         const item = await this.itemRepository.findOneAndPopulate({ id: id }, {
             tenant: true, admin: true
@@ -301,12 +301,26 @@ class PipelineService {
             throw new Error("Item not found");
         }
 
+        const mergeArraysByKey = (a = {}, b = {}) => {
+            const result = { ...a };
+
+            for (const key in b) {
+                if (Array.isArray(result[key])) {
+                    result[key] = [...result[key], ...b[key]];
+                } else {
+                    result[key] = b[key];
+                }
+            }
+
+            return result;
+        };
+
         const update = await this.itemRepository.update(data.id, {
             pipelineStageId: data.pipelineStageId || item.pipelineStageId,
             assignToAdmin: data.assignToAdmin || item.assignToAdmin,
             assignToTenantStaff: data.assignToTenantStaff || item.assignToTenantStaff,
             doneTasks: data.doneTasks || item.doneTasks,
-            sentDocuments: data.sentDocuments || item.sentDocuments
+            sentDocuments: mergeArraysByKey(data.sentDocuments, item.sentDocuments)
         });
 
         if (!update) {
@@ -380,7 +394,23 @@ class PipelineService {
         return deleted;
     }
 
-    async deleteMultipleTenantPipelineItems({ids}) {
+    async moveToClient(id) {
+        const item = await this.itemRepository.findFirst({ id })
+
+        if (!item) {
+            throw new Error("item not found.");
+        }
+
+        const deleted = await this.itemRepository.delete(id);
+
+        if (!deleted) {
+            throw new Error("Failed to delete item");
+        }
+
+        return deleted;
+    }
+
+    async deleteMultipleTenantPipelineItems({ ids }) {
         if (!Array.isArray(ids) || ids.length === 0) {
             throw new Error("No item IDs provided.");
         }

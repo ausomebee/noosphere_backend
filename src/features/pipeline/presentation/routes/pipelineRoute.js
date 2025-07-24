@@ -2,6 +2,7 @@ import express from "express";
 import { adminProtect } from "../../../../middleware/auth_handlers.js";
 import PipelineDto from "../dto/pipelineDto.js";
 import PipelineController from "../controllers/pipeline.Controller.js";
+import S3Service from "../../../../utilities/s3.js";
 
 /**
  * @swagger
@@ -358,6 +359,7 @@ class PipelineRoutes {
     constructor() {
         this.controller = new PipelineController();
         this.router = express.Router();
+        this.S3Service = new S3Service().getUploadMiddleware()
         this.initializeRoutes();
     }
 
@@ -836,6 +838,27 @@ class PipelineRoutes {
 
         /**
          * @swagger
+         * /api/v1/pipeline/client/item/{id}:
+         *   delete:
+         *     summary: move to client
+         *     tags: [PipelineItem]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The ID of the pipeline item
+         *     responses:
+         *       201:
+         *         description: Pipeline item noved to client successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.delete("/client/item/:id", PipelineDto.deleteTenantPipelineItemDto, this.controller.moveToClient);
+
+        /**
+         * @swagger
          * /api/v1/pipeline/multi/tenant/item:
          *   delete:
          *     summary: Delete multiple tenant pipeline items
@@ -936,6 +959,52 @@ class PipelineRoutes {
         *         description: Validation error
         */
         this.router.patch("/item/document", PipelineDto.updateItemSentDocumentsDto, this.controller.updateItem);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/item/document/{id}:
+         *   post:
+         *     summary: Upload documents and update item
+         *     tags:
+         *       - PipelineItem
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: ID of the item to update
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         multipart/form-data:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               documents:
+         *                 type: array
+         *                 items:
+         *                   type: string
+         *                   format: binary
+         *                 description: Multiple documents to upload
+         *     responses:
+         *       201:
+         *         description: Item updated successfully
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 message:
+         *                   type: string
+         *                 status:
+         *                   type: string
+         *                 data:
+         *                   type: object
+         *       500:
+         *         description: Failed to update item
+         */
+        this.router.post("/item/document/:id", this.S3Service.any(), this.controller.updateItemSentDocuments);
 
     }
 
