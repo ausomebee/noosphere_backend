@@ -652,6 +652,28 @@ class PipelineRoutes {
 
         /**
          * @swagger
+         * /api/v1/pipeline/item/client/{id}:
+         *   get:
+         *     summary: Get pipeline item by ID
+         *     tags: [PipelineItem]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The ID of the pipeline item
+         *     responses:
+         *       201:
+         *         description: Pipeline item fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+
+        this.router.get("/item/client/:id", PipelineDto.getByIdDto, this.controller.getItemByIdClient);
+
+        /**
+         * @swagger
          * /api/v1/pipeline/item/stage:
          *   patch:
          *     summary: update activity

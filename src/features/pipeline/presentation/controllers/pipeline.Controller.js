@@ -184,6 +184,20 @@ class PipelineController {
         });
     });
 
+    getItemByIdClient = expressAsyncHandler(async (req, res) => {
+        const item = await this.service.getItemByIdClient(req.params.id);
+
+        if (!item) {
+            res.status(500).json({ message: 'Failed to fetch item' });
+        }
+
+        return res.status(201).json({
+            message: "Item fetched successfully",
+            status: 'ok',
+            data: item
+        });
+    });
+
     updateItem = expressAsyncHandler(async (req, res) => {
         const item = await this.service.updateItem(req.body);
 

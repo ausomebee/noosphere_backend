@@ -92,6 +92,26 @@ class ClientDto {
 
         Validator.validateRequest(req, next, schema);
     };
+
+    static updateClientDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required(),
+            email: Joi.string().email().optional(),
+            phoneNumber: Joi.string().optional(),
+            fullName: Joi.string().optional(),
+            isDeleted: Joi.boolean().optional(),
+            DOB: Joi.date().iso().optional(),
+            gender: Joi.string().optional(),
+            streetAddress: Joi.string().optional(),
+            city: Joi.string().optional(),
+            state: Joi.string().optional(),
+            country: Joi.string().optional(),
+            zipCode: Joi.string().optional(),
+            password: Joi.string().min(6).optional()
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
 }
 
 export default ClientDto;

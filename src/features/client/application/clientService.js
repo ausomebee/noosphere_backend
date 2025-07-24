@@ -55,6 +55,35 @@ class ClientService {
 
         return newCandidate.pipelineItem;
     }
+
+    async updateClient(data) {
+        const client = await this.clientRepository.findOne({ id: data.id })
+
+        if (!client) {
+            throw new Error("client not found");
+        }
+
+        const update = await this.clientRepository.update(data.id, {
+            email: data.email || client.email,
+            phoneNumber: data.phoneNumber || client.phoneNumber,
+            fullName: data.fullName || client.fullName,
+            isDeleted: data.isDeleted ?? client.isDeleted,
+            DOB: data.DOB || client.DOB,
+            gender: data.gender || client.gender,
+            streetAddress: data.streetAddress || client.streetAddress,
+            city: data.city || client.city,
+            state: data.state || client.state,
+            country: data.country || client.country,
+            zipCode: data.zipCode || client.zipCode,
+            password: data.password || client.password
+        });
+
+        if (!update) {
+            throw new Error("Failed to update client");
+        }
+
+        return update;
+    }
 }
 
 export default ClientService;
