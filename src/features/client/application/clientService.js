@@ -75,7 +75,8 @@ class ClientService {
             state: data.state || client.state,
             country: data.country || client.country,
             zipCode: data.zipCode || client.zipCode,
-            password: data.password || client.password
+            password: data.password || client.password,
+            isVerified: data.isVerified ?? client.isVerified,
         });
 
         if (!update) {
