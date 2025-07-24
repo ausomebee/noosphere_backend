@@ -218,18 +218,73 @@ class PipelineService {
     }
 
     async getItemByStageIdClient(pipelineStageId) {
-        const items = await this.itemRepository.findAllAndPopulate({ pipelineStageId: pipelineStageId }, { client: true });
+        const items = await this.itemRepository.findAllAndPopulate({ pipelineStageId: pipelineStageId }, {
+            client: {
+                select: {
+                    id: true,
+                    fullName: true, 
+                    createdAt: true,
+                    tenantLinks: {
+                        select: {
+                            tenantStaff: {
+                                select: {
+                                    fullName: true
+                                }
+                            }
+                        }
+                    }
+                }
+            }, tenantStaff: {
+                select: {
+                    fullName: true
+                }
+            }
+        });
 
         if (!items) {
             throw new Error("Failed to fetch items.");
         }
 
-        return items;
-    }
+        if (items.length === 0) {
+            return [];
+        }
 
+        const stage = await this.stageRepository.findOne({ id: items[0]?.pipelineStageId })
+
+        if (!stage) {
+            throw new Error("Failed to fetch stage.");
+        }
+
+        const updatedItems = items.map(item => {
+            const totalTasks = stage.tasks.length;
+            const completedTasks = stage.tasks?.filter(task => item.doneTasks && item.doneTasks[task.name] === true).length;
+
+            const completionPercentage = (completedTasks / totalTasks) * 100;
+
+            return {
+                ...item,
+                completionPercentage
+            };
+        });
+
+        return updatedItems;
+    }
+    
     async getItemById(id) {
         const item = await this.itemRepository.findOneAndPopulate({ id: id }, {
             tenant: true, admin: true
+        });
+
+        if (!item) {
+            throw new Error("Failed to fetch item.");
+        }
+
+        return item;
+    }
+
+    async getItemByIdClient(id) {
+        const item = await this.itemRepository.findOneAndPopulate({ id: id }, {
+            client: true, tenantStaff: true
         });
 
         if (!item) {

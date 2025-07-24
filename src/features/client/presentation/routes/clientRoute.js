@@ -80,6 +80,54 @@ import ClientDto from "../dto/clientDto.js";
  *         dbAccess:
  *           type: boolean
  *           example: true
+ *     UpdateClientDto:
+ *       type: object
+ *       required:
+ *         - id
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "123e4567-e89b-12d3-a456-426614174000"
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: "client@example.com"
+ *         phoneNumber:
+ *           type: string
+ *           example: "+2348012345678"
+ *         fullName:
+ *           type: string
+ *           example: "Jane Doe"
+ *         isDeleted:
+ *           type: boolean
+ *           example: false
+ *         DOB:
+ *           type: string
+ *           format: date
+ *           example: "1990-01-01"
+ *         gender:
+ *           type: string
+ *           example: "female"
+ *         streetAddress:
+ *           type: string
+ *           example: "123 Banana Island"
+ *         city:
+ *           type: string
+ *           example: "Lagos"
+ *         state:
+ *           type: string
+ *           example: "Lagos"
+ *         country:
+ *           type: string
+ *           example: "Nigeria"
+ *         zipCode:
+ *           type: string
+ *           example: "100001"
+ *         password:
+ *           type: string
+ *           format: password
+ *           example: "SecurePass123"
  */
 
 class ClientRoutes {
@@ -110,6 +158,28 @@ class ClientRoutes {
          */
         this.router.post("/", ClientDto.createClientDto, this.controller.createClientCandidate);
 
+        /**
+         * @swagger
+         * /api/clients/update:
+         *   put:
+         *     summary: Update client details
+         *     tags:
+         *       - Clients
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateClientDto'
+         *     responses:
+         *       200:
+         *         description: Client updated successfully
+         *       400:
+         *         description: Invalid request body
+         *       404:
+         *         description: Client not found
+         */
+        this.router.put("/", ClientDto.updateClientDto, this.controller.updateClient);
     }
 
     getRouter() {

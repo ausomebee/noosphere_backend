@@ -30,6 +30,20 @@ class ClientController {
         });
     });
 
+    updateClient = expressAsyncHandler(async (req, res) => {
+        const client = await this.service.updateClient(req.body);
+
+        if (!client) {
+            res.status(500).json({ message: 'Failed to update client' });
+        }
+
+        return res.status(201).json({
+            message: "candidate updated successfully",
+            status: 'ok',
+            data: client
+        });
+    });
+
 }
 
 export default ClientController;
