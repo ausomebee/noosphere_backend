@@ -63,7 +63,11 @@ class ClientDto {
                 "string.empty": "tenant staff ID is required",
                 "string.guid": "tenant staff ID must be a valid UUID",
             }),
-            dbAccess: Joi.boolean().required()
+            dbAccess: Joi.boolean().required(),
+            createdBy: Joi.string().uuid().required().messages({
+                "string.empty": "Created by is required",
+                "string.guid": "Created by must be a valid UUID",
+            }),
         });
 
         Validator.validateRequest(req, next, schema);
