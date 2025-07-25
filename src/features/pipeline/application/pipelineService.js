@@ -394,6 +394,22 @@ class PipelineService {
         return deleted;
     }
 
+    async deleteClientPipelineItem(id) {
+        const item = await this.itemRepository.findFirst({ id })
+
+        if (!item) {
+            throw new Error("item not found.");
+        }
+
+        const deleted = await this.itemRepository.delete(id);
+
+        if (!deleted) {
+            throw new Error("Failed to delete item");
+        }
+
+        return deleted;
+    }
+
     async moveToClient(id) {
         const item = await this.itemRepository.findFirst({ id })
 

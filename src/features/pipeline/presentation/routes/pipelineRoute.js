@@ -840,6 +840,27 @@ class PipelineRoutes {
          * @swagger
          * /api/v1/pipeline/client/item/{id}:
          *   delete:
+         *     summary: Delete client pipeline item
+         *     tags: [PipelineItem]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The ID of the pipeline item to delete
+         *     responses:
+         *       201:
+         *         description: Pipeline item deleted successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.delete("/client/item/:id", PipelineDto.deleteTenantPipelineItemDto, this.controller.deleteClientPipelineItem);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/client/item/{id}:
+         *   delete:
          *     summary: move to client
          *     tags: [PipelineItem]
          *     parameters:
