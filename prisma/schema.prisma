@@ -245,6 +245,7 @@ model PipelineItem {
   assignToTenantStaff String?
   doneTasks           Json?
   sentDocuments       Json?
+  isDeleted           Boolean  @default(false)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 

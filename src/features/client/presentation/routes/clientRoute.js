@@ -165,7 +165,7 @@ class ClientRoutes {
 
         /**
          * @swagger
-         * /api/clients/update:
+         * /api/v1/client/:
          *   put:
          *     summary: Update client details
          *     tags:
