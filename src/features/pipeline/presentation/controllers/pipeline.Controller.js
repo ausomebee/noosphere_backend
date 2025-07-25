@@ -231,7 +231,7 @@ class PipelineController {
             id: req.params.id,
             sentDocuments: groupedFiles
         }
-        
+
         const item = await this.service.updateItem(data);
 
         if (!item) {
@@ -261,6 +261,20 @@ class PipelineController {
 
     deleteTenantPipelineItem = expressAsyncHandler(async (req, res) => {
         const item = await this.service.deleteTenantPipelineItem(req.params.id);
+
+        if (!item) {
+            res.status(500).json({ message: 'Failed to delete item' });
+        }
+
+        return res.status(201).json({
+            message: "Item deleted successfully",
+            status: 'ok',
+            data: item
+        });
+    });
+
+    deleteClientPipelineItem = expressAsyncHandler(async (req, res) => {
+        const item = await this.service.deleteClientPipelineItem(req.params.id);
 
         if (!item) {
             res.status(500).json({ message: 'Failed to delete item' });
