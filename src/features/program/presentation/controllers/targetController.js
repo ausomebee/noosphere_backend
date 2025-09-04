@@ -12,7 +12,11 @@ class TargetController {
     }
 
     createTarget = expressAsyncHandler(async (req, res) => {
-        const targetData = new Target(req.body);
+        const data = req.file ? {
+            ...req.body,
+            attachment: req.file.location
+        } : req.body
+        const targetData = new Target(data);
         const target = await this.service.createTarget(targetData.createTarget);
 
         if (!target) {
@@ -27,7 +31,11 @@ class TargetController {
     });
 
     updateTarget = expressAsyncHandler(async (req, res) => {
-        const target = await this.service.updateTarget(req.body);
+        const data = req.file ? {
+            ...req.body,
+            attachment: req.file.location
+        } : req.body
+        const target = await this.service.updateTarget(data);
 
         if (!target) {
             res.status(500).json({ message: 'Failed to update target' });
@@ -51,6 +59,20 @@ class TargetController {
             message: "targets fetched successfully",
             status: 'ok',
             data: targets
+        });
+    });
+
+    deleteTarget = expressAsyncHandler(async (req, res) => {
+        const target = await this.service.updateTarget({ id: req.params.id, isDeleted: true });
+
+        if (!target) {
+            res.status(500).json({ message: 'Failed to delete target' });
+        }
+
+        return res.status(201).json({
+            message: "target deleted successfully",
+            status: 'ok',
+            data: target
         });
     });
 

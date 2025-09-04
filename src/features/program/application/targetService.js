@@ -35,7 +35,6 @@ class TargetService {
         const update = await this.targetRepository.update(data.id, {
             name: data.name || target.name,
             description: data.description || target.description,
-            programId: data.programId || target.programId,
             sd: data.sd || target.sd,
             expectedResponse: data.expectedResponse || target.expectedResponse,
             teachingProcedure: data.teachingProcedure || target.teachingProcedure,

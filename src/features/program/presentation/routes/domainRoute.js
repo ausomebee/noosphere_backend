@@ -101,25 +101,54 @@ class DomainRoutes {
         this.router.patch("/", DomainDto.updateDomainDto, this.controller.updateDomain);
 
         /**
+         * @swagger
+         * /api/v1/domains/{tenantId}:
+         *   get:
+         *     summary: Gets tenant domains
+         *     tags: [program]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The tenant ID of the Domain
+         *       - in: query
+         *         name: type
+         *         required: false
+         *         schema:
+         *           type: string
+         *           enum: [SKILL_ACQUISITION, BEHAVIOR_REDUCTION]
+         *         description: Filter domains by type
+         *     responses:
+         *       200:
+         *         description: Domains fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/:tenantId", this.controller.getAllTenantDomain);
+
+
+        /**
         * @swagger
-        * /api/v1/domains/{tenantId}:
-        *   get:
-        *     summary: gets tenant domains
+        * /api/v1/domains/{id}:
+        *   delete:
+        *     summary: deletes a domain
         *     tags: [program]
         *     parameters:
         *       - in: path
-        *         name: tenantId
+        *         name: id
         *         required: true
         *         schema:
         *           type: string
-        *         description: The tenant ID of the Domain
+        *         description: The ID of the Domain
         *     responses:
         *       200:
-        *         description: Domains fetched successfully
+        *         description: Domain deleted successfully
         *       400:
         *         description: Validation error
         */
-        this.router.get("/:tenantId", this.controller.getAllTenantDomain);
+        this.router.delete("/:id", this.controller.deleteDomain);
 
     }
 
