@@ -48,7 +48,8 @@ class ProgramService {
 
     async getAllDomainPrograms(domainId) {
         const programs = await this.programRepository.findAll({
-            domainId
+            domainId,
+            isDeleted: false
         });
 
         if (!programs) {
