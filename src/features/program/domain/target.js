@@ -1,5 +1,5 @@
 class Target {
-    constructor({name, id, description, programId, sd, expectedResponse, teachingProcedure, promptingStrategy, dataCollectionType, baselineDataRequired, numberOfTrials, numberOfTasks, taskSteps, masteryMetric, masteryCriteria}) {
+    constructor({name, id, description, programId, sd, expectedResponse, teachingProcedure, promptingStrategy, dataCollectionType, baselineDataRequired, numberOfTrials, numberOfTasks, taskSteps, masteryMetric, masteryCriteria, initialStatus, notes, attachment}) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -15,6 +15,9 @@ class Target {
         this.taskSteps = taskSteps;
         this.masteryMetric = masteryMetric;
         this.masteryCriteria = masteryCriteria;
+        this.initialStatus = initialStatus;
+        this.notes = notes;
+        this.attachment = attachment;
     }
 
     get createTarget() {
@@ -33,6 +36,9 @@ class Target {
             taskSteps: this.taskSteps,
             masteryMetric: this.masteryMetric,
             masteryCriteria: this.masteryCriteria,
+            initialStatus: this.initialStatus,
+            notes: this.notes,
+            attachment: this.attachment,
         };
     }
 }

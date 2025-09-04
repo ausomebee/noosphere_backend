@@ -41,7 +41,7 @@ class DomainController {
     });
 
     getAllTenantDomain = expressAsyncHandler(async (req, res) => {
-        const domains = await this.service.getAllTenantDomain(req.params.tenantId);
+        const domains = await this.service.getAllTenantDomain(req.params.tenantId, req.query.type);
 
         if (!domains) {
             res.status(500).json({ message: 'Failed to fetch domains' });
@@ -54,6 +54,19 @@ class DomainController {
         });
     });
 
+    deleteDomain = expressAsyncHandler(async (req, res) => {
+        const domain = await this.service.updateDomain({id: req.params.id, isDeleted: true});
+
+        if (!domain) {
+            res.status(500).json({ message: 'Failed to delete domain' });
+        }
+
+        return res.status(201).json({
+            message: "domain deleted successfully",
+            status: 'ok',
+            data: domain
+        });
+    });
 }
 
 export default DomainController;

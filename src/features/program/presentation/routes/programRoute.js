@@ -114,6 +114,27 @@ class ProgramRoutes {
         */
         this.router.get("/:domainId", this.controller.getAllDomainPrograms);
 
+        /**
+         * @swagger
+         * /api/v1/programs/{id}:
+         *   delete:
+         *     summary: Delete Program
+         *     tags: [program]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The Program ID
+         *     responses:
+         *       200:
+         *         description: Program deleted successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.delete("/:id", this.controller.deleteProgram);
+
     }
 
     getRouter() {

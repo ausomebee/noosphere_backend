@@ -54,6 +54,20 @@ class ProgramController {
         });
     });
 
+    deleteProgram = expressAsyncHandler(async (req, res) => {
+        const program = await this.service.updateProgram({ id: req.params.id, isDeleted: true });
+
+        if (!program) {
+            res.status(500).json({ message: 'Failed to delete program' });
+        }
+
+        return res.status(201).json({
+            message: "program deleted successfully",
+            status: 'ok',
+            data: program
+        });
+    });
+
 }
 
 export default ProgramController;

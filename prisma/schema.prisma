@@ -560,7 +560,7 @@ model Target {
   sd                   String
   expectedResponse     String
   teachingProcedure    String
-  promptingStrategy    String
+  promptingStrategy    Json
   dataCollectionType   String
   baselineDataRequired Boolean
   numberOfTrials       Int?
@@ -568,6 +568,9 @@ model Target {
   taskSteps            Json?
   masteryMetric        String
   masteryCriteria      Json
+  initialStatus        String
+  attachment           String
+  notes                String
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
