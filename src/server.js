@@ -24,6 +24,9 @@ import invoice_route from "./features/invoice/presentation/routes/invoiceRoute.j
 import log_route from "./features/logs/presentation/routes/logRoute.js"
 import performance_route from "./features/performance/presentation/routes/performanceRoute.js"
 import issue_route from "./features/issue/presentation/routes/issueRoute.js"
+import program_route from "./features/program/presentation/routes/programRoute.js"
+import domain_route from "./features/program/presentation/routes/domainRoute.js"
+import target_route from "./features/program/presentation/routes/targetRoute.js"
 
 
 class App {
@@ -77,6 +80,9 @@ class App {
         this.app.use("/api/v1/log", log_route);
         this.app.use("/api/v1/performance", performance_route);
         this.app.use("/api/v1/issue", issue_route);
+        this.app.use("/api/v1/programs", program_route);
+        this.app.use("/api/v1/domains", domain_route);
+        this.app.use("/api/v1/targets", target_route);
     }
 
     initializeErrorHandler() {

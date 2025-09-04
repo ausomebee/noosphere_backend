@@ -37,6 +37,11 @@ enum incoiceBillingFrequency {
   Yearly
 }
 
+enum DomainType {
+  SKILL_ACQUISITION
+  BEHAVIOR_REDUCTION
+}
+
 model Admin {
   id                    String   @id @default(uuid())
   fullName              String
@@ -137,6 +142,7 @@ model Tenant {
   PaymentMethod      PaymentMethod[]
   issues             Issue[]
   tenantAdminChoices TenantAdminChoices?
+  domain             Domain[]
 }
 
 model TenantStaff {
@@ -174,7 +180,7 @@ model Client {
   state         String
   country       String
   zipCode       String
-  isVerified   Boolean  @default(false)
+  isVerified    Boolean  @default(false)
   isDeleted     Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -516,4 +522,54 @@ model IssueComment {
 
   issue     Issue @relation(fields: [issueId], references: [id])
   commentBy Admin @relation(fields: [adminId], references: [id])
+}
+
+model Domain {
+  id          String     @id @default(uuid())
+  name        String
+  description String
+  tenantId    String
+  domainType  DomainType
+  isDeleted   Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  tenant  Tenant    @relation(fields: [tenantId], references: [id])
+  program Program[]
+}
+
+model Program {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  domainId    String
+  isDeleted   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  domain Domain   @relation(fields: [domainId], references: [id])
+  target Target[]
+}
+
+model Target {
+  id                   String   @id @default(uuid())
+  name                 String
+  description          String
+  programId            String
+  isDeleted            Boolean  @default(false)
+  sd                   String
+  expectedResponse     String
+  teachingProcedure    String
+  promptingStrategy    String
+  dataCollectionType   String
+  baselineDataRequired Boolean
+  numberOfTrials       Int?
+  numberOfTasks        Int?
+  taskSteps            Json?
+  masteryMetric        String
+  masteryCriteria      Json
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  program Program @relation(fields: [programId], references: [id])
 }
