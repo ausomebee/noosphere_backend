@@ -58,7 +58,8 @@ class TargetService {
 
     async getAllProgramTargets(programId) {
         const targets = await this.targetRepository.findAll({
-            programId
+            programId,
+            isDeleted: false
         });
 
         if (!targets) {

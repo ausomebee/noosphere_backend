@@ -49,6 +49,7 @@ class DomainService {
     async getAllTenantDomain(tenantId, type) {
         const domain = await this.domainRepository.findAll({
             tenantId,
+            isDeleted: false,
             ...(type && { domainType: type })
         });
 
