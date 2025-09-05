@@ -79,6 +79,26 @@ class TargetService {
         return target;
     }
 
+    async duplicateTarget(id) {
+        const target = await this.targetRepository.findOne({ id });
+
+        if (!target) {
+            throw new Error("Target not found")
+        }
+
+        const duplicatedTarget = await this.targetRepository.create({
+            ...target,
+            name: `${target.name} (Copy)`,
+            id: undefined,
+        });
+
+        if (!duplicatedTarget) {
+            throw new Error("Failed to duplicate target");
+        }
+
+        return duplicatedTarget;
+    }
+
 }
 
 export default TargetService;

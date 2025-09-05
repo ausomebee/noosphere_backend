@@ -90,6 +90,20 @@ class TargetController {
         });
     });
 
+    duplicateTarget = expressAsyncHandler(async (req, res) => {
+        const target = await this.service.duplicateTarget(req.params.id);
+
+        if (!target) {
+            res.status(500).json({ message: 'Failed to duplicate target' });
+        }
+
+        return res.status(201).json({
+            message: "target duplicated successfully",
+            status: 'ok',
+            data: target
+        });
+    });
+
 }
 
 export default TargetController;
