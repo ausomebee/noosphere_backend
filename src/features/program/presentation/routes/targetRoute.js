@@ -311,6 +311,26 @@ class TargetRoutes {
          */
         this.router.get("/:id", this.controller.getTarget);
 
+        /**
+         * @swagger
+         * /api/v1/targets/duplicate/{id}:
+         *   post:
+         *     summary: Duplicate Target
+         *     tags: [program]
+         *     parameters:
+         *      - in: path
+         *        name: id
+         *        required: true
+         *        schema:
+         *          type: string
+         *        description: The Target ID
+         *     responses:
+         *       200:
+         *         description: Target duplicated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/duplicate/:id", this.controller.duplicateTarget);
     }
 
     getRouter() {
