@@ -250,7 +250,7 @@ class TargetRoutes {
 
         /**
         * @swagger
-        * /api/v1/targets/{programId}:
+        * /api/v1/targets/program/{programId}:
         *   get:
         *     summary: gets tenant targets
         *     tags: [program]
@@ -267,7 +267,7 @@ class TargetRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/:programId", this.controller.getAllProgramTargets);
+        this.router.get("/program/:programId", this.controller.getAllProgramTargets);
 
         /**
          * @swagger
@@ -289,6 +289,27 @@ class TargetRoutes {
          *         description: Validation error
          */
         this.router.delete("/:id", this.controller.deleteTarget);
+
+        /**
+         * @swagger
+         * /api/v1/targets/{id}:
+         *   get:
+         *     summary: Get Target
+         *     tags: [program]
+         *     parameters:
+         *      - in: path
+         *        name: id
+         *        required: true
+         *        schema:
+         *          type: string
+         *        description: The Target ID
+         *     responses:
+         *       200:
+         *         description: Target fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/:id", this.controller.getTarget);
 
     }
 

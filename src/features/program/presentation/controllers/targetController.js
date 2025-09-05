@@ -76,6 +76,20 @@ class TargetController {
         });
     });
 
+    getTarget = expressAsyncHandler(async (req, res) => {
+        const target = await this.service.getSingleTarget(req.params.id);
+
+        if (!target) {
+            res.status(500).json({ message: 'Failed to fetch target' });
+        }
+
+        return res.status(201).json({
+            message: "target fetched successfully",
+            status: 'ok',
+            data: target
+        });
+    });
+
 }
 
 export default TargetController;
