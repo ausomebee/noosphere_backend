@@ -69,6 +69,16 @@ class TargetService {
         return targets;
     }
 
+    async getSingleTarget(id) {
+        const target = await this.targetRepository.findOne({ id });
+
+        if (!target) {
+            throw new Error("Target not found")
+        }
+
+        return target;
+    }
+
 }
 
 export default TargetService;
