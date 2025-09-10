@@ -64,6 +64,33 @@ class TargetDataRoutes {
          */
         this.router.post("/", TargetDataDto.createTargetDataDto, this.controller.createTargetData);
 
+        /**
+         * @swagger
+         * /api/v1/target-data/{targetId}/client/{clientId}:
+         *   get:
+         *     summary: Get Target Data by ID
+         *     tags: [program]
+         *     parameters:
+         *      - in: path
+         *        name: targetId
+         *        required: true
+         *        schema:
+         *          type: string
+         *        description: The Target ID
+         *      - in: path
+         *        name: clientId
+         *        required: true
+         *        schema:
+         *          type: string
+         *        description: The Client ID
+         *     responses:
+         *       201:
+         *         description: Target Data fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/:targetId/client/:clientId", this.controller.getClientTargetData);
+
     }
 
     getRouter() {

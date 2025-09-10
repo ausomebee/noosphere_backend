@@ -13,6 +13,19 @@ class TargetDataService {
         return newTargetData;
     }
 
+    async getClientTargetData(data) {
+        const targetData = await this.targetDataRepository.findAll({
+            clientId: data.clientId,
+            targetId: data.targetId
+        });
+
+        if (!targetData) {
+            throw new Error("Target data not found")
+        }
+
+        return targetData;
+    }
+
 }
 
 export default TargetDataService;

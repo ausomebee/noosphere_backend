@@ -26,6 +26,20 @@ class TargetDataController {
         });
     });
 
+    getClientTargetData = expressAsyncHandler(async (req, res) => {
+        const targetData = await this.service.getClientTargetData(req.params);
+
+        if (!targetData) {
+            res.status(500).json({ message: 'Failed to fetch target data' });
+        }
+
+        return res.status(201).json({
+            message: "target data fetched successfully",
+            status: 'ok',
+            data: targetData
+        });
+    });
+
 }
 
 export default TargetDataController;
