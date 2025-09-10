@@ -1,8 +1,7 @@
 class TargetData {
-    constructor({id, clientId, targetId, data, createdAt, updatedAt}) {
+    constructor({id, clientTargetId, data, createdAt, updatedAt}) {
         this.id = id;
-        this.clientId = clientId;
-        this.targetId = targetId;
+        this.clientTargetId = clientTargetId;
         this.data = data;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -10,8 +9,7 @@ class TargetData {
 
     get createTargetData() {
         return {
-            clientId: this.clientId,
-            targetId: this.targetId,
+            clientTargetId: this.clientTargetId,
             data: this.data,
         };
     }

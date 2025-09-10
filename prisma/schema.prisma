@@ -186,11 +186,11 @@ model Client {
   updatedAt     DateTime @updatedAt
   password      String?
 
-  pipelineItems              PipelineItem[]
-  tenantLinks                ClientTenant[]
-  logs                       Logs[]
-  ClientProgram              ClientProgram[]
-  ClientTargetDataCollection ClientTargetDataCollection[]
+  pipelineItems PipelineItem[]
+  tenantLinks   ClientTenant[]
+  logs          Logs[]
+  ClientProgram ClientProgram[]
+  ClientTarget  ClientTarget[]
 }
 
 model ClientTenant {
@@ -577,8 +577,8 @@ model Target {
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
-  program                    Program                      @relation(fields: [programId], references: [id])
-  ClientTargetDataCollection ClientTargetDataCollection[]
+  program      Program        @relation(fields: [programId], references: [id])
+  ClientTarget ClientTarget[]
 }
 
 model ClientProgram {
@@ -594,14 +594,24 @@ model ClientProgram {
   @@unique([clientId, programId])
 }
 
-model ClientTargetDataCollection {
+model ClientTarget {
   id        String   @id @default(uuid())
   clientId  String
   targetId  String
-  data      Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  client Client @relation(fields: [clientId], references: [id])
-  target Target @relation(fields: [targetId], references: [id])
+  client                     Client                       @relation(fields: [clientId], references: [id])
+  target                     Target                       @relation(fields: [targetId], references: [id])
+  ClientTargetDataCollection ClientTargetDataCollection[]
+}
+
+model ClientTargetDataCollection {
+  id             String   @id @default(uuid())
+  clientTargetId String
+  data           Json
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  clientTarget ClientTarget @relation(fields: [clientTargetId], references: [id])
 }

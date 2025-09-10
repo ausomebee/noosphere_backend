@@ -15,8 +15,7 @@ class TargetDataService {
 
     async getClientTargetData(data) {
         const targetData = await this.targetDataRepository.findAll({
-            clientId: data.clientId,
-            targetId: data.targetId
+            clientTargetId: data.clientTargetId
         });
 
         if (!targetData) {
