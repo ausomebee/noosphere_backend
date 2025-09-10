@@ -8,7 +8,8 @@ class DomainService {
             AND: [
                 { name: data.name },
                 { isDeleted: false },
-                { tenantId: data.tenantId }
+                { tenantId: data.tenantId },
+                { domainType: data.domainType }
             ]
         });
 

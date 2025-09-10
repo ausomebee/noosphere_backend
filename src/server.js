@@ -27,6 +27,8 @@ import issue_route from "./features/issue/presentation/routes/issueRoute.js"
 import program_route from "./features/program/presentation/routes/programRoute.js"
 import domain_route from "./features/program/presentation/routes/domainRoute.js"
 import target_route from "./features/program/presentation/routes/targetRoute.js"
+import target_data_route from "./features/program/presentation/routes/targetDataRoute.js";    
+import client_program_route from "./features/program/presentation/routes/clientProgramRoute.js";
 
 
 class App {
@@ -83,6 +85,8 @@ class App {
         this.app.use("/api/v1/programs", program_route);
         this.app.use("/api/v1/domains", domain_route);
         this.app.use("/api/v1/targets", target_route);
+        this.app.use("/api/v1/target-data", target_data_route);
+        this.app.use("/api/v1/client-programs", client_program_route);
     }
 
     initializeErrorHandler() {
