@@ -66,30 +66,24 @@ class TargetDataRoutes {
 
         /**
          * @swagger
-         * /api/v1/target-data/{targetId}/client/{clientId}:
+         * /api/v1/target-data/{clientTargetId}:
          *   get:
-         *     summary: Get Target Data by ID
+         *     summary: Get Target Data by clientTargetId
          *     tags: [program]
          *     parameters:
          *      - in: path
-         *        name: targetId
+         *        name: clientTargetId
          *        required: true
          *        schema:
          *          type: string
-         *        description: The Target ID
-         *      - in: path
-         *        name: clientId
-         *        required: true
-         *        schema:
-         *          type: string
-         *        description: The Client ID
+         *        description: The Client Target ID
          *     responses:
          *       201:
          *         description: Target Data fetched successfully
          *       400:
          *         description: Validation error
          */
-        this.router.get("/:targetId/client/:clientId", this.controller.getClientTargetData);
+        this.router.get("/:clientTargetId", this.controller.getClientTargetData);
 
     }
 
