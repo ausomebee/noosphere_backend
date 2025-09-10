@@ -55,7 +55,7 @@ class TargetDataRoutes {
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/ClientProgramDto'
+         *             $ref: '#/components/schemas/TargetDataDto'
          *     responses:
          *       201:
          *         description: Target Data created successfully
