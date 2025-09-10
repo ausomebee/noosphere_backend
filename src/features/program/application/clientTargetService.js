@@ -24,8 +24,13 @@ class ClientTargetService {
         return newClientTarget;
     }
 
-    async getAllClientTargets(clientId) {
-        const clientTargets = await this.clientTargetRepository.findAllAndPopulate({clientId}, {target: true});
+    async getAllClientTargets(data) {
+        const { clientId, targetId } = data;
+        const clientTargets = await this.clientTargetRepository.findAllAndPopulate({ clientId, targetId }, {
+            target: {
+                include: { program: { include: { domain: true } } }
+            }
+        });
 
         if (!clientTargets) {
             throw new Error("Client Targets not found")

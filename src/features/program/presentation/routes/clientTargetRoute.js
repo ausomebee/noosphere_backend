@@ -54,7 +54,7 @@ class ClientTargetRoutes {
 
         /**
          * @swagger
-         * /api/v1/client-targets/{clientId}:
+         * /api/v1/client-targets/{targetId}/client/{clientId}:
          *   get:
          *     summary: Get All Client Targets
          *     tags: [program]
@@ -65,14 +65,24 @@ class ClientTargetRoutes {
          *           type: string
          *           format: uuid
          *         required: true
+         *         example: "123e4567-e89b-12d3-a456-426614174000"
          *         description: Unique identifier of the client
+         *       - in: path
+         *         name: targetId
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         required: false
+         *         example: "223e4567-e89b-12d3-a456-426614174111"
+         *         description: Unique identifier of the target
+         *     description: Fetch all client targets, optionally filtered by targetId
          *     responses:
          *       201:
          *         description: Client Targets fetched successfully
          *       400:
          *         description: Validation error
          */
-        this.router.get("/:clientId", this.controller.getAllClientTargets);
+        this.router.get("/:targetId/client/:clientId", this.controller.getAllClientTargets);
 
     }
 

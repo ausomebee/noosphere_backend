@@ -27,7 +27,7 @@ class ClientTargetController {
     });
 
     getAllClientTargets = expressAsyncHandler(async (req, res) => {
-        const clientTargets = await this.service.getAllClientTargets(req.params.clientId);
+        const clientTargets = await this.service.getAllClientTargets(req.params);
 
         if (!clientTargets) {
             res.status(500).json({ message: 'Failed to fetch client targets' });
