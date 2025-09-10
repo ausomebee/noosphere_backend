@@ -1,6 +1,6 @@
 import expressAsyncHandler from "express-async-handler";
 import prismaService from "../../../../config/prisma.js";
-import TargetDataRepository from "../../infrastructure/targetData.js";
+import TargetDataRepository from "../../infrastructure/targetDataRepository.js";
 import TargetDataService from "../../application/targetDataService.js";
 import TargetData from "../../domain/targetData.js";
 

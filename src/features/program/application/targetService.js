@@ -70,7 +70,7 @@ class TargetService {
     }
 
     async getSingleTarget(id) {
-        const target = await this.targetRepository.findOne({ id });
+        const target = await this.targetRepository.findOneAndPopulate({ id }, { program: { include: { domain: true } } });
 
         if (!target) {
             throw new Error("Target not found")
