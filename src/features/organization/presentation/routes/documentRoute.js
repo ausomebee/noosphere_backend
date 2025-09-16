@@ -83,7 +83,7 @@ class DocumentRoutes {
 
         /**
         * @swagger
-        * /api/v1/organization/tenant/document/{tenantId}:
+        * /api/v1/organization/document/tenant/{tenantId}:
         *   get:
         *     summary: gets tenant organization documents
         *     tags: [organization]

@@ -55,7 +55,7 @@ class LicenseController {
     });
 
     getTenantLicense = expressAsyncHandler(async (req, res) => {
-        const license = await this.service.getTenantLicense(req.params.tenantId);
+        const license = await this.service.getTenantLicenses(req.params.tenantId);
 
         if (!license) {
             res.status(500).json({ message: 'Failed to fetch license' });
