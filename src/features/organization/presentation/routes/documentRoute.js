@@ -49,7 +49,7 @@ class DocumentRoutes {
          *     requestBody:
          *       required: true
          *       content:
-         *         application/json:
+         *         multipart/form-data:
          *           schema:
          *             $ref: '#/components/schemas/DocumentCreateDto'
          *     responses:
