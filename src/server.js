@@ -30,6 +30,9 @@ import target_route from "./features/program/presentation/routes/targetRoute.js"
 import target_data_route from "./features/program/presentation/routes/targetDataRoute.js";    
 import client_program_route from "./features/program/presentation/routes/clientProgramRoute.js";
 import client_target_route from "./features/program/presentation/routes/clientTargetRoute.js";
+import organization_information_route from "./features/organization/presentation/routes/informationRoute.js";
+import organization_document_route from "./features/organization/presentation/routes/documentRoute.js";
+import organization_license_route from "./features/organization/presentation/routes/licenseRoute.js";
 
 
 class App {
@@ -89,6 +92,9 @@ class App {
         this.app.use("/api/v1/target-data", target_data_route);
         this.app.use("/api/v1/client-programs", client_program_route);
         this.app.use("/api/v1/client-targets", client_target_route);
+        this.app.use("/api/v1/organization/information", organization_information_route);
+        this.app.use("/api/v1/organization/document", organization_document_route);
+        this.app.use("/api/v1/organization/license", organization_license_route);
     }
 
     initializeErrorHandler() {

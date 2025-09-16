@@ -127,22 +127,25 @@ model Tenant {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  pipelineItems      PipelineItem[]
-  clientLinks        ClientTenant[]
-  pipelines          Pipeline[]
-  departments        Department[]
-  TenantStaff        TenantStaff[]
-  BillingMetadata    BillingMetadata?
-  Subscription       Subscription[]
-  admin              Admin               @relation(fields: [createdBy], references: [id])
-  Payment            Payment[]
-  logs               Logs[]
-  BillingPlan        BillingPlan[]
-  Invoice            Invoice[]
-  PaymentMethod      PaymentMethod[]
-  issues             Issue[]
-  tenantAdminChoices TenantAdminChoices?
-  domain             Domain[]
+  pipelineItems           PipelineItem[]
+  clientLinks             ClientTenant[]
+  pipelines               Pipeline[]
+  departments             Department[]
+  TenantStaff             TenantStaff[]
+  BillingMetadata         BillingMetadata?
+  Subscription            Subscription[]
+  admin                   Admin                    @relation(fields: [createdBy], references: [id])
+  Payment                 Payment[]
+  logs                    Logs[]
+  BillingPlan             BillingPlan[]
+  Invoice                 Invoice[]
+  PaymentMethod           PaymentMethod[]
+  issues                  Issue[]
+  tenantAdminChoices      TenantAdminChoices?
+  domain                  Domain[]
+  OrganizationInformation OrganizationInformation?
+  OrganizationLicenses    OrganizationLicenses?
+  OrganizationDocuments   OrganizationDocuments[]
 }
 
 model TenantStaff {
@@ -614,4 +617,45 @@ model ClientTargetDataCollection {
   updatedAt      DateTime @updatedAt
 
   clientTarget ClientTarget @relation(fields: [clientTargetId], references: [id])
+}
+
+model OrganizationInformation {
+  id            String @id @default(uuid())
+  tenantId      String @unique
+  name          String
+  email         String
+  phoneNumber   String
+  website       String
+  practiceNPI   String
+  streetAddress String
+  city          String
+  state         String
+  country       String
+  zipCode       String
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model OrganizationLicenses {
+  id            String   @id @default(uuid())
+  tenantId      String   @unique
+  licenseName   String
+  licenseNumber String
+  issueDate     DateTime
+  expiryDate    DateTime
+  isDeleted     Boolean  @default(false)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model OrganizationDocuments {
+  id           String   @id @default(uuid())
+  tenantId     String
+  documentName String
+  documentUrl  String
+  uploadedBy   String
+  createdAt    DateTime @default(now())
+  isDeleted    Boolean  @default(false)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
 }
