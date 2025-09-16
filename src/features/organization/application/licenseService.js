@@ -33,7 +33,7 @@ class LicenseService {
             tenantId: data.tenantId || license.tenantId,
             licenseName: data.licenseName || license.licenseName,
             licenseNumber: data.licenseNumber || license.licenseNumber,
-            issueDate: data.issueDate || license.issueDate,
+            issueState: data.issueState || license.issueState,
             expiryDate: data.expiryDate || license.expiryDate,
             isDeleted: data.isDeleted || license.isDeleted,
         });

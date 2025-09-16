@@ -12,7 +12,7 @@ import LicenseDto from "../dto/licenseDto.js";
  *         - tenantId
  *         - licenseName
  *         - licenseNumber
- *         - issueDate
+ *         - issueState
  *         - expiryDate
  *       properties:
  *         tenantId:
@@ -26,15 +26,14 @@ import LicenseDto from "../dto/licenseDto.js";
  *           type: string
  *           description: License number
  *           example: "LIC-123456"
- *         issueDate:
+ *         issueState:
  *           type: string
- *           format: date
- *           description: Date the license was issued
+ *           description: issue state of the license
  *           example: "2024-01-01"
  *         expiryDate:
  *           type: string
  *           format: date
- *           description: Date the license will expire (must be after issueDate)
+ *           description: Date the license will expire 
  *           example: "2026-01-01"
  *
  *     LicenseUpdateDto:
@@ -43,7 +42,7 @@ import LicenseDto from "../dto/licenseDto.js";
  *         - tenantId
  *         - licenseName
  *         - licenseNumber
- *         - issueDate
+ *         - issueState
  *         - expiryDate
  *       properties:
  *         id:
@@ -59,14 +58,13 @@ import LicenseDto from "../dto/licenseDto.js";
  *         licenseNumber:
  *           type: string
  *           description: License number
- *         issueDate:
+ *         issueState:
  *           type: string
- *           format: date
- *           description: Date the license was issued
+ *           description: issue state of the license
  *         expiryDate:
  *           type: string
  *           format: date
- *           description: Date the license will expire (must be after issueDate)
+ *           description: Date the license will expire 
  */
 
 class LicenseRoutes {
