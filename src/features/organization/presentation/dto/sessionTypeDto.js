@@ -13,13 +13,11 @@ class OrganizationSessionTypesDto {
             category: Joi.string()
                 .min(1)
                 .required(),
-            service: Joi.object()
+            service: Joi.array()
                 .required(),
             staffRolesAllowed: Joi.array()
-                .items(Joi.string())
                 .required(),
             locationsAllowed: Joi.array()
-                .items(Joi.string())
                 .required(),
             defaultDuration: Joi.number()
                 .integer()
