@@ -5,8 +5,8 @@ class DocumentService {
 
     async createDocument(data) {
         const documentExists = await this.documentRepository.findFirstDynamic({
-            where: { name: data.name },
-            select: { name: true }
+            where: { documentName: data.documentName },
+            select: { documentName: true }
         });
 
         if (documentExists) {
