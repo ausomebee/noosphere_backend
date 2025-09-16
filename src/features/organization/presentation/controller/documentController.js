@@ -2,6 +2,7 @@ import expressAsyncHandler from "express-async-handler";
 import prismaService from "../../../../config/prisma.js";
 import DocumentRepository from "../../infrastucture/documentRepository.js";
 import DocumentService from "../../application/documentService.js";
+import Document from "../../domain/document.js";
 
 class DocumentController {
     constructor() {
