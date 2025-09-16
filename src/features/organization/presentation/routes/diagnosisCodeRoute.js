@@ -145,7 +145,7 @@ class OrganizationDiagnosisCodesRoutes {
         /**
          * @swagger
          * /api/v1/organization/diagnosis-codes/{id}:
-         *   delete:
+         *   patch:
          *     summary: Deactivate an organization diagnosis code
          *     tags: [organization]
          *     parameters:
@@ -159,7 +159,7 @@ class OrganizationDiagnosisCodesRoutes {
          *       200:
          *         description: Organization diagnosis code deactivated successfully
          */
-        this.router.delete("/:id", this.controller.deactivateDiagnosisCode);
+        this.router.patch("/:id", this.controller.deactivateDiagnosisCode);
     }
 
     getRouter() {
