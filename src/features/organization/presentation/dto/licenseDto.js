@@ -12,10 +12,10 @@ class LicenseDto {
             licenseNumber: Joi.string()
                 .min(1)
                 .required(),
-            issueDate: Joi.date()
+            issueState: Joi.string()
+                .min(1)
                 .required(),
             expiryDate: Joi.date()
-                .greater(Joi.ref('issueDate'))
                 .required(),
         });
 
@@ -35,10 +35,10 @@ class LicenseDto {
             licenseNumber: Joi.string()
                 .min(1)
                 .required(),
-            issueDate: Joi.date()
+            issueState: Joi.string()
+                .min(1)
                 .required(),
             expiryDate: Joi.date()
-                .greater(Joi.ref('issueDate'))
                 .required(),
         });
 

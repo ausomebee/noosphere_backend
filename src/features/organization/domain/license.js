@@ -1,10 +1,10 @@
 class License {
-    constructor({ id, tenantId, licenseName, licenseNumber, issueDate, expiryDate, isDeleted }) {
+    constructor({ id, tenantId, licenseName, licenseNumber, issueState, expiryDate, isDeleted }) {
         this.id = id;
         this.tenantId = tenantId;
         this.licenseName = licenseName;
         this.licenseNumber = licenseNumber;
-        this.issueDate = issueDate;
+        this.issueState = issueState;
         this.expiryDate = expiryDate;
         this.isDeleted = isDeleted;
     }
@@ -15,7 +15,7 @@ class License {
             tenantId: this.tenantId,
             licenseName: this.licenseName,
             licenseNumber: this.licenseNumber,
-            issueDate: this.issueDate,
+            issueState: this.issueState,
             expiryDate: this.expiryDate,
             isDeleted: this.isDeleted
         };
