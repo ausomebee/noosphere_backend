@@ -33,6 +33,8 @@ import client_target_route from "./features/program/presentation/routes/clientTa
 import organization_information_route from "./features/organization/presentation/routes/informationRoute.js";
 import organization_document_route from "./features/organization/presentation/routes/documentRoute.js";
 import organization_license_route from "./features/organization/presentation/routes/licenseRoute.js";
+import organization_session_type_route from "./features/organization/presentation/routes/sessionTypeRoute.js";
+import organization_diagnosis_code_route from "./features/organization/presentation/routes/diagnosisCodeRoute.js";
 
 
 class App {
@@ -95,6 +97,8 @@ class App {
         this.app.use("/api/v1/organization/information", organization_information_route);
         this.app.use("/api/v1/organization/document", organization_document_route);
         this.app.use("/api/v1/organization/license", organization_license_route);
+        this.app.use("/api/v1/organization/diagnosis-codes", organization_diagnosis_code_route);
+        this.app.use("/api/v1/organization/session-types", organization_session_type_route);
     }
 
     initializeErrorHandler() {

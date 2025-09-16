@@ -127,25 +127,27 @@ model Tenant {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  pipelineItems           PipelineItem[]
-  clientLinks             ClientTenant[]
-  pipelines               Pipeline[]
-  departments             Department[]
-  TenantStaff             TenantStaff[]
-  BillingMetadata         BillingMetadata?
-  Subscription            Subscription[]
-  admin                   Admin                    @relation(fields: [createdBy], references: [id])
-  Payment                 Payment[]
-  logs                    Logs[]
-  BillingPlan             BillingPlan[]
-  Invoice                 Invoice[]
-  PaymentMethod           PaymentMethod[]
-  issues                  Issue[]
-  tenantAdminChoices      TenantAdminChoices?
-  domain                  Domain[]
-  OrganizationInformation OrganizationInformation?
-  OrganizationLicenses    OrganizationLicenses?
-  OrganizationDocuments   OrganizationDocuments[]
+  pipelineItems              PipelineItem[]
+  clientLinks                ClientTenant[]
+  pipelines                  Pipeline[]
+  departments                Department[]
+  TenantStaff                TenantStaff[]
+  BillingMetadata            BillingMetadata?
+  Subscription               Subscription[]
+  admin                      Admin                        @relation(fields: [createdBy], references: [id])
+  Payment                    Payment[]
+  logs                       Logs[]
+  BillingPlan                BillingPlan[]
+  Invoice                    Invoice[]
+  PaymentMethod              PaymentMethod[]
+  issues                     Issue[]
+  tenantAdminChoices         TenantAdminChoices?
+  domain                     Domain[]
+  OrganizationInformation    OrganizationInformation?
+  OrganizationLicenses       OrganizationLicenses?
+  OrganizationDocuments      OrganizationDocuments[]
+  OrganizationDiagnosisCodes OrganizationDiagnosisCodes[]
+  OrganizationSessionTypes   OrganizationSessionTypes[]
 }
 
 model TenantStaff {
@@ -656,6 +658,31 @@ model OrganizationDocuments {
   uploadedBy   String
   createdAt    DateTime @default(now())
   isDeleted    Boolean  @default(false)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model OrganizationDiagnosisCodes {
+  id          String  @id @default(uuid())
+  tenantId    String
+  code        String
+  description String
+  isActive    Boolean
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model OrganizationSessionTypes {
+  id                String  @id @default(uuid())
+  tenantId          String
+  name              String
+  category          String
+  service           Json
+  staffRolesAllowed Json
+  locationsAllowed  Json
+  defaultDuration   Int
+  isActive          Boolean
+  isBillable        Boolean
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
 }
