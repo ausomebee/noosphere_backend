@@ -23,6 +23,7 @@ class OrganizationDiagnosisCodesService {
     }
 
     async updateOrganizationDiagnosisCode(data) {
+        console.log(data)
         const code = await this.organizationDiagnosisCodesRepository.findOne({ id: data.id });
 
         if (!code) {
@@ -33,7 +34,7 @@ class OrganizationDiagnosisCodesService {
             tenantId: data.tenantId || code.tenantId,
             code: data.code || code.code,
             description: data.description || code.description,
-            isActive: data.isActive !== undefined ? data.isActive : code.isActive,
+            isActive: data.isActive ?? code.isActive,
         });
 
         if (!update) {

@@ -144,9 +144,9 @@ class OrganizationDiagnosisCodesRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/diagnosis-codes/{id}:
+         * /api/v1/organization/diagnosis-codes/active/{id}/{active}:
          *   patch:
-         *     summary: Deactivate an organization diagnosis code
+         *     summary: Deactivate or activate an organization diagnosis code
          *     tags: [organization]
          *     parameters:
          *       - in: path
@@ -154,12 +154,22 @@ class OrganizationDiagnosisCodesRoutes {
          *         required: true
          *         schema:
          *           type: string
-         *         description: The Id of the diagnosis code
+         *         description: The ID of the diagnosis code
+         *       - in: path
+         *         name: active
+         *         required: true
+         *         schema:
+         *           type: boolean
+         *         description: Set to `true` to activate or `false` to deactivate
          *     responses:
          *       200:
-         *         description: Organization diagnosis code deactivated successfully
+         *         description: Organization diagnosis code status updated successfully
+         *       400:
+         *         description: Invalid request
+         *       404:
+         *         description: Diagnosis code not found
          */
-        this.router.patch("/:id", this.controller.deactivateDiagnosisCode);
+        this.router.patch("/active/:id/:active", this.controller.deactivateDiagnosisCode);
     }
 
     getRouter() {

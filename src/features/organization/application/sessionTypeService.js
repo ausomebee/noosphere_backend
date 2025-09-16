@@ -37,8 +37,8 @@ class OrganizationSessionTypesService {
             staffRolesAllowed: data.staffRolesAllowed || type.staffRolesAllowed,
             locationsAllowed: data.locationsAllowed || type.locationsAllowed,
             defaultDuration: data.defaultDuration || type.defaultDuration,
-            isActive: data.isActive !== undefined ? data.isActive : type.isActive,
-            isBillable: data.isBillable !== undefined ? data.isBillable : type.isBillable,
+            isActive: data.isActive ?? type.isActive,
+            isBillable: data.isBillable ?? type.isBillable,
         });
 
         if (!update) {
