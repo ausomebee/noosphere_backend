@@ -1,0 +1,190 @@
+import express from "express";
+import LicenseController from "../controller/licenseController.js";
+import LicenseDto from "../dto/licenseDto.js";
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     LicenseCreateDto:
+ *       type: object
+ *       required:
+ *         - tenantId
+ *         - licenseName
+ *         - licenseNumber
+ *         - issueDate
+ *         - expiryDate
+ *       properties:
+ *         tenantId:
+ *           type: string
+ *           description: Unique tenant identifier
+ *         licenseName:
+ *           type: string
+ *           description: Name of the license
+ *           example: "Medical Practice License"
+ *         licenseNumber:
+ *           type: string
+ *           description: License number
+ *           example: "LIC-123456"
+ *         issueDate:
+ *           type: string
+ *           format: date
+ *           description: Date the license was issued
+ *           example: "2024-01-01"
+ *         expiryDate:
+ *           type: string
+ *           format: date
+ *           description: Date the license will expire (must be after issueDate)
+ *           example: "2026-01-01"
+ *
+ *     LicenseUpdateDto:
+ *       type: object
+ *       required:
+ *         - tenantId
+ *         - licenseName
+ *         - licenseNumber
+ *         - issueDate
+ *         - expiryDate
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           description: Unique identifier for the license (optional on update)
+ *         tenantId:
+ *           type: string
+ *           description: Unique tenant identifier
+ *         licenseName:
+ *           type: string
+ *           description: Name of the license
+ *         licenseNumber:
+ *           type: string
+ *           description: License number
+ *         issueDate:
+ *           type: string
+ *           format: date
+ *           description: Date the license was issued
+ *         expiryDate:
+ *           type: string
+ *           format: date
+ *           description: Date the license will expire (must be after issueDate)
+ */
+
+class LicenseRoutes {
+    constructor() {
+        this.controller = new LicenseController();
+        this.router = express.Router();
+        this.initializeRoutes();
+    }
+
+    initializeRoutes() {
+        /**
+         * @swagger
+         * /api/v1/organization/license:
+         *   post:
+         *     summary: Create organization license
+         *     tags: [organization]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/LicenseCreateDto'
+         *     responses:
+         *       201:
+         *         description: Organization license created successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/", LicenseDto.createLicenseDto, this.controller.createLicense);
+
+        /**
+         * @swagger
+         * /api/v1/organization/license:
+         *   put:
+         *     summary: Update organization license
+         *     tags: [organization]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/LicenseUpdateDto'
+         *     responses:
+         *       201:
+         *         description: Organization license updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.put("/", LicenseDto.updateLicenseDto, this.controller.updateLicense);
+
+        /**
+        * @swagger
+        * /api/v1/organization/license/tenant/{tenantId}:
+        *   get:
+        *     summary: gets tenant organization license
+        *     tags: [organization]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the tenant
+        *     responses:
+        *       200:
+        *         description: organization license fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant/:tenantId", this.controller.getTenantLicense);
+
+        /**
+        * @swagger
+        * /api/v1/organization/license/{id}:
+        *   get:
+        *     summary: gets single organization license
+        *     tags: [organization]
+        *     parameters:
+        *       - in: path
+        *         name: id
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the license
+        *     responses:
+        *       200:
+        *         description: organization license fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/:id", this.controller.getSingleLicense);
+
+        /**
+        * @swagger
+        * /api/v1/organization/license/{id}:
+        *   delete:
+        *     summary: deletes an organization license
+        *     tags: [organization]
+        *     parameters:
+        *       - in: path
+        *         name: id
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the license
+        *     responses:
+        *       200:
+        *         description: organization license deleted successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.delete("/:id", this.controller.deleteLicense);
+
+    }
+
+    getRouter() {
+        return this.router;
+    }
+}
+
+export default new LicenseRoutes().getRouter();
