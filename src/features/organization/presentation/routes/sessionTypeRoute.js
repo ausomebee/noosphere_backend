@@ -191,9 +191,9 @@ class OrganizationSessionTypesRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/session-types/{id}:
+         * /api/v1/organization/session-types/active/{id}/{active}:
          *   patch:
-         *     summary: Deactivate an organization session type
+         *     summary: Activate or deactivate an organization session type
          *     tags: [organization]
          *     parameters:
          *       - in: path
@@ -201,12 +201,22 @@ class OrganizationSessionTypesRoutes {
          *         required: true
          *         schema:
          *           type: string
-         *         description: The Id of the session type
+         *         description: The ID of the session type
+         *       - in: path
+         *         name: active
+         *         required: true
+         *         schema:
+         *           type: boolean
+         *         description: Set to `true` to activate or `false` to deactivate
          *     responses:
          *       200:
-         *         description: Organization session type deactivated successfully
+         *         description: Organization session type status updated successfully
+         *       400:
+         *         description: Invalid request
+         *       404:
+         *         description: Session type not found
          */
-        this.router.patch("/:id", this.controller.deactivateSessionType);
+        this.router.patch("/active/:id/:active", this.controller.deactivateSessionType);
     }
 
     getRouter() {

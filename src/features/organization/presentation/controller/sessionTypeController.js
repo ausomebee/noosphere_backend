@@ -69,7 +69,7 @@ class OrganizationSessionTypesController {
     });
 
     deactivateSessionType = expressAsyncHandler(async (req, res) => {
-        const type = await this.service.updateOrganizationSessionType({ id: req.params.id, isActive: false });
+        const type = await this.service.updateOrganizationSessionType({ id: req.params.id, isActive: req.params.active === "true" });
 
         if (!type) {
             res.status(500).json({ message: "Failed to deactivate session type" });

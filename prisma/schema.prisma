@@ -144,10 +144,10 @@ model Tenant {
   tenantAdminChoices         TenantAdminChoices?
   domain                     Domain[]
   OrganizationInformation    OrganizationInformation?
-  OrganizationLicenses       OrganizationLicenses?
   OrganizationDocuments      OrganizationDocuments[]
   OrganizationDiagnosisCodes OrganizationDiagnosisCodes[]
   OrganizationSessionTypes   OrganizationSessionTypes[]
+  OrganizationLicenses       OrganizationLicenses[]
 }
 
 model TenantStaff {
@@ -640,10 +640,10 @@ model OrganizationInformation {
 
 model OrganizationLicenses {
   id            String   @id @default(uuid())
-  tenantId      String   @unique
+  tenantId      String
   licenseName   String
   licenseNumber String
-  issueState     String
+  issueState    String
   expiryDate    DateTime
   isDeleted     Boolean  @default(false)
 

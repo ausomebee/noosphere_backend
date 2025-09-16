@@ -69,7 +69,7 @@ class OrganizationDiagnosisCodesController {
     });
 
     deactivateDiagnosisCode = expressAsyncHandler(async (req, res) => {
-        const code = await this.service.updateOrganizationDiagnosisCode({ id: req.params.id, isActive: false });
+        const code = await this.service.updateOrganizationDiagnosisCode({ id: req.params.id, isActive: req.params.active === "true" });
 
         if (!code) {
             res.status(500).json({ message: "Failed to deactivate diagnosis code" });
