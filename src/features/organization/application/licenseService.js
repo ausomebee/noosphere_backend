@@ -5,8 +5,8 @@ class LicenseService {
 
     async createLicense(data) {
         const licenseExists = await this.licenseRepository.findFirstDynamic({
-            where: { name: data.name },
-            select: { name: true }
+            where: { licenseName: data.licenseName },
+            select: { licenseName: true }
         });
 
         if (licenseExists) {
