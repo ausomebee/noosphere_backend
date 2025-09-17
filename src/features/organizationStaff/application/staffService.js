@@ -112,7 +112,7 @@ class TenantStaffService {
     async getStaffDetails(id) {
         const staff = await this.staffRepository.findFirstDynamic({ where: { id }, include: { role: true } });
         const payroll = await this.payrollRepository.findFirst({ tenantStaffId: staff.id });
-        const license = await this.licenseRepository.findFirst({ tenantStaffId: staff.id });
+        const license = await this.licenseRepository.findAll({ tenantStaffId: staff.id });
         const document = await this.documentRepository.findAll({ tenantStaffId: staff.id });
 
 
