@@ -78,6 +78,20 @@ class TenantStaffController {
         });
     });
 
+    getStaffDetails = expressAsyncHandler(async (req, res) => {
+        const staff = await this.service.getStaffDetails(req.params.id);
+
+        if (!staff) {
+            res.status(404).json({ message: "Staff not found" });
+        }
+
+        return res.status(200).json({
+            message: "Tenant staff retrieved successfully",
+            status: "ok",
+            data: staff,
+        });
+    });
+
 }
 
 export default TenantStaffController;

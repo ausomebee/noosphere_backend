@@ -26,7 +26,7 @@ class TenantStaffService {
         }
 
         const createStaffData = new TenantStaff(data);
-console.log(createStaffData.createTenantStaff)
+
         const newStaff = await this.prisma.$transaction(async (tx) => {
             const staff = await this.staffRepository.txCreate(createStaffData.createTenantStaff, tx.tenantStaff);
             data.documents.forEach((d) => {
@@ -107,6 +107,20 @@ console.log(createStaffData.createTenantStaff)
         }
 
         return staff;
+    }
+
+    async getStaffDetails(id) {
+        const staff = await this.staffRepository.findFirstDynamic({ where: { id }, include: { role: true } });
+        const payroll = await this.payrollRepository.findFirst({ tenantStaffId: staff.id });
+        const license = await this.licenseRepository.findFirst({ tenantStaffId: staff.id });
+        const document = await this.documentRepository.findAll({ tenantStaffId: staff.id });
+
+
+        if (!staff) {
+            throw new Error("Staff not found")
+        }
+
+        return {staff, payroll, license, document};
     }
 
 }

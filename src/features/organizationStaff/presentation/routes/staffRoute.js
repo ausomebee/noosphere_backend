@@ -358,6 +358,27 @@ class TenantStaffRoutes {
 
         /**
          * @swagger
+         * /api/v1/organization-staff/staff/details/{id}:
+         *   get:
+         *     summary: Get a single tenant staff member
+         *     tags: [organization-staff]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The ID of the staff member
+         *     responses:
+         *       200:
+         *         description: Tenant staff fetched successfully
+         *       404:
+         *         description: Staff not found
+         */
+        this.router.get("/details/:id", this.controller.getStaffDetails);
+
+        /**
+         * @swagger
          * /api/v1/organization-staff/staff/active/{id}/{active}:
          *   patch:
          *     summary: Activate or deactivate a tenant staff member
