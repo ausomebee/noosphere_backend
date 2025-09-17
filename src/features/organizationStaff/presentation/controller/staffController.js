@@ -10,10 +10,10 @@ class TenantStaffController {
     constructor() {
         this.prisma = prismaService.getClient();
         this.documentRepository = new DocumentRepository(this.prisma.tenantStaffDocuments);
-        this.staffRepository = new StaffRepository(this.prisma.tenantStaffPayroll);
+        this.staffRepository = new StaffRepository(this.prisma.tenantStaff);
         this.licenseRepository = new LicenseRepository(this.prisma.tenantStaffLicenses);
         this.payrollRepository = new PayrollRepository(this.prisma.tenantStaffPayroll);
-        this.service = new TenantStaffService({ documentRepository: this.documentRepository, staffRepository: this.staffRepository, licenseRepository: this.licenseRepository, payrollRepository: this.payrollRepository  });
+        this.service = new TenantStaffService({ documentRepository: this.documentRepository, staffRepository: this.staffRepository, licenseRepository: this.licenseRepository, payrollRepository: this.payrollRepository, prisma: this.prisma });
     }
 
     createTenantStaff = expressAsyncHandler(async (req, res) => {
@@ -31,7 +31,12 @@ class TenantStaffController {
     });
 
     updateTenantStaff = expressAsyncHandler(async (req, res) => {
-        const staff = await this.service.updateTenantStaff(req.body);
+        const staff = await this.service.updateTenantStaff(
+            {
+                id: req.params.id ? req.params.id : req.body.id,
+                ...req.body
+            }
+        );
 
         if (!staff) {
             res.status(500).json({ message: "Failed to update staff" });
@@ -71,7 +76,7 @@ class TenantStaffController {
             data: staff,
         });
     });
-    
+
 }
 
 export default TenantStaffController;

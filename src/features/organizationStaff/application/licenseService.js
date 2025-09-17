@@ -16,7 +16,7 @@ class LicenseService {
             tenantStaffId: data.tenantStaffId || license.tenantStaffId,
             issueState: data.issueState || license.issueState,
             expiryDate: data.expiryDate || license.expiryDate,
-            isDeleted: data.isDeleted ?? tenant.isDeleted
+            isDeleted: data.isDeleted ?? license.isDeleted
         });
 
         if (!update) {
@@ -27,7 +27,7 @@ class LicenseService {
     }
 
     async getTenantStaffLicenses(tenantStaffId) {
-        const licenses = await this.licenseRepository.findAllAndPopulate({ tenantStaffId, active: true, isDeleted: false });
+        const licenses = await this.licenseRepository.findAllAndPopulate({ tenantStaffId, isDeleted: false });
 
         if (!licenses) {
             throw new Error("Licenses not found");

@@ -333,17 +333,10 @@ class TenantStaffRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization-staff/staff/{id}:
+         * /api/v1/organization-staff/staff/:
          *   put:
          *     summary: Update a tenant staff member
          *     tags: [organization-staff]
-         *     parameters:
-         *       - in: path
-         *         name: id
-         *         required: true
-         *         schema:
-         *           type: string
-         *         description: The ID of the staff member
          *     requestBody:
          *       required: true
          *       content:
@@ -358,7 +351,7 @@ class TenantStaffRoutes {
          *       404:
          *         description: Staff not found
          */
-        this.router.put("/:id", StaffDto.updateTenantStaffDto, this.controller.updateTenantStaff);
+        this.router.put("/", StaffDto.updateTenantStaffDto, this.controller.updateTenantStaff);
 
         /**
          * @swagger

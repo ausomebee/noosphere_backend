@@ -14,7 +14,7 @@ class LicenseController {
 
     updateLicense = expressAsyncHandler(async (req, res) => {
         const license = await this.service.updateLicense({
-            id: req.params.id,
+            id: req.params.id ? req.params.id : req.body.id,
             ...req.body
         });
 

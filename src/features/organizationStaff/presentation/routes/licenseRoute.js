@@ -55,17 +55,10 @@ class LicenseRoutes {
     initializeRoutes() {
         /**
          * @swagger
-         * /api/v1/organization-staff/license/{id}:
+         * /api/v1/organization-staff/license:
          *   put:
          *     summary: Update a tenant staff license
          *     tags: [organization-staff]
-         *     parameters:
-         *       - in: path
-         *         name: id
-         *         required: true
-         *         schema:
-         *           type: string
- *         description: The ID of the license
          *     requestBody:
          *       required: true
          *       content:
@@ -80,7 +73,7 @@ class LicenseRoutes {
          *       404:
          *         description: License not found
          */
-        this.router.put("/:id", LicenseDto.updateLicenseDto, this.controller.updateLicense);
+        this.router.put("/", LicenseDto.updateLicenseDto, this.controller.updateLicense);
 
         /**
          * @swagger

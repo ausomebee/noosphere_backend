@@ -17,7 +17,7 @@ class PayrollService {
             minimumHours: data.minimumHours || payroll.minimumHours,
             otherPays: data.otherPays || payroll.otherPays,
             deductions: data.deductions || payroll.deductions,
-            isDeleted: data.isDeleted ?? tenant.isDeleted
+            isDeleted: data.isDeleted ?? payroll.isDeleted
         });
 
         if (!update) {
@@ -28,7 +28,7 @@ class PayrollService {
     }
 
     async getTenantStaffPayrolls(tenantStaffId) {
-        const payrolls = await this.payrollRepository.findAllAndPopulate({ tenantStaffId, active: true, isDeleted: false });
+        const payrolls = await this.payrollRepository.findAllAndPopulate({ tenantStaffId, isDeleted: false });
 
         if (!payrolls) {
             throw new Error("Payrolls not found");

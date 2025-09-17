@@ -52,17 +52,10 @@ class PayrollRoutes {
     initializeRoutes() {
         /**
          * @swagger
-         * /api/v1/organization-staff/payroll/{id}:
+         * /api/v1/organization-staff/payroll/:
          *   put:
          *     summary: Update a tenant staff payroll
          *     tags: [organization-staff]
-         *     parameters:
-         *       - in: path
-         *         name: id
-         *         required: true
-         *         schema:
-         *           type: string
-         *         description: The ID of the payroll
          *     requestBody:
          *       required: true
          *       content:
@@ -77,7 +70,7 @@ class PayrollRoutes {
          *       404:
          *         description: Payroll not found
          */
-        this.router.put("/:id", PayrollDto.updatePayrollDto, this.controller.updatePayroll);
+        this.router.put("/", PayrollDto.updatePayrollDto, this.controller.updatePayroll);
 
         /**
          * @swagger
