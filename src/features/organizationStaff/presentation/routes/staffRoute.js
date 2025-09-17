@@ -13,6 +13,7 @@ import StaffDto from "../dto/staffDto.js";
  *         - email
  *         - roleId
  *         - phoneNumber
+ *         - tenantId
  *       properties:
  *         fullName:
  *           type: string
@@ -23,6 +24,10 @@ import StaffDto from "../dto/staffDto.js";
  *           format: email
  *           description: Email address of the staff member
  *           example: "john.doe@example.com"
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *           description: Unique identifier for the role
  *         roleId:
  *           type: string
  *           format: uuid
