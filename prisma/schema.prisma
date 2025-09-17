@@ -153,12 +153,21 @@ model Tenant {
 }
 
 model TenantStaff {
-  id           String   @id @default(uuid())
-  fullName     String
-  email        String   @unique
-  stage        String
-  roleId       String
-  tenantId     String
+  id       String  @id @default(uuid())
+  fullName String
+  email    String  @unique
+  stage    String?
+  roleId   String
+  tenantId String
+  dob      String?
+  gender   String?
+  npi      String?
+  address  String?
+  city     String?
+  state    String?
+  zip      String?
+  country  String?
+
   phoneNumber  String   @unique
   active       Boolean  @default(true)
   isDeleted    Boolean  @default(false)
@@ -169,10 +178,47 @@ model TenantStaff {
   authQuestion String?
   auth2FADone  Boolean  @default(false)
 
-  role         Role           @relation(fields: [roleId], references: [id])
-  tenant       Tenant         @relation(fields: [tenantId], references: [id])
-  PipelineItem PipelineItem[]
-  ClientTenant ClientTenant[]
+  role                 Role                   @relation(fields: [roleId], references: [id])
+  tenant               Tenant                 @relation(fields: [tenantId], references: [id])
+  PipelineItem         PipelineItem[]
+  ClientTenant         ClientTenant[]
+  TenantStaffLicenses  TenantStaffLicenses[]
+  TenantStaffPayroll   TenantStaffPayroll[]
+  TenantStaffDocuments TenantStaffDocuments[]
+}
+
+model TenantStaffLicenses {
+  id            String   @id @default(uuid())
+  licencseName  String
+  licenseNumber String
+  tenantStaffId String
+  issueState    String
+  expiryDate    DateTime
+  isDeleted    Boolean  @default(false)
+
+  tenantStaff TenantStaff @relation(fields: [tenantStaffId], references: [id])
+}
+
+model TenantStaffPayroll {
+  id              String  @id @default(uuid())
+  paymentSchedule String
+  ratePerHour     String
+  tenantStaffId   String
+  minimumHours    String?
+  otherPays       Json?
+  deductions      Json?
+  isDeleted    Boolean  @default(false)
+
+  tenantStaff TenantStaff @relation(fields: [tenantStaffId], references: [id])
+}
+
+model TenantStaffDocuments {
+  id            String @id @default(uuid())
+  documentsUrl  Json
+  tenantStaffId String
+  isDeleted    Boolean  @default(false)
+
+  tenantStaff TenantStaff @relation(fields: [tenantStaffId], references: [id])
 }
 
 model Client {

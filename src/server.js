@@ -35,6 +35,11 @@ import organization_document_route from "./features/organization/presentation/ro
 import organization_license_route from "./features/organization/presentation/routes/licenseRoute.js";
 import organization_session_type_route from "./features/organization/presentation/routes/sessionTypeRoute.js";
 import organization_diagnosis_code_route from "./features/organization/presentation/routes/diagnosisCodeRoute.js";
+import organization_staff_route from "./features/organizationStaff/presentation/routes/staffRoute.js";
+import organization_staff_document_route from "./features/organizationStaff/presentation/routes/DocumentRoute.js";
+import organization_staff_license_route from "./features/organizationStaff/presentation/routes/licenseRoute.js";
+import organization_staff_payroll_route from "./features/organizationStaff/presentation/routes/payrollRoute.js";
+import image_route from "./features/images/presentation/routes/imageRoutes.js";
 
 
 class App {
@@ -99,6 +104,11 @@ class App {
         this.app.use("/api/v1/organization/license", organization_license_route);
         this.app.use("/api/v1/organization/diagnosis-codes", organization_diagnosis_code_route);
         this.app.use("/api/v1/organization/session-types", organization_session_type_route);
+        this.app.use("/api/v1/organization-staff/document", organization_staff_document_route);
+        this.app.use("/api/v1/organization-staff/license", organization_staff_license_route);
+        this.app.use("/api/v1/organization-staff/payroll", organization_staff_payroll_route);
+        this.app.use("/api/v1/organization-staff/staff", organization_staff_route);
+        this.app.use("/api/v1/images", image_route);
     }
 
     initializeErrorHandler() {
