@@ -23,7 +23,6 @@ import StaffDto from "../dto/staffDto.js";
  *           format: email
  *           description: Email address of the staff member
  *           example: "john.doe@example.com"
- *           example: "Active"
  *         roleId:
  *           type: string
  *           format: uuid
@@ -68,7 +67,6 @@ import StaffDto from "../dto/staffDto.js";
  *           type: boolean
  *           description: Indicates if the staff member is active
  *           default: true
- 
  *         documents:
  *           type: array
  *           items:
@@ -113,7 +111,6 @@ import StaffDto from "../dto/staffDto.js";
  *               type: string
  *               description: Hourly rate
  *               example: "50.00"
- *               description: Unique identifier for the staff member
  *             minimumHours:
  *               type: string
  *               description: Minimum hours required
@@ -145,7 +142,6 @@ import StaffDto from "../dto/staffDto.js";
  *           type: string
  *           format: email
  *           description: Email address of the staff member
- 
  *         roleId:
  *           type: string
  *           format: uuid
@@ -187,7 +183,6 @@ import StaffDto from "../dto/staffDto.js";
  *         isDeleted:
  *           type: boolean
  *           description: Indicates if the staff member is deleted
- 
  *         documents:
  *           type: array
  *           items:
@@ -257,11 +252,15 @@ import StaffDto from "../dto/staffDto.js";
  *               type: string
  *               description: Minimum hours required
  *             otherPays:
- *               type: object
+ *               type: array
  *               description: Additional pay details
+ *               items:
+ *                 type: object
  *             deductions:
- *               type: object
+ *               type: array
  *               description: Deduction details
+ *               items:
+ *                 type: object
  */
 
 class TenantStaffRoutes {
