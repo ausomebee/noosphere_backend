@@ -52,6 +52,8 @@ class TenantDto {
                 "string.empty": "Pipeline stage ID is required",
                 "string.guid": "Pipeline stage ID must be a valid UUID",
             }),
+            website: Joi.string().trim().optional(),
+            practiceNPI: Joi.string().trim().optional(),
             createdBy: Joi.string().uuid().required().messages({
                 "string.empty": "created by ID is required",
                 "string.guid": "created by ID must be a valid UUID",
@@ -91,6 +93,8 @@ class TenantDto {
                 .messages({
                     "boolean.base": "Active status must be a boolean value",
                 }),
+            website: Joi.string().trim().optional(),
+            practiceNPI: Joi.string().trim().optional(),
             isDeleted: Joi.boolean()
                 .messages({
                     "boolean.base": "Deleted status must be a boolean value",

@@ -22,6 +22,8 @@ import multer from "multer";
  *         - leadSource
  *         - pipelineStageId
  *         - assignToAdmin
+ *         - website
+ *         -practiceNPI
  *       properties:
  *         fullName:
  *           type: string
@@ -43,6 +45,12 @@ import multer from "multer";
  *         stage:
  *           type: string
  *           example: VERIFIED
+ *         website:
+ *           type: string
+ *           example: http://nosphere
+ *         practiceNPI:
+ *           type: string
+ *           example: "example"
  *         companyName:
  *           type: string
  *           example: Malik Inc
@@ -110,6 +118,12 @@ import multer from "multer";
  *           type: string
  *           description: The name of the contact person at the tenant
  *           example: "John Doe"
+ *         website:
+ *           type: string
+ *           example: http://nosphere
+ *         practiceNPI:
+ *           type: string
+ *           example: "example"
  *         companySize:
  *           type: string
  *           description: The size of the company (e.g., Small, Medium, Large)
@@ -144,6 +158,8 @@ import multer from "multer";
  *         - location
  *         - leadSource
  *         - stage
+ *         - website
+ *         -practiceNPI
  *     ContactTenantDto:
  *       type: object
  *       required:
@@ -303,6 +319,27 @@ class TenantRoutes {
          *         description: Bad request
          */
         this.router.patch("/", TenantDto.updateTenantDto, this.controller.updateTenant);
+
+        /**
+         * @swagger
+         * /api/v1/tenant/organization:
+         *   patch:
+         *     summary: Update tenant details
+         *     description: Update the details of an existing tenant by specifying the tenant ID.
+         *     tags: [Tenant]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/TenantUpdate'
+         *     responses:
+         *       201:
+         *         description: Tenant updated successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.patch("/organization", TenantDto.updateTenantDto, this.controller.updateTenant);
 
         /**
          * @swagger

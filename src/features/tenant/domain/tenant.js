@@ -1,5 +1,5 @@
 class Tenant {
-    constructor({ id, fullName, email, phoneNumber, roleId, stage, password, tenantId, contactPerson, companySize, organizationType, location, leadSource, companyName, createdBy }) {
+    constructor({ id, fullName, email, phoneNumber, roleId, stage, password, tenantId, contactPerson, companySize, organizationType, location, leadSource, companyName, createdBy, website, practiceNPI }) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
@@ -15,6 +15,8 @@ class Tenant {
         this.leadSource = leadSource;
         this.companyName = companyName;
         this.createdBy = createdBy;
+        this.website = website;
+        this.practiceNPI = practiceNPI;
     }
 
     get createTenant() {
