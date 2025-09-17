@@ -56,7 +56,7 @@ class TenantService {
             const role = await this.roleRepository.createTenantRole(department.id, tx);
             const staff = await this.staffRepository.txCreate({ ...createData.createTenantStaff, tenantId: tenant.id, roleId: role.id }, tx);
 
-            return {pipelineItem, staff};
+            return { pipelineItem, staff };
         }, { timeout: 10_000 });
 
         if (!newCandidate) {
@@ -377,7 +377,9 @@ class TenantService {
             organizationType: data.organizationType || tenant.organizationType,
             location: data.location || tenant.location,
             leadSource: data.leadSource || tenant.leadSource,
-            stage: data.stage || tenant.stage
+            stage: data.stage || tenant.stage,
+            website: data.website || tenant.website,
+            practiceNPI: data.practiceNPI || tenant.practiceNPI
         });
 
         if (!update) {
@@ -398,7 +400,7 @@ class TenantService {
     }
 
     async getTenant(id) {
-        const tenants = await this.tenantRepository.findFirst({id});
+        const tenants = await this.tenantRepository.findFirst({ id });
 
         if (!tenants) {
             throw new Error("Tenant not found")
@@ -776,7 +778,7 @@ class TenantService {
             throw new Error("Invalid password.");
         }
 
-        return {...tenantStaff, token: this.token.generateToken(tenantStaff.id)};
+        return { ...tenantStaff, token: this.token.generateToken(tenantStaff.id) };
     }
 
     async tenantAdminChoices(data) {

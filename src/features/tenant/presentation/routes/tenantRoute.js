@@ -22,6 +22,8 @@ import multer from "multer";
  *         - leadSource
  *         - pipelineStageId
  *         - assignToAdmin
+ *         - website
+ *         -practiceNPI
  *       properties:
  *         fullName:
  *           type: string
@@ -43,6 +45,12 @@ import multer from "multer";
  *         stage:
  *           type: string
  *           example: VERIFIED
+ *         website:
+ *           type: string
+ *           example: http://nosphere
+ *         practiceNPI:
+ *           type: string
+ *           example: "example"
  *         companyName:
  *           type: string
  *           example: Malik Inc
@@ -110,6 +118,12 @@ import multer from "multer";
  *           type: string
  *           description: The name of the contact person at the tenant
  *           example: "John Doe"
+ *         website:
+ *           type: string
+ *           example: http://nosphere
+ *         practiceNPI:
+ *           type: string
+ *           example: "example"
  *         companySize:
  *           type: string
  *           description: The size of the company (e.g., Small, Medium, Large)
@@ -144,6 +158,8 @@ import multer from "multer";
  *         - location
  *         - leadSource
  *         - stage
+ *         - website
+ *         -practiceNPI
  *     ContactTenantDto:
  *       type: object
  *       required:
