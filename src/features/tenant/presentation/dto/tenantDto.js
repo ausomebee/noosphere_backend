@@ -143,6 +143,65 @@ class TenantDto {
         Validator.validateRequest(req, next, schema);
     };
 
+    static updateTenantDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID",
+            }),
+            email: Joi.string()
+                .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
+                .required()
+                .trim()
+                .lowercase()
+                .messages({
+                    "string.email": "Email must be a valid email",
+                    "string.empty": "Email is required",
+                    "any.required": "Email is a required field",
+                }),
+            phoneNumber: Joi.string()
+                .required()
+                .trim()
+                .min(10)
+                .max(15)
+                .messages({
+                    "string.empty": "Phone number is required",
+                    "string.min": "Phone number must be at least 10 characters long",
+                    "string.max": "Phone number must be at most 15 characters long"
+                }),
+            active: Joi.boolean()
+                .messages({
+                    "boolean.base": "Active status must be a boolean value",
+                }),
+            website: Joi.string().trim().optional(),
+            practiceNPI: Joi.string().trim().optional(),
+            isDeleted: Joi.boolean()
+                .messages({
+                    "boolean.base": "Deleted status must be a boolean value",
+                }),
+            companyName: Joi.string()
+                .trim()
+                .max(255)
+                .messages({
+                    "string.empty": "Company name is required",
+                    "string.max": "Company name must not exceed 255 characters",
+                }),
+            companySize: Joi.string()
+                .trim()
+                .messages({
+                    "string.empty": "Company size is required",
+                }),
+            organizationType: Joi.string()
+                .trim()
+                .messages({
+                    "string.empty": "Organization type is required",
+                }),
+            location: Joi.object()
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
     static contactTenantDto = (req, res, next) => {
         const schema = Joi.object({
             id: Joi.string().uuid().required().messages({
