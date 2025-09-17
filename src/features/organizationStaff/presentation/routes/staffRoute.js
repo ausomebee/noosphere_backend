@@ -75,10 +75,6 @@ import StaffDto from "../dto/staffDto.js";
  *               documentsUrl:
  *                 type: object
  *                 description: JSON object containing document URLs
- *               tenantStaffId:
- *                 type: string
- *                 format: uuid
- *                 description: Unique identifier for the staff member
  *         licenses:
  *           type: array
  *           items:
