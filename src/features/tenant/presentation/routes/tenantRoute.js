@@ -486,6 +486,27 @@ class TenantRoutes {
          */
         this.router.get("/forgotpassword/:email", TenantDto.forgotPasswordDto, this.controller.forgotPassword);
 
+        /**
+         * @swagger
+         * /api/v1/tenant/{id}:
+         *   get:
+         *     summary: Get tenant by tenant id
+         *     tags: [Tenant]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The id of the tenant 
+         *     responses:
+         *       200:
+         *         description: tenant fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/:id", this.controller.getTenant);
+
     }
 
     getRouter() {

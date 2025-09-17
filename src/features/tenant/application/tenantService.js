@@ -397,6 +397,16 @@ class TenantService {
         return tenants;
     }
 
+    async getTenant(id) {
+        const tenants = await this.tenantRepository.findFirst({id});
+
+        if (!tenants) {
+            throw new Error("Tenant not found")
+        }
+
+        return tenants;
+    }
+
     async countAllTenant() {
         const totalTenants = await this.tenantRepository.countAllTenants();
 
