@@ -7,7 +7,6 @@ class StaffDto {
             fullName: Joi.string().min(1).required(),
             email: Joi.string().email().required(),
             roleId: Joi.string().uuid().required(),
-            tenantId: Joi.string().uuid().required(),
             dob: Joi.string().required(),
             gender: Joi.string().required(),
             npi: Joi.string().required(),
@@ -37,8 +36,8 @@ class StaffDto {
                 ratePerHour: Joi.string().min(1).required(),
                 tenantStaffId: Joi.string().uuid().optional(),
                 minimumHours: Joi.string().optional(),
-                otherPays: Joi.object().optional(),
-                deductions: Joi.object().optional()
+                otherPays: Joi.array().optional(),
+                deductions: Joi.array().optional()
             }).required()
         });
 

@@ -11,9 +11,7 @@ import StaffDto from "../dto/staffDto.js";
  *       required:
  *         - fullName
  *         - email
- *         - stage
  *         - roleId
- *         - tenantId
  *         - phoneNumber
  *       properties:
  *         fullName:
@@ -25,18 +23,11 @@ import StaffDto from "../dto/staffDto.js";
  *           format: email
  *           description: Email address of the staff member
  *           example: "john.doe@example.com"
- *         stage:
- *           type: string
- *           description: Stage of the staff member
  *           example: "Active"
  *         roleId:
  *           type: string
  *           format: uuid
  *           description: Unique identifier for the role
- *         tenantId:
- *           type: string
- *           format: uuid
- *           description: Unique identifier for the tenant
  *         dob:
  *           type: string
  *           description: Date of birth
@@ -77,21 +68,7 @@ import StaffDto from "../dto/staffDto.js";
  *           type: boolean
  *           description: Indicates if the staff member is active
  *           default: true
- *         password:
- *           type: string
- *           description: Password for authentication
- *         authType:
- *           type: string
- *           description: Authentication type
- *           example: "password"
- *         authQuestion:
- *           type: string
- *           description: Security question for authentication
- *           example: "What is your mother's maiden name?"
- *         auth2FADone:
- *           type: boolean
- *           description: Indicates if two-factor authentication is completed
- *           default: false
+ 
  *         documents:
  *           type: array
  *           items:
@@ -125,10 +102,6 @@ import StaffDto from "../dto/staffDto.js";
  *                 type: string
  *                 format: date-time
  *                 description: Expiry date of the license
- *               tenantStaffId:
- *                 type: string
- *                 format: uuid
- *                 description: Unique identifier for the staff member
  *         payroll:
  *           type: object
  *           properties:
@@ -140,20 +113,21 @@ import StaffDto from "../dto/staffDto.js";
  *               type: string
  *               description: Hourly rate
  *               example: "50.00"
- *             tenantStaffId:
- *               type: string
- *               format: uuid
  *               description: Unique identifier for the staff member
  *             minimumHours:
  *               type: string
  *               description: Minimum hours required
  *               example: "40"
  *             otherPays:
- *               type: object
+ *               type: array
  *               description: Additional pay details
+ *               items:
+ *                 type: object
  *             deductions:
- *               type: object
+ *               type: array
  *               description: Deduction details
+ *               items:
+ *                 type: object
  *
  *     TenantStaffUpdateDto:
  *       type: object
@@ -171,9 +145,7 @@ import StaffDto from "../dto/staffDto.js";
  *           type: string
  *           format: email
  *           description: Email address of the staff member
- *         stage:
- *           type: string
- *           description: Stage of the staff member
+ 
  *         roleId:
  *           type: string
  *           format: uuid
@@ -215,18 +187,7 @@ import StaffDto from "../dto/staffDto.js";
  *         isDeleted:
  *           type: boolean
  *           description: Indicates if the staff member is deleted
- *         password:
- *           type: string
- *           description: Password for authentication
- *         authType:
- *           type: string
- *           description: Authentication type
- *         authQuestion:
- *           type: string
- *           description: Security question for authentication
- *         auth2FADone:
- *           type: boolean
- *           description: Indicates if two-factor authentication is completed
+ 
  *         documents:
  *           type: array
  *           items:
