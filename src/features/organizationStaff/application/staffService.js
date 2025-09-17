@@ -26,18 +26,18 @@ class TenantStaffService {
         }
 
         const createStaffData = new TenantStaff(data);
-        
+
         const newStaff = await this.prisma.$transaction(async (tx) => {
             const staff = await this.staffRepository.txCreate(createStaffData.createTenantStaff, tx.tenantStaff);
-            data.documents.forEach((d)=>{
-                const createDocumentData = new TenantStaffDocument({...d, tenantStaffId: staff.id});
+            data.documents.forEach((d) => {
+                const createDocumentData = new TenantStaffDocument({ ...d, tenantStaffId: staff.id });
                 const document = this.documentRepository.txCreate(createDocumentData.createTenantStaffDocuments, tx.tenantStaffDocuments);
             })
-            data.licenses.forEach((d)=>{
-                const createLicenseData = new TenantStaffLicense({...d, tenantStaffId: staff.id});
+            data.licenses.forEach((d) => {
+                const createLicenseData = new TenantStaffLicense({ ...d, tenantStaffId: staff.id });
                 const license = this.licenseRepository.txCreate(createLicenseData.createTenantStaffLicense, tx.tenantStaffLicenses);
             })
-            const createPayrollData = new TenantStaffPayroll({...data.payroll, tenantStaffId: staff.id});
+            const createPayrollData = new TenantStaffPayroll({ ...data.payroll, tenantStaffId: staff.id });
             const payroll = await this.payrollRepository.txCreate(createPayrollData.createTenantStaffPayroll, tx.tenantStaffPayroll);
 
             return { staff };
@@ -90,7 +90,7 @@ class TenantStaffService {
     }
 
     async getTenantStaffs(tenantId) {
-        const staffs = await this.staffRepository.findAll({tenantId, isDeleted: false});
+        const staffs = await this.staffRepository.findAllAndPopulate({ tenantId, isDeleted: false }, { role: true });
 
         if (!staffs) {
             throw new Error("Staffs not found")
@@ -100,7 +100,7 @@ class TenantStaffService {
     }
 
     async getStaff(id) {
-        const staff = await this.staffRepository.findFirst({ id });
+        const staff = await this.staffRepository.findFirstDynamic({ where: { id }, include: { role: true } });
 
         if (!staff) {
             throw new Error("Staff not found")

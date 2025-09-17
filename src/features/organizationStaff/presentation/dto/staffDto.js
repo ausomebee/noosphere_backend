@@ -59,8 +59,6 @@ class StaffDto {
             zip: Joi.string().optional(),
             country: Joi.string().optional(),
             phoneNumber: Joi.string().min(1).optional(),
-            active: Joi.boolean().optional(),
-            isDeleted: Joi.boolean().optional(),
             password: Joi.string().optional(),
             documents: Joi.array().items(
                 Joi.object({
