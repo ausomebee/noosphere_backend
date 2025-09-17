@@ -26,7 +26,7 @@ class TenantStaffService {
         }
 
         const createStaffData = new TenantStaff(data);
-
+console.log(createStaffData.createTenantStaff)
         const newStaff = await this.prisma.$transaction(async (tx) => {
             const staff = await this.staffRepository.txCreate(createStaffData.createTenantStaff, tx.tenantStaff);
             data.documents.forEach((d) => {

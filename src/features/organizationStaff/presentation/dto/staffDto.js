@@ -7,6 +7,7 @@ class StaffDto {
             fullName: Joi.string().min(1).required(),
             email: Joi.string().email().required(),
             roleId: Joi.string().uuid().required(),
+            tenantId: Joi.string().uuid().required(),
             dob: Joi.string().required(),
             gender: Joi.string().required(),
             npi: Joi.string().required(),
