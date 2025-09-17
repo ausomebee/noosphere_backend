@@ -353,10 +353,10 @@ class TenantStaffRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization-staff/active/{id}/{active}:
+         * /api/v1/organization-staff/staff/active/{id}/{active}:
          *   patch:
          *     summary: Activate or deactivate a tenant staff member
-         *     tags: [staff]
+         *     tags: [organization-staff]
          *     parameters:
          *       - in: path
          *         name: id

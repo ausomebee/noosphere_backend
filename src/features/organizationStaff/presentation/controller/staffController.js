@@ -31,12 +31,13 @@ class TenantStaffController {
     });
 
     updateTenantStaff = expressAsyncHandler(async (req, res) => {
-        const staff = await this.service.updateTenantStaff(
-            {
-                id: req.params.id ? req.params.id : req.body.id,
-                ...req.body
-            }
-        );
+        const payload = {
+            ...req.params,
+            ...req.body,
+            active: req.params.active === "true"
+        };
+        console.log(payload)
+        const staff = await this.service.updateTenantStaff(payload);
 
         if (!staff) {
             res.status(500).json({ message: "Failed to update staff" });
