@@ -306,6 +306,27 @@ class TenantRoutes {
 
         /**
          * @swagger
+         * /api/v1/tenant/organization:
+         *   patch:
+         *     summary: Update tenant details
+         *     description: Update the details of an existing tenant by specifying the tenant ID.
+         *     tags: [Tenant]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/TenantUpdate'
+         *     responses:
+         *       201:
+         *         description: Tenant updated successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.patch("/organization", TenantDto.updateTenantDto, this.controller.updateTenant);
+
+        /**
+         * @swagger
          * /api/v1/tenant/:
          *   get:
          *     summary: Retrieve all tenants
