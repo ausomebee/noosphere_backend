@@ -23,72 +23,76 @@ import multer from "multer";
  *         - pipelineStageId
  *         - assignToAdmin
  *         - website
- *         -practiceNPI
+ *         - practiceNPI
  *       properties:
  *         fullName:
  *           type: string
  *           minLength: 3
  *           maxLength: 20
- *           example: John Doe
+ *           example: "John Doe"
  *           description: Candidate's full name
  *         email:
  *           type: string
  *           format: email
- *           example: johndoe@example.com
+ *           example: "johndoe@example.com"
  *           description: Valid email (only `.com` or `.net` domains allowed)
  *         phoneNumber:
  *           type: string
  *           minLength: 10
  *           maxLength: 15
+ *           pattern: '^\+?[0-9]{10,15}$'
  *           example: "+2348012345678"
  *           description: Candidate's phone number
  *         stage:
  *           type: string
- *           example: VERIFIED
+ *           example: "VERIFIED"
  *         website:
  *           type: string
- *           example: http://nosphere
+ *           example: "http://nosphere.com"
  *         practiceNPI:
  *           type: string
  *           example: "example"
  *         companyName:
  *           type: string
- *           example: Malik Inc
+ *           example: "Malik Inc"
  *         contactPerson:
  *           type: string
- *           example: Malik
+ *           example: "Malik"
  *         companySize:
  *           type: string
- *           example: 1-2
+ *           example: "1-2"
  *         organizationType:
  *           type: string
- *           example: Startup
+ *           example: "Startup"
  *         location:
  *           type: object
  *           properties:
  *             city:
  *               type: string
- *               example: Ikeja
+ *               example: "Ikeja"
  *             state:
  *               type: string
- *               example: Lagos
+ *               example: "Lagos"
  *         leadSource:
  *           type: string
- *           example: LinkedIn
+ *           example: "LinkedIn"
  *         pipelineStageId:
  *           type: string
  *           format: uuid
- *           example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *           example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
  *         assignToAdmin:
  *           type: string
  *           format: uuid
- *           example: d6c6f7b4-b2f9-4d76-9f9c-9b292d3a1cfa
+ *           example: "d6c6f7b4-b2f9-4d76-9f9c-9b292d3a1cfa"
  *         createdBy:
  *           type: string
  *           format: uuid
- *           example: d6c6f7b4-b2f9-4d76-9f9c-9b292d3a1cfa
+ *           example: "d6c6f7b4-b2f9-4d76-9f9c-9b292d3a1cfa"
+ *
  *     TenantUpdate:
  *       type: object
+ *       required:
+ *         - id
  *       properties:
  *         id:
  *           type: string
@@ -96,94 +100,71 @@ import multer from "multer";
  *           description: The unique identifier of the tenant to update
  *         email:
  *           type: string
- *           description: The email of the tenant
- *           example: tenant@example.com
+ *           example: "tenant@example.com"
  *         phoneNumber:
  *           type: string
- *           description: The phone number of the tenant
  *           example: "+1234567890"
  *         active:
  *           type: boolean
- *           description: Whether the tenant is active or not
  *           example: true
  *         isDeleted:
  *           type: boolean
- *           description: Whether the tenant is marked as deleted
  *           example: false
  *         companyName:
  *           type: string
- *           description: The name of the company
  *           example: "Acme Corporation"
  *         contactPerson:
  *           type: string
- *           description: The name of the contact person at the tenant
  *           example: "John Doe"
  *         website:
  *           type: string
- *           example: http://nosphere
+ *           example: "http://nosphere.com"
  *         practiceNPI:
  *           type: string
  *           example: "example"
  *         companySize:
  *           type: string
- *           description: The size of the company (e.g., Small, Medium, Large)
  *           example: "Medium"
  *         organizationType:
  *           type: string
- *           description: The type of the organization
  *           example: "Non-Profit"
  *         location:
  *           type: object
  *           properties:
  *             city:
  *               type: string
- *               example: Ikeja
+ *               example: "Ikeja"
  *             state:
  *               type: string
- *               example: Lagos
+ *               example: "Lagos"
  *         leadSource:
  *           type: string
- *           description: The lead source for the tenant
  *           example: "Referral"
  *         stage:
  *           type: string
- *           description: The current stage of the tenant
  *           example: "Onboarding"
- *       required:
- *         - id
- *         - email
- *         - phoneNumber
- *         - companyName
- *         - contactPerson
- *         - location
- *         - leadSource
- *         - stage
- *         - website
- *         -practiceNPI
+ *
  *     ContactTenantDto:
  *       type: object
  *       required:
  *         - id
  *         - header
  *         - body
- *         - attachment
  *       properties:
  *         id:
  *           type: string
  *           format: uuid
- *           description: Unique ID of the tenant to contact
  *           example: "e95fbc1e-8833-4c44-a4d5-2fdc98a0c455"
  *         header:
  *           type: string
- *           description: Subject or header of the message
  *           example: "Request for additional services"
  *         body:
  *           type: string
- *           description: Message body to be sent to the tenant
  *           example: "We would like to discuss additional features for our current plan."
  *         attachment:
  *           type: string
  *           format: binary
+ *
  *     CreateStaffDto:
  *       type: object
  *       required:
@@ -219,6 +200,7 @@ import multer from "multer";
  *         stage:
  *           type: string
  *           example: "ONBOARDING"
+ *
  *     UpdateStaffPasswordDto:
  *       type: object
  *       required:
@@ -233,6 +215,7 @@ import multer from "multer";
  *           type: string
  *           format: password
  *           example: "StrongPassw0rd!"
+ *
  *     StaffSigninDto:
  *       type: object
  *       required:
@@ -247,6 +230,7 @@ import multer from "multer";
  *           type: string
  *           format: password
  *           example: "LoginStrongP@ss1"
+ *
  *     TenantAdminChoicesDto:
  *       type: object
  *       required:
