@@ -170,6 +170,20 @@ class TenantController {
         });
     });
 
+    getTenant = expressAsyncHandler(async (req, res) => {
+        const tenant = await this.service.getTenant(req.params.id);
+
+        if (!tenant) {
+            return res.status(500).json({ message: 'Failed to get tenant.' });
+        }
+
+        return res.status(200).json({
+            message: "Tenant retrieved successfully",
+            status: 'ok',
+            data: tenant
+        });
+    });
+
     forgotPassword = expressAsyncHandler(async (req, res) => {
         const result = await this.service.forgotPassword(req.params.email);
 
