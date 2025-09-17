@@ -1,0 +1,440 @@
+import express from "express";
+import TenantStaffController from "../controller/staffController.js";
+import StaffDto from "../dto/staffDto.js";
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     TenantStaffCreateDto:
+ *       type: object
+ *       required:
+ *         - fullName
+ *         - email
+ *         - stage
+ *         - roleId
+ *         - tenantId
+ *         - phoneNumber
+ *       properties:
+ *         fullName:
+ *           type: string
+ *           description: Full name of the staff member
+ *           example: "John Doe"
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: Email address of the staff member
+ *           example: "john.doe@example.com"
+ *         stage:
+ *           type: string
+ *           description: Stage of the staff member
+ *           example: "Active"
+ *         roleId:
+ *           type: string
+ *           format: uuid
+ *           description: Unique identifier for the role
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *           description: Unique identifier for the tenant
+ *         dob:
+ *           type: string
+ *           description: Date of birth
+ *           example: "1990-01-01"
+ *         gender:
+ *           type: string
+ *           description: Gender of the staff member
+ *           example: "Male"
+ *         npi:
+ *           type: string
+ *           description: National Provider Identifier
+ *           example: "1234567890"
+ *         address:
+ *           type: string
+ *           description: Address of the staff member
+ *           example: "123 Main St"
+ *         city:
+ *           type: string
+ *           description: City of the staff member
+ *           example: "New York"
+ *         state:
+ *           type: string
+ *           description: State of the staff member
+ *           example: "NY"
+ *         zip:
+ *           type: string
+ *           description: Zip code
+ *           example: "10001"
+ *         country:
+ *           type: string
+ *           description: Country of the staff member
+ *           example: "USA"
+ *         phoneNumber:
+ *           type: string
+ *           description: Phone number of the staff member
+ *           example: "+1234567890"
+ *         active:
+ *           type: boolean
+ *           description: Indicates if the staff member is active
+ *           default: true
+ *         password:
+ *           type: string
+ *           description: Password for authentication
+ *         authType:
+ *           type: string
+ *           description: Authentication type
+ *           example: "password"
+ *         authQuestion:
+ *           type: string
+ *           description: Security question for authentication
+ *           example: "What is your mother's maiden name?"
+ *         auth2FADone:
+ *           type: boolean
+ *           description: Indicates if two-factor authentication is completed
+ *           default: false
+ *         documents:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               documentsUrl:
+ *                 type: object
+ *                 description: JSON object containing document URLs
+ *               tenantStaffId:
+ *                 type: string
+ *                 format: uuid
+ *                 description: Unique identifier for the staff member
+ *         licenses:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               licenseName:
+ *                 type: string
+ *                 description: Name of the license
+ *                 example: "Medical License"
+ *               licenseNumber:
+ *                 type: string
+ *                 description: License number
+ *                 example: "LIC123456"
+ *               issueState:
+ *                 type: string
+ *                 description: State issuing the license
+ *                 example: "NY"
+ *               expiryDate:
+ *                 type: string
+ *                 format: date-time
+ *                 description: Expiry date of the license
+ *               tenantStaffId:
+ *                 type: string
+ *                 format: uuid
+ *                 description: Unique identifier for the staff member
+ *         payroll:
+ *           type: object
+ *           properties:
+ *             paymentSchedule:
+ *               type: string
+ *               description: Payment schedule
+ *               example: "Monthly"
+ *             ratePerHour:
+ *               type: string
+ *               description: Hourly rate
+ *               example: "50.00"
+ *             tenantStaffId:
+ *               type: string
+ *               format: uuid
+ *               description: Unique identifier for the staff member
+ *             minimumHours:
+ *               type: string
+ *               description: Minimum hours required
+ *               example: "40"
+ *             otherPays:
+ *               type: object
+ *               description: Additional pay details
+ *             deductions:
+ *               type: object
+ *               description: Deduction details
+ *
+ *     TenantStaffUpdateDto:
+ *       type: object
+ *       required:
+ *         - id
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           description: Unique identifier for the staff member
+ *         fullName:
+ *           type: string
+ *           description: Full name of the staff member
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: Email address of the staff member
+ *         stage:
+ *           type: string
+ *           description: Stage of the staff member
+ *         roleId:
+ *           type: string
+ *           format: uuid
+ *           description: Unique identifier for the role
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *           description: Unique identifier for the tenant
+ *         dob:
+ *           type: string
+ *           description: Date of birth
+ *         gender:
+ *           type: string
+ *           description: Gender of the staff member
+ *         npi:
+ *           type: string
+ *           description: National Provider Identifier
+ *         address:
+ *           type: string
+ *           description: Address of the staff member
+ *         city:
+ *           type: string
+ *           description: City of the staff member
+ *         state:
+ *           type: string
+ *           description: State of the staff member
+ *         zip:
+ *           type: string
+ *           description: Zip code
+ *         country:
+ *           type: string
+ *           description: Country of the staff member
+ *         phoneNumber:
+ *           type: string
+ *           description: Phone number of the staff member
+ *         active:
+ *           type: boolean
+ *           description: Indicates if the staff member is active
+ *         isDeleted:
+ *           type: boolean
+ *           description: Indicates if the staff member is deleted
+ *         password:
+ *           type: string
+ *           description: Password for authentication
+ *         authType:
+ *           type: string
+ *           description: Authentication type
+ *         authQuestion:
+ *           type: string
+ *           description: Security question for authentication
+ *         auth2FADone:
+ *           type: boolean
+ *           description: Indicates if two-factor authentication is completed
+ *         documents:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 format: uuid
+ *                 description: Unique identifier for the document
+ *               documentsUrl:
+ *                 type: object
+ *                 description: JSON object containing document URLs
+ *               tenantStaffId:
+ *                 type: string
+ *                 format: uuid
+ *                 description: Unique identifier for the staff member
+ *               isDeleted:
+ *                 type: boolean
+ *                 description: Indicates if the document is deleted
+ *         licenses:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 format: uuid
+ *                 description: Unique identifier for the license
+ *               licenseName:
+ *                 type: string
+ *                 description: Name of the license
+ *               licenseNumber:
+ *                 type: string
+ *                 description: License number
+ *               issueState:
+ *                 type: string
+ *                 description: State issuing the license
+ *               expiryDate:
+ *                 type: string
+ *                 format: date-time
+ *                 description: Expiry date of the license
+ *               tenantStaffId:
+ *                 type: string
+ *                 format: uuid
+ *                 description: Unique identifier for the staff member
+ *               isDeleted:
+ *                 type: boolean
+ *                 description: Indicates if the license is deleted
+ *         payroll:
+ *           type: object
+ *           properties:
+ *             id:
+ *               type: string
+ *               format: uuid
+ *               description: Unique identifier for the payroll
+ *             paymentSchedule:
+ *               type: string
+ *               description: Payment schedule
+ *             ratePerHour:
+ *               type: string
+ *               description: Hourly rate
+ *             tenantStaffId:
+ *               type: string
+ *               format: uuid
+ *               description: Unique identifier for the staff member
+ *             minimumHours:
+ *               type: string
+ *               description: Minimum hours required
+ *             otherPays:
+ *               type: object
+ *               description: Additional pay details
+ *             deductions:
+ *               type: object
+ *               description: Deduction details
+ */
+
+class TenantStaffRoutes {
+    constructor() {
+        this.controller = new TenantStaffController();
+        this.router = express.Router();
+        this.initializeRoutes();
+    }
+
+    initializeRoutes() {
+        /**
+         * @swagger
+         * /api/v1/organization-staff/staff:
+         *   post:
+         *     summary: Create a tenant staff member
+         *     tags: [organization-staff]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/TenantStaffCreateDto'
+         *     responses:
+         *       201:
+         *         description: Tenant staff created successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/", StaffDto.createTenantStaffDto, this.controller.createTenantStaff);
+
+        /**
+         * @swagger
+         * /api/v1/organization-staff/staff/{id}:
+         *   put:
+         *     summary: Update a tenant staff member
+         *     tags: [organization-staff]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The ID of the staff member
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/TenantStaffUpdateDto'
+         *     responses:
+         *       200:
+         *         description: Tenant staff updated successfully
+         *       400:
+         *         description: Validation error
+         *       404:
+         *         description: Staff not found
+         */
+        this.router.put("/:id", StaffDto.updateTenantStaffDto, this.controller.updateTenantStaff);
+
+        /**
+         * @swagger
+         * /api/v1/organization-staff/staff/tenant/{tenantId}:
+         *   get:
+         *     summary: Get all staff for a tenant
+         *     tags: [organization-staff]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The ID of the tenant
+         *     responses:
+         *       200:
+         *         description: Tenant staff members fetched successfully
+         *       404:
+         *         description: Staff not found
+         */
+        this.router.get("/tenant/:tenantId", this.controller.getTenantStaffs);
+
+        /**
+         * @swagger
+         * /api/v1/organization-staff/staff/{id}:
+         *   get:
+         *     summary: Get a single tenant staff member
+         *     tags: [organization-staff]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The ID of the staff member
+         *     responses:
+         *       200:
+         *         description: Tenant staff fetched successfully
+         *       404:
+         *         description: Staff not found
+         */
+        this.router.get("/:id", this.controller.getStaff);
+
+        /**
+         * @swagger
+         * /api/v1/organization-staff/active/{id}/{active}:
+         *   patch:
+         *     summary: Activate or deactivate a tenant staff member
+         *     tags: [staff]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The ID of the staff member
+         *       - in: path
+         *         name: active
+         *         required: true
+         *         schema:
+         *           type: boolean
+         *         description: Set to `true` to activate or `false` to deactivate
+         *     responses:
+         *       200:
+         *         description: Tenant staff status updated successfully
+         *       400:
+         *         description: Invalid request
+         *       404:
+         *         description: Staff not found
+         */
+        this.router.patch("/active/:id/:active", this.controller.updateTenantStaff);
+    }
+
+    getRouter() {
+        return this.router;
+    }
+}
+
+export default new TenantStaffRoutes().getRouter();
