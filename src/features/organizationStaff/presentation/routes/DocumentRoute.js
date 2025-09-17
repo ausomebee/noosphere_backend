@@ -39,17 +39,10 @@ class DocumentRoutes {
     initializeRoutes() {
         /**
          * @swagger
-         * /api/v1/organization-staff/document/{id}:
+         * /api/v1/organization-staff/document:
          *   put:
          *     summary: Update a tenant staff document
          *     tags: [organization-staff]
-         *     parameters:
-         *       - in: path
-         *         name: id
-         *         required: true
-         *         schema:
-         *           type: string
-         *         description: The ID of the document
          *     requestBody:
          *       required: true
          *       content:
@@ -64,7 +57,7 @@ class DocumentRoutes {
          *       404:
          *         description: Document not found
          */
-        this.router.put("/:id", DocumentDto.updateDocumentDto, this.controller.updateDocument);
+        this.router.put("/", DocumentDto.updateDocumentDto, this.controller.updateDocument);
 
         /**
          * @swagger

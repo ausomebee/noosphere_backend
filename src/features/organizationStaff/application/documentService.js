@@ -44,7 +44,7 @@ class DocumentService {
     }
 
     async getTenantStaffDocuments(tenantStaffId) {
-        const documents = await this.documentRepository.findAllAndPopulate({ tenantStaffId, active: true, isDeleted: false });
+        const documents = await this.documentRepository.findAllAndPopulate({ tenantStaffId, isDeleted: false });
 
         if (!documents) {
             throw new Error("Documents not found");

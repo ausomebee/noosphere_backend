@@ -16,6 +16,7 @@ class TenantStaffService {
         const staffExists = await this.staffRepository.findFirst({
             OR: [{ email: data.email }, { phoneNumber: data.phoneNumber }],
         });
+
         if (staffExists?.email === data.email) {
             throw new Error("This email is already taken.");
         }
@@ -25,18 +26,18 @@ class TenantStaffService {
         }
 
         const createStaffData = new TenantStaff(data);
-        const createPayrollData = new TenantStaffPayroll(data);
         
         const newStaff = await this.prisma.$transaction(async (tx) => {
             const staff = await this.staffRepository.txCreate(createStaffData.createTenantStaff, tx.tenantStaff);
-            data.document.forEach((d)=>{
-                const createDocumentData = new TenantStaffDocument(d);
+            data.documents.forEach((d)=>{
+                const createDocumentData = new TenantStaffDocument({...d, tenantStaffId: staff.id});
                 const document = this.documentRepository.txCreate(createDocumentData.createTenantStaffDocuments, tx.tenantStaffDocuments);
             })
-            data.license.forEach((d)=>{
-                const createLicenseData = new TenantStaffLicense(d);
+            data.licenses.forEach((d)=>{
+                const createLicenseData = new TenantStaffLicense({...d, tenantStaffId: staff.id});
                 const license = this.licenseRepository.txCreate(createLicenseData.createTenantStaffLicense, tx.tenantStaffLicenses);
             })
+            const createPayrollData = new TenantStaffPayroll({...data.payroll, tenantStaffId: staff.id});
             const payroll = await this.payrollRepository.txCreate(createPayrollData.createTenantStaffPayroll, tx.tenantStaffPayroll);
 
             return { staff };
@@ -53,32 +54,32 @@ class TenantStaffService {
         const staff = await this.staffRepository.findOne({ id: data.id })
 
         if (!staff) {
-            throw new Error("tenant not found");
+            throw new Error("staff not found");
         }
 
         const update = await this.staffRepository.update(data.id, {
-            fullName: data.fullName || tenant.fullName,
-            email: data.email || tenant.email,
-            stage: data.stage || tenant.stage,
-            roleId: data.roleId || tenant.roleId,
-            tenantId: data.tenantId || tenant.tenantId,
-            dob: data.dob || tenant.dob,
-            gender: data.gender || tenant.gender,
-            npi: data.npi || tenant.npi,
-            address: data.address || tenant.address,
-            city: data.city || tenant.city,
-            state: data.state || tenant.state,
-            zip: data.zip || tenant.zip,
-            country: data.country || tenant.country,
-            phoneNumber: data.phoneNumber || tenant.phoneNumber,
-            active: data.active ?? tenant.active,
-            createdAt: data.createdAt || tenant.createdAt,
-            updatedAt: data.updatedAt || tenant.updatedAt,
-            password: data.password || tenant.password,
-            authType: data.authType || tenant.authType,
-            authQuestion: data.authQuestion || tenant.authQuestion,
-            auth2FADone: data.auth2FADone ?? tenant.auth2FADone,
-            isDeleted: data.isDeleted ?? tenant.isDeleted
+            fullName: data.fullName || staff.fullName,
+            email: data.email || staff.email,
+            stage: data.stage || staff.stage,
+            roleId: data.roleId || staff.roleId,
+            tenantId: data.tenantId || staff.tenantId,
+            dob: data.dob || staff.dob,
+            gender: data.gender || staff.gender,
+            npi: data.npi || staff.npi,
+            address: data.address || staff.address,
+            city: data.city || staff.city,
+            state: data.state || staff.state,
+            zip: data.zip || staff.zip,
+            country: data.country || staff.country,
+            phoneNumber: data.phoneNumber || staff.phoneNumber,
+            active: data.active ?? staff.active,
+            createdAt: data.createdAt || staff.createdAt,
+            updatedAt: data.updatedAt || staff.updatedAt,
+            password: data.password || staff.password,
+            authType: data.authType || staff.authType,
+            authQuestion: data.authQuestion || staff.authQuestion,
+            auth2FADone: data.auth2FADone ?? staff.auth2FADone,
+            isDeleted: data.isDeleted ?? staff.isDeleted
         });
 
         if (!update) {
@@ -89,7 +90,7 @@ class TenantStaffService {
     }
 
     async getTenantStaffs(tenantId) {
-        const staffs = await this.tenantRepository.findAllAndPopulate({tenantId, active: true, isDeleted: false});
+        const staffs = await this.staffRepository.findAll({tenantId, isDeleted: false});
 
         if (!staffs) {
             throw new Error("Staffs not found")

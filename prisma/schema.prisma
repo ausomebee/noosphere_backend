@@ -189,7 +189,7 @@ model TenantStaff {
 
 model TenantStaffLicenses {
   id            String   @id @default(uuid())
-  licencseName  String
+  licenseName  String
   licenseNumber String
   tenantStaffId String
   issueState    String
