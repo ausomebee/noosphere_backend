@@ -93,6 +93,27 @@ class StaffDto {
 
         Validator.validateRequest(req, next, schema);
     };
+
+    static updateTenantStaffOnlyDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required(),
+            fullName: Joi.string().min(1).optional(),
+            email: Joi.string().email().optional(),
+            roleId: Joi.string().uuid().optional(),
+            dob: Joi.string().optional(),
+            gender: Joi.string().optional(),
+            npi: Joi.string().optional(),
+            address: Joi.string().optional(),
+            city: Joi.string().optional(),
+            state: Joi.string().optional(),
+            zip: Joi.string().optional(),
+            country: Joi.string().optional(),
+            phoneNumber: Joi.string().min(1).optional(),
+            password: Joi.string().optional(),
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
 }
 
 export default StaffDto;

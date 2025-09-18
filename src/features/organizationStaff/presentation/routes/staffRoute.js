@@ -262,6 +262,63 @@ import StaffDto from "../dto/staffDto.js";
  *               description: Deduction details
  *               items:
  *                 type: object
+ *     TenantStaffOnlyUpdateDto:
+ *       type: object
+ *       required:
+ *         - id
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           description: Unique identifier for the staff member
+ *         fullName:
+ *           type: string
+ *           description: Full name of the staff member
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: Email address of the staff member
+ *         roleId:
+ *           type: string
+ *           format: uuid
+ *           description: Unique identifier for the role
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *           description: Unique identifier for the tenant
+ *         dob:
+ *           type: string
+ *           description: Date of birth
+ *         gender:
+ *           type: string
+ *           description: Gender of the staff member
+ *         npi:
+ *           type: string
+ *           description: National Provider Identifier
+ *         address:
+ *           type: string
+ *           description: Address of the staff member
+ *         city:
+ *           type: string
+ *           description: City of the staff member
+ *         state:
+ *           type: string
+ *           description: State of the staff member
+ *         zip:
+ *           type: string
+ *           description: Zip code
+ *         country:
+ *           type: string
+ *           description: Country of the staff member
+ *         phoneNumber:
+ *           type: string
+ *           description: Phone number of the staff member
+ *         active:
+ *           type: boolean
+ *           description: Indicates if the staff member is active
+ *         isDeleted:
+ *           type: boolean
+ *           description: Indicates if the staff member is deleted
  */
 
 class TenantStaffRoutes {
@@ -313,6 +370,28 @@ class TenantStaffRoutes {
          *         description: Staff not found
          */
         this.router.put("/", StaffDto.updateTenantStaffDto, this.controller.updateTenantStaff);
+
+        /**
+         * @swagger
+         * /api/v1/organization-staff/staff/staff:
+         *   put:
+         *     summary: Update a tenant staff member
+         *     tags: [organization-staff]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/TenantStaffOnlyUpdateDto'
+         *     responses:
+         *       200:
+         *         description: Tenant staff updated successfully
+         *       400:
+         *         description: Validation error
+         *       404:
+         *         description: Staff not found
+         */
+        this.router.put("/staff", StaffDto.updateTenantStaffOnlyDto, this.controller.updateTenantStaff);
 
         /**
          * @swagger

@@ -16,7 +16,7 @@ class DocumentController {
         const payload = {
             ...req.params,
             ...req.body,
-            isDeleted: req.params.isDeleted === "true"
+            ...(req.params.isDeleted !== undefined && { isDeleted: req.params.isDeleted === "true" }),
         };
         const document = await this.service.updateDocument(payload);
 
