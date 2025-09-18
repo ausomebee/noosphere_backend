@@ -36,7 +36,6 @@ class TenantStaffController {
             ...req.body,
             active: req.params.active === "true"
         };
-        console.log(payload)
         const staff = await this.service.updateTenantStaff(payload);
 
         if (!staff) {

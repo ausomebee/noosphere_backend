@@ -13,10 +13,12 @@ class DocumentController {
     }
 
     updateDocument = expressAsyncHandler(async (req, res) => {
-        const document = await this.service.updateDocument({
-            id: req.params.id ? req.params.id : req.body.id,
-            ...req.body
-        });
+        const payload = {
+            ...req.params,
+            ...req.body,
+            active: req.params.active === "true"
+        };
+        const document = await this.service.updateDocument(payload);
 
         if (!document) {
             res.status(500).json({ message: "Failed to update document" });

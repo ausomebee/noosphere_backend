@@ -99,7 +99,7 @@ class DocumentRoutes {
          *       404:
          *         description: Document not found
          */
-        this.router.put("/", DocumentDto.createDocumentDto, this.controller.createDocument);
+        this.router.post("/", DocumentDto.createDocumentDto, this.controller.createDocument);
 
         /**
          * @swagger

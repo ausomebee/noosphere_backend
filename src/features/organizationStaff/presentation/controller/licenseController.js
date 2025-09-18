@@ -13,10 +13,12 @@ class LicenseController {
     }
 
     updateLicense = expressAsyncHandler(async (req, res) => {
-        const license = await this.service.updateLicense({
-            id: req.params.id ? req.params.id : req.body.id,
-            ...req.body
-        });
+        const payload = {
+            ...req.params,
+            ...req.body,
+            active: req.params.active === "true"
+        };
+        const license = await this.service.updateLicense(payload);
 
         if (!license) {
             res.status(500).json({ message: "Failed to update license" });
