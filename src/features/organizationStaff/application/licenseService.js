@@ -1,4 +1,4 @@
-import TenantStaffLicense from "../domain/license";
+import TenantStaffLicense from "../domain/license.js";
 
 class LicenseService {
     constructor({ licenseRepository }) {
