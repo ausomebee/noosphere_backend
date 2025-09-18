@@ -62,6 +62,16 @@ class DocumentService {
 
         return document;
     }
+
+    async createTenantDocument(data) {
+        const createDocumentData = new TenantStaffDocument(data);
+        const document = this.documentRepository.create(createDocumentData.createTenantStaffDocuments)
+        if (!document) {
+            throw new Error("Failed to create candidate");
+        }
+
+        return document;
+    }
 }
 
 export default DocumentService;

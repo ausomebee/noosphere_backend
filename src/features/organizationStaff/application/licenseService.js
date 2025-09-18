@@ -1,3 +1,5 @@
+import TenantStaffLicense from "../domain/license.js";
+
 class LicenseService {
     constructor({ licenseRepository }) {
         this.licenseRepository = licenseRepository;
@@ -41,6 +43,16 @@ class LicenseService {
 
         if (!license) {
             throw new Error("License not found");
+        }
+
+        return license;
+    }
+
+    async createStaffLicense(data) {
+        const createLicenseData = new TenantStaffLicense(data);
+        const license = this.licenseRepository.create(createLicenseData.createTenantStaffLicense);
+        if (!license) {
+            throw new Error("Failed to create license");
         }
 
         return license;

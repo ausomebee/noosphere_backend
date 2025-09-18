@@ -56,6 +56,20 @@ class DocumentController {
             data: document,
         });
     });
+
+    createDocument = expressAsyncHandler(async (req, res) => {
+        const document = await this.service.createTenantDocument(req.body);
+
+        if (!document) {
+            res.status(404).json({ message: "Document creation failed" });
+        }
+
+        return res.status(200).json({
+            message: "Document created successfully",
+            status: "ok",
+            data: document,
+        });
+    });
 }
 
 export default DocumentController;
