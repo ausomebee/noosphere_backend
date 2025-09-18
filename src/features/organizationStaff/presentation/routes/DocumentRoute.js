@@ -6,6 +6,23 @@ import DocumentDto from "../dto/documentDto.js";
  * @swagger
  * components:
  *   schemas:
+ *     DocumentCreateDto:
+ *       type: object
+ *       required:
+ *         - documentsUrl
+ *         - tenantStaffId
+ *       properties:
+ *         documentsUrl:
+ *           type: object
+ *           description: JSON object containing document URLs
+ *           example:
+ *             passport: "https://example.com/passport.pdf"
+ *             license: "https://example.com/license.pdf"
+ *         tenantStaffId:
+ *           type: string
+ *           format: uuid
+ *           description: Unique identifier for the staff member
+ * 
  *     DocumentUpdateDto:
  *       type: object
  *       required:
@@ -20,6 +37,9 @@ import DocumentDto from "../dto/documentDto.js";
  *         documentsUrl:
  *           type: object
  *           description: JSON object containing document URLs
+ *           example:
+ *             passport: "https://example.com/passport.pdf"
+ *             license: "https://example.com/license.pdf"
  *         tenantStaffId:
  *           type: string
  *           format: uuid
@@ -58,6 +78,28 @@ class DocumentRoutes {
          *         description: Document not found
          */
         this.router.put("/", DocumentDto.updateDocumentDto, this.controller.updateDocument);
+
+        /**
+         * @swagger
+         * /api/v1/organization-staff/document:
+         *   post:
+         *     summary: create a tenant staff document
+         *     tags: [organization-staff]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/DocumentCreateDto'
+         *     responses:
+         *       200:
+         *         description: Document created successfully
+         *       400:
+         *         description: Validation error
+         *       404:
+         *         description: Document not found
+         */
+        this.router.put("/", DocumentDto.createDocumentDto, this.controller.createDocument);
 
         /**
          * @swagger

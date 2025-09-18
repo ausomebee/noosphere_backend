@@ -6,6 +6,36 @@ import LicenseDto from "../dto/licenseDto.js";
  * @swagger
  * components:
  *   schemas:
+ *     LicenseCreateDto:
+ *       type: object
+ *       required:
+ *         - licenseName
+ *         - licenseNumber
+ *         - tenantStaffId
+ *         - issueState
+ *         - expiryDate
+ *       properties:
+ *         licenseName:
+ *           type: string
+ *           description: Name of the license
+ *           example: "Medical License"
+ *         licenseNumber:
+ *           type: string
+ *           description: License number
+ *           example: "LIC123456"
+ *         tenantStaffId:
+ *           type: string
+ *           format: uuid
+ *           description: Unique identifier for the staff member
+ *         issueState:
+ *           type: string
+ *           description: State issuing the license
+ *           example: "NY"
+ *         expiryDate:
+ *           type: string
+ *           format: date-time
+ *           description: Expiry date of the license
+ * 
  *     LicenseUpdateDto:
  *       type: object
  *       required:
@@ -53,6 +83,28 @@ class LicenseRoutes {
     }
 
     initializeRoutes() {
+        /**
+         * @swagger
+         * /api/v1/organization-staff/license:
+         *   post:
+         *     summary: Create a tenant staff license
+         *     tags: [organization-staff]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/LicenseCreateDto'
+         *     responses:
+         *       200:
+         *         description: License created successfully
+         *       400:
+         *         description: Validation error
+         *       404:
+         *         description: License not found
+         */
+        this.router.post("/", LicenseDto.createLicenseDto, this.controller.createStaffLicense);
+
         /**
          * @swagger
          * /api/v1/organization-staff/license:

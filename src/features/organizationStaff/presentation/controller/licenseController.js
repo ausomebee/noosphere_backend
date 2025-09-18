@@ -56,6 +56,20 @@ class LicenseController {
             data: license,
         });
     });
+
+    createStaffLicense = expressAsyncHandler(async (req, res) => {
+        const document = await this.service.createStaffLicense(req.body);
+
+        if (!document) {
+            res.status(404).json({ message: "Document creation failed" });
+        }
+
+        return res.status(200).json({
+            message: "Document created successfully",
+            status: "ok",
+            data: document,
+        });
+    });
 }
 
 export default LicenseController;
