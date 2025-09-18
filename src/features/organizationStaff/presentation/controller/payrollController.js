@@ -13,10 +13,12 @@ class PayrollController {
     }
 
     updatePayroll = expressAsyncHandler(async (req, res) => {
-        const payroll = await this.service.updatePayroll({
-            id: req.params.id,
-            ...req.body
-        });
+        const payload = {
+            ...req.params,
+            ...req.body,
+            active: req.params.active === "true"
+        };
+        const payroll = await this.service.updatePayroll(payload);
 
         if (!payroll) {
             res.status(500).json({ message: "Failed to update payroll" });
