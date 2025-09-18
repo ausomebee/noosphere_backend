@@ -83,7 +83,7 @@ class TenantStaffService {
             isDeleted: data.isDeleted ?? staff.isDeleted
         });
 
-        if (data?.documents?.length() > 0) {
+        if (data?.documents?.length > 0) {
             data.documents.forEach(async (d) => {
                 const document = await this.documentRepository.findOne({ id: d.id });
 
@@ -107,7 +107,7 @@ class TenantStaffService {
             })
         }
 
-        if (data?.licenses?.length() > 0) {
+        if (data?.licenses?.length > 0) {
             data.licenses.forEach(async (d) => {
                 const license = await this.licenseRepository.findOne({ id: d.id });
 
