@@ -1,6 +1,8 @@
 class ClientProgramService {
-    constructor({ clientProgramRepository }) {
+    constructor({ clientProgramRepository, targetRepository, clientTargetRepository }) {
         this.clientProgramRepository = clientProgramRepository;
+        this.targetRepository = targetRepository;
+        this.clientTargetRepository = clientTargetRepository;
     }
 
     async createClientProgram(data) {
@@ -19,6 +21,33 @@ class ClientProgramService {
 
         if (!newClientProgram) {
             throw new Error("Failed to create ClientProgram");
+        }
+
+        const targets = await this.targetRepository.findAll({
+            programId: data.programId,
+            isDeleted: false
+        });
+
+        if (targets.length > 0) {
+            for (const t of targets) {
+                const clientTargetExists = await this.clientTargetRepository.findFirst({
+                    AND: [
+                        { clientId: data.clientId },
+                        { targetId: t.id },
+                    ]
+                });
+
+                if (clientTargetExists) continue;
+
+                const newClientTarget = await this.clientTargetRepository.create({
+                    clientId: data.clientId, 
+                    targetId: t.id,
+                });
+
+                if (!newClientTarget) {
+                    throw new Error("Failed to create ClientTarget");
+                }
+            }
         }
 
         return newClientProgram;

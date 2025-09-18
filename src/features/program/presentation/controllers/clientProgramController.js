@@ -8,7 +8,9 @@ class ClientProgramController {
     constructor() {
         this.prisma = prismaService.getClient()
         this.clientProgramRepository = new ClientProgramRepository(this.prisma.clientProgram)
-        this.service = new ClientProgramService({ clientProgramRepository: this.clientProgramRepository });
+        this.targetRepository = new TargetRepository(this.prisma.target)
+        this.clientTargetRepository = new ClientTargetRepository(this.prisma.clientTarget)
+        this.service = new ClientProgramService({ clientProgramRepository: this.clientProgramRepository, targetRepository: this.targetRepository, clientTargetRepository: this.clientTargetRepository });
     }
 
     createClientProgram = expressAsyncHandler(async (req, res) => {
