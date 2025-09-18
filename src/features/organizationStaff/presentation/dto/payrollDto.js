@@ -9,8 +9,8 @@ class PayrollDto {
             ratePerHour: Joi.string().min(1).required(),
             tenantStaffId: Joi.string().uuid().required(),
             minimumHours: Joi.string().optional(),
-            otherPays: Joi.object().optional(),
-            deductions: Joi.object().optional()
+            otherPays: Joi.array().optional(),
+            deductions: Joi.array().optional()
         });
 
         Validator.validateRequest(req, next, schema);
