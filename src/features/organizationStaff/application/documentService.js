@@ -1,3 +1,5 @@
+import TenantStaffDocument from "../domain/document.js";
+
 class DocumentService {
     constructor({ documentRepository }) {
         this.documentRepository = documentRepository;
