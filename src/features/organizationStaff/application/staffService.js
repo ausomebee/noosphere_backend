@@ -51,7 +51,6 @@ class TenantStaffService {
     }
 
     async updateTenantStaff(data) {
-        console.log(data)
         const staff = await this.staffRepository.findOne({ id: data.id })
 
         if (!staff) {
@@ -85,51 +84,51 @@ class TenantStaffService {
 
         if (data?.documents?.length > 0) {
             data.documents.forEach(async (d) => {
-                const document = await this.documentRepository.findOne({ id: d.id });
+                if (d.id) {
+                    const document = await this.documentRepository.findOne({ id: d.id });
+                    const update = await this.documentRepository.update(d.id, {
+                        documentsUrl: d.documentsUrl || document.documentsUrl,
+                        tenantStaffId: d.tenantStaffId || document.tenantStaffId,
+                        isDeleted: d.isDeleted ?? document.isDeleted
+                    });
 
-                if (!document) {
-                    const createDocumentData = new TenantStaffDocument(data);
+                    if (!update) {
+                        throw new Error("Failed to update document");
+                    }
+
+                } else {
+                    const createDocumentData = new TenantStaffDocument(d);
                     const doc = this.documentRepository.create(createDocumentData.createTenantStaffDocuments)
                     if (!doc) {
                         throw new Error("Failed to create candidate");
                     }
-                }
-
-                const update = await this.documentRepository.update(d.id, {
-                    documentsUrl: d.documentsUrl || document.documentsUrl,
-                    tenantStaffId: d.tenantStaffId || document.tenantStaffId,
-                    isDeleted: d.isDeleted ?? document.isDeleted
-                });
-
-                if (!update) {
-                    throw new Error("Failed to update document");
                 }
             })
         }
 
         if (data?.licenses?.length > 0) {
             data.licenses.forEach(async (d) => {
-                const license = await this.licenseRepository.findOne({ id: d.id });
+                if (d.id) {
+                    const license = await this.licenseRepository.findOne({ id: d.id });
 
-                if (!license) {
-                    const createLicenseData = new TenantStaffLicense(data);
+                    const update = await this.licenseRepository.update(d.id, {
+                        licenseName: d.licenseName || license.licenseName,
+                        licenseNumber: d.licenseNumber || license.licenseNumber,
+                        tenantStaffId: d.tenantStaffId || license.tenantStaffId,
+                        issueState: d.issueState || license.issueState,
+                        expiryDate: d.expiryDate || license.expiryDate,
+                        isDeleted: d.isDeleted ?? license.isDeleted
+                    });
+
+                    if (!update) {
+                        throw new Error("Failed to update license");
+                    }
+                } else {
+                    const createLicenseData = new TenantStaffLicense(d);
                     const lic = this.licenseRepository.create(createLicenseData.createTenantStaffLicense);
                     if (!lic) {
                         throw new Error("Failed to add license");
                     }
-                }
-
-                const update = await this.licenseRepository.update(d.id, {
-                    licenseName: d.licenseName || license.licenseName,
-                    licenseNumber: d.licenseNumber || license.licenseNumber,
-                    tenantStaffId: d.tenantStaffId || license.tenantStaffId,
-                    issueState: d.issueState || license.issueState,
-                    expiryDate: d.expiryDate || license.expiryDate,
-                    isDeleted: d.isDeleted ?? license.isDeleted
-                });
-
-                if (!update) {
-                    throw new Error("Failed to update license");
                 }
             })
         }
