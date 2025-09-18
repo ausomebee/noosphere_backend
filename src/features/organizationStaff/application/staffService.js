@@ -87,7 +87,11 @@ class TenantStaffService {
                 const document = await this.documentRepository.findOne({ id: d.id });
 
                 if (!document) {
-                    throw new Error("Document not found");
+                    const createDocumentData = new TenantStaffDocument(data);
+                    const doc = this.documentRepository.create(createDocumentData.createTenantStaffDocuments)
+                    if (!doc) {
+                        throw new Error("Failed to create candidate");
+                    }
                 }
 
                 const update = await this.documentRepository.update(d.id, {
@@ -107,7 +111,11 @@ class TenantStaffService {
                 const license = await this.licenseRepository.findOne({ id: d.id });
 
                 if (!license) {
-                    throw new Error("License not found");
+                    const createLicenseData = new TenantStaffLicense(data);
+                    const lic = this.licenseRepository.create(createLicenseData.createTenantStaffLicense);
+                    if (!lic) {
+                        throw new Error("Failed to add license");
+                    }
                 }
 
                 const update = await this.licenseRepository.update(d.id, {

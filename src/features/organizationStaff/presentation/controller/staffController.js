@@ -34,8 +34,8 @@ class TenantStaffController {
         const payload = {
             ...req.params,
             ...req.body,
-            active: req.params.active === "true",
-            isDeleted: req.params.isDeleted === "true"
+            ...(req.params.active !== undefined && { active: req.params.active === "true" }),
+            ...(req.params.isDeleted !== undefined && { isDeleted: req.params.isDeleted === "true" }),
         };
         const staff = await this.service.updateTenantStaff(payload);
 

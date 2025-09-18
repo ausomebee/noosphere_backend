@@ -16,7 +16,7 @@ class PayrollController {
         const payload = {
             ...req.params,
             ...req.body,
-            isDeleted: req.params.isDeleted === "true"
+            ...(req.params.isDeleted !== undefined && { isDeleted: req.params.isDeleted === "true" }),
         };
         const payroll = await this.service.updatePayroll(payload);
 

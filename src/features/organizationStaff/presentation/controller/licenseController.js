@@ -16,7 +16,7 @@ class LicenseController {
         const payload = {
             ...req.params,
             ...req.body,
-            isDeleted: req.params.isDeleted === "true"
+            ...(req.params.isDeleted !== undefined && { isDeleted: req.params.isDeleted === "true" }),
         };
         const license = await this.service.updateLicense(payload);
 
