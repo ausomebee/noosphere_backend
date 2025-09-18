@@ -82,6 +82,71 @@ class TenantStaffService {
             isDeleted: data.isDeleted ?? staff.isDeleted
         });
 
+        if (data.documents) {
+            data.documents.forEach(async (d) => {
+                const document = await this.documentRepository.findOne({ id: d.id });
+
+                if (!document) {
+                    throw new Error("Document not found");
+                }
+
+                const update = await this.documentRepository.update(d.id, {
+                    documentsUrl: d.documentsUrl || document.documentsUrl,
+                    tenantStaffId: d.tenantStaffId || document.tenantStaffId,
+                    isDeleted: d.isDeleted ?? document.isDeleted
+                });
+
+                if (!update) {
+                    throw new Error("Failed to update document");
+                }
+            })
+        }
+
+        if (data.licenses) {
+            data.licenses.forEach(async (d) => {
+                const license = await this.licenseRepository.findOne({ id: d.id });
+
+                if (!license) {
+                    throw new Error("License not found");
+                }
+
+                const update = await this.licenseRepository.update(d.id, {
+                    licenseName: d.licenseName || license.licenseName,
+                    licenseNumber: d.licenseNumber || license.licenseNumber,
+                    tenantStaffId: d.tenantStaffId || license.tenantStaffId,
+                    issueState: d.issueState || license.issueState,
+                    expiryDate: d.expiryDate || license.expiryDate,
+                    isDeleted: d.isDeleted ?? license.isDeleted
+                });
+
+                if (!update) {
+                    throw new Error("Failed to update license");
+                }
+            })
+        }
+
+        if (data.payroll) {
+            const payroll = await this.payrollRepository.findOne({ id: data.payroll.id });
+
+            if (!payroll) {
+                throw new Error("Payroll not found");
+            }
+
+            const update = await this.payrollRepository.update(data.payroll.id, {
+                paymentSchedule: data.payroll.paymentSchedule || payroll.paymentSchedule,
+                ratePerHour: data.payroll.ratePerHour || payroll.ratePerHour,
+                tenantStaffId: data.payroll.tenantStaffId || payroll.tenantStaffId,
+                minimumHours: data.payroll.minimumHours || payroll.minimumHours,
+                otherPays: data.payroll.otherPays || payroll.otherPays,
+                deductions: data.payroll.deductions || payroll.deductions,
+                isDeleted: data.payroll.isDeleted ?? payroll.isDeleted
+            });
+
+            if (!update) {
+                throw new Error("Failed to update payroll");
+            }
+        }
+
         if (!update) {
             throw new Error("Failed to update staff");
         }
@@ -120,7 +185,7 @@ class TenantStaffService {
             throw new Error("Staff not found")
         }
 
-        return {staff, payroll, license, document};
+        return { staff, payroll, license, document };
     }
 
 }
