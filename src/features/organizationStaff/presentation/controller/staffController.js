@@ -34,9 +34,14 @@ class TenantStaffController {
         const payload = {
             ...req.params,
             ...req.body,
-            ...(req.params.active !== undefined && { active: req.params.active === "true" }),
-            ...(req.params.isDeleted !== undefined && { isDeleted: req.params.isDeleted === "true" }),
+            ...(req.params.active === "true" || req.params.active === "false"
+                ? { active: req.params.active === "true" }
+                : {}),
+            ...(req.params.isDeleted === "true" || req.params.isDeleted === "false"
+                ? { isDeleted: req.params.isDeleted === "true" }
+                : {}),
         };
+
         const staff = await this.service.updateTenantStaff(payload);
 
         if (!staff) {
