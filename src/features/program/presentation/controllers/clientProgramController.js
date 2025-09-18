@@ -3,6 +3,8 @@ import prismaService from "../../../../config/prisma.js";
 import ClientProgramRepository from "../../infrastructure/clientProgramRepository.js";
 import ClientProgramService from "../../application/clientProgramService.js";
 import ClientProgram from "../../domain/clientProgram.js";
+import TargetRepository from "../../infrastructure/targetRepository.js";
+import ClientTargetRepository from "../../infrastructure/clientTargetRepository.js";
 
 class ClientProgramController {
     constructor() {
