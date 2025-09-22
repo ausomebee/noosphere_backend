@@ -27,7 +27,7 @@ import issue_route from "./features/issue/presentation/routes/issueRoute.js"
 import program_route from "./features/program/presentation/routes/programRoute.js"
 import domain_route from "./features/program/presentation/routes/domainRoute.js"
 import target_route from "./features/program/presentation/routes/targetRoute.js"
-import target_data_route from "./features/program/presentation/routes/targetDataRoute.js";    
+import target_data_route from "./features/program/presentation/routes/targetDataRoute.js";
 import client_program_route from "./features/program/presentation/routes/clientProgramRoute.js";
 import client_target_route from "./features/program/presentation/routes/clientTargetRoute.js";
 import organization_information_route from "./features/organization/presentation/routes/informationRoute.js";
@@ -40,6 +40,7 @@ import organization_staff_document_route from "./features/organizationStaff/pres
 import organization_staff_license_route from "./features/organizationStaff/presentation/routes/licenseRoute.js";
 import organization_staff_payroll_route from "./features/organizationStaff/presentation/routes/payrollRoute.js";
 import image_route from "./features/images/presentation/routes/imageRoutes.js";
+import appointment_route from "./features/appointment/presentation/routes/appointmentRoute.js";
 
 
 class App {
@@ -109,6 +110,7 @@ class App {
         this.app.use("/api/v1/organization-staff/payroll", organization_staff_payroll_route);
         this.app.use("/api/v1/organization-staff/staff", organization_staff_route);
         this.app.use("/api/v1/images", image_route);
+        this.app.use("/api/v1/appointments", appointment_route);
     }
 
     initializeErrorHandler() {
