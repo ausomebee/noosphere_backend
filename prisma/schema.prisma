@@ -245,6 +245,7 @@ model Client {
   logs          Logs[]
   ClientProgram ClientProgram[]
   ClientTarget  ClientTarget[]
+  Appointment   Appointment[]
 }
 
 model ClientTenant {
@@ -733,5 +734,29 @@ model OrganizationSessionTypes {
   isActive          Boolean
   isBillable        Boolean
 
-  tenant Tenant @relation(fields: [tenantId], references: [id])
+  tenant      Tenant        @relation(fields: [tenantId], references: [id])
+  Appointment Appointment[]
+}
+
+model Appointment {
+  id                 String   @id @default(uuid())
+  clientId           String
+  sessionId          String
+  clinicians         Json
+  service            Json
+  date               DateTime
+  isRecurring        Boolean
+  startTime          DateTime
+  endTime            DateTime
+  recurrence         Json
+  isBillable         Boolean
+  serviceLocation    String
+  requiresTravel     Boolean
+  colourCode         String
+  relatedAppointment String?
+
+  client      Client                   @relation(fields: [clientId], references: [id])
+  session     OrganizationSessionTypes @relation(fields: [sessionId], references: [id])
+  relatedTo   Appointment?             @relation("AppointmentRelation", fields: [relatedAppointment], references: [id])
+  relatedFrom Appointment[]            @relation("AppointmentRelation")
 }
