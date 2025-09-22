@@ -26,6 +26,21 @@ class AppointmentController {
             data: appointment
         });
     });
+
+    updateAppointment = expressAsyncHandler(async (req, res) => {
+        const appointment = await this.service.updateAppointment(req.body);
+
+        if (!appointment) {
+            return res.status(500).json({ message: "Failed to update appointment" });
+        }
+
+        return res.status(201).json({
+            message: "Appointment updated successfully",
+            status: "ok",
+            data: appointment
+        });
+    });
+
 }
 
 export default AppointmentController;

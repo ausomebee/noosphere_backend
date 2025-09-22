@@ -74,6 +74,58 @@ import AppointmentController from "../controllers/appointmentController.js";
  *           type: string
  *           format: uuid
  *           description: ID of a related appointment
+ *         forAll:
+ *           type: boolean
+ *           description: Apply this update to all recurring appointments
+ *           example: false
+ *
+ *     AppointmentUpdateDto:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *         clientId:
+ *           type: string
+ *           format: uuid
+ *         sessionId:
+ *           type: string
+ *           format: uuid
+ *         clinicians:
+ *           type: array
+ *           items:
+ *             type: string
+ *             format: uuid
+ *         service:
+ *           type: object
+ *         date:
+ *           type: string
+ *           format: date-time
+ *         isRecurring:
+ *           type: boolean
+ *         startTime:
+ *           type: string
+ *           format: date-time
+ *         endTime:
+ *           type: string
+ *           format: date-time
+ *         recurrence:
+ *           type: object
+ *         isBillable:
+ *           type: boolean
+ *         serviceLocation:
+ *           type: string
+ *         requiresTravel:
+ *           type: boolean
+ *         colourCode:
+ *           type: string
+ *         relatedAppointment:
+ *           type: string
+ *           format: uuid
+ *         forAll:
+ *           type: boolean
+ *           description: Apply this update to all recurring appointments
+ *           example: false
  */
 
 class AppointmentRoutes {
@@ -103,6 +155,28 @@ class AppointmentRoutes {
          *         description: Validation error
          */
         this.router.post("/", AppointmentDto.createAppointmentDto, this.controller.createAppointment);
+
+        /**
+         * @swagger
+         * /api/v1/appointments/:
+         *   put:
+         *     summary: Update an existing appointment
+         *     tags: [appointments]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/AppointmentUpdateDto'
+         *     responses:
+         *       200:
+         *         description: Appointment updated successfully
+         *       400:
+         *         description: Validation error
+         *       404:
+         *         description: Appointment not found
+         */
+        this.router.put("/", AppointmentDto.updateAppointmentDto, this.controller.updateAppointment);
     }
 
     getRouter() {

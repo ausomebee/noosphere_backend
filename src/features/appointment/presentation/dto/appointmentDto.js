@@ -29,6 +29,29 @@ class AppointmentDto {
 
         Validator.validateRequest(req, next, schema);
     };
+
+    static updateAppointmentDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required(),
+            clientId: Joi.string().uuid(),
+            sessionId: Joi.string().uuid(),
+            clinicians: Joi.array().items(Joi.string().uuid()).min(1),
+            service: Joi.object(),
+            date: Joi.date(),
+            isRecurring: Joi.boolean(),
+            startTime: Joi.date(),
+            endTime: Joi.date(),
+            recurrence: Joi.object(),
+            isBillable: Joi.boolean(),
+            serviceLocation: Joi.string().min(1),
+            requiresTravel: Joi.boolean(),
+            colourCode: Joi.string().min(1),
+            relatedAppointment: Joi.string().uuid().allow(null),
+            forAll: Joi.boolean().default(false)
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
 }
 
 export default AppointmentDto;
