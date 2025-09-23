@@ -52,11 +52,11 @@ import AppointmentController from "../controllers/appointmentController.js";
  *           example: false
  *         startTime:
  *           type: string
- *           format: date-time
+ *           format: time
  *           description: Start time of the appointment
  *         endTime:
  *           type: string
- *           format: date-time
+ *           format: time
  *           description: End time of the appointment
  *         recurrence:
  *           type: object
@@ -76,14 +76,6 @@ import AppointmentController from "../controllers/appointmentController.js";
  *           type: string
  *           description: Colour code for the appointment
  *           example: "#FF5733"
- *         relatedAppointment:
- *           type: string
- *           format: uuid
- *           description: ID of a related appointment
- *         forAll:
- *           type: boolean
- *           description: Apply this update to all recurring appointments
- *           example: false
  *
  *     AppointmentUpdateDto:
  *       type: object
@@ -114,10 +106,10 @@ import AppointmentController from "../controllers/appointmentController.js";
  *           type: boolean
  *         startTime:
  *           type: string
- *           format: date-time
+ *           format: time
  *         endTime:
  *           type: string
- *           format: date-time
+ *           format: time
  *         recurrence:
  *           type: object
  *         isBillable:

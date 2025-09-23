@@ -748,8 +748,8 @@ model Appointment {
   service            Json
   date               DateTime
   isRecurring        Boolean
-  startTime          DateTime
-  endTime            DateTime
+  startTime          String
+  endTime            String
   recurrence         Json
   isBillable         Boolean
   serviceLocation    String
