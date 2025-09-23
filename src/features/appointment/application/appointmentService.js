@@ -75,8 +75,18 @@ class AppointmentService {
         return update;
     }
 
+    async getClientAppointments(clientId) {
+        const appointments = await this.appointmentRepository.findAllAndPopulate({ clientId, relatedAppointment: null }, {tenant: true, client: true, session: true});
+
+        if (!appointments) {
+            throw new Error("appointments not found")
+        }
+
+        return appointments;
+    }
+
     async getTenantAppointments(tenantId) {
-        const appointments = await this.appointmentRepository.findAll({ tenantId, relatedAppointment: null });
+        const appointments = await this.appointmentRepository.findAllAndPopulate({ tenantId, relatedAppointment: null }, {tenant: true, client: true, session: true});
 
         if (!appointments) {
             throw new Error("appointments not found")
@@ -86,12 +96,12 @@ class AppointmentService {
     }
 
     async getStaffAppointments(staffId) {
-        const appointments = await this.appointmentRepository.findAll({
+        const appointments = await this.appointmentRepository.findAllAndPopulate({
             clinicians: {
                 array_contains: [staffId]
             },
             relatedAppointment: null
-        });
+        }, {tenant: true, client: true, session: true});
 
         if (!appointments) {
             throw new Error("appointments not found")

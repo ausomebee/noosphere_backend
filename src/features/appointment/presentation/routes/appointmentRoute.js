@@ -236,6 +236,27 @@ class AppointmentRoutes {
         *         description: Validation error
         */
         this.router.get("/staff/:staffId", this.controller.getStaffAppointments);
+
+         /**
+        * @swagger
+        * /api/v1/appointments/client/{clientId}:
+        *   get:
+        *     summary: get client appointments
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: clientId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the client
+        *     responses:
+        *       200:
+        *         description: client appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/client/:clientId", this.controller.getClientAppointments);
     }
 
     getRouter() {
