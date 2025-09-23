@@ -923,6 +923,16 @@ class TenantService {
 
         return update;
     }
+
+    async getAllTenantStaffs(tenantId) {
+        const staffs = await this.staffRepository.findAll({tenantId});
+
+        if (!staffs) {
+            throw new Error("staffs not found")
+        }
+
+        return staffs;
+    }
 }
 
 export default TenantService;

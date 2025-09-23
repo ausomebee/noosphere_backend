@@ -44,6 +44,20 @@ class ClientController {
         });
     });
 
+    getTenantClients = expressAsyncHandler(async (req, res) => {
+        const clients = await this.service.getTenantClients(req.params.tenantId);
+
+        if (!clients) {
+            res.status(500).json({ message: 'Failed to fetch clients' });
+        }
+
+        return res.status(201).json({
+            message: "clients fetched successfully",
+            status: 'ok',
+            data: clients
+        });
+    });
+
 }
 
 export default ClientController;

@@ -150,6 +150,7 @@ model Tenant {
   OrganizationDiagnosisCodes OrganizationDiagnosisCodes[]
   OrganizationSessionTypes   OrganizationSessionTypes[]
   OrganizationLicenses       OrganizationLicenses[]
+  Appointment                Appointment[]
 }
 
 model TenantStaff {
@@ -741,6 +742,7 @@ model OrganizationSessionTypes {
 model Appointment {
   id                 String   @id @default(uuid())
   clientId           String
+  tenantId           String
   sessionId          String
   clinicians         Json
   service            Json
@@ -754,8 +756,13 @@ model Appointment {
   requiresTravel     Boolean
   colourCode         String
   relatedAppointment String?
+  isCanceled          Boolean  @default(false)
+  reasonForCancel    String?
+  rescheduled        Boolean  @default(false)
+  rescheduleAccepted Boolean  @default(false)
 
   client      Client                   @relation(fields: [clientId], references: [id])
+  tenant      Tenant                   @relation(fields: [tenantId], references: [id])
   session     OrganizationSessionTypes @relation(fields: [sessionId], references: [id])
   relatedTo   Appointment?             @relation("AppointmentRelation", fields: [relatedAppointment], references: [id])
   relatedFrom Appointment[]            @relation("AppointmentRelation")

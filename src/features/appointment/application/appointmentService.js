@@ -31,7 +31,6 @@ class AppointmentService {
     }
 
     async updateAppointment(data) {
-        console.log(data)
         if (!data.forAll && data.relatedAppointment) {
             const appointmentData = new Appointment(data);
             const newAppointment = await this.appointmentRepository.create(appointmentData.createAppointment);
@@ -63,6 +62,10 @@ class AppointmentService {
             serviceLocation: data.serviceLocation || appointment.serviceLocation,
             requiresTravel: data.requiresTravel ?? appointment.requiresTravel,
             colourCode: data.colourCode || appointment.colourCode,
+            isCanceled: data.isCanceled ?? appointment.isCanceled,
+            reasonForCancel: data.reasonForCancel || appointment.reasonForCancel,
+            rescheduled: data.rescheduled ?? appointment.rescheduled,
+            rescheduleAccepted: data.rescheduleAccepted ?? appointment.rescheduleAccepted,
         });
 
         if (!update) {
@@ -72,6 +75,30 @@ class AppointmentService {
         return update;
     }
 
+    async getTenantAppointments(tenantId) {
+        const appointments = await this.appointmentRepository.findAll({ tenantId });
+
+        if (!appointments) {
+            throw new Error("appointments not found")
+        }
+
+        return appointments;
+    }
+
+    async getStaffAppointments(staffId) {
+        const appointments = await this.appointmentRepository.findAll({
+            clinicians: {
+                array_contains: [staffId]
+            },
+            relatedAppointment: null
+        });
+
+        if (!appointments) {
+            throw new Error("appointments not found")
+        }
+
+        return appointments;
+    }
 }
 
 export default AppointmentService;

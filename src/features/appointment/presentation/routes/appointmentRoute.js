@@ -10,6 +10,7 @@ import AppointmentController from "../controllers/appointmentController.js";
  *       type: object
  *       required:
  *         - clientId
+ *         - tenantId
  *         - sessionId
  *         - clinicians
  *         - service
@@ -23,6 +24,10 @@ import AppointmentController from "../controllers/appointmentController.js";
  *           type: string
  *           format: uuid
  *           description: Unique client identifier
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *           description: Unique tenant identifier
  *         sessionId:
  *           type: string
  *           format: uuid
@@ -34,8 +39,9 @@ import AppointmentController from "../controllers/appointmentController.js";
  *             format: uuid
  *           description: List of clinician IDs
  *         service:
- *           type: object
- *           description: Service details (JSON)
+ *           type: array
+ *           items:
+ *             type: object
  *         date:
  *           type: string
  *           format: date-time
@@ -85,6 +91,7 @@ import AppointmentController from "../controllers/appointmentController.js";
  *         id:
  *           type: string
  *           format: uuid
+ *           description: Unique appointment identifier
  *         clientId:
  *           type: string
  *           format: uuid
@@ -97,7 +104,9 @@ import AppointmentController from "../controllers/appointmentController.js";
  *             type: string
  *             format: uuid
  *         service:
- *           type: object
+ *           type: array
+ *           items:
+ *             type: object
  *         date:
  *           type: string
  *           format: date-time
@@ -122,6 +131,22 @@ import AppointmentController from "../controllers/appointmentController.js";
  *         relatedAppointment:
  *           type: string
  *           format: uuid
+ *         isCanceled:
+ *           type: boolean
+ *           description: Indicates if the appointment has been canceled
+ *           example: false
+ *         reasonForCancel:
+ *           type: string
+ *           description: Reason for cancellation
+ *           example: "Client unavailable"
+ *         rescheduled:
+ *           type: boolean
+ *           description: Indicates if the appointment has been rescheduled
+ *           example: false
+ *         rescheduleAccepted:
+ *           type: boolean
+ *           description: Indicates if the reschedule was accepted
+ *           example: false
  *         forAll:
  *           type: boolean
  *           description: Apply this update to all recurring appointments
@@ -177,6 +202,48 @@ class AppointmentRoutes {
          *         description: Appointment not found
          */
         this.router.put("/", AppointmentDto.updateAppointmentDto, this.controller.updateAppointment);
+
+        /**
+        * @swagger
+        * /api/v1/appointments/tenant/{tenantId}:
+        *   get:
+        *     summary: get tenant appointments
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the tenant
+        *     responses:
+        *       200:
+        *         description: tenant appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant/:tenantId", this.controller.getTenantAppointments);
+
+        /**
+        * @swagger
+        * /api/v1/appointments/staff/{staffId}:
+        *   get:
+        *     summary: get staff appointments
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: staffId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the staff
+        *     responses:
+        *       200:
+        *         description: staff appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/staff/:staffId", this.controller.getStaffAppointments);
     }
 
     getRouter() {

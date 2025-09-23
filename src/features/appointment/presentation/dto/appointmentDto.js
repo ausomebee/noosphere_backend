@@ -7,6 +7,9 @@ class AppointmentDto {
             clientId: Joi.string()
                 .uuid()
                 .required(),
+            tenantId: Joi.string()
+                .uuid()
+                .required(),
             sessionId: Joi.string()
                 .uuid()
                 .required(),
@@ -14,7 +17,7 @@ class AppointmentDto {
                 .items(Joi.string().uuid())
                 .min(1)
                 .required(),
-            service: Joi.object().required(),
+            service: Joi.array().items(Joi.object()),
             date: Joi.date().required(),
             isRecurring: Joi.boolean().default(false),
             startTime: Joi.date().required(),
@@ -36,7 +39,7 @@ class AppointmentDto {
             clientId: Joi.string().uuid(),
             sessionId: Joi.string().uuid(),
             clinicians: Joi.array().items(Joi.string().uuid()).min(1),
-            service: Joi.object(),
+            service: Joi.array().items(Joi.object()),
             date: Joi.date(),
             isRecurring: Joi.boolean(),
             startTime: Joi.date(),
@@ -47,6 +50,10 @@ class AppointmentDto {
             requiresTravel: Joi.boolean(),
             colourCode: Joi.string().min(1),
             relatedAppointment: Joi.string().uuid().allow(null),
+            isCanceled: Joi.boolean(),
+            reasonForCancel: Joi.string().allow(null, ''),
+            rescheduled: Joi.boolean(),
+            rescheduleAccepted: Joi.boolean(),
             forAll: Joi.boolean().default(false)
         });
 

@@ -85,6 +85,16 @@ class ClientService {
 
         return update;
     }
+
+    async getTenantClients(tenantId) {
+        const clients = await this.clientTenantRepository.findAllAndPopulate({ tenantId }, { client: true });
+
+        if (!clients) {
+            throw new Error("clients not found")
+        }
+
+        return clients;
+    }
 }
 
 export default ClientService;

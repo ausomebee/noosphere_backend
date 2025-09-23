@@ -184,6 +184,20 @@ class TenantController {
         });
     });
 
+    getTenantStaffs = expressAsyncHandler(async (req, res) => {
+        const staffs = await this.service.getAllTenantStaffs(req.params.tenantId);
+
+        if (!staffs) {
+            return res.status(500).json({ message: 'Failed to get staffs.' });
+        }
+
+        return res.status(200).json({
+            message: "staffs retrieved successfully",
+            status: 'ok',
+            data: staffs
+        });
+    });
+
     forgotPassword = expressAsyncHandler(async (req, res) => {
         const result = await this.service.forgotPassword(req.params.email);
 

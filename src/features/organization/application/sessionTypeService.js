@@ -68,6 +68,16 @@ class OrganizationSessionTypesService {
         return sessionTypes;
     }
 
+    async getActiveTenantSessionTypes(tenantId) {
+        const sessionTypes = await this.organizationSessionTypesRepository.findAll({ AND: [{ tenantId }, { isActive: true }] });
+
+        if (!sessionTypes) {
+            throw new Error("Session types not found");
+        }
+
+        return sessionTypes;
+    }
+
 }
 
 export default OrganizationSessionTypesService;
