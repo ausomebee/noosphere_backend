@@ -69,6 +69,19 @@ class AppointmentController {
         });
     });
 
+    getClientAppointments = expressAsyncHandler(async (req, res) => {
+        const appointments = await this.service.getClientAppointments(req.params.clientId);
+
+        if (!appointments) {
+            res.status(500).json({ message: 'Failed to fetch appointments' });
+        }
+
+        return res.status(201).json({
+            message: "appointments fetched successfully",
+            status: 'ok',
+            data: appointments
+        });
+    });
 }
 
 export default AppointmentController;

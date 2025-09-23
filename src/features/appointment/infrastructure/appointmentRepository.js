@@ -42,6 +42,13 @@ class AppointmentRepository {
         const { where, include, select, orderBy, take, skip } = query;
         return await this.model.findFirst({ where, include, select, orderBy, take, skip });
     }
+
+    async findAllAndPopulate(query, populate) {
+        return await this.model.findMany({
+            where: query,
+            include: populate
+        });
+    }
 }
 
 export default AppointmentRepository
