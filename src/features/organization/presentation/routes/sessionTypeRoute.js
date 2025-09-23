@@ -172,6 +172,25 @@ class OrganizationSessionTypesRoutes {
 
         /**
          * @swagger
+         * /api/v1/organization/session-types/active/tenant/{tenantId}:
+         *   get:
+         *     summary: Get tenant organization session types
+         *     tags: [organization]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The Id of the tenant
+         *     responses:
+         *       200:
+         *         description: Organization session types fetched successfully
+         */
+        this.router.get("/active/tenant/:tenantId", this.controller.getTenantSessionTypes);
+
+        /**
+         * @swagger
          * /api/v1/organization/session-types/{id}:
          *   get:
          *     summary: Get single organization session type

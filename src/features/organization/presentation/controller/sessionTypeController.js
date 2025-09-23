@@ -68,6 +68,20 @@ class OrganizationSessionTypesController {
         });
     });
 
+    getActiveTenantSessionTypes = expressAsyncHandler(async (req, res) => {
+        const types = await this.service.getActiveTenantSessionTypes(req.params.tenantId);
+
+        if (!types) {
+            res.status(500).json({ message: "Failed to fetch session types" });
+        }
+
+        return res.status(200).json({
+            message: "Session types fetched successfully",
+            status: "ok",
+            data: types,
+        });
+    });
+
     deactivateSessionType = expressAsyncHandler(async (req, res) => {
         const type = await this.service.updateOrganizationSessionType({ id: req.params.id, isActive: req.params.active === "true" });
 

@@ -14,7 +14,12 @@ class Appointment {
         serviceLocation,
         requiresTravel,
         colourCode,
-        relatedAppointment
+        relatedAppointment,
+        tenantId,
+        isCanceled,
+        reasonForCancel,
+        rescheduled,
+        rescheduleAccepted
     }) {
         this.id = id;
         this.clientId = clientId;
@@ -31,6 +36,11 @@ class Appointment {
         this.requiresTravel = requiresTravel;
         this.colourCode = colourCode;
         this.relatedAppointment = relatedAppointment;
+        this.tenantId = tenantId;
+        this.isCanceled = isCanceled;
+        this.reasonForCancel = reasonForCancel;
+        this.rescheduled = rescheduled;
+        this.rescheduleAccepted = rescheduleAccepted;
     }
 
     get createAppointment() {
@@ -48,7 +58,8 @@ class Appointment {
             serviceLocation: this.serviceLocation,
             requiresTravel: this.requiresTravel,
             colourCode: this.colourCode,
-            relatedAppointment: this.relatedAppointment
+            relatedAppointment: this.relatedAppointment,
+            tenantId: this.tenantId
         };
     }
 }

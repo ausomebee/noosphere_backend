@@ -528,6 +528,27 @@ class TenantRoutes {
          */
         this.router.get("/:id", this.controller.getTenant);
 
+        /**
+         * @swagger
+         * /api/v1/tenant/staff/{tenantId}:
+         *   get:
+         *     summary: Gets tenant staffs by tenant id
+         *     tags: [Tenant]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The id of the tenant 
+         *     responses:
+         *       200:
+         *         description: tenant staffs fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/staff/:tenantId", this.controller.getTenantStaffs);
+
     }
 
     getRouter() {

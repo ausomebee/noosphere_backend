@@ -185,6 +185,27 @@ class ClientRoutes {
          *         description: Client not found
          */
         this.router.put("/", ClientDto.updateClientDto, this.controller.updateClient);
+
+        /**
+        * @swagger
+        * /api/v1/client/tenant/{tenantId}:
+        *   get:
+        *     summary: gets tenant clients
+        *     tags: [Clients]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the tenant
+        *     responses:
+        *       200:
+        *         description: tenant clients fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant/:tenantId", this.controller.getTenantClients);
     }
 
     getRouter() {
