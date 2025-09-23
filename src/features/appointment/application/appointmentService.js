@@ -76,7 +76,7 @@ class AppointmentService {
     }
 
     async getTenantAppointments(tenantId) {
-        const appointments = await this.appointmentRepository.findAll({ tenantId });
+        const appointments = await this.appointmentRepository.findAll({ tenantId, relatedAppointment: null });
 
         if (!appointments) {
             throw new Error("appointments not found")
