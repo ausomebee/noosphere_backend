@@ -47,6 +47,9 @@ class AppointmentDto {
         const schema = Joi.object({
             id: Joi.string().uuid().required(),
             clientId: Joi.string().uuid(),
+            tenantId: Joi.string()
+                .uuid()
+                .required(),
             sessionId: Joi.string().uuid(),
             clinicians: Joi.array().items(Joi.string().uuid()).min(1),
             service: Joi.array().items(Joi.object()),

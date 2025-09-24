@@ -33,6 +33,7 @@ class AppointmentService {
     async updateAppointment(data) {
         if (!data.forAll && data.relatedAppointment) {
             const appointmentData = new Appointment(data);
+            console.log(appointmentData.createAppointment)
             const newAppointment = await this.appointmentRepository.create(appointmentData.createAppointment);
 
             if (!newAppointment) {
