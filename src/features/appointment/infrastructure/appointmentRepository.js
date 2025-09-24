@@ -49,6 +49,25 @@ class AppointmentRepository {
             include: populate
         });
     }
+
+    async getAppointmentsByTenant(tenantId) {
+        const appointments = await this.model.findMany({
+            where: { tenantId },
+            include: {
+                relatedTo: true,
+                relatedFrom: true,
+                client: true,
+                session: true,
+                tenant: true,
+                client: true,
+                session: true
+            },
+            orderBy: { date: "asc" }
+        });
+
+        return appointments;
+    }
+
 }
 
 export default AppointmentRepository
