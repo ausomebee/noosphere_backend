@@ -54,9 +54,15 @@ class AppointmentRepository {
         const appointments = await this.model.findMany({
             where: { tenantId },
             include: {
-                relatedTo: true,
-                relatedFrom: true,
-                client: true,
+                // relatedTo: true,
+                // relatedFrom: true,
+                client: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                    },
+                },
                 session: true,
             },
             orderBy: { date: "asc" }
