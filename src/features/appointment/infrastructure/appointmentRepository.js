@@ -58,9 +58,6 @@ class AppointmentRepository {
                 relatedFrom: true,
                 client: true,
                 session: true,
-                tenant: true,
-                client: true,
-                session: true
             },
             orderBy: { date: "asc" }
         });
