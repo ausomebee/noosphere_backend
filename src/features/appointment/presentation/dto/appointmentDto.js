@@ -57,18 +57,17 @@ class AppointmentDto {
             isRecurring: Joi.boolean(),
             startTime: Joi.string()
                 .pattern(/^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/)
-                .required()
+                .optional()
                 .messages({
                     "string.pattern.base": "startTime must be in HH:mm or HH:mm:ss format",
                 }),
-
             endTime: Joi.string()
                 .pattern(/^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/)
-                .required()
+                .optional()
                 .messages({
                     "string.pattern.base": "endTime must be in HH:mm or HH:mm:ss format",
                 }),
-            recurrence: Joi.object(),
+            recurrence: Joi.object().optional(),
             isBillable: Joi.boolean(),
             serviceLocation: Joi.string().min(1),
             requiresTravel: Joi.boolean(),

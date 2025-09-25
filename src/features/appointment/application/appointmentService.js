@@ -77,13 +77,105 @@ class AppointmentService {
     }
 
     async getClientAppointments(clientId) {
-        const appointments = await this.appointmentRepository.findAllAndPopulate({ clientId, relatedAppointment: null }, { tenant: true, client: true, session: true });
+        const appointments = await this.appointmentRepository.findAllAndPopulate(
+            { clientId },
+            { tenant: true, client: true, session: true }
+        );
 
-        if (!appointments) {
-            throw new Error("appointments not found")
+        if (!appointments || appointments.length === 0) {
+            return [];
         }
 
-        return appointments;
+        const grouped = {};
+
+        for (const appt of appointments) {
+            if (!appt.relatedAppointment) {
+                grouped[appt.id] = {
+                    ...appt,
+                    relatedAppointments: [],
+                };
+            }
+        }
+
+        for (const appt of appointments) {
+            if (appt.relatedAppointment) {
+                if (grouped[appt.relatedAppointment]) {
+                    grouped[appt.relatedAppointment].relatedAppointments.push(appt);
+                } else {
+                    grouped[appt.id] = {
+                        ...appt,
+                        relatedAppointments: [],
+                    };
+                }
+            }
+        }
+
+        const result = Object.values(grouped).sort(
+            (a, b) => new Date(a.date) - new Date(b.date)
+        );
+
+        for (const item of result) {
+            item.relatedAppointments.sort((a, b) => {
+                const d = new Date(a.date) - new Date(b.date);
+                if (d !== 0) return d;
+                return a.startTime.localeCompare(b.startTime);
+            });
+        }
+
+        return result;
+    }
+
+    async getStaffAppointments(staffId) {
+        const appointments = await this.appointmentRepository.findAllAndPopulate(
+            {
+                clinicians: {
+                    array_contains: [staffId]
+                }
+            },
+            { tenant: true, client: true, session: true }
+        );
+
+        if (!appointments || appointments.length === 0) {
+            return [];
+        }
+
+        const grouped = {};
+
+        for (const appt of appointments) {
+            if (!appt.relatedAppointment) {
+                grouped[appt.id] = {
+                    ...appt,
+                    relatedAppointments: [],
+                };
+            }
+        }
+
+        for (const appt of appointments) {
+            if (appt.relatedAppointment) {
+                if (grouped[appt.relatedAppointment]) {
+                    grouped[appt.relatedAppointment].relatedAppointments.push(appt);
+                } else {
+                    grouped[appt.id] = {
+                        ...appt,
+                        relatedAppointments: [],
+                    };
+                }
+            }
+        }
+
+        const result = Object.values(grouped).sort(
+            (a, b) => new Date(a.date) - new Date(b.date)
+        );
+
+        for (const item of result) {
+            item.relatedAppointments.sort((a, b) => {
+                const d = new Date(a.date) - new Date(b.date);
+                if (d !== 0) return d;
+                return a.startTime.localeCompare(b.startTime);
+            });
+        }
+
+        return result;
     }
 
     async getTenantAppointments(tenantId) {
@@ -132,20 +224,6 @@ class AppointmentService {
         return result;
     }
 
-    async getStaffAppointments(staffId) {
-        const appointments = await this.appointmentRepository.findAllAndPopulate({
-            clinicians: {
-                array_contains: [staffId]
-            },
-            relatedAppointment: null
-        }, { tenant: true, client: true, session: true });
-
-        if (!appointments) {
-            throw new Error("appointments not found")
-        }
-
-        return appointments;
-    }
 }
 
 export default AppointmentService;
