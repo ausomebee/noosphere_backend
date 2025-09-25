@@ -31,9 +31,9 @@ class AppointmentService {
     }
 
     async updateAppointment(data) {
+        const appointment = await this.appointmentRepository.findOne({ id: data.id });
         if (!data.forAll && data.relatedAppointment) {
-            const appointmentData = new Appointment(data);
-            console.log(appointmentData.createAppointment)
+            const appointmentData = new Appointment({...appointment, ...data});
             const newAppointment = await this.appointmentRepository.create(appointmentData.createAppointment);
 
             if (!newAppointment) {
@@ -43,7 +43,6 @@ class AppointmentService {
             return newAppointment;
         }
 
-        const appointment = await this.appointmentRepository.findOne({ id: data.id });
 
         if (!appointment) {
             throw new Error("Appointment not found");
