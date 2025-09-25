@@ -251,6 +251,75 @@ class AppointmentService {
         return result;
     }
 
+    async getTenantRescheduledAppointments(tenantId) {
+        const appointments = await this.appointmentRepository.findAllAndPopulate({ tenantId, rescheduled: true, rescheduleAccepted: false }, {
+            client: {
+                select: {
+                    id: true,
+                    fullName: true,
+                    email: true,
+                },
+            },
+            session: true
+        });
+
+        if (!appointments) {
+            throw new Error("Session types not found");
+        }
+
+        return appointments;
+    }
+
+    async getStaffRescheduledAppointments(staffId) {
+        const appointments = await this.appointmentRepository.findAllAndPopulate({ staffId, rescheduled: true, rescheduleAccepted: false }, {
+            client: {
+                select: {
+                    id: true,
+                    fullName: true,
+                    email: true,
+                },
+            },
+            session: true
+        });
+
+        if (!appointments) {
+            throw new Error("Session types not found");
+        }
+
+        return appointments;
+    }
+
+    async acceptRescheduleAppointment(data) {
+        for (const id of data) {
+            const appointment = await this.appointmentRepository.findOne({ id: id });
+
+            const update = await this.appointmentRepository.update(id, {
+                rescheduleAccepted: data.rescheduleAccepted ?? appointment.rescheduleAccepted,
+            });
+
+            if (!update) {
+                throw new Error("Failed to update Appointment");
+            }
+        };
+
+        return update;
+    }
+
+    async rejectRescheduleAppointment(data) {
+        for (const id of data) {
+            const appointment = await this.appointmentRepository.findOne({ id: id });
+
+            const update = await this.appointmentRepository.update(id, {
+                rescheduleRejected: data.rescheduleRejected ?? appointment.rescheduleRejected
+            });
+
+            if (!update) {
+                throw new Error("Failed to update Appointment");
+            }
+        };
+
+        return update;
+    }
 }
 
 export default AppointmentService;
