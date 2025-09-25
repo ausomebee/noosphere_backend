@@ -33,14 +33,42 @@ class AppointmentService {
     async updateAppointment(data) {
         const appointment = await this.appointmentRepository.findOne({ id: data.id });
         if (!data.forAll && data.relatedAppointment) {
-            const appointmentData = new Appointment({...appointment, ...data});
-            const newAppointment = await this.appointmentRepository.create(appointmentData.createAppointment);
+            if (appointment) {
+                const update = await this.appointmentRepository.update(data.id, {
+                    clientId: data.clientId || appointment.clientId,
+                    sessionId: data.sessionId || appointment.sessionId,
+                    clinicians: data.clinicians || appointment.clinicians,
+                    service: data.service || appointment.service,
+                    date: data.date || appointment.date,
+                    isRecurring: data.isRecurring ?? appointment.isRecurring,
+                    startTime: data.startTime || appointment.startTime,
+                    endTime: data.endTime || appointment.endTime,
+                    recurrence: data.recurrence || appointment.recurrence,
+                    isBillable: data.isBillable ?? appointment.isBillable,
+                    serviceLocation: data.serviceLocation || appointment.serviceLocation,
+                    requiresTravel: data.requiresTravel ?? appointment.requiresTravel,
+                    colourCode: data.colourCode || appointment.colourCode,
+                    isCanceled: data.isCanceled ?? appointment.isCanceled,
+                    reasonForCancel: data.reasonForCancel || appointment.reasonForCancel,
+                    rescheduled: data.rescheduled ?? appointment.rescheduled,
+                    rescheduleAccepted: data.rescheduleAccepted ?? appointment.rescheduleAccepted,
+                });
 
-            if (!newAppointment) {
-                throw new Error("Failed to create Appointment");
+                if (!update) {
+                    throw new Error("Failed to update Appointment");
+                }
+
+                return update;
+            } else {
+                const appointmentData = new Appointment(data);
+                const newAppointment = await this.appointmentRepository.create(appointmentData.createAppointment);
+
+                if (!newAppointment) {
+                    throw new Error("Failed to create Appointment");
+                }
+
+                return newAppointment;
             }
-
-            return newAppointment;
         }
 
 
