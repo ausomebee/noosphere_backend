@@ -60,7 +60,7 @@ class AppointmentService {
 
                 return update;
             } else {
-                const appointmentData = new Appointment(data);
+                const appointmentData = new Appointment({...appointment, ...data});
                 const newAppointment = await this.appointmentRepository.create(appointmentData.createAppointment);
 
                 if (!newAppointment) {
@@ -264,7 +264,7 @@ class AppointmentService {
         });
 
         if (!appointments) {
-            throw new Error("Session types not found");
+            throw new Error("Failed to fetch Appointment");
         }
 
         return appointments;
@@ -283,7 +283,7 @@ class AppointmentService {
         });
 
         if (!appointments) {
-            throw new Error("Session types not found");
+            throw new Error("Failed to fetch Appointment");
         }
 
         return appointments;
@@ -319,6 +319,44 @@ class AppointmentService {
         };
 
         return update;
+    }
+
+    async getTenantCanceledAppointments(tenantId) {
+        const appointments = await this.appointmentRepository.findAllAndPopulate({ tenantId, isCanceled: true }, {
+            client: {
+                select: {
+                    id: true,
+                    fullName: true,
+                    email: true,
+                },
+            },
+            session: true
+        });
+
+        if (!appointments) {
+            throw new Error("Failed to fetch Appointment");
+        }
+
+        return appointments;
+    }
+
+    async getStaffCanceledAppointments(staffId) {
+        const appointments = await this.appointmentRepository.findAllAndPopulate({ staffId, isCanceled: true }, {
+            client: {
+                select: {
+                    id: true,
+                    fullName: true,
+                    email: true,
+                },
+            },
+            session: true
+        });
+
+        if (!appointments) {
+            throw new Error("Failed to fetch Appointment");
+        }
+
+        return appointments;
     }
 }
 

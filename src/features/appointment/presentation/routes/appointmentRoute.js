@@ -261,6 +261,69 @@ class AppointmentRoutes {
         */
         this.router.get("/staff/:staffId", this.controller.getStaffAppointments);
 
+        /**
+        * @swagger
+        * /api/v1/appointments/tenant/canceled/{tenantId}:
+        *   get:
+        *     summary: get tenant canceled appointments
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the tenant
+        *     responses:
+        *       200:
+        *         description: tenant appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant/canceled/:tenantId", this.controller.getTenantCanceledAppointments);
+
+        /**
+        * @swagger
+        * /api/v1/appointments/staff/canceled/{staffId}:
+        *   get:
+        *     summary: get staff canceled appointments
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: staffId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the staff
+        *     responses:
+        *       200:
+        *         description: staff appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/staff/canceled/:staffId", this.controller.getStaffCanceledAppointments);
+
+        /**
+        * @swagger
+        * /api/v1/appointments/staff/rescheduled/{staffId}:
+        *   get:
+        *     summary: get staff rescheduled appointments
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: staffId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the staff
+        *     responses:
+        *       200:
+        *         description: staff appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/staff/rescheduled/:staffId", this.controller.getStaffRescheduledAppointments);
+
          /**
         * @swagger
         * /api/v1/appointments/client/{clientId}:
