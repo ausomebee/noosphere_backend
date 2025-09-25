@@ -33,7 +33,7 @@ class AppointmentService {
     async updateAppointment(data) {
         const appointment = await this.appointmentRepository.findOne({ id: data.id });
         if (!data.forAll && data.relatedAppointment) {
-            if (appointment) {
+            if (appointment && !data.forAll && data.relatedAppointment) {
                 const update = await this.appointmentRepository.update(data.id, {
                     clientId: data.clientId || appointment.clientId,
                     sessionId: data.sessionId || appointment.sessionId,
