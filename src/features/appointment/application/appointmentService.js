@@ -60,7 +60,7 @@ class AppointmentService {
 
                 return update;
             } else {
-                const appointmentData = new Appointment(data);
+                const appointmentData = new Appointment({...appointment, ...data});
                 const newAppointment = await this.appointmentRepository.create(appointmentData.createAppointment);
 
                 if (!newAppointment) {
@@ -251,6 +251,113 @@ class AppointmentService {
         return result;
     }
 
+    async getTenantRescheduledAppointments(tenantId) {
+        const appointments = await this.appointmentRepository.findAllAndPopulate({ tenantId, rescheduled: true, rescheduleAccepted: false }, {
+            client: {
+                select: {
+                    id: true,
+                    fullName: true,
+                    email: true,
+                },
+            },
+            session: true
+        });
+
+        if (!appointments) {
+            throw new Error("Failed to fetch Appointment");
+        }
+
+        return appointments;
+    }
+
+    async getStaffRescheduledAppointments(staffId) {
+        const appointments = await this.appointmentRepository.findAllAndPopulate({ staffId, rescheduled: true, rescheduleAccepted: false }, {
+            client: {
+                select: {
+                    id: true,
+                    fullName: true,
+                    email: true,
+                },
+            },
+            session: true
+        });
+
+        if (!appointments) {
+            throw new Error("Failed to fetch Appointment");
+        }
+
+        return appointments;
+    }
+
+    async acceptRescheduleAppointment(data) {
+        for (const id of data) {
+            const appointment = await this.appointmentRepository.findOne({ id: id });
+
+            const update = await this.appointmentRepository.update(id, {
+                rescheduleAccepted: data.rescheduleAccepted ?? appointment.rescheduleAccepted,
+            });
+
+            if (!update) {
+                throw new Error("Failed to update Appointment");
+            }
+        };
+
+        return update;
+    }
+
+    async rejectRescheduleAppointment(data) {
+        for (const id of data) {
+            const appointment = await this.appointmentRepository.findOne({ id: id });
+
+            const update = await this.appointmentRepository.update(id, {
+                rescheduleRejected: data.rescheduleRejected ?? appointment.rescheduleRejected
+            });
+
+            if (!update) {
+                throw new Error("Failed to update Appointment");
+            }
+        };
+
+        return update;
+    }
+
+    async getTenantCanceledAppointments(tenantId) {
+        const appointments = await this.appointmentRepository.findAllAndPopulate({ tenantId, isCanceled: true }, {
+            client: {
+                select: {
+                    id: true,
+                    fullName: true,
+                    email: true,
+                },
+            },
+            session: true
+        });
+
+        if (!appointments) {
+            throw new Error("Failed to fetch Appointment");
+        }
+
+        return appointments;
+    }
+
+    async getStaffCanceledAppointments(staffId) {
+        const appointments = await this.appointmentRepository.findAllAndPopulate({ staffId, isCanceled: true }, {
+            client: {
+                select: {
+                    id: true,
+                    fullName: true,
+                    email: true,
+                },
+            },
+            session: true
+        });
+
+        if (!appointments) {
+            throw new Error("Failed to fetch Appointment");
+        }
+
+        return appointments;
+    }
 }
 
 export default AppointmentService;

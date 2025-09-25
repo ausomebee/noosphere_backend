@@ -221,6 +221,27 @@ class AppointmentRoutes {
 
         /**
         * @swagger
+        * /api/v1/appointments/tenant/rescheduled/{tenantId}:
+        *   get:
+        *     summary: get tenant recheduled appointments
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the tenant
+        *     responses:
+        *       200:
+        *         description: tenant appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant/rescheduled/:tenantId", this.controller.getTenantRescheduledAppointments);
+
+        /**
+        * @swagger
         * /api/v1/appointments/staff/{staffId}:
         *   get:
         *     summary: get staff appointments
@@ -239,6 +260,69 @@ class AppointmentRoutes {
         *         description: Validation error
         */
         this.router.get("/staff/:staffId", this.controller.getStaffAppointments);
+
+        /**
+        * @swagger
+        * /api/v1/appointments/tenant/canceled/{tenantId}:
+        *   get:
+        *     summary: get tenant canceled appointments
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the tenant
+        *     responses:
+        *       200:
+        *         description: tenant appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant/canceled/:tenantId", this.controller.getTenantCanceledAppointments);
+
+        /**
+        * @swagger
+        * /api/v1/appointments/staff/canceled/{staffId}:
+        *   get:
+        *     summary: get staff canceled appointments
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: staffId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the staff
+        *     responses:
+        *       200:
+        *         description: staff appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/staff/canceled/:staffId", this.controller.getStaffCanceledAppointments);
+
+        /**
+        * @swagger
+        * /api/v1/appointments/staff/rescheduled/{staffId}:
+        *   get:
+        *     summary: get staff rescheduled appointments
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: staffId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the staff
+        *     responses:
+        *       200:
+        *         description: staff appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/staff/rescheduled/:staffId", this.controller.getStaffRescheduledAppointments);
 
          /**
         * @swagger
@@ -260,6 +344,63 @@ class AppointmentRoutes {
         *         description: Validation error
         */
         this.router.get("/client/:clientId", this.controller.getClientAppointments);
+
+        /**
+         * @swagger
+         * /api/v1/appointments/accept-reschedule:
+         *   patch:
+         *     summary: Accept rescheduled appointments
+         *     tags: [appointments]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: array
+         *             items:
+         *               type: string
+         *               format: uuid
+         *             example:
+         *               - "550e8400-e29b-41d4-a716-446655440000"
+         *               - "550e8400-e29b-41d4-a716-446655440111"
+         *     responses:
+         *       200:
+         *         description: Appointments updated successfully
+         *       400:
+         *         description: Validation error
+         *       404:
+         *         description: Appointment not found
+         */
+        this.router.put("/", this.controller.acceptRescheduleAppointment);
+
+        /**
+         * @swagger
+         * /api/v1/appointments/reject-reschedule:
+         *   patch:
+         *     summary: Reject rescheduled appointments
+         *     tags: [appointments]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: array
+         *             items:
+         *               type: string
+         *               format: uuid
+         *             example:
+         *               - "550e8400-e29b-41d4-a716-446655440000"
+         *               - "550e8400-e29b-41d4-a716-446655440111"
+         *     responses:
+         *       200:
+         *         description: Appointments updated successfully
+         *       400:
+         *         description: Validation error
+         *       404:
+         *         description: Appointment not found
+         */
+        this.router.put("/", this.controller.rejectRescheduleAppointment);
+
     }
 
     getRouter() {
