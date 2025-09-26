@@ -113,8 +113,7 @@ class AppointmentService {
             { tenant: true, client: true, session: true, clinicians: {
                 select: {
                     id: true,
-                    firstName: true,
-                    lastName: true,
+                    fullName: true,
                     email: true,
                 }
             } }
@@ -174,8 +173,7 @@ class AppointmentService {
                 tenant: true, client: true, session: true, clinicians: {
                     select: {
                         id: true,
-                        firstName: true,
-                        lastName: true,
+                        fullName: true,
                         email: true,
                     }
                 }
@@ -284,8 +282,7 @@ class AppointmentService {
             clinicians: {
                 select: {
                     id: true,
-                    firstName: true,
-                    lastName: true,
+                    fullName: true,
                     email: true,
                 }
             }
@@ -316,8 +313,7 @@ class AppointmentService {
             clinicians: {
                 select: {
                     id: true,
-                    firstName: true,
-                    lastName: true,
+                    fullName: true,
                     email: true,
                 }
             }
@@ -375,8 +371,7 @@ class AppointmentService {
             clinicians: {
                 select: {
                     id: true,
-                    firstName: true,
-                    lastName: true,
+                    fullName: true,
                     email: true,
                 }
             }
@@ -406,8 +401,7 @@ class AppointmentService {
             clinicians: {
                 select: {
                     id: true,
-                    firstName: true,
-                    lastName: true,
+                    fullName: true,
                     email: true,
                 }
             }
