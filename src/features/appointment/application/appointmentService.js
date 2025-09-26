@@ -38,7 +38,7 @@ class AppointmentService {
                     clientId: data.clientId || appointment.clientId,
                     sessionId: data.sessionId || appointment.sessionId,
                     clinicians: {
-                        connect: data.clinicians || appointment.clinicians
+                        set: data.clinicians || appointment.clinicians
                     },
                     service: data.service || appointment.service,
                     date: data.date || appointment.date,
@@ -84,7 +84,7 @@ class AppointmentService {
             clientId: data.clientId || appointment.clientId,
             sessionId: data.sessionId || appointment.sessionId,
             clinicians: {
-                connect: data.clinicians || appointment.clinicians
+                set: data.clinicians || appointment.clinicians
             }, service: data.service || appointment.service,
             date: data.date || appointment.date,
             isRecurring: data.isRecurring ?? appointment.isRecurring,
