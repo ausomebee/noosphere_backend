@@ -62,7 +62,7 @@ class AppointmentService {
 
                 return update;
             } else {
-                const appointmentData = new Appointment({...appointment, ...data});
+                const appointmentData = new Appointment({ ...appointment, ...data });
                 const newAppointment = await this.appointmentRepository.create(appointmentData.createAppointment);
 
                 if (!newAppointment) {
@@ -275,7 +275,12 @@ class AppointmentService {
     }
 
     async getStaffRescheduledAppointments(staffId) {
-        const appointments = await this.appointmentRepository.findAllAndPopulate({ staffId, rescheduled: true, rescheduleAccepted: false }, {
+        const appointments = await this.appointmentRepository.findAllAndPopulate({
+            clinicians: {
+                array_contains: [staffId]
+            }
+            , rescheduled: true, rescheduleAccepted: false
+        }, {
             client: {
                 select: {
                     id: true,
@@ -345,7 +350,11 @@ class AppointmentService {
     }
 
     async getStaffCanceledAppointments(staffId) {
-        const appointments = await this.appointmentRepository.findAllAndPopulate({ staffId, isCanceled: true }, {
+        const appointments = await this.appointmentRepository.findAllAndPopulate({
+            clinicians: {
+                array_contains: [staffId]
+            }, isCanceled: true
+        }, {
             client: {
                 select: {
                     id: true,
