@@ -14,7 +14,11 @@ class AppointmentDto {
                 .uuid()
                 .required(),
             clinicians: Joi.array()
-                .items(Joi.string().uuid())
+                .items(
+                    Joi.object({
+                        id: Joi.string().uuid().required(),
+                    })
+                )
                 .min(1)
                 .required(),
             service: Joi.array().items(Joi.object()),
@@ -51,7 +55,14 @@ class AppointmentDto {
                 .uuid()
                 .required(),
             sessionId: Joi.string().uuid(),
-            clinicians: Joi.array().items(Joi.string().uuid()).min(1),
+            clinicians: Joi.array()
+                .items(
+                    Joi.object({
+                        id: Joi.string().uuid().required(),
+                    })
+                )
+                .min(1)
+                .required(),
             service: Joi.array().items(Joi.object()),
             date: Joi.date(),
             isRecurring: Joi.boolean(),

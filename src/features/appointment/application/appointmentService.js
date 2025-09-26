@@ -110,7 +110,14 @@ class AppointmentService {
     async getClientAppointments(clientId) {
         const appointments = await this.appointmentRepository.findAllAndPopulate(
             { clientId },
-            { tenant: true, client: true, session: true }
+            { tenant: true, client: true, session: true, clinicians: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                }
+            } }
         );
 
         if (!appointments || appointments.length === 0) {
@@ -160,10 +167,19 @@ class AppointmentService {
         const appointments = await this.appointmentRepository.findAllAndPopulate(
             {
                 clinicians: {
-                    array_contains: [staffId]
+                    some: { id: staffId }
                 }
             },
-            { tenant: true, client: true, session: true }
+            {
+                tenant: true, client: true, session: true, clinicians: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                    }
+                }
+            }
         );
 
         if (!appointments || appointments.length === 0) {
@@ -264,7 +280,15 @@ class AppointmentService {
                     email: true,
                 },
             },
-            session: true
+            session: true,
+            clinicians: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                }
+            }
         });
 
         if (!appointments) {
@@ -277,7 +301,7 @@ class AppointmentService {
     async getStaffRescheduledAppointments(staffId) {
         const appointments = await this.appointmentRepository.findAllAndPopulate({
             clinicians: {
-                array_contains: [staffId]
+                some: { id: staffId }
             }
             , rescheduled: true, rescheduleAccepted: false
         }, {
@@ -288,7 +312,15 @@ class AppointmentService {
                     email: true,
                 },
             },
-            session: true
+            session: true,
+            clinicians: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                }
+            }
         });
 
         if (!appointments) {
@@ -339,7 +371,15 @@ class AppointmentService {
                     email: true,
                 },
             },
-            session: true
+            session: true,
+            clinicians: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                }
+            }
         });
 
         if (!appointments) {
@@ -352,7 +392,7 @@ class AppointmentService {
     async getStaffCanceledAppointments(staffId) {
         const appointments = await this.appointmentRepository.findAllAndPopulate({
             clinicians: {
-                array_contains: [staffId]
+                some: { id: staffId }
             }, isCanceled: true
         }, {
             client: {
@@ -362,7 +402,15 @@ class AppointmentService {
                     email: true,
                 },
             },
-            session: true
+            session: true,
+            clinicians: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                }
+            }
         });
 
         if (!appointments) {
