@@ -34,10 +34,14 @@ import AppointmentController from "../controllers/appointmentController.js";
  *           description: Unique session type identifier
  *         clinicians:
  *           type: array
+ *           description: List of clinician objects
  *           items:
- *             type: string
- *             format: uuid
- *           description: List of clinician IDs
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 format: uuid
+ *                 description: Clinician identifier
  *         service:
  *           type: array
  *           items:
@@ -97,9 +101,14 @@ import AppointmentController from "../controllers/appointmentController.js";
  *           format: uuid
  *         clinicians:
  *           type: array
+ *           description: List of clinician objects
  *           items:
- *             type: string
- *             format: uuid
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 format: uuid
+ *                 description: Clinician identifier
  *         service:
  *           type: array
  *           items:

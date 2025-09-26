@@ -186,6 +186,7 @@ model TenantStaff {
   TenantStaffLicenses  TenantStaffLicenses[]
   TenantStaffPayroll   TenantStaffPayroll[]
   TenantStaffDocuments TenantStaffDocuments[]
+  appointments         Appointment[]          @relation("AppointmentClinicians")
 }
 
 model TenantStaffLicenses {
@@ -740,11 +741,10 @@ model OrganizationSessionTypes {
 }
 
 model Appointment {
-  id                 String   @id @default(uuid())
+  id                 String    @id @default(uuid())
   clientId           String
   tenantId           String
   sessionId          String
-  clinicians         Json
   service            Json
   date               DateTime
   isRecurring        Boolean
@@ -756,17 +756,18 @@ model Appointment {
   requiresTravel     Boolean
   colourCode         String
   relatedAppointment String?
-  isCanceled          Boolean  @default(false)
+  isCanceled         Boolean   @default(false)
   reasonForCancel    String?
-  rescheduled        Boolean  @default(false)
-  rescheduleAccepted Boolean  @default(false)
-  rescheduleRejected Boolean  @default(false)
-  canceledBy String?
-  cancelTime DateTime?
+  rescheduled        Boolean   @default(false)
+  rescheduleAccepted Boolean   @default(false)
+  rescheduleRejected Boolean   @default(false)
+  canceledBy         String?
+  cancelTime         DateTime?
 
   client      Client                   @relation(fields: [clientId], references: [id])
   tenant      Tenant                   @relation(fields: [tenantId], references: [id])
   session     OrganizationSessionTypes @relation(fields: [sessionId], references: [id])
   relatedTo   Appointment?             @relation("AppointmentRelation", fields: [relatedAppointment], references: [id])
   relatedFrom Appointment[]            @relation("AppointmentRelation")
+  clinicians  TenantStaff[]            @relation("AppointmentClinicians")
 }

@@ -47,7 +47,9 @@ class Appointment {
         return {
             clientId: this.clientId,
             sessionId: this.sessionId,
-            clinicians: this.clinicians,
+            clinicians: {
+                connect: this.clinicians
+            },
             service: this.service,
             date: this.date,
             isRecurring: this.isRecurring,
