@@ -746,7 +746,7 @@ model Appointment {
   tenantId           String
   sessionId          String
   service            Json
-  date               DateTime
+  date               DateTime  @db.Date
   isRecurring        Boolean
   startTime          String
   endTime            String
