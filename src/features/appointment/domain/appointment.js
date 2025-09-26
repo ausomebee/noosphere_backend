@@ -51,7 +51,7 @@ class Appointment {
                 connect: this.clinicians
             },
             service: this.service,
-            date: new Date(`${this.date}T00:00:00.000Z`),
+            date: this.date,
             isRecurring: this.isRecurring,
             startTime: this.startTime,
             endTime: this.endTime,
