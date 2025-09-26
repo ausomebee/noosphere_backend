@@ -84,6 +84,8 @@ import AppointmentController from "../controllers/appointmentController.js";
  *           type: string
  *           format: uuid
  *           description: Unique appointment identifier
+ *         canceledBy:
+ *           type: string
  *         tenantId:
  *           type: string
  *           format: uuid

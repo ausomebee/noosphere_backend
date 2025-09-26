@@ -52,6 +52,8 @@ class AppointmentService {
                     reasonForCancel: data.reasonForCancel || appointment.reasonForCancel,
                     rescheduled: data.rescheduled ?? appointment.rescheduled,
                     rescheduleAccepted: data.rescheduleAccepted ?? appointment.rescheduleAccepted,
+                    canceledBy: data.canceledBy ?? appointment.canceledBy,
+                    cancelTime: data.isCanceled ? new Date() : null
                 });
 
                 if (!update) {
@@ -94,6 +96,8 @@ class AppointmentService {
             reasonForCancel: data.reasonForCancel || appointment.reasonForCancel,
             rescheduled: data.rescheduled ?? appointment.rescheduled,
             rescheduleAccepted: data.rescheduleAccepted ?? appointment.rescheduleAccepted,
+            canceledBy: data.canceledBy ?? appointment.canceledBy,
+            cancelTime: data.isCanceled ? new Date() : null
         });
 
         if (!update) {
