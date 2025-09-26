@@ -761,6 +761,8 @@ model Appointment {
   rescheduled        Boolean  @default(false)
   rescheduleAccepted Boolean  @default(false)
   rescheduleRejected Boolean  @default(false)
+  canceledBy String?
+  cancelTime DateTime?
 
   client      Client                   @relation(fields: [clientId], references: [id])
   tenant      Tenant                   @relation(fields: [tenantId], references: [id])

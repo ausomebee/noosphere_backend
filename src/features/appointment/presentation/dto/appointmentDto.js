@@ -77,7 +77,8 @@ class AppointmentDto {
             reasonForCancel: Joi.string().allow(null, ''),
             rescheduled: Joi.boolean(),
             rescheduleAccepted: Joi.boolean(),
-            forAll: Joi.boolean().default(false)
+            forAll: Joi.boolean().default(false),
+            canceledBy: Joi.string().allow(null, '')
         });
 
         Validator.validateRequest(req, next, schema);
