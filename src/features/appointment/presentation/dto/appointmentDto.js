@@ -22,7 +22,12 @@ class AppointmentDto {
                 .min(1)
                 .required(),
             service: Joi.array().items(Joi.object()),
-            date: Joi.date().required(),
+            date: Joi.string()
+                .pattern(/^\d{4}-\d{2}-\d{2}$/)
+                .required()
+                .messages({
+                    "string.pattern.base": `"date" must be in YYYY-MM-DD format`
+                }),
             isRecurring: Joi.boolean().default(false),
             startTime: Joi.string()
                 .pattern(/^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/)
@@ -63,7 +68,12 @@ class AppointmentDto {
                 )
                 .min(1),
             service: Joi.array().items(Joi.object()),
-            date: Joi.date(),
+            date: Joi.string()
+                .pattern(/^\d{4}-\d{2}-\d{2}$/)
+                .required()
+                .messages({
+                    "string.pattern.base": `"date" must be in YYYY-MM-DD format`
+                }),
             isRecurring: Joi.boolean(),
             startTime: Joi.string()
                 .pattern(/^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/)
