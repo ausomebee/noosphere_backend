@@ -41,7 +41,7 @@ class AppointmentService {
                         set: data.clinicians || appointment.clinicians
                     },
                     service: data.service || appointment.service,
-                    date: data.date || appointment.date,
+                    date: new Date(`${data.date}T00:00:00.000Z`) || appointment.date,
                     isRecurring: data.isRecurring ?? appointment.isRecurring,
                     startTime: data.startTime || appointment.startTime,
                     endTime: data.endTime || appointment.endTime,
@@ -86,7 +86,7 @@ class AppointmentService {
             clinicians: {
                 set: data.clinicians || appointment.clinicians
             }, service: data.service || appointment.service,
-            date: data.date || appointment.date,
+            date: new Date(`${data.date}T00:00:00.000Z`) || appointment.date,
             isRecurring: data.isRecurring ?? appointment.isRecurring,
             startTime: data.startTime || appointment.startTime,
             endTime: data.endTime || appointment.endTime,
