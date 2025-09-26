@@ -61,8 +61,7 @@ class AppointmentDto {
                         id: Joi.string().uuid().required(),
                     })
                 )
-                .min(1)
-                .required(),
+                .min(1),
             service: Joi.array().items(Joi.object()),
             date: Joi.date(),
             isRecurring: Joi.boolean(),
