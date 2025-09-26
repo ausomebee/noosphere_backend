@@ -37,7 +37,9 @@ class AppointmentService {
                 const update = await this.appointmentRepository.update(data.id, {
                     clientId: data.clientId || appointment.clientId,
                     sessionId: data.sessionId || appointment.sessionId,
-                    clinicians: data.clinicians || appointment.clinicians,
+                    clinicians: {
+                        connect: data.clinicians || appointment.clinicians
+                    },
                     service: data.service || appointment.service,
                     date: data.date || appointment.date,
                     isRecurring: data.isRecurring ?? appointment.isRecurring,
@@ -81,8 +83,9 @@ class AppointmentService {
         const update = await this.appointmentRepository.update(data.id, {
             clientId: data.clientId || appointment.clientId,
             sessionId: data.sessionId || appointment.sessionId,
-            clinicians: data.clinicians || appointment.clinicians,
-            service: data.service || appointment.service,
+            clinicians: {
+                connect: data.clinicians || appointment.clinicians
+            }, service: data.service || appointment.service,
             date: data.date || appointment.date,
             isRecurring: data.isRecurring ?? appointment.isRecurring,
             startTime: data.startTime || appointment.startTime,
@@ -110,13 +113,15 @@ class AppointmentService {
     async getClientAppointments(clientId) {
         const appointments = await this.appointmentRepository.findAllAndPopulate(
             { clientId },
-            { tenant: true, client: true, session: true, clinicians: {
-                select: {
-                    id: true,
-                    fullName: true,
-                    email: true,
+            {
+                tenant: true, client: true, session: true, clinicians: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                    }
                 }
-            } }
+            }
         );
 
         if (!appointments || appointments.length === 0) {
