@@ -55,7 +55,10 @@ class AppointmentService {
                     rescheduled: data.rescheduled ?? appointment.rescheduled,
                     rescheduleAccepted: data.rescheduleAccepted ?? appointment.rescheduleAccepted,
                     canceledBy: data.canceledBy ?? appointment.canceledBy,
-                    cancelTime: data.isCanceled ? new Date() : null
+                    cancelTime: data.isCanceled ? new Date() : null,
+                    previousDate: data.rescheduled ? appointment.data : null,
+                    previousStartTime: data.rescheduled ? appointment.startTime : null,
+                    previousEndTime: data.rescheduled ? appointment.endTime : null
                 });
 
                 if (!update) {
@@ -64,8 +67,13 @@ class AppointmentService {
 
                 return update;
             } else {
-                const appointmentData = new Appointment({ ...appointment, ...data});
-                const newAppointment = await this.appointmentRepository.create(appointmentData.createAppointment);
+                const appointmentData = new Appointment({ ...appointment, ...data });
+                const newAppointment = await this.appointmentRepository.create({
+                    ...appointmentData.createAppointment,
+                    previousDate: data.rescheduled ? appointment.data : null,
+                    previousStartTime: data.rescheduled ? appointment.startTime : null,
+                    previousEndTime: data.rescheduled ? appointment.endTime : null
+                });
 
                 if (!newAppointment) {
                     throw new Error("Failed to create Appointment");
@@ -100,7 +108,10 @@ class AppointmentService {
             rescheduled: data.rescheduled ?? appointment.rescheduled,
             rescheduleAccepted: data.rescheduleAccepted ?? appointment.rescheduleAccepted,
             canceledBy: data.canceledBy ?? appointment.canceledBy,
-            cancelTime: data.isCanceled ? new Date() : null
+            cancelTime: data.isCanceled ? new Date() : null,
+            previousDate: data.rescheduled ? appointment.data : null,
+            previousStartTime: data.rescheduled ? appointment.startTime : null,
+            previousEndTime: data.rescheduled ? appointment.endTime : null
         });
 
         if (!update) {
