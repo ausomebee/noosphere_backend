@@ -1,4 +1,5 @@
 import Appointment from "../domain/appointment.js";
+import { addDays, addWeeks, addMonths, isBefore } from "date-fns";
 
 class AppointmentService {
     constructor({ appointmentRepository }) {
@@ -438,70 +439,52 @@ class AppointmentService {
         return appointments;
     }
 
-    expandRecurring(appt) {
-        const occurrences = [];
+    isUpcoming(appt, now = new Date()) {
+        const start = new Date(`${appt.date}T${appt.startTime}:00`);
 
         if (!appt.isRecurring) {
-            occurrences.push(appt.date);
-            return occurrences;
+            return start >= now;
         }
 
-        let current = new Date(appt.date);
-        const end = appt.recurrence?.endOn ? new Date(appt.recurrence.endOn) : null;
+        const recurrenceEnd = appt.recurrence?.endOn
+            ? new Date(appt.recurrence.endOn)
+            : null;
 
-        while (!end || isBefore(current, addDays(end, 1))) {
-            occurrences.push(current.toISOString().split("T")[0]);
+        if (!recurrenceEnd) return true;
 
-            if (appt.recurrence?.type === "day") {
-                current = addDays(current, 1);
-            } else if (appt.recurrence?.type === "week") {
-                current = addWeeks(current, 1);
-            } else if (appt.recurrence?.type === "month") {
-                current = addMonths(current, 1);
-            } else {
-                break;
-            }
+        return recurrenceEnd >= now;
+    }
+
+    isPast(appt, now = new Date()) {
+        const end = new Date(`${appt.date}T${appt.endTime}:00`);
+
+        if (!appt.isRecurring) {
+            return end < now;
         }
 
-        return occurrences;
+        const recurrenceEnd = appt.recurrence?.endOn
+            ? new Date(appt.recurrence.endOn)
+            : null;
+
+        if (!recurrenceEnd) return false;
+
+        return recurrenceEnd < now;
     }
 
     async getUpcomingAppointments(tenantId) {
         const now = new Date();
 
-        const allAppointments = await this.appointmentRepository.findAllAndPopulate({ isCanceled: false, tenantId },
+        const allAppointments = await this.appointmentRepository.findAllAndPopulate(
+            { isCanceled: false, tenantId },
             {
-                client: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        email: true,
-                    },
-                },
+                client: { select: { id: true, fullName: true, email: true } },
                 session: true,
-                clinicians: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        email: true,
-                    }
-                }
+                clinicians: { select: { id: true, fullName: true, email: true } }
             }
         );
 
-        const expanded = allAppointments.flatMap(appt => {
-            const dates = expandRecurring(appt);
-            return dates.map(d => ({
-                ...appt,
-                date: d
-            }));
-        });
-
-        return expanded
-            .filter(appt => {
-                const startDateTime = new Date(`${appt.date}T${appt.startTime}:00`);
-                return startDateTime >= now;
-            })
+        return allAppointments
+            .filter(appt => this.isUpcoming(appt, now))
             .sort((a, b) => {
                 const aDate = new Date(`${a.date}T${a.startTime}:00`);
                 const bDate = new Date(`${b.date}T${b.startTime}:00`);
@@ -509,48 +492,27 @@ class AppointmentService {
             });
     }
 
-    async getPastAppointments() {
+    async getPastAppointments(tenantId) {
         const now = new Date();
 
-        const allAppointments = await this.appointmentRepository.findAllAndPopulate({ isCanceled: false, tenantId },
+        const allAppointments = await this.appointmentRepository.findAllAndPopulate(
+            { isCanceled: false, tenantId },
             {
-                client: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        email: true,
-                    },
-                },
+                client: { select: { id: true, fullName: true, email: true } },
                 session: true,
-                clinicians: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        email: true,
-                    }
-                }
+                clinicians: { select: { id: true, fullName: true, email: true } }
             }
         );
 
-        const expanded = allAppointments.flatMap(appt => {
-            const dates = expandRecurring(appt);
-            return dates.map(d => ({
-                ...appt,
-                date: d
-            }));
-        });
-
-        return expanded
-            .filter(appt => {
-                const endDateTime = new Date(`${appt.date}T${appt.endTime}:00`);
-                return endDateTime < now;
-            })
+        return allAppointments
+            .filter(appt => this.isPast(appt, now))
             .sort((a, b) => {
                 const aDate = new Date(`${a.date}T${a.startTime}:00`);
                 const bDate = new Date(`${b.date}T${b.startTime}:00`);
                 return bDate - aDate;
             });
     }
+
 }
 
 export default AppointmentService;
