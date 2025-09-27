@@ -287,7 +287,7 @@ class AppointmentService {
     }
 
     async getTenantRescheduledAppointments(tenantId) {
-        const appointments = await this.appointmentRepository.findAllAndPopulate({ tenantId, rescheduled: true, rescheduleAccepted: false }, {
+        const appointments = await this.appointmentRepository.findAllAndPopulate({ tenantId, rescheduled: true, rescheduleAccepted: false, rescheduleRejected: false }, {
             client: {
                 select: {
                     id: true,
@@ -317,7 +317,7 @@ class AppointmentService {
             clinicians: {
                 some: { id: staffId }
             }
-            , rescheduled: true, rescheduleAccepted: false
+            , rescheduled: true, rescheduleAccepted: false, rescheduleRejected: false
         }, {
             client: {
                 select: {
