@@ -420,6 +420,48 @@ class AppointmentRoutes {
          */
         this.router.patch("/reject-reschedule", this.controller.rejectRescheduleAppointment);
 
+        /**
+        * @swagger
+        * /api/v1/appointments/upcomming/{tenantId}:
+        *   get:
+        *     summary: get tenant upcomming appointments
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the tenant
+        *     responses:
+        *       200:
+        *         description: tenant appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/upcomming/:tenantId", this.controller.getUpcomingAppointments);
+
+        /**
+        * @swagger
+        * /api/v1/appointments/past/{tenantId}:
+        *   get:
+        *     summary: get tenant past appointments
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the tenant
+        *     responses:
+        *       200:
+        *         description: tenant appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/past/:tenantId", this.controller.getPastAppointments);
+
     }
 
     getRouter() {

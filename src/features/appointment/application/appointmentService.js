@@ -1,4 +1,5 @@
 import Appointment from "../domain/appointment.js";
+import { addDays, addWeeks, addMonths, isBefore } from "date-fns";
 
 class AppointmentService {
     constructor({ appointmentRepository }) {
@@ -346,8 +347,12 @@ class AppointmentService {
         for (const obj of data) {
             const appointment = await this.appointmentRepository.findOne({ id: obj.id });
 
+            if (!appointment) {
+                throw new Error("Appointment not found");
+            }
+
             const update = await this.appointmentRepository.update(obj.id, {
-                rescheduleAccepted: data.rescheduleAccepted ?? appointment.rescheduleAccepted,
+                rescheduleAccepted: true,
             });
 
             if (!update) {
@@ -362,8 +367,12 @@ class AppointmentService {
         for (const obj of data) {
             const appointment = await this.appointmentRepository.findOne({ id: obj.id });
 
+            if (!appointment) {
+                throw new Error("Appointment not found");
+            }
+
             const update = await this.appointmentRepository.update(obj.id, {
-                rescheduleRejected: data.rescheduleRejected ?? appointment.rescheduleRejected
+                rescheduleRejected: true
             });
 
             if (!update) {
@@ -429,6 +438,81 @@ class AppointmentService {
 
         return appointments;
     }
+
+    isUpcoming(appt, now = new Date()) {
+        const start = new Date(`${appt.date}T${appt.startTime}:00`);
+
+        if (!appt.isRecurring) {
+            return start >= now;
+        }
+
+        const recurrenceEnd = appt.recurrence?.endOn
+            ? new Date(appt.recurrence.endOn)
+            : null;
+
+        if (!recurrenceEnd) return true;
+
+        return recurrenceEnd >= now;
+    }
+
+    isPast(appt, now = new Date()) {
+        const end = new Date(`${appt.date}T${appt.endTime}:00`);
+
+        if (!appt.isRecurring) {
+            return end < now;
+        }
+
+        const recurrenceEnd = appt.recurrence?.endOn
+            ? new Date(appt.recurrence.endOn)
+            : null;
+
+        if (!recurrenceEnd) return false;
+
+        return recurrenceEnd < now;
+    }
+
+    async getUpcomingAppointments(tenantId) {
+        const now = new Date();
+
+        const allAppointments = await this.appointmentRepository.findAllAndPopulate(
+            { isCanceled: false, tenantId },
+            {
+                client: { select: { id: true, fullName: true, email: true } },
+                session: true,
+                clinicians: { select: { id: true, fullName: true, email: true } }
+            }
+        );
+
+        return allAppointments
+            .filter(appt => this.isUpcoming(appt, now))
+            .sort((a, b) => {
+                const aDate = new Date(`${a.date}T${a.startTime}:00`);
+                const bDate = new Date(`${b.date}T${b.startTime}:00`);
+                return aDate - bDate;
+            });
+    }
+
+    async getPastAppointments(tenantId) {
+        const now = new Date();
+
+        const allAppointments = await this.appointmentRepository.findAllAndPopulate(
+            { isCanceled: false, tenantId },
+            {
+                client: { select: { id: true, fullName: true, email: true } },
+                session: true,
+                clinicians: { select: { id: true, fullName: true, email: true } }
+            }
+        );
+
+        return allAppointments
+            .filter(appt => this.isPast(appt, now))
+            .sort((a, b) => {
+                const aDate = new Date(`${a.date}T${a.startTime}:00`);
+                const bDate = new Date(`${b.date}T${b.startTime}:00`);
+                return bDate - aDate;
+            });
+    }
+
 }
 
 export default AppointmentService;
