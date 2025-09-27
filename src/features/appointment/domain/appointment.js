@@ -61,7 +61,8 @@ class Appointment {
             requiresTravel: this.requiresTravel,
             colourCode: this.colourCode,
             relatedAppointment: this.relatedAppointment,
-            tenantId: this.tenantId
+            tenantId: this.tenantId,
+            rescheduled: this.rescheduled
         };
     }
 }
