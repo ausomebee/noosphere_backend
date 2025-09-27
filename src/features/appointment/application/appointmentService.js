@@ -71,6 +71,9 @@ class AppointmentService {
                 const appointmentData = new Appointment({ ...appointment, ...data });
                 const newAppointment = await this.appointmentRepository.create({
                     ...appointmentData.createAppointment,
+                    clinicians: {
+                        set: data.clinicians || appointment.clinicians
+                    },
                     previousDate: data.rescheduled ? appointment.date : null,
                     previousStartTime: data.rescheduled ? appointment.startTime : null,
                     previousEndTime: data.rescheduled ? appointment.endTime : null
@@ -372,7 +375,8 @@ class AppointmentService {
             }
 
             const update = await this.appointmentRepository.update(obj.id, {
-                rescheduleRejected: true
+                rescheduleRejected: true,
+                isCanceled: true
             });
 
             if (!update) {
