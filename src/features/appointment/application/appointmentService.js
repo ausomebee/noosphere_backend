@@ -53,7 +53,7 @@ class AppointmentService {
                     isCanceled: data.isCanceled ?? appointment.isCanceled,
                     reasonForCancel: data.reasonForCancel || appointment.reasonForCancel,
                     rescheduled: data.rescheduled ?? appointment.rescheduled,
-                    rescheduleAccepted: data.rescheduleAccepted ?? appointment.rescheduleAccepted,
+                    rescheduleAccepted: data.rescheduled ? false : (data.rescheduleAccepted ?? appointment.rescheduleAccepted),
                     canceledBy: data.canceledBy ?? appointment.canceledBy,
                     cancelTime: data.isCanceled ? new Date() : null,
                     previousDate: data.rescheduled ? appointment.date : null,
@@ -73,6 +73,7 @@ class AppointmentService {
                     clinicians: {
                         connect: data.clinicians || appointment.clinicians
                     },
+                    rescheduleAccepted: data.rescheduled ? false : (data.rescheduleAccepted ?? appointment.rescheduleAccepted),
                     previousDate: data.rescheduled ? appointment.date : null,
                     previousStartTime: data.rescheduled ? appointment.startTime : null,
                     previousEndTime: data.rescheduled ? appointment.endTime : null
@@ -109,7 +110,7 @@ class AppointmentService {
             isCanceled: data.isCanceled ?? appointment.isCanceled,
             reasonForCancel: data.reasonForCancel || appointment.reasonForCancel,
             rescheduled: data.rescheduled ?? appointment.rescheduled,
-            rescheduleAccepted: data.rescheduleAccepted ?? appointment.rescheduleAccepted,
+            rescheduleAccepted: data.rescheduled ? false : (data.rescheduleAccepted ?? appointment.rescheduleAccepted),
             canceledBy: data.canceledBy ?? appointment.canceledBy,
             cancelTime: data.isCanceled ? new Date() : null,
             previousDate: data.rescheduled ? appointment.date : null,
