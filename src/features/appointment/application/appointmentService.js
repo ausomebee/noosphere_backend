@@ -64,7 +64,7 @@ class AppointmentService {
 
                 return update;
             } else {
-                const appointmentData = new Appointment({ ...data, ...appointment });
+                const appointmentData = new Appointment({ ...appointment, ...data});
                 const newAppointment = await this.appointmentRepository.create(appointmentData.createAppointment);
 
                 if (!newAppointment) {
