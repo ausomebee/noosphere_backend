@@ -63,12 +63,12 @@ class AppointmentRepository {
                 },
                 session: true,
                 clinicians: {
-                select: {
-                    id: true,
-                    fullName: true,
-                    email: true,
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                    }
                 }
-            }
             },
             orderBy: { date: "asc" }
         });

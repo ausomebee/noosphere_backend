@@ -382,7 +382,7 @@ class AppointmentRoutes {
          *       404:
          *         description: Appointment not found
          */
-        this.router.put("/", this.controller.acceptRescheduleAppointment);
+        this.router.patch("/accept-reschedule", this.controller.acceptRescheduleAppointment);
 
         /**
          * @swagger
@@ -410,7 +410,7 @@ class AppointmentRoutes {
          *       404:
          *         description: Appointment not found
          */
-        this.router.put("/", this.controller.rejectRescheduleAppointment);
+        this.router.patch("/reject-reschedule", this.controller.rejectRescheduleAppointment);
 
     }
 

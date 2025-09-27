@@ -355,7 +355,7 @@ class AppointmentService {
             }
         };
 
-        return update;
+        return "appointment recheduled successfully";
     }
 
     async rejectRescheduleAppointment(data) {
@@ -371,7 +371,7 @@ class AppointmentService {
             }
         };
 
-        return update;
+        return "appointment rechedule rejected successfully";
     }
 
     async getTenantCanceledAppointments(tenantId) {
