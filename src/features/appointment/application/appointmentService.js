@@ -31,7 +31,17 @@ class AppointmentService {
     }
 
     async updateAppointment(data) {
-        const appointment = await this.appointmentRepository.findOne({ id: data.id });
+        const appointment = await this.appointmentRepository.findFirstDynamic({
+            where: { id: data.id }, include: {
+                clinicians: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                    }
+                }
+            }
+        });
         if ((!data.forAll || !isRecurring) && data.relatedAppointment || !appointment.isRecurring) {
             if (appointment && appointment.relatedAppointment || !appointment.isRecurring) {
                 const update = await this.appointmentRepository.update(data.id, {
