@@ -56,7 +56,7 @@ class AppointmentService {
                     rescheduleAccepted: data.rescheduleAccepted ?? appointment.rescheduleAccepted,
                     canceledBy: data.canceledBy ?? appointment.canceledBy,
                     cancelTime: data.isCanceled ? new Date() : null,
-                    previousDate: data.rescheduled ? appointment.data : null,
+                    previousDate: data.rescheduled ? appointment.date : null,
                     previousStartTime: data.rescheduled ? appointment.startTime : null,
                     previousEndTime: data.rescheduled ? appointment.endTime : null
                 });
@@ -70,7 +70,7 @@ class AppointmentService {
                 const appointmentData = new Appointment({ ...appointment, ...data });
                 const newAppointment = await this.appointmentRepository.create({
                     ...appointmentData.createAppointment,
-                    previousDate: data.rescheduled ? appointment.data : null,
+                    previousDate: data.rescheduled ? appointment.date : null,
                     previousStartTime: data.rescheduled ? appointment.startTime : null,
                     previousEndTime: data.rescheduled ? appointment.endTime : null
                 });
@@ -109,7 +109,7 @@ class AppointmentService {
             rescheduleAccepted: data.rescheduleAccepted ?? appointment.rescheduleAccepted,
             canceledBy: data.canceledBy ?? appointment.canceledBy,
             cancelTime: data.isCanceled ? new Date() : null,
-            previousDate: data.rescheduled ? appointment.data : null,
+            previousDate: data.rescheduled ? appointment.date : null,
             previousStartTime: data.rescheduled ? appointment.startTime : null,
             previousEndTime: data.rescheduled ? appointment.endTime : null
         });
