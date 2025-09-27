@@ -1,5 +1,4 @@
 import Appointment from "../domain/appointment.js";
-import { addDays, addWeeks, addMonths, isBefore } from "date-fns";
 
 class AppointmentService {
     constructor({ appointmentRepository }) {
@@ -33,7 +32,7 @@ class AppointmentService {
 
     async updateAppointment(data) {
         const appointment = await this.appointmentRepository.findOne({ id: data.id });
-        if (!data.forAll && data.relatedAppointment || !appointment.isRecurring) {
+        if ((!data.forAll || !isRecurring) && data.relatedAppointment || !appointment.isRecurring) {
             if (appointment && appointment.relatedAppointment || !appointment.isRecurring) {
                 const update = await this.appointmentRepository.update(data.id, {
                     clientId: data.clientId || appointment.clientId,
@@ -72,7 +71,7 @@ class AppointmentService {
                 const newAppointment = await this.appointmentRepository.create({
                     ...appointmentData.createAppointment,
                     clinicians: {
-                        set: data.clinicians || appointment.clinicians
+                        connect: data.clinicians || appointment.clinicians
                     },
                     previousDate: data.rescheduled ? appointment.date : null,
                     previousStartTime: data.rescheduled ? appointment.startTime : null,
