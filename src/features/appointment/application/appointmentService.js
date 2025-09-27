@@ -343,10 +343,10 @@ class AppointmentService {
     }
 
     async acceptRescheduleAppointment(data) {
-        for (const id of data) {
-            const appointment = await this.appointmentRepository.findOne({ id: id });
+        for (const obj of data) {
+            const appointment = await this.appointmentRepository.findOne({ id: obj.id });
 
-            const update = await this.appointmentRepository.update(id, {
+            const update = await this.appointmentRepository.update(obj.id, {
                 rescheduleAccepted: data.rescheduleAccepted ?? appointment.rescheduleAccepted,
             });
 
@@ -359,10 +359,10 @@ class AppointmentService {
     }
 
     async rejectRescheduleAppointment(data) {
-        for (const id of data) {
-            const appointment = await this.appointmentRepository.findOne({ id: id });
+        for (const obj of data) {
+            const appointment = await this.appointmentRepository.findOne({ id: obj.id });
 
-            const update = await this.appointmentRepository.update(id, {
+            const update = await this.appointmentRepository.update(obj.id, {
                 rescheduleRejected: data.rescheduleRejected ?? appointment.rescheduleRejected
             });
 

@@ -369,11 +369,15 @@ class AppointmentRoutes {
          *           schema:
          *             type: array
          *             items:
-         *               type: string
-         *               format: uuid
+         *               type: object
+         *               properties:
+         *                 id:
+         *                   type: string
+         *                   format: uuid
+         *                   description: Appointment ID to reject reschedule for
          *             example:
-         *               - "550e8400-e29b-41d4-a716-446655440000"
-         *               - "550e8400-e29b-41d4-a716-446655440111"
+         *               - id: "550e8400-e29b-41d4-a716-446655440000"
+         *               - id: "550e8400-e29b-41d4-a716-446655440111"
          *     responses:
          *       200:
          *         description: Appointments updated successfully
@@ -397,11 +401,15 @@ class AppointmentRoutes {
          *           schema:
          *             type: array
          *             items:
-         *               type: string
-         *               format: uuid
+         *               type: object
+         *               properties:
+         *                 id:
+         *                   type: string
+         *                   format: uuid
+         *                   description: Appointment ID to reject reschedule for
          *             example:
-         *               - "550e8400-e29b-41d4-a716-446655440000"
-         *               - "550e8400-e29b-41d4-a716-446655440111"
+         *               - id: "550e8400-e29b-41d4-a716-446655440000"
+         *               - id: "550e8400-e29b-41d4-a716-446655440111"
          *     responses:
          *       200:
          *         description: Appointments updated successfully
