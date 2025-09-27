@@ -346,8 +346,12 @@ class AppointmentService {
         for (const obj of data) {
             const appointment = await this.appointmentRepository.findOne({ id: obj.id });
 
+            if (!appointment) {
+                throw new Error("Appointment not found");
+            }
+
             const update = await this.appointmentRepository.update(obj.id, {
-                rescheduleAccepted: data.rescheduleAccepted ?? appointment.rescheduleAccepted,
+                rescheduleAccepted: true,
             });
 
             if (!update) {
@@ -362,8 +366,12 @@ class AppointmentService {
         for (const obj of data) {
             const appointment = await this.appointmentRepository.findOne({ id: obj.id });
 
+            if (!appointment) {
+                throw new Error("Appointment not found");
+            }
+
             const update = await this.appointmentRepository.update(obj.id, {
-                rescheduleRejected: data.rescheduleRejected ?? appointment.rescheduleRejected
+                rescheduleRejected: true
             });
 
             if (!update) {
@@ -428,6 +436,120 @@ class AppointmentService {
         }
 
         return appointments;
+    }
+
+    expandRecurring(appt) {
+        const occurrences = [];
+
+        if (!appt.isRecurring) {
+            occurrences.push(appt.date);
+            return occurrences;
+        }
+
+        let current = new Date(appt.date);
+        const end = appt.recurrence?.endOn ? new Date(appt.recurrence.endOn) : null;
+
+        while (!end || isBefore(current, addDays(end, 1))) {
+            occurrences.push(current.toISOString().split("T")[0]);
+
+            if (appt.recurrence?.type === "day") {
+                current = addDays(current, 1);
+            } else if (appt.recurrence?.type === "week") {
+                current = addWeeks(current, 1);
+            } else if (appt.recurrence?.type === "month") {
+                current = addMonths(current, 1);
+            } else {
+                break;
+            }
+        }
+
+        return occurrences;
+    }
+
+    async getUpcomingAppointments(tenantId) {
+        const now = new Date();
+
+        const allAppointments = await this.appointmentRepository.findAllAndPopulate({ isCanceled: false, tenantId },
+            {
+                client: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                    },
+                },
+                session: true,
+                clinicians: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                    }
+                }
+            }
+        );
+
+        const expanded = allAppointments.flatMap(appt => {
+            const dates = expandRecurring(appt);
+            return dates.map(d => ({
+                ...appt,
+                date: d
+            }));
+        });
+
+        return expanded
+            .filter(appt => {
+                const startDateTime = new Date(`${appt.date}T${appt.startTime}:00`);
+                return startDateTime >= now;
+            })
+            .sort((a, b) => {
+                const aDate = new Date(`${a.date}T${a.startTime}:00`);
+                const bDate = new Date(`${b.date}T${b.startTime}:00`);
+                return aDate - bDate;
+            });
+    }
+
+    async getPastAppointments() {
+        const now = new Date();
+
+        const allAppointments = await this.appointmentRepository.findAllAndPopulate({ isCanceled: false, tenantId },
+            {
+                client: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                    },
+                },
+                session: true,
+                clinicians: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                    }
+                }
+            }
+        );
+
+        const expanded = allAppointments.flatMap(appt => {
+            const dates = expandRecurring(appt);
+            return dates.map(d => ({
+                ...appt,
+                date: d
+            }));
+        });
+
+        return expanded
+            .filter(appt => {
+                const endDateTime = new Date(`${appt.date}T${appt.endTime}:00`);
+                return endDateTime < now;
+            })
+            .sort((a, b) => {
+                const aDate = new Date(`${a.date}T${a.startTime}:00`);
+                const bDate = new Date(`${b.date}T${b.startTime}:00`);
+                return bDate - aDate;
+            });
     }
 }
 
