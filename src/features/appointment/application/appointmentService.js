@@ -531,7 +531,11 @@ class AppointmentService {
         const now = new Date();
 
         const allAppointments = await this.appointmentRepository.findAllAndPopulate(
-            { isCanceled: false, staffId },
+            {
+                isCanceled: false, clinicians: {
+                    some: { id: staffId }
+                }
+            },
             {
                 client: { select: { id: true, fullName: true, email: true } },
                 session: true,
@@ -552,7 +556,11 @@ class AppointmentService {
         const now = new Date();
 
         const allAppointments = await this.appointmentRepository.findAllAndPopulate(
-            { isCanceled: false, staffId },
+            {
+                isCanceled: false, clinicians: {
+                    some: { id: staffId }
+                }
+            },
             {
                 client: { select: { id: true, fullName: true, email: true } },
                 session: true,
