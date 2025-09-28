@@ -42,7 +42,7 @@ class AppointmentService {
                 }
             }
         });
-        if ((!data.forAll || !isRecurring) && data.relatedAppointment || !appointment.isRecurring) {
+        if ((!data.forAll || !appointment.isRecurring) && data.relatedAppointment || !appointment.isRecurring) {
             if (appointment && appointment.relatedAppointment || !appointment.isRecurring) {
                 const update = await this.appointmentRepository.update(data.id, {
                     clientId: data.clientId || appointment.clientId,
