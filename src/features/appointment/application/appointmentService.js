@@ -485,7 +485,7 @@ class AppointmentService {
         return recurrenceEnd < now;
     }
 
-    async getUpcomingAppointments(tenantId) {
+    async getTenantUpcomingAppointments(tenantId) {
         const now = new Date();
 
         const allAppointments = await this.appointmentRepository.findAllAndPopulate(
@@ -506,11 +506,53 @@ class AppointmentService {
             });
     }
 
-    async getPastAppointments(tenantId) {
+    async getTenantPastAppointments(tenantId) {
         const now = new Date();
 
         const allAppointments = await this.appointmentRepository.findAllAndPopulate(
             { isCanceled: false, tenantId },
+            {
+                client: { select: { id: true, fullName: true, email: true } },
+                session: true,
+                clinicians: { select: { id: true, fullName: true, email: true } }
+            }
+        );
+
+        return allAppointments
+            .filter(appt => this.isPast(appt, now))
+            .sort((a, b) => {
+                const aDate = new Date(`${a.date}T${a.startTime}:00`);
+                const bDate = new Date(`${b.date}T${b.startTime}:00`);
+                return bDate - aDate;
+            });
+    }
+
+    async getStaffUpcomingAppointments(staffId) {
+        const now = new Date();
+
+        const allAppointments = await this.appointmentRepository.findAllAndPopulate(
+            { isCanceled: false, staffId },
+            {
+                client: { select: { id: true, fullName: true, email: true } },
+                session: true,
+                clinicians: { select: { id: true, fullName: true, email: true } }
+            }
+        );
+
+        return allAppointments
+            .filter(appt => this.isUpcoming(appt, now))
+            .sort((a, b) => {
+                const aDate = new Date(`${a.date}T${a.startTime}:00`);
+                const bDate = new Date(`${b.date}T${b.startTime}:00`);
+                return aDate - bDate;
+            });
+    }
+
+    async getStaffPastAppointments(staffId) {
+        const now = new Date();
+
+        const allAppointments = await this.appointmentRepository.findAllAndPopulate(
+            { isCanceled: false, staffId },
             {
                 client: { select: { id: true, fullName: true, email: true } },
                 session: true,

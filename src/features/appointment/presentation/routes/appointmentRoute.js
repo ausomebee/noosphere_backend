@@ -422,9 +422,9 @@ class AppointmentRoutes {
 
         /**
         * @swagger
-        * /api/v1/appointments/upcomming/{tenantId}:
+        * /api/v1/appointments/tenant/upcoming/{tenantId}:
         *   get:
-        *     summary: get tenant upcomming appointments
+        *     summary: get tenant upcoming appointments
         *     tags: [appointments]
         *     parameters:
         *       - in: path
@@ -439,11 +439,11 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/upcomming/:tenantId", this.controller.getUpcomingAppointments);
+        this.router.get("/tenant/upcoming/:tenantId", this.controller.getTenantUpcomingAppointments);
 
         /**
         * @swagger
-        * /api/v1/appointments/past/{tenantId}:
+        * /api/v1/appointments/tenant/past/{tenantId}:
         *   get:
         *     summary: get tenant past appointments
         *     tags: [appointments]
@@ -460,7 +460,49 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/past/:tenantId", this.controller.getPastAppointments);
+        this.router.get("/tenant/past/:tenantId", this.controller.getTenantPastAppointments);
+
+        /**
+        * @swagger
+        * /api/v1/appointments/staff/upcoming/{staffId}:
+        *   get:
+        *     summary: get staff upcoming appointments
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: staffId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the staff
+        *     responses:
+        *       200:
+        *         description: staff appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/staff/upcoming/:staffId", this.controller.getStaffUpcomingAppointments);
+
+        /**
+        * @swagger
+        * /api/v1/appointments/staff/past/{staffId}:
+        *   get:
+        *     summary: get staff past appointments
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: staffId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the staff
+        *     responses:
+        *       200:
+        *         description: staff appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/staff/past/:staffId", this.controller.getStaffPastAppointments);
 
     }
 
