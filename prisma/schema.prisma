@@ -151,6 +151,10 @@ model Tenant {
   OrganizationSessionTypes   OrganizationSessionTypes[]
   OrganizationLicenses       OrganizationLicenses[]
   Appointment                Appointment[]
+  ServiceCodes               ServiceCodes[]
+  RoundingRules              RoundingRules[]
+  InsuranceType              InsuranceType[]
+  Payer                      Payer[]
 }
 
 model TenantStaff {
@@ -773,4 +777,84 @@ model Appointment {
   relatedTo   Appointment?             @relation("AppointmentRelation", fields: [relatedAppointment], references: [id])
   relatedFrom Appointment[]            @relation("AppointmentRelation")
   clinicians  TenantStaff[]            @relation("AppointmentClinicians")
+}
+
+model ServiceCodes {
+  id          String  @id @default(uuid())
+  tenantId    String
+  code        String
+  description String
+  modifiers   Json
+  isDeleted   Boolean
+  isActive    Boolean
+
+  tenant            Tenant              @relation(fields: [tenantId], references: [id])
+  PayerServiceCodes PayerServiceCodes[]
+}
+
+model RoundingRules {
+  id           String  @id @default(uuid())
+  tenantId     String
+  ruleType     String
+  ruleName     String
+  description  String
+  standardUnit Int
+  roundingRule Json
+  isDeleted    Boolean
+  isActive     Boolean
+
+  tenant            Tenant              @relation(fields: [tenantId], references: [id])
+  PayerServiceCodes PayerServiceCodes[]
+}
+
+model InsuranceType {
+  id          String  @id @default(uuid())
+  tenantId    String
+  name        String
+  description String
+  isDeleted   Boolean
+  isActive    Boolean
+
+  tenant Tenant  @relation(fields: [tenantId], references: [id])
+  Payer  Payer[]
+}
+
+model Payer {
+  id              String  @id @default(uuid())
+  tenantId        String
+  payerName       String
+  email           String
+  phone           String
+  insuranceTypeId String
+  tplCode         String
+  carrierPayerId  String
+  address         String
+  city            String
+  state           String
+  zip             String
+  country         String
+  serviceCodes    Json
+  isDeleted       Boolean
+  isActive        Boolean
+
+  tenant            Tenant              @relation(fields: [tenantId], references: [id])
+  insuranceType     InsuranceType       @relation(fields: [insuranceTypeId], references: [id])
+  PayerServiceCodes PayerServiceCodes[]
+}
+
+model PayerServiceCodes {
+  id             String  @id @default(uuid())
+  payerId        String
+  serviceCodeId  String
+  code           String
+  description    String
+  unitCurrency   String
+  ratePerUnit    String
+  roundingRuleId String
+  modifiers      Json
+  billable       Boolean
+
+  serviceCode  ServiceCodes  @relation(fields: [serviceCodeId], references: [id])
+  roundingRule RoundingRules @relation(fields: [roundingRuleId], references: [id])
+  payer        Payer         @relation(fields: [payerId], references: [id])
 }

@@ -41,6 +41,11 @@ import organization_staff_license_route from "./features/organizationStaff/prese
 import organization_staff_payroll_route from "./features/organizationStaff/presentation/routes/payrollRoute.js";
 import image_route from "./features/images/presentation/routes/imageRoutes.js";
 import appointment_route from "./features/appointment/presentation/routes/appointmentRoute.js";
+import service_codes_route from "./features/tenantBilling/presentation/routes/serviceCodesRoutes.js";
+import rounding_rules_route from "./features/tenantBilling/presentation/routes/roundingRulesRoutes.js";
+import insurance_type_route from "./features/tenantBilling/presentation/routes/insuranceTypeRoutes.js";
+import payer_route from "./features/tenantBilling/presentation/routes/payerRoutes.js";
+import payer_service_codes_route from "./features/tenantBilling/presentation/routes/payerServiceCodeRoutes.js";
 
 
 class App {
@@ -111,6 +116,11 @@ class App {
         this.app.use("/api/v1/organization-staff/staff", organization_staff_route);
         this.app.use("/api/v1/images", image_route);
         this.app.use("/api/v1/appointments", appointment_route);
+        this.app.use("/api/v1/service-codes", service_codes_route);
+        this.app.use("/api/v1/rounding-rules", rounding_rules_route);
+        this.app.use("/api/v1/insurance-types", insurance_type_route);
+        this.app.use("/api/v1/payers", payer_route);
+        this.app.use("/api/v1/payer-service-codes", payer_service_codes_route);
     }
 
     initializeErrorHandler() {
