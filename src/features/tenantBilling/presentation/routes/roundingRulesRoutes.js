@@ -151,7 +151,7 @@ class RoundingRulesRoutes {
 
         /**
          * @swagger
-         * /api/v1/rounding-rules/{id}:
+         * /api/v1/rounding-rules/{id}/{active}:
          *   patch:
          *     summary: Deactivate rounding rule
          *     tags: [rounding-rules]
@@ -165,7 +165,7 @@ class RoundingRulesRoutes {
          *       200:
          *         description: Rounding rule deactivated successfully
          */
-        this.router.patch("/:id", this.controller.deactivateRoundingRule);
+        this.router.patch("/:id/:active", this.controller.deactivateRoundingRule);
     }
 
     getRouter() {

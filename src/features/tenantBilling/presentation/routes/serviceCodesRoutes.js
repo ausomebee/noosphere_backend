@@ -137,7 +137,7 @@ class ServiceCodesRoutes {
 
         /**
          * @swagger
-         * /api/v1/service-codes/{id}:
+         * /api/v1/service-codes/{id}/{active}:
          *   patch:
          *     summary: Deactivate service code
          *     tags: [service-codes]
@@ -151,7 +151,7 @@ class ServiceCodesRoutes {
          *       200:
          *         description: Service code deleted successfully
          */
-        this.router.patch("/:id", this.controller.deactivateServiceCode);
+        this.router.patch("/:id/:active", this.controller.deactivateServiceCode);
     }
 
     getRouter() {

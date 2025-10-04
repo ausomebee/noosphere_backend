@@ -70,7 +70,7 @@ class ServiceCodesController {
     });
 
     deactivateServiceCode = expressAsyncHandler(async (req, res) => {
-        const serviceCode = await this.service.updateServiceCode({ id: req.params.id, isActive: false });
+        const serviceCode = await this.service.updateServiceCode({ id: req.params.id, isActive: req.params.active });
 
         if (!serviceCode) {
             return res.status(500).json({ message: "Failed to delete service code" });

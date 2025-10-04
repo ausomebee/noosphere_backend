@@ -72,7 +72,7 @@ class InsuranceTypeController {
     deactivateInsuranceType = expressAsyncHandler(async (req, res) => {
         const insuranceType = await this.service.updateInsuranceType({
             id: req.params.id,
-            isActive: false
+            isActive: req.params.active
         });
 
         if (!insuranceType) {

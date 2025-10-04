@@ -130,7 +130,7 @@ class InsuranceTypeRoutes {
 
         /**
          * @swagger
-         * /api/v1/insurance-types/{id}:
+         * /api/v1/insurance-types/{id}/{active}:
          *   patch:
          *     summary: Deactivate insurance type
          *     tags: [insurance-types]
@@ -144,7 +144,7 @@ class InsuranceTypeRoutes {
          *       200:
          *         description: Insurance type deactivated successfully
          */
-        this.router.patch("/:id", this.controller.deactivateInsuranceType);
+        this.router.patch("/:id/:active", this.controller.deactivateInsuranceType);
     }
 
     getRouter() {
