@@ -40,7 +40,7 @@ class PayerController {
                 }
             } else {
                 const serviceCodeData = new ServiceCodes({ ...serviceCode, tenantId: data.tenantId });
-                const serviceCode = await this.service.createServiceCode(serviceCodeData.createServiceCode);
+                const serviceCode = await this.service.createServiceCode(serviceCodeData.createServiceCodeFromPayer);
 
                 if (!serviceCode) {
                     return res.status(500).json({ message: "Failed to create service code" });
@@ -113,7 +113,7 @@ class PayerController {
                     });
 
                     const newServiceCode = await this.service.createServiceCode(
-                        serviceCodeData.createServiceCode
+                        serviceCodeData.createServiceCodeFromPayer
                     );
 
                     if (!newServiceCode) {
