@@ -8,8 +8,8 @@ class RoundingRulesDto {
             ruleType: Joi.string().min(1).required(),
             ruleName: Joi.string().min(1).required(),
             description: Joi.string().min(1).required(),
-            standardUnit: Joi.number().integer().required(),
-            roundingRule: Joi.object().required(),
+            standardUnit: Joi.number().integer().optional(),
+            roundingRule: Joi.object().optional(),
         });
 
         Validator.validateRequest(req, next, schema);

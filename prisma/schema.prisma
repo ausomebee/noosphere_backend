@@ -798,8 +798,8 @@ model RoundingRules {
   ruleType     String
   ruleName     String
   description  String
-  standardUnit Int
-  roundingRule Json
+  standardUnit Int?
+  roundingRule Json?
   isDeleted    Boolean @default(false)
   isActive     Boolean @default(true)
 

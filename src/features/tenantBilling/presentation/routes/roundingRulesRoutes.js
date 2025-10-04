@@ -12,8 +12,6 @@ import RoundingRulesController from "../controllers/roundingRulesController.js";
  *         - tenantId
  *         - ruleType
  *         - ruleName
- *         - standardUnit
- *         - roundingRule
  *       properties:
  *         tenantId:
  *           type: string
