@@ -847,7 +847,7 @@ model PayerServiceCodes {
   payerId        String
   serviceCodeId  String
   unitCurrency   String
-  ratePerUnit    String
+  ratePerUnit    Int
   roundingRuleId String
   billable       Boolean
 

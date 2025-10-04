@@ -23,7 +23,7 @@ class PayerDto {
                         code: Joi.string().required(),
                         description: Joi.string().required(),
                         unitCurrency: Joi.string().length(3).required(),
-                        ratePerUnit: Joi.string().pattern(/^\d+(\.\d{1,2})?$/).required(),
+                        ratePerUnit: Joi.number().required(),
                         roundingRuleId: Joi.string().uuid().required(),
                         modifiers: Joi.object().unknown(true).required(),
                         billable: Joi.boolean().required()
@@ -70,7 +70,7 @@ class PayerDto {
                         code: Joi.string().max(50).required(),
                         description: Joi.string().max(500).required(),
                         unitCurrency: Joi.string().max(10).required(),
-                        ratePerUnit: Joi.string().pattern(/^[0-9]+$/).required(),
+                        ratePerUnit: Joi.number().required(),
                         roundingRuleId: Joi.string().uuid().required(),
                         modifiers: Joi.object().pattern(Joi.string(), Joi.string()).default({}),
                         billable: Joi.boolean().required(),
