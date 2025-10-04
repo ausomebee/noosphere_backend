@@ -7,8 +7,8 @@ import ServiceCodes from "../../domain/serviceCodes.js";
 class ServiceCodesController {
     constructor() {
         this.prisma = prismaService.getClient();
-        this.repository = new ServiceCodesRepository(this.prisma.serviceCodes);
-        this.service = new ServiceCodesService({ repository: this.repository });
+        this.serviceCodesRepository = new ServiceCodesRepository(this.prisma.serviceCodes);
+        this.service = new ServiceCodesService({ serviceCodesRepository: this.serviceCodesRepository });
     }
 
     createServiceCode = expressAsyncHandler(async (req, res) => {
@@ -69,8 +69,8 @@ class ServiceCodesController {
         });
     });
 
-    deleteServiceCode = expressAsyncHandler(async (req, res) => {
-        const serviceCode = await this.service.updateServiceCode({ id: req.params.id, isDeleted: true });
+    deactivateServiceCode = expressAsyncHandler(async (req, res) => {
+        const serviceCode = await this.service.updateServiceCode({ id: req.params.id, isActive: false });
 
         if (!serviceCode) {
             return res.status(500).json({ message: "Failed to delete service code" });

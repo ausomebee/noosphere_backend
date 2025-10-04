@@ -785,8 +785,8 @@ model ServiceCodes {
   code        String
   description String
   modifiers   Json
-  isDeleted   Boolean
-  isActive    Boolean
+  isDeleted   Boolean @default(false)
+  isActive    Boolean @default(true)
 
   tenant            Tenant              @relation(fields: [tenantId], references: [id])
   PayerServiceCodes PayerServiceCodes[]
@@ -800,8 +800,8 @@ model RoundingRules {
   description  String
   standardUnit Int
   roundingRule Json
-  isDeleted    Boolean
-  isActive     Boolean
+  isDeleted    Boolean @default(false)
+  isActive     Boolean @default(true)
 
   tenant            Tenant              @relation(fields: [tenantId], references: [id])
   PayerServiceCodes PayerServiceCodes[]
@@ -812,8 +812,8 @@ model InsuranceType {
   tenantId    String
   name        String
   description String
-  isDeleted   Boolean
-  isActive    Boolean
+  isDeleted   Boolean @default(false)
+  isActive    Boolean @default(true)
 
   tenant Tenant  @relation(fields: [tenantId], references: [id])
   Payer  Payer[]
@@ -834,8 +834,8 @@ model Payer {
   zip             String
   country         String
   serviceCodes    Json
-  isDeleted       Boolean
-  isActive        Boolean
+  isDeleted       Boolean @default(false)
+  isActive        Boolean @default(true)
 
   tenant            Tenant              @relation(fields: [tenantId], references: [id])
   insuranceType     InsuranceType       @relation(fields: [insuranceTypeId], references: [id])

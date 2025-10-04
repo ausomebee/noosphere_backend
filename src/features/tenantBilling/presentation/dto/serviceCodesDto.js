@@ -8,8 +8,6 @@ class ServiceCodesDto {
             code: Joi.string().min(1).required(),
             description: Joi.string().min(1).required(),
             modifiers: Joi.object().required(),
-            isDeleted: Joi.boolean().default(false),
-            isActive: Joi.boolean().default(true),
         });
 
         Validator.validateRequest(req, next, schema);

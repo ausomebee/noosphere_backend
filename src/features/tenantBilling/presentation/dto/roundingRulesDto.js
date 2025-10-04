@@ -10,8 +10,6 @@ class RoundingRulesDto {
             description: Joi.string().min(1).required(),
             standardUnit: Joi.number().integer().required(),
             roundingRule: Joi.object().required(),
-            isDeleted: Joi.boolean().default(false),
-            isActive: Joi.boolean().default(true),
         });
 
         Validator.validateRequest(req, next, schema);

@@ -7,8 +7,8 @@ import InsuranceType from "../../domain/insuranceType.js";
 class InsuranceTypeController {
     constructor() {
         this.prisma = prismaService.getClient();
-        this.repository = new InsuranceTypeRepository(this.prisma.insuranceType);
-        this.service = new InsuranceTypeService({ repository: this.repository });
+        this.insuranceTypeRepository = new InsuranceTypeRepository(this.prisma.insuranceType);
+        this.service = new InsuranceTypeService({ insuranceTypeRepository: this.insuranceTypeRepository });
     }
 
     createInsuranceType = expressAsyncHandler(async (req, res) => {
@@ -69,18 +69,18 @@ class InsuranceTypeController {
         });
     });
 
-    deleteInsuranceType = expressAsyncHandler(async (req, res) => {
+    deactivateInsuranceType = expressAsyncHandler(async (req, res) => {
         const insuranceType = await this.service.updateInsuranceType({
             id: req.params.id,
-            isDeleted: true
+            isActive: false
         });
 
         if (!insuranceType) {
-            return res.status(500).json({ message: "Failed to delete insurance type" });
+            return res.status(500).json({ message: "Failed to deactivate insurance type" });
         }
 
         return res.status(200).json({
-            message: "Insurance type deleted successfully",
+            message: "Insurance type deactivated successfully",
             status: "ok",
             data: insuranceType
         });
