@@ -3,12 +3,22 @@ import prismaService from "../../../../config/prisma.js";
 import PayerRepository from "../../infrastructure/payerRepository.js";
 import PayerService from "../../application/payerService.js";
 import Payer from "../../domain/payer.js";
+import PayerServiceCodesRepository from "../../infrastructure/payerServiceCodesRepository.js";
+import PayerServiceCodesService from "../../application/payerServiceCodesService.js";
+import PayerServiceCodes from "../../domain/payerServiceCodes.js";
+import ServiceCodesService from "../../application/serviceCodesService.js";
+import ServiceCodesRepository from "../../infrastructure/serviceCodesRepository.js";
+import ServiceCodes from "../../domain/serviceCodes.js";
 
 class PayerController {
     constructor() {
         this.prisma = prismaService.getClient();
-        this.repository = new PayerRepository(this.prisma.payer);
-        this.service = new PayerService({ repository: this.repository });
+        this.payerRepository = new PayerRepository(this.prisma.payer);
+        this.payerServiceCodesRepository = new PayerServiceCodesRepository(this.prisma.payerServiceCodes);
+        this.serviceCodesRepository = new ServiceCodesRepository(this.prisma.serviceCodes);
+        this.serviceCodesService = new ServiceCodesService({ serviceCodesRepository: this.serviceCodesRepository });
+        this.service = new PayerService({ payerRepository: this.payerRepository });
+        this.payerServiceCodesService = new PayerServiceCodesService({ payerServiceCodesRepository: this.payerServiceCodesRepository });
     }
 
     createPayer = expressAsyncHandler(async (req, res) => {
@@ -20,6 +30,31 @@ class PayerController {
             return res.status(500).json({ message: "Failed to create payer" });
         }
 
+        for (const serviceCode of data.serviceCodes) {
+            if (serviceCode.serviceCodeId) {
+                const payerServiceCodeData = new PayerServiceCodes({ ...serviceCode, payerId: payer.id });
+                const payerServiceCode = await this.payerServiceCodesService.createPayerServiceCode(payerServiceCodeData.createPayerServiceCode);
+
+                if (!payerServiceCode) {
+                    return res.status(500).json({ message: "Failed to create payer service code" });
+                }
+            } else {
+                const serviceCodeData = new ServiceCodes({ ...serviceCode, tenantId: data.tenantId });
+                const serviceCode = await this.service.createServiceCode(serviceCodeData.createServiceCode);
+
+                if (!serviceCode) {
+                    return res.status(500).json({ message: "Failed to create service code" });
+                }
+
+                const payerServiceCodeData = new PayerServiceCodes({ ...serviceCode, payerId: payer.id, serviceCodeId: serviceCode.id });
+                const payerServiceCode = await this.payerServiceCodesService.createPayerServiceCode(payerServiceCodeData.createPayerServiceCode);
+
+                if (!payerServiceCode) {
+                    return res.status(500).json({ message: "Failed to create payer service code" });
+                }
+            }
+        }
+
         return res.status(201).json({
             message: "Payer created successfully",
             status: "ok",
@@ -28,18 +63,93 @@ class PayerController {
     });
 
     updatePayer = expressAsyncHandler(async (req, res) => {
-        const payer = await this.service.updatePayer(req.body);
+        const data = req.body;
 
-        if (!payer) {
-            return res.status(500).json({ message: "Failed to update payer" });
+        const payerData = new Payer(data);
+        const updatedPayer = await this.service.updatePayer(payerData.updatePayer);
+
+        if (!updatedPayer) {
+            return res.status(404).json({ message: "Payer not found or failed to update" });
+        }
+
+        for (const serviceCode of data.serviceCodes) {
+            if (serviceCode.id) {
+                const payerServiceCodeData = new PayerServiceCodes({
+                    ...serviceCode,
+                    payerId: data.id,
+                });
+
+                const updatedPayerServiceCode =
+                    await this.payerServiceCodesService.updatePayerServiceCode(
+                        payerServiceCodeData.updatePayerServiceCode
+                    );
+
+                if (!updatedPayerServiceCode) {
+                    return res
+                        .status(500)
+                        .json({ message: "Failed to update payer service code" });
+                }
+            } else {
+                if (serviceCode.serviceCodeId) {
+                    const payerServiceCodeData = new PayerServiceCodes({
+                        ...serviceCode,
+                        payerId: data.id,
+                    });
+
+                    const payerServiceCode =
+                        await this.payerServiceCodesService.createPayerServiceCode(
+                            payerServiceCodeData.createPayerServiceCode
+                        );
+
+                    if (!payerServiceCode) {
+                        return res
+                            .status(500)
+                            .json({ message: "Failed to create payer service code" });
+                    }
+                } else {
+                    const serviceCodeData = new ServiceCodes({
+                        ...serviceCode,
+                        tenantId: data.tenantId,
+                    });
+
+                    const newServiceCode = await this.service.createServiceCode(
+                        serviceCodeData.createServiceCode
+                    );
+
+                    if (!newServiceCode) {
+                        return res
+                            .status(500)
+                            .json({ message: "Failed to create new service code" });
+                    }
+
+                    const payerServiceCodeData = new PayerServiceCodes({
+                        ...serviceCode,
+                        payerId: data.id,
+                        serviceCodeId: newServiceCode.id,
+                    });
+
+                    const payerServiceCode =
+                        await this.payerServiceCodesService.createPayerServiceCode(
+                            payerServiceCodeData.createPayerServiceCode
+                        );
+
+                    if (!payerServiceCode) {
+                        return res
+                            .status(500)
+                            .json({ message: "Failed to create payer service code" });
+                    }
+                }
+            }
         }
 
         return res.status(200).json({
             message: "Payer updated successfully",
             status: "ok",
-            data: payer
+            data: updatedPayer,
         });
     });
+
+
 
     getSinglePayer = expressAsyncHandler(async (req, res) => {
         const payer = await this.service.getSinglePayer(req.params);
@@ -69,10 +179,10 @@ class PayerController {
         });
     });
 
-    deletePayer = expressAsyncHandler(async (req, res) => {
+    deactivatePayer = expressAsyncHandler(async (req, res) => {
         const payer = await this.service.updatePayer({
             id: req.params.id,
-            isDeleted: true
+            isActive: req.params.active === "true"
         });
 
         if (!payer) {

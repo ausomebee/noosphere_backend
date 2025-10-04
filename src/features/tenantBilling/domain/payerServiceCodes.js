@@ -36,6 +36,20 @@ class PayerServiceCodes {
             billable: this.billable
         };
     }
+
+    get updatePayerServiceCode() {
+        return {
+            payerId: this.payerId,
+            serviceCodeId: this.serviceCodeId,
+            roundingRuleId: this.roundingRuleId,
+            code: this.code,
+            description: this.description,
+            unitCurrency: this.unitCurrency,
+            ratePerUnit: this.ratePerUnit,
+            modifiers: this.modifiers,
+            billable: this.billable
+        };
+    }
 }
 
 export default PayerServiceCodes;

@@ -7,8 +7,8 @@ import PayerServiceCodes from "../../domain/payerServiceCodes.js";
 class PayerServiceCodesController {
     constructor() {
         this.prisma = prismaService.getClient();
-        this.repository = new PayerServiceCodesRepository(this.prisma.payerServiceCodes);
-        this.service = new PayerServiceCodesService({ repository: this.repository });
+        this.payerServiceCodesRepository = new PayerServiceCodesRepository(this.prisma.payerServiceCodes);
+        this.service = new PayerServiceCodesService({ payerServiceCodesRepository: this.payerServiceCodesRepository });
     }
 
     createPayerServiceCode = expressAsyncHandler(async (req, res) => {
