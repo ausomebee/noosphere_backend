@@ -70,7 +70,7 @@ class RoundingRulesController {
     });
 
     deactivateRoundingRule = expressAsyncHandler(async (req, res) => {
-        const rule = await this.service.updateRoundingRule({ id: req.params.id, isActive: req.params.active });
+        const rule = await this.service.updateRoundingRule({ id: req.params.id, isActive: req.params.active === "true" });
 
         if (!rule) {
             return res.status(500).json({ message: "Failed to deactivated rounding rule" });
