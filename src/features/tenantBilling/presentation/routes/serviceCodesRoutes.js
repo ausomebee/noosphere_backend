@@ -29,12 +29,6 @@ import ServiceCodesController from "../controllers/serviceCodesController.js";
  *           type: object
  *           description: JSON object with modifiers
  *           example: { "modifier1": "urgent", "modifier2": "telehealth" }
- *         isDeleted:
- *           type: boolean
- *           default: false
- *         isActive:
- *           type: boolean
- *           default: true
  *
  *     ServiceCodesUpdateDto:
  *       type: object
@@ -71,10 +65,10 @@ class ServiceCodesRoutes {
     initializeRoutes() {
         /**
          * @swagger
-         * /api/v1/organization/service-codes:
+         * /api/v1/service-codes/:
          *   post:
          *     summary: Create service code
-         *     tags: [organization]
+         *     tags: [service-codes]
          *     requestBody:
          *       required: true
          *       content:
@@ -89,10 +83,10 @@ class ServiceCodesRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/service-codes:
+         * /api/v1/service-codes/:
          *   put:
          *     summary: Update service code
-         *     tags: [organization]
+         *     tags: [service-codes]
          *     requestBody:
          *       required: true
          *       content:
@@ -107,10 +101,10 @@ class ServiceCodesRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/service-codes/tenant/{tenantId}:
+         * /api/v1/service-codes/tenant/{tenantId}:
          *   get:
          *     summary: Get all service codes for a tenant
-         *     tags: [organization]
+         *     tags: [service-codes]
          *     parameters:
          *       - in: path
          *         name: tenantId
@@ -125,10 +119,10 @@ class ServiceCodesRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/service-codes/{id}:
+         * /api/v1/service-codes/{id}:
          *   get:
          *     summary: Get a single service code
-         *     tags: [organization]
+         *     tags: [service-codes]
          *     parameters:
          *       - in: path
          *         name: id
@@ -143,10 +137,10 @@ class ServiceCodesRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/service-codes/{id}:
-         *   delete:
-         *     summary: Delete service code
-         *     tags: [organization]
+         * /api/v1/service-codes/{id}:
+         *   patch:
+         *     summary: Deactivate service code
+         *     tags: [service-codes]
          *     parameters:
          *       - in: path
          *         name: id
@@ -157,7 +151,7 @@ class ServiceCodesRoutes {
          *       200:
          *         description: Service code deleted successfully
          */
-        this.router.delete("/:id", this.controller.deleteServiceCode);
+        this.router.patch("/:id", this.controller.deactivateServiceCode);
     }
 
     getRouter() {

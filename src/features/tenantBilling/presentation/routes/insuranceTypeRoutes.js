@@ -24,12 +24,6 @@ import InsuranceTypeDto from "../dto/insuranceTypeDto.js";
  *           type: string
  *           description: Description of the insurance type
  *           example: "Covers basic and advanced health services"
- *         isDeleted:
- *           type: boolean
- *           default: false
- *         isActive:
- *           type: boolean
- *           default: true
  *
  *     InsuranceTypeUpdateDto:
  *       type: object
@@ -64,10 +58,10 @@ class InsuranceTypeRoutes {
     initializeRoutes() {
         /**
          * @swagger
-         * /api/v1/organization/insurance-type:
+         * /api/v1/insurance-types/:
          *   post:
          *     summary: Create insurance type
-         *     tags: [organization]
+         *     tags: [insurance-types]
          *     requestBody:
          *       required: true
          *       content:
@@ -82,10 +76,10 @@ class InsuranceTypeRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/insurance-type:
+         * /api/v1/insurance-types/:
          *   put:
          *     summary: Update insurance type
-         *     tags: [organization]
+         *     tags: [insurance-types]
          *     requestBody:
          *       required: true
          *       content:
@@ -100,10 +94,10 @@ class InsuranceTypeRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/insurance-type/tenant/{tenantId}:
+         * /api/v1/insurance-types/tenant/{tenantId}:
          *   get:
          *     summary: Get all insurance types for a tenant
-         *     tags: [organization]
+         *     tags: [insurance-types]
          *     parameters:
          *       - in: path
          *         name: tenantId
@@ -118,10 +112,10 @@ class InsuranceTypeRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/insurance-type/{id}:
+         * /api/v1/insurance-types/{id}:
          *   get:
          *     summary: Get a single insurance type
-         *     tags: [organization]
+         *     tags: [insurance-types]
          *     parameters:
          *       - in: path
          *         name: id
@@ -136,10 +130,10 @@ class InsuranceTypeRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/insurance-type/{id}:
-         *   delete:
-         *     summary: Delete insurance type
-         *     tags: [organization]
+         * /api/v1/insurance-types/{id}:
+         *   patch:
+         *     summary: Deactivate insurance type
+         *     tags: [insurance-types]
          *     parameters:
          *       - in: path
          *         name: id
@@ -148,9 +142,9 @@ class InsuranceTypeRoutes {
          *           type: string
          *     responses:
          *       200:
-         *         description: Insurance type deleted successfully
+         *         description: Insurance type deactivated successfully
          */
-        this.router.delete("/:id", this.controller.deleteInsuranceType);
+        this.router.patch("/:id", this.controller.deactivateInsuranceType);
     }
 
     getRouter() {

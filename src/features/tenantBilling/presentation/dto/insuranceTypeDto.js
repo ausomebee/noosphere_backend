@@ -7,8 +7,6 @@ class InsuranceTypeDto {
             tenantId: Joi.string().uuid().required(),
             name: Joi.string().min(1).required(),
             description: Joi.string().min(1).required(),
-            isDeleted: Joi.boolean().default(false),
-            isActive: Joi.boolean().default(true),
         });
 
         Validator.validateRequest(req, next, schema);

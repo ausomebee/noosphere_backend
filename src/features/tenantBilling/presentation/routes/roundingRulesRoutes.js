@@ -39,12 +39,6 @@ import RoundingRulesController from "../controllers/roundingRulesController.js";
  *           type: object
  *           description: JSON definition of the rounding rule
  *           example: { "method": "nearest", "unit": 15 }
- *         isDeleted:
- *           type: boolean
- *           default: false
- *         isActive:
- *           type: boolean
- *           default: true
  *
  *     RoundingRulesUpdateDto:
  *       type: object
@@ -85,10 +79,10 @@ class RoundingRulesRoutes {
     initializeRoutes() {
         /**
          * @swagger
-         * /api/v1/organization/rounding-rules:
+         * /api/v1/rounding-rules/:
          *   post:
          *     summary: Create rounding rule
-         *     tags: [organization]
+         *     tags: [rounding-rules]
          *     requestBody:
          *       required: true
          *       content:
@@ -103,10 +97,10 @@ class RoundingRulesRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/rounding-rules:
+         * /api/v1/rounding-rules/:
          *   put:
          *     summary: Update rounding rule
-         *     tags: [organization]
+         *     tags: [rounding-rules]
          *     requestBody:
          *       required: true
          *       content:
@@ -121,10 +115,10 @@ class RoundingRulesRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/rounding-rules/tenant/{tenantId}:
+         * /api/v1/rounding-rules/tenant/{tenantId}:
          *   get:
          *     summary: Get all rounding rules for a tenant
-         *     tags: [organization]
+         *     tags: [rounding-rules]
          *     parameters:
          *       - in: path
          *         name: tenantId
@@ -139,10 +133,10 @@ class RoundingRulesRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/rounding-rules/{id}:
+         * /api/v1/rounding-rules/{id}:
          *   get:
          *     summary: Get a single rounding rule
-         *     tags: [organization]
+         *     tags: [rounding-rules]
          *     parameters:
          *       - in: path
          *         name: id
@@ -157,10 +151,10 @@ class RoundingRulesRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/rounding-rules/{id}:
-         *   delete:
-         *     summary: Delete rounding rule
-         *     tags: [organization]
+         * /api/v1/rounding-rules/{id}:
+         *   patch:
+         *     summary: Deactivate rounding rule
+         *     tags: [rounding-rules]
          *     parameters:
          *       - in: path
          *         name: id
@@ -169,9 +163,9 @@ class RoundingRulesRoutes {
          *           type: string
          *     responses:
          *       200:
-         *         description: Rounding rule deleted successfully
+         *         description: Rounding rule deactivated successfully
          */
-        this.router.delete("/:id", this.controller.deleteRoundingRule);
+        this.router.patch("/:id", this.controller.deactivateRoundingRule);
     }
 
     getRouter() {

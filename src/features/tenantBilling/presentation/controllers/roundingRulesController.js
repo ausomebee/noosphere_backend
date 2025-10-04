@@ -7,8 +7,8 @@ import RoundingRules from "../../domain/roundingRule.js";
 class RoundingRulesController {
     constructor() {
         this.prisma = prismaService.getClient();
-        this.repository = new RoundingRulesRepository(this.prisma.roundingRules);
-        this.service = new RoundingRulesService({ repository: this.repository });
+        this.roundingRulesRepository = new RoundingRulesRepository(this.prisma.roundingRules);
+        this.service = new RoundingRulesService({ roundingRulesRepository: this.roundingRulesRepository });
     }
 
     createRoundingRule = expressAsyncHandler(async (req, res) => {
@@ -69,15 +69,15 @@ class RoundingRulesController {
         });
     });
 
-    deleteRoundingRule = expressAsyncHandler(async (req, res) => {
-        const rule = await this.service.updateRoundingRule({ id: req.params.id, isDeleted: true });
+    deactivateRoundingRule = expressAsyncHandler(async (req, res) => {
+        const rule = await this.service.updateRoundingRule({ id: req.params.id, isActive: false });
 
         if (!rule) {
-            return res.status(500).json({ message: "Failed to delete rounding rule" });
+            return res.status(500).json({ message: "Failed to deactivated rounding rule" });
         }
 
         return res.status(200).json({
-            message: "Rounding rule deleted successfully",
+            message: "Rounding rule deactivated successfully",
             status: "ok",
             data: rule
         });
