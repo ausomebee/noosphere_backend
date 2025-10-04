@@ -30,23 +30,23 @@ class PayerController {
             return res.status(500).json({ message: "Failed to create payer" });
         }
 
-        for (const serviceCode of data.serviceCodes) {
-            if (serviceCode.serviceCodeId) {
-                const payerServiceCodeData = new PayerServiceCodes({ ...serviceCode, payerId: payer.id });
+        for (const sc of data.serviceCodes) {
+            if (sc.serviceCodeId) {
+                const payerServiceCodeData = new PayerServiceCodes({ ...sc, payerId: payer.id });
                 const payerServiceCode = await this.payerServiceCodesService.createPayerServiceCode(payerServiceCodeData.createPayerServiceCode);
 
                 if (!payerServiceCode) {
                     return res.status(500).json({ message: "Failed to create payer service code" });
                 }
             } else {
-                const serviceCodeData = new ServiceCodes({ ...serviceCode, tenantId: data.tenantId });
-                const serviceCode = await this.service.createServiceCode(serviceCodeData.createServiceCodeFromPayer);
+                const serviceCodeData = new ServiceCodes({ ...sc, tenantId: data.tenantId });
+                const serviceCode = await this.serviceCodesService.createServiceCode(serviceCodeData.createServiceCodeFromPayer);
 
                 if (!serviceCode) {
                     return res.status(500).json({ message: "Failed to create service code" });
                 }
 
-                const payerServiceCodeData = new PayerServiceCodes({ ...serviceCode, payerId: payer.id, serviceCodeId: serviceCode.id });
+                const payerServiceCodeData = new PayerServiceCodes({ ...sc, payerId: payer.id, serviceCodeId: serviceCode.id });
                 const payerServiceCode = await this.payerServiceCodesService.createPayerServiceCode(payerServiceCodeData.createPayerServiceCode);
 
                 if (!payerServiceCode) {
