@@ -3,7 +3,6 @@ class PayerServiceCodes {
         id,
         payerId,
         serviceCodeId,
-        description,
         unitCurrency,
         ratePerUnit,
         roundingRuleId,
@@ -13,7 +12,6 @@ class PayerServiceCodes {
         this.id = id;
         this.payerId = payerId;
         this.serviceCodeId = serviceCodeId;
-        this.description = description;
         this.unitCurrency = unitCurrency;
         this.ratePerUnit = ratePerUnit;
         this.roundingRuleId = roundingRuleId;
@@ -26,7 +24,6 @@ class PayerServiceCodes {
             payerId: this.payerId,
             serviceCodeId: this.serviceCodeId,
             roundingRuleId: this.roundingRuleId,
-            description: this.description,
             unitCurrency: this.unitCurrency,
             ratePerUnit: this.ratePerUnit,
             modifiers: this.modifiers,
@@ -39,7 +36,6 @@ class PayerServiceCodes {
             payerId: this.payerId,
             serviceCodeId: this.serviceCodeId,
             roundingRuleId: this.roundingRuleId,
-            description: this.description,
             unitCurrency: this.unitCurrency,
             ratePerUnit: this.ratePerUnit,
             modifiers: this.modifiers,
