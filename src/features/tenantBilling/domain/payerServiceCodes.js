@@ -13,7 +13,6 @@ class PayerServiceCodes {
         this.id = id;
         this.payerId = payerId;
         this.serviceCodeId = serviceCodeId;
-        this.code = code;
         this.description = description;
         this.unitCurrency = unitCurrency;
         this.ratePerUnit = ratePerUnit;
