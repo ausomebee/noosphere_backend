@@ -846,12 +846,9 @@ model PayerServiceCodes {
   id             String  @id @default(uuid())
   payerId        String
   serviceCodeId  String
-  code           String
-  description    String
   unitCurrency   String
   ratePerUnit    String
   roundingRuleId String
-  modifiers      Json
   billable       Boolean
 
   serviceCode  ServiceCodes  @relation(fields: [serviceCodeId], references: [id])

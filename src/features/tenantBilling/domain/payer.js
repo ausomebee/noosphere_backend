@@ -54,6 +54,26 @@ class Payer {
             isActive: this.isActive
         };
     }
+
+    get updatePayer() {
+        return {
+            tenantId: this.tenantId,
+            payerName: this.payerName,
+            email: this.email,
+            phone: this.phone,
+            insuranceTypeId: this.insuranceTypeId,
+            tplCode: this.tplCode,
+            carrierPayerId: this.carrierPayerId,
+            address: this.address,
+            city: this.city,
+            state: this.state,
+            zip: this.zip,
+            country: this.country,
+            serviceCodes: this.serviceCodes,
+            isDeleted: this.isDeleted,
+            isActive: this.isActive
+        };
+    }
 }
 
 export default Payer;

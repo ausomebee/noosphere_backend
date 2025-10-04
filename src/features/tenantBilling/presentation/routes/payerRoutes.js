@@ -6,7 +6,7 @@ import PayerDto from "../dto/payerDto.js";
  * @swagger
  * components:
  *   schemas:
- *     PayerCreateDto:
+ *     CreatePayerInput:
  *       type: object
  *       required:
  *         - tenantId
@@ -14,99 +14,75 @@ import PayerDto from "../dto/payerDto.js";
  *         - email
  *         - phone
  *         - insuranceTypeId
+ *         - tplCode
+ *         - carrierPayerId
+ *         - address
+ *         - city
+ *         - state
+ *         - country
+ *         - serviceCodes
  *       properties:
  *         tenantId:
  *           type: string
  *           format: uuid
- *           description: Unique tenant identifier
+ *           example: "8d833659-e3a1-4702-88af-8f7c9fc1ad82"
  *         payerName:
  *           type: string
- *           description: Name of the payer
- *           example: "Blue Cross"
+ *           example: "Blue Cross Health Insurance"
  *         email:
  *           type: string
  *           format: email
- *           description: Contact email of the payer
- *           example: "support@bluecross.com"
+ *           example: "claims@bluecross.com"
  *         phone:
  *           type: string
- *           description: Contact phone of the payer
- *           example: "+1-555-123-4567"
+ *           example: "+1-202-555-0167"
  *         insuranceTypeId:
  *           type: string
  *           format: uuid
- *           description: Linked insurance type
+ *           example: "c98d84b1-8f60-4b9f-b85d-7b9c9c99e22b"
  *         tplCode:
  *           type: string
- *           description: Third-party liability code
+ *           example: "TPL-001"
  *         carrierPayerId:
  *           type: string
- *           description: Unique payer identifier from carrier
+ *           example: "CARR-BC123"
  *         address:
  *           type: string
- *           description: Payer’s street address
+ *           example: "123 Blue Cross Blvd"
  *         city:
  *           type: string
+ *           example: "Austin"
  *         state:
  *           type: string
+ *           example: "Texas"
  *         zip:
  *           type: string
+ *           example: "73301"
  *         country:
  *           type: string
- *         serviceCodes:
- *           type: object
- *           description: JSON object containing payer service codes
+ *           example: "USA"
  *         isActive:
  *           type: boolean
- *           default: true
+ *           example: true
  *         isDeleted:
  *           type: boolean
- *           default: false
+ *           example: false
+ *         serviceCodes:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/ServiceCodeInput'
  *
- *     PayerUpdateDto:
- *       type: object
- *       required:
- *         - id
- *         - tenantId
- *         - payerName
- *       properties:
- *         id:
- *           type: string
- *           format: uuid
- *           description: Unique identifier for the payer
- *         tenantId:
- *           type: string
- *           format: uuid
- *         payerName:
- *           type: string
- *         email:
- *           type: string
- *           format: email
- *         phone:
- *           type: string
- *         insuranceTypeId:
- *           type: string
- *           format: uuid
- *         tplCode:
- *           type: string
- *         carrierPayerId:
- *           type: string
- *         address:
- *           type: string
- *         city:
- *           type: string
- *         state:
- *           type: string
- *         zip:
- *           type: string
- *         country:
- *           type: string
- *         serviceCodes:
- *           type: object
- *         isActive:
- *           type: boolean
- *         isDeleted:
- *           type: boolean
+ *     UpdatePayerInput:
+ *       allOf:
+ *         - $ref: '#/components/schemas/CreatePayerInput'
+ *         - type: object
+ *           required:
+ *             - id
+ *           properties:
+ *             id:
+ *               type: string
+ *               format: uuid
+ *               example: "3f90b630-019d-42a7-a255-4bdf4b530cd8"
  */
 
 class PayerRoutes {
@@ -119,16 +95,16 @@ class PayerRoutes {
     initializeRoutes() {
         /**
          * @swagger
-         * /api/v1/organization/payer:
+         * /api/v1/payers/:
          *   post:
          *     summary: Create a new payer
-         *     tags: [organization]
+         *     tags: [payers]
          *     requestBody:
          *       required: true
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/PayerCreateDto'
+         *             $ref: '#/components/schemas/CreatePayerInput'
          *     responses:
          *       201:
          *         description: Payer created successfully
@@ -137,16 +113,16 @@ class PayerRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/payer:
+         * /api/v1/payers/:
          *   put:
          *     summary: Update an existing payer
-         *     tags: [organization]
+         *     tags: [payers]
          *     requestBody:
          *       required: true
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/PayerUpdateDto'
+         *             $ref: '#/components/schemas/UpdatePayerInput'
          *     responses:
          *       200:
          *         description: Payer updated successfully
@@ -155,10 +131,10 @@ class PayerRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/payer/tenant/{tenantId}:
+         * /api/v1/payers/tenant/{tenantId}:
          *   get:
          *     summary: Get all payers for a tenant
-         *     tags: [organization]
+         *     tags: [payers]
          *     parameters:
          *       - in: path
          *         name: tenantId
@@ -173,10 +149,10 @@ class PayerRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/payer/{id}:
+         * /api/v1/payers/{id}:
          *   get:
          *     summary: Get a single payer by ID
-         *     tags: [organization]
+         *     tags: [payers]
          *     parameters:
          *       - in: path
          *         name: id
@@ -191,10 +167,10 @@ class PayerRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/payer/{id}:
-         *   delete:
+         * /api/v1/payers/{id}/{active}:
+         *   patch:
          *     summary: Delete a payer
-         *     tags: [organization]
+         *     tags: [payers]
          *     parameters:
          *       - in: path
          *         name: id
@@ -205,7 +181,7 @@ class PayerRoutes {
          *       200:
          *         description: Payer deleted successfully
          */
-        this.router.delete("/:id", this.controller.deletePayer);
+        this.router.patch("/:id/:active", this.controller.deactivatePayer);
     }
 
     getRouter() {
