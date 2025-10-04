@@ -19,7 +19,7 @@ class PayerDto {
             serviceCodes: Joi.array()
                 .items(
                     Joi.object({
-                        serviceCodeId: Joi.string().uuid().optional(),
+                        serviceCodeId: Joi.string().uuid().allow("").optional(),
                         code: Joi.string().required(),
                         description: Joi.string().required(),
                         unitCurrency: Joi.string().length(3).required(),
@@ -65,7 +65,7 @@ class PayerDto {
                         serviceCodeId: Joi.alternatives().try(
                             Joi.string().uuid(),
                             Joi.string().pattern(/^[0-9A-Za-z]+$/) 
-                        ).optional(),
+                        ).allow("").optional(),
 
                         code: Joi.string().max(50).required(),
                         description: Joi.string().max(500).required(),
