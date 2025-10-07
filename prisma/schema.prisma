@@ -858,3 +858,10 @@ model PayerServiceCodes {
   roundingRule RoundingRules @relation(fields: [roundingRuleId], references: [id])
   payer        Payer         @relation(fields: [payerId], references: [id])
 }
+
+model AppointmentTimesheet {
+  id             String  @id @default(uuid())
+  appointmentId  String
+  tenantStaffId  String
+  
+}
