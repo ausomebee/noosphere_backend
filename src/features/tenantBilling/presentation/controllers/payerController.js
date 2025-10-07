@@ -149,8 +149,6 @@ class PayerController {
         });
     });
 
-
-
     getSinglePayer = expressAsyncHandler(async (req, res) => {
         const payer = await this.service.getSinglePayer(req.params);
 

@@ -33,6 +33,7 @@ class PayerServiceCodes {
 
     get updatePayerServiceCode() {
         return {
+            id: this.id,
             payerId: this.payerId,
             serviceCodeId: this.serviceCodeId,
             roundingRuleId: this.roundingRuleId,
