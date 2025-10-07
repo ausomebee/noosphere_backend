@@ -9,56 +9,51 @@ import PayerDto from "../dto/payerDto.js";
  *     ServiceCode:
  *       type: object
  *       required:
- *         - code
- *         - description
  *         - unitCurrency
  *         - ratePerUnit
  *         - roundingRuleId
- *         - modifiers
  *         - billable
  *       properties:
  *         id:
  *           type: string
  *           format: uuid
  *           description: Unique identifier of the payer service code (for updates only)
- *           example: "a0d9b5a2-7f0b-45c7-8f3e-43f1b7f0fdf3"
+ *           example: "a5a4e3bc-3339-4b8c-9b92-9c14e813b222"
  *         serviceCodeId:
  *           type: string
  *           format: uuid
- *           description: Reference to an existing service code
- *           example: "f1e02d91-c8b7-4bc5-a764-8aebf9dfe8bc"
+ *           description: Reference to an existing service code (use this if already created)
+ *           example: "6c9b9b3f-02c0-498b-8e7a-3e89e9e3a8f9"
  *         code:
  *           type: string
- *           description: Service code identifier
+ *           description: New service code identifier (required if creating a new one)
  *           example: "97151"
  *         description:
  *           type: string
- *           description: Description of the service code
+ *           description: Description of the service code (required if creating a new one)
  *           example: "Initial/periodic assessment by a BCBA, including development of treatment plan."
  *         unitCurrency:
  *           type: string
- *           description: Currency code (ISO 4217)
- *           example: "USD"
+ *           description: ISO 4217 currency code
+ *           example: "NGN"
  *         ratePerUnit:
  *           type: number
  *           description: Billing rate per unit
- *           example: 125.50
+ *           example: 5000
  *         roundingRuleId:
  *           type: string
  *           format: uuid
- *           description: Reference to rounding rule
- *           example: "94b39b7d-5146-4e58-b4d7-c3ab8a5f1f4b"
+ *           description: Reference to rounding rule ID
+ *           example: "b6fba91e-5a7e-4e4a-8f29-8027a22184f5"
  *         modifiers:
- *           type: object
- *           description: Dynamic modifier fields (e.g., CPT modifiers)
- *           additionalProperties:
+ *           type: array
+ *           description: Array of modifier strings
+ *           items:
  *             type: string
- *           example:
- *             modifier1: "U1"
- *             modifier2: "U2"
+ *           example: ["GT", "59"]
  *         billable:
  *           type: boolean
- *           description: Indicates if service is billable
+ *           description: Indicates if service code is billable
  *           example: true
  *
  *     CreatePayer:
@@ -81,81 +76,217 @@ import PayerDto from "../dto/payerDto.js";
  *         tenantId:
  *           type: string
  *           format: uuid
- *           example: "8d833659-e3a1-4702-88af-8f7c9fc1ad82"
+ *           example: "d44c229e-3f21-4c94-9d45-0f8f1efb8d99"
  *         payerName:
  *           type: string
- *           example: "Blue Cross Health Insurance"
+ *           example: "HealthSure Insurance Ltd"
  *         email:
  *           type: string
  *           format: email
- *           example: "contact@bluecross.com"
+ *           example: "claims@healthsure.com"
  *         phone:
  *           type: string
- *           example: "+1-202-555-0187"
+ *           example: "+2348067891234"
  *         insuranceTypeId:
  *           type: string
  *           format: uuid
- *           example: "b3f8c7d4-9357-4ad4-8428-9a3fd88d6a5c"
+ *           example: "b21cc3f9-6e67-41a4-9215-bf97f453ac2f"
  *         tplCode:
  *           type: string
- *           example: "TPL-001"
+ *           example: "TPL-2001"
  *         carrierPayerId:
  *           type: string
- *           example: "CPI-9845"
+ *           example: "HS-458"
  *         address:
  *           type: string
- *           example: "123 Main Street, Suite 405"
+ *           example: "15 Adeola Odeku Street"
  *         city:
  *           type: string
- *           example: "Lagos"
+ *           example: "Victoria Island"
  *         state:
  *           type: string
  *           example: "Lagos"
  *         zip:
  *           type: string
- *           example: "100001"
+ *           example: "101241"
  *         country:
  *           type: string
  *           example: "Nigeria"
- *         serviceCodes:
- *           type: array
- *           items:
- *             $ref: '#/components/schemas/ServiceCode'
- *           example:
- *             - code: "97151"
- *               description: "Initial behavioral assessment"
- *               unitCurrency: "USD"
- *               ratePerUnit: 125.5
- *               roundingRuleId: "94b39b7d-5146-4e58-b4d7-c3ab8a5f1f4b"
- *               modifiers:
- *                 modifier1: "U1"
- *                 modifier2: "U2"
- *               billable: true
- *             - code: "97155"
- *               description: "Adaptive behavior treatment"
- *               unitCurrency: "USD"
- *               ratePerUnit: 150.0
- *               roundingRuleId: "8b293b0a-8348-49a8-8f5e-ff63d60b8f3b"
- *               modifiers:
- *                 modifier1: "U3"
- *               billable: true
- *
- *     UpdatePayer:
- *       allOf:
- *         - $ref: '#/components/schemas/CreatePayer'
- *       required:
- *         - id
- *       properties:
- *         id:
- *           type: string
- *           format: uuid
- *           example: "1b3c7f8e-4b9b-4a61-bf8c-dfe8d22b96d1"
  *         isActive:
  *           type: boolean
  *           example: true
  *         isDeleted:
  *           type: boolean
  *           example: false
+ *         serviceCodes:
+ *           type: array
+ *           description: List of service codes linked to this payer
+ *           items:
+ *             $ref: '#/components/schemas/ServiceCode'
+ *           example:
+ *             - id: "a5a4e3bc-3339-4b8c-9b92-9c14e813b222"
+ *               serviceCodeId: "6c9b9b3f-02c0-498b-8e7a-3e89e9e3a8f9"
+ *               unitCurrency: "NGN"
+ *               modifiers: ["U1", "U2"]
+ *               ratePerUnit: 2500
+ *               roundingRuleId: "ad12c9e1-1e84-4932-99e7-44f80a0d9f00"
+ *               billable: true
+ *             - serviceCodeId: "1f8a3f4a-73e1-49e5-a4ef-3e93ec50e02a"
+ *               unitCurrency: "NGN"
+ *               modifiers: ["GT"]
+ *               ratePerUnit: 4500
+ *               roundingRuleId: "ad12c9e1-1e84-4932-99e7-44f80a0d9f00"
+ *               billable: true
+ *             - code: "97151"
+ *               description: "Initial/periodic assessment by a BCBA, including development of treatment plan."
+ *               modifiers: ["U3", "59"]
+ *               unitCurrency: "NGN"
+ *               ratePerUnit: 5000
+ *               roundingRuleId: "b6fba91e-5a7e-4e4a-8f29-8027a22184f5"
+ *               billable: true
+ *
+ *     UpdatePayer:
+ *       type: object
+ *       required:
+ *         - id
+ *         - tenantId
+ *         - payerName
+ *         - email
+ *         - phone
+ *         - insuranceTypeId
+ *         - tplCode
+ *         - carrierPayerId
+ *         - address
+ *         - city
+ *         - state
+ *         - country
+ *         - serviceCodes
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           description: Unique payer ID (required for updates)
+ *           example: "7b74b0b4-6571-45ce-98d1-1b5c8e0a412a"
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *           example: "d44c229e-3f21-4c94-9d45-0f8f1efb8d99"
+ *         payerName:
+ *           type: string
+ *           minLength: 2
+ *           maxLength: 100
+ *           example: "HealthSure Insurance Ltd"
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: "claims@healthsure.com"
+ *         phone:
+ *           type: string
+ *           minLength: 5
+ *           maxLength: 20
+ *           example: "+2348067891234"
+ *         insuranceTypeId:
+ *           type: string
+ *           format: uuid
+ *           example: "b21cc3f9-6e67-41a4-9215-bf97f453ac2f"
+ *         tplCode:
+ *           type: string
+ *           maxLength: 50
+ *           example: "TPL-2001"
+ *         carrierPayerId:
+ *           type: string
+ *           maxLength: 50
+ *           example: "HS-458"
+ *         address:
+ *           type: string
+ *           maxLength: 200
+ *           example: "15 Adeola Odeku Street"
+ *         city:
+ *           type: string
+ *           maxLength: 100
+ *           example: "Victoria Island"
+ *         state:
+ *           type: string
+ *           maxLength: 100
+ *           example: "Lagos"
+ *         zip:
+ *           type: string
+ *           maxLength: 20
+ *           nullable: true
+ *           example: "101241"
+ *         country:
+ *           type: string
+ *           maxLength: 100
+ *           example: "Nigeria"
+ *         isActive:
+ *           type: boolean
+ *           default: true
+ *           example: true
+ *         isDeleted:
+ *           type: boolean
+ *           default: false
+ *           example: false
+ *         serviceCodes:
+ *           type: array
+ *           minItems: 1
+ *           description: List of service codes associated with this payer
+ *           items:
+ *             type: object
+ *             required:
+ *               - code
+ *               - description
+ *               - unitCurrency
+ *               - ratePerUnit
+ *               - roundingRuleId
+ *               - billable
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 format: uuid
+ *                 description: Unique ID of this payer's service code (optional)
+ *                 example: "a5a4e3bc-3339-4b8c-9b92-9c14e813b222"
+ *               serviceCodeId:
+ *                 type: string
+ *                 description: Reference to an existing service code or alphanumeric identifier
+ *                 example: "6c9b9b3f-02c0-498b-8e7a-3e89e9e3a8f9"
+ *               code:
+ *                 type: string
+ *                 maxLength: 50
+ *                 description: Service code identifier
+ *                 example: "97151"
+ *               description:
+ *                 type: string
+ *                 maxLength: 500
+ *                 example: "Initial/periodic assessment by a BCBA, including development of treatment plan."
+ *               unitCurrency:
+ *                 type: string
+ *                 maxLength: 10
+ *                 example: "NGN"
+ *               ratePerUnit:
+ *                 type: number
+ *                 example: 5000
+ *               roundingRuleId:
+ *                 type: string
+ *                 format: uuid
+ *                 example: "b6fba91e-5a7e-4e4a-8f29-8027a22184f5"
+ *               modifiers:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: ["GT", "59"]
+ *               billable:
+ *                 type: boolean
+ *                 example: true
+ *           example:
+ *             - id: "a5a4e3bc-3339-4b8c-9b92-9c14e813b222"
+ *               serviceCodeId: "6c9b9b3f-02c0-498b-8e7a-3e89e9e3a8f9"
+ *               code: "97151"
+ *               description: "Initial/periodic assessment by a BCBA, including development of treatment plan."
+ *               unitCurrency: "NGN"
+ *               ratePerUnit: 5000
+ *               roundingRuleId: "b6fba91e-5a7e-4e4a-8f29-8027a22184f5"
+ *               modifiers: ["GT"]
+ *               billable: true
  */
 
 class PayerRoutes {
@@ -177,7 +308,7 @@ class PayerRoutes {
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/CreatePayerInput'
+         *             $ref: '#/components/schemas/CreatePayer'
          *     responses:
          *       201:
          *         description: Payer created successfully
@@ -195,7 +326,7 @@ class PayerRoutes {
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/UpdatePayerInput'
+         *             $ref: '#/components/schemas/UpdatePayer'
          *     responses:
          *       200:
          *         description: Payer updated successfully
