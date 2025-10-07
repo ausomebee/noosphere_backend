@@ -57,6 +57,7 @@ class Payer {
 
     get updatePayer() {
         return {
+            id: this.id,
             tenantId: this.tenantId,
             payerName: this.payerName,
             email: this.email,

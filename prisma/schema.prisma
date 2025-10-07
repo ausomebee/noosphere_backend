@@ -851,6 +851,8 @@ model PayerServiceCodes {
   ratePerUnit    Int
   roundingRuleId String
   billable       Boolean
+  isDeleted      Boolean @default(false)
+  isActive       Boolean @default(true)
 
   serviceCode  ServiceCodes  @relation(fields: [serviceCodeId], references: [id])
   roundingRule RoundingRules @relation(fields: [roundingRuleId], references: [id])

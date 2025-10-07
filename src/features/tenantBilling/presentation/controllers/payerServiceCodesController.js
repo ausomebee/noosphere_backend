@@ -92,15 +92,15 @@ class PayerServiceCodesController {
         });
     });
 
-    deletePayerServiceCode = expressAsyncHandler(async (req, res) => {
-        const payerServiceCode = await this.service.updatePayerServiceCode({ id: req.params.id, isDeleted: true });
+    deactivatePayerServiceCode = expressAsyncHandler(async (req, res) => {
+        const payerServiceCode = await this.service.updatePayerServiceCode({ id: req.params.id, isActive: req.params.active === "true" });
 
         if (!payerServiceCode) {
-            return res.status(500).json({ message: "Failed to delete payer service code" });
+            return res.status(500).json({ message: "Failed to deactivate payer service code" });
         }
 
         return res.status(200).json({
-            message: "Payer service code deleted successfully",
+            message: "Payer service code deactivated successfully",
             status: "ok",
             data: payerServiceCode
         });
