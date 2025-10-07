@@ -64,7 +64,7 @@ class PayerController {
 
     updatePayer = expressAsyncHandler(async (req, res) => {
         const data = req.body;
-
+console.log(data)
         const payerData = new Payer(data);
         const updatedPayer = await this.service.updatePayer(payerData.updatePayer);
 
