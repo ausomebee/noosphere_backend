@@ -3,19 +3,25 @@ import Validator from "../../../../utilities/validate.js";
 
 class PayerServiceCodesDto {
     static createPayerServiceCodeDto = (req, res, next) => {
-        const schema = Joi.object({
-            payerId: Joi.string().uuid().required(),
-            serviceCodeId: Joi.string().uuid().required(),
-            code: Joi.string().min(1).required(),
-            description: Joi.string().min(1).required(),
-            unitCurrency: Joi.string().min(1).required(),
-            ratePerUnit: Joi.string().min(1).required(),
-            roundingRuleId: Joi.string().uuid().required(),
-            modifiers: Joi.object().required(),
-            billable: Joi.boolean().required(),
-        });
+        const schema = Joi.array()
+            .items(
+                Joi.object({
+                    tenantId: Joi.string().uuid().required(),
+                    payerId: Joi.string().uuid().required(),
+                    serviceCodeId: Joi.string().uuid().allow("").optional(),
+                    code: Joi.string().required(),
+                    description: Joi.string().required(),
+                    unitCurrency: Joi.string().length(3).required(),
+                    ratePerUnit: Joi.number().required(),
+                    roundingRuleId: Joi.string().uuid().required(),
+                    modifiers: Joi.array().items(Joi.string()).required(),
+                    billable: Joi.boolean().required(),
+                })
+            )
+            .min(1)
+            .required();
 
-        Validator.validateRequest(req, next, schema);
+        return Validator.validateRequest(req, next, schema);
     };
 
     static updatePayerServiceCodeDto = (req, res, next) => {

@@ -3,21 +3,44 @@ import prismaService from "../../../../config/prisma.js";
 import PayerServiceCodesRepository from "../../infrastructure/payerServiceCodesRepository.js";
 import PayerServiceCodesService from "../../application/payerServiceCodesService.js";
 import PayerServiceCodes from "../../domain/payerServiceCodes.js";
+import ServiceCodes from "../../domain/serviceCodes.js";
+import ServiceCodesRepository from "../../infrastructure/serviceCodesRepository.js";
+import ServiceCodesService from "../../application/serviceCodesService.js";
 
 class PayerServiceCodesController {
     constructor() {
         this.prisma = prismaService.getClient();
         this.payerServiceCodesRepository = new PayerServiceCodesRepository(this.prisma.payerServiceCodes);
-        this.service = new PayerServiceCodesService({ payerServiceCodesRepository: this.payerServiceCodesRepository });
+        this.serviceCodesRepository = new ServiceCodesRepository(this.prisma.serviceCodes);
+        this.serviceCodesService = new ServiceCodesService({ serviceCodesRepository: this.serviceCodesRepository });
+        this.payerServiceCodesService = new PayerServiceCodesService({ payerServiceCodesRepository: this.payerServiceCodesRepository });
     }
 
     createPayerServiceCode = expressAsyncHandler(async (req, res) => {
         const data = req.body;
-        const payerServiceCodeData = new PayerServiceCodes(data);
-        const payerServiceCode = await this.service.createPayerServiceCode(payerServiceCodeData.createPayerServiceCode);
+        for (const sc of data) {
+            if (sc.serviceCodeId) {
+                const payerServiceCodeData = new PayerServiceCodes(sc);
+                const payerServiceCode = await this.payerServiceCodesService.createPayerServiceCode(payerServiceCodeData.createPayerServiceCode);
 
-        if (!payerServiceCode) {
-            return res.status(500).json({ message: "Failed to create payer service code" });
+                if (!payerServiceCode) {
+                    return res.status(500).json({ message: "Failed to create payer service code" });
+                }
+            } else {
+                const serviceCodeData = new ServiceCodes(sc);
+                const serviceCode = await this.serviceCodesService.createServiceCode(serviceCodeData.createServiceCodeFromPayer);
+
+                if (!serviceCode) {
+                    return res.status(500).json({ message: "Failed to create service code" });
+                }
+
+                const payerServiceCodeData = new PayerServiceCodes({ ...sc, payerId: payer.id, serviceCodeId: serviceCode.id });
+                const payerServiceCode = await this.payerServiceCodesService.createPayerServiceCode(payerServiceCodeData.createPayerServiceCode);
+
+                if (!payerServiceCode) {
+                    return res.status(500).json({ message: "Failed to create payer service code" });
+                }
+            }
         }
 
         return res.status(201).json({
