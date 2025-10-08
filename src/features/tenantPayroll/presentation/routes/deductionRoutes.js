@@ -27,9 +27,9 @@ import DeductionDto from "../dto/deductionDto.js";
  *           description: Type of the deduction item (e.g., fixed, percentage)
  *           example: "percentage"
  *         rate:
- *           type: integer
+ *           type: object
  *           description: Rate or value of the deduction
- *           example: 10
+ *           example: { amount: 10, currency: "USD" }
  *
  *     DeductionUpdateDto:
  *       type: object
@@ -52,7 +52,7 @@ import DeductionDto from "../dto/deductionDto.js";
  *           type: string
  *           description: Updated type of deduction
  *         rate:
- *           type: integer
+ *           type: object
  *           description: Updated rate
  *         isDeleted:
  *           type: boolean

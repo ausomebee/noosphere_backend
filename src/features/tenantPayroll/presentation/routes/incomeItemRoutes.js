@@ -27,9 +27,9 @@ import IncomeItemDto from "../dto/incomeItemDto.js";
  *           description: Type of the income item (e.g., fixed, variable)
  *           example: "fixed"
  *         rate:
- *           type: integer
+ *           type: object
  *           description: Rate or value of the income item
- *           example: 50000
+ *           example: { amount: 50000, currency: "USD" }
  *
  *     IncomeItemUpdateDto:
  *       type: object
@@ -52,7 +52,7 @@ import IncomeItemDto from "../dto/incomeItemDto.js";
  *           type: string
  *           description: Updated type of income item
  *         rate:
- *           type: integer
+ *           type: object
  *           description: Updated rate
  *         isDeleted:
  *           type: boolean

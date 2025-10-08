@@ -879,7 +879,7 @@ model IncomeItems {
   tenantId  String
   name      String
   type      String
-  rate      Int
+  rate      Json
   isDeleted Boolean @default(false)
   isActive  Boolean @default(true)
 
@@ -891,7 +891,7 @@ model Deductions {
   tenantId  String
   name      String
   type      String
-  rate      Int
+  rate      Json
   isDeleted Boolean @default(false)
   isActive  Boolean @default(true)
 
