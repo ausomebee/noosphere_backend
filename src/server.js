@@ -46,7 +46,10 @@ import rounding_rules_route from "./features/tenantBilling/presentation/routes/r
 import insurance_type_route from "./features/tenantBilling/presentation/routes/insuranceTypeRoutes.js";
 import payer_route from "./features/tenantBilling/presentation/routes/payerRoutes.js";
 import payer_service_codes_route from "./features/tenantBilling/presentation/routes/payerServiceCodeRoutes.js";
-
+import compensation_type_route from "./features/tenantPayroll/presentation/routes/compensationTypeRoutes.js";
+import income_item_route from "./features/tenantPayroll/presentation/routes/incomeItemRoutes.js";
+import deduction_route from "./features/tenantPayroll/presentation/routes/deductionRoutes.js";
+import payroll_cycle_route from "./features/tenantPayroll/presentation/routes/payrollCycleRoutes.js";
 
 class App {
     constructor() {
@@ -121,6 +124,10 @@ class App {
         this.app.use("/api/v1/insurance-types", insurance_type_route);
         this.app.use("/api/v1/payers", payer_route);
         this.app.use("/api/v1/payer-service-codes", payer_service_codes_route);
+        this.app.use("/api/v1/compensation-types", compensation_type_route);
+        this.app.use("/api/v1/income-items", income_item_route);
+        this.app.use("/api/v1/deductions", deduction_route);
+        this.app.use("/api/v1/payroll-cycles", payroll_cycle_route);
     }
 
     initializeErrorHandler() {
