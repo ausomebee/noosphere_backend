@@ -30,7 +30,7 @@ class PayerService {
     }
 
     async getSinglePayer(data) {
-        const payer = await this.payerRepository.findOne({ id: data.id });
+        const payer = await this.payerRepository.findAllAndPopulate({ id: data.id }, { PayerServiceCodes: true });
 
         if (!payer) {
             throw new Error("Payer not found");

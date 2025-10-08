@@ -155,6 +155,10 @@ model Tenant {
   RoundingRules              RoundingRules[]
   InsuranceType              InsuranceType[]
   Payer                      Payer[]
+  CompensationTypes          CompensationTypes[]
+  IncomeItems                IncomeItems[]
+  Deductions                 Deductions[]
+  PayrollCycles              PayrollCycles[]
 }
 
 model TenantStaff {
@@ -859,9 +863,52 @@ model PayerServiceCodes {
   payer        Payer         @relation(fields: [payerId], references: [id])
 }
 
-model AppointmentTimesheet {
-  id             String  @id @default(uuid())
-  appointmentId  String
-  tenantStaffId  String
-  
+model CompensationTypes {
+  id        String  @id @default(uuid())
+  tenantId  String
+  name      String
+  isDeleted Boolean @default(false)
+  isActive  Boolean @default(true)
+
+  tenant        Tenant          @relation(fields: [tenantId], references: [id])
+  PayrollCycles PayrollCycles[]
+}
+
+model IncomeItems {
+  id        String  @id @default(uuid())
+  tenantId  String
+  name      String
+  type      String
+  rate      Int
+  isDeleted Boolean @default(false)
+  isActive  Boolean @default(true)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model Deductions {
+  id        String  @id @default(uuid())
+  tenantId  String
+  name      String
+  type      String
+  rate      Int
+  isDeleted Boolean @default(false)
+  isActive  Boolean @default(true)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model PayrollCycles {
+  id                 String  @id @default(uuid())
+  tenantId           String
+  name               String
+  compensationTypeId String
+  interval           Int
+  startDate          String
+  autoRun            Boolean @default(false)
+  isDeleted          Boolean @default(false)
+  isActive           Boolean @default(true)
+
+  tenant           Tenant            @relation(fields: [tenantId], references: [id])
+  compensationType CompensationTypes @relation(fields: [compensationTypeId], references: [id])
 }
