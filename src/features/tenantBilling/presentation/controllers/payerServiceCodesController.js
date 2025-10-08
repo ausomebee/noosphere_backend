@@ -51,7 +51,7 @@ class PayerServiceCodesController {
     });
 
     updatePayerServiceCode = expressAsyncHandler(async (req, res) => {
-        const payerServiceCode = await this.service.updatePayerServiceCode(req.body);
+        const payerServiceCode = await this.payerServiceCodesService.updatePayerServiceCode(req.body);
 
         if (!payerServiceCode) {
             return res.status(500).json({ message: "Failed to update payer service code" });
@@ -65,7 +65,7 @@ class PayerServiceCodesController {
     });
 
     getSinglePayerServiceCode = expressAsyncHandler(async (req, res) => {
-        const payerServiceCode = await this.service.getSinglePayerServiceCode(req.params);
+        const payerServiceCode = await this.payerServiceCodesService.getSinglePayerServiceCode(req.params);
 
         if (!payerServiceCode) {
             return res.status(404).json({ message: "Payer service code not found" });
@@ -79,7 +79,7 @@ class PayerServiceCodesController {
     });
 
     getPayerServiceCodes = expressAsyncHandler(async (req, res) => {
-        const payerServiceCodes = await this.service.getPayerServiceCodes(req.params.payerId);
+        const payerServiceCodes = await this.payerServiceCodesService.getPayerServiceCodes(req.params.payerId);
 
         if (!payerServiceCodes) {
             return res.status(404).json({ message: "No payer service codes found" });
@@ -93,7 +93,7 @@ class PayerServiceCodesController {
     });
 
     deactivatePayerServiceCode = expressAsyncHandler(async (req, res) => {
-        const payerServiceCode = await this.service.updatePayerServiceCode({ id: req.params.id, isActive: req.params.active === "true" });
+        const payerServiceCode = await this.payerServiceCodesService.updatePayerServiceCode({ id: req.params.id, isActive: req.params.active === "true" });
 
         if (!payerServiceCode) {
             return res.status(500).json({ message: "Failed to deactivate payer service code" });
