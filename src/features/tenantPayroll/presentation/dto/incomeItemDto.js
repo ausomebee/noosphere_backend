@@ -7,7 +7,7 @@ class IncomeItemDto {
             tenantId: Joi.string().uuid().required(),
             name: Joi.string().min(1).required(),
             type: Joi.string().min(1).required(),
-            rate: Joi.number().required()
+            rate: Joi.object().required()
         });
 
         Validator.validateRequest(req, next, schema);
@@ -19,7 +19,7 @@ class IncomeItemDto {
             tenantId: Joi.string().uuid().required(),
             name: Joi.string().min(1),
             type: Joi.string().min(1),
-            rate: Joi.number(),
+            rate: Joi.object(),
             isDeleted: Joi.boolean(),
             isActive: Joi.boolean()
         });
