@@ -68,6 +68,20 @@ class PayrollRecordController {
             data: payrollRecords
         });
     });
+
+    getTenantPayrollRecords = expressAsyncHandler(async (req, res) => {
+        const payrollRecords = await this.service.getTenantPayrollRecords(req.params.tenantId);
+
+        if (!payrollRecords || payrollRecords.length === 0) {
+            return res.status(404).json({ message: "No payroll records found" });
+        }
+
+        return res.status(200).json({
+            message: "Payroll records fetched successfully",
+            status: "ok",
+            data: payrollRecords
+        });
+    });
 }
 
 export default PayrollRecordController;

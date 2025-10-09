@@ -142,6 +142,25 @@ class PayrollRecordRoutes {
          *         description: Payroll record retrieved successfully
          */
         this.router.get("/:id", this.controller.getSinglePayrollRecord);
+
+        /**
+         * @swagger
+         * /api/v1/payroll-records/tenant/{tenantId}:
+         *   get:
+         *     summary: Get all payroll records for a specific tenant
+         *     tags: [payroll-records]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: List of payroll records retrieved successfully
+         */
+        this.router.get("/tenant/:tenantId", this.controller.getTenantPayrollRecords);
+
     }
 
     getRouter() {
