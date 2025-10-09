@@ -911,4 +911,16 @@ model PayrollCycles {
 
   tenant           Tenant            @relation(fields: [tenantId], references: [id])
   compensationType CompensationTypes @relation(fields: [compensationTypeId], references: [id])
+  PayrollRecord    PayrollRecord[]
+}
+
+model PayrollRecord {
+  id             String @id @default(uuid())
+  payrollCycleId String
+  from           String
+  to             String
+  noOfStaff      Int
+  totalValue     Int
+
+  payrollCycle PayrollCycles @relation(fields: [payrollCycleId], references: [id])
 }

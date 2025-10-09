@@ -50,6 +50,7 @@ import compensation_type_route from "./features/tenantPayroll/presentation/route
 import income_item_route from "./features/tenantPayroll/presentation/routes/incomeItemRoutes.js";
 import deduction_route from "./features/tenantPayroll/presentation/routes/deductionRoutes.js";
 import payroll_cycle_route from "./features/tenantPayroll/presentation/routes/payrollCycleRoutes.js";
+import payroll_record_route from "./features/tenantPayroll/presentation/routes/payrollRecordRoutes.js";
 
 class App {
     constructor() {
@@ -128,6 +129,7 @@ class App {
         this.app.use("/api/v1/income-items", income_item_route);
         this.app.use("/api/v1/deductions", deduction_route);
         this.app.use("/api/v1/payroll-cycles", payroll_cycle_route);
+        this.app.use("/api/v1/payroll-records", payroll_record_route);
     }
 
     initializeErrorHandler() {
