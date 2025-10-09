@@ -5,7 +5,7 @@ class PayrollRecordService {
 
     async createPayrollRecord(data) {
         const exists = await this.payrollRecordRepository.findFirstDynamic({
-            where: { 
+            where: {
                 payrollCycleId: data.payrollCycleId,
                 from: data.from,
                 to: data.to
@@ -45,6 +45,14 @@ class PayrollRecordService {
 
     async getPayrollRecordsByCycle(payrollCycleId) {
         return await this.payrollRecordRepository.findAll({ payrollCycleId });
+    }
+
+    async getTenantPayrollRecords(tenantId) {
+        return await this.payrollRecordRepository.findAllAndPopulate({
+            payrollCycle: {
+                tenantId: tenantId
+            },
+        }, { payrollCycle: true });
     }
 }
 
