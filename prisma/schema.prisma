@@ -924,3 +924,7 @@ model PayrollRecord {
 
   payrollCycle PayrollCycles @relation(fields: [payrollCycleId], references: [id])
 }
+
+model CustomForms {
+  id String @id @default(uuid())
+}
