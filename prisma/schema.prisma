@@ -159,6 +159,8 @@ model Tenant {
   IncomeItems                IncomeItems[]
   Deductions                 Deductions[]
   PayrollCycles              PayrollCycles[]
+  Forms                      Forms[]
+  FormResponses              FormResponses[]
 }
 
 model TenantStaff {
@@ -269,9 +271,10 @@ model ClientTenant {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  tenantStaff TenantStaff @relation(fields: [createdBy], references: [id])
-  client      Client      @relation(fields: [clientId], references: [id])
-  tenant      Tenant      @relation(fields: [tenantId], references: [id])
+  tenantStaff   TenantStaff     @relation(fields: [createdBy], references: [id])
+  client        Client          @relation(fields: [clientId], references: [id])
+  tenant        Tenant          @relation(fields: [tenantId], references: [id])
+  FormResponses FormResponses[]
 
   @@unique([clientId, tenantId])
 }
@@ -925,6 +928,49 @@ model PayrollRecord {
   payrollCycle PayrollCycles @relation(fields: [payrollCycleId], references: [id])
 }
 
-model CustomForms {
-  id String @id @default(uuid())
+model Forms {
+  id       String @id @default(uuid())
+  tenantId String
+  name     String
+
+  FormFields    FormFields[]
+  tenant        Tenant          @relation(fields: [tenantId], references: [id])
+  FormResponses FormResponses[]
+}
+
+model FormFields {
+  id          String  @id @default(uuid())
+  formId      String
+  fieldType   String
+  label       String
+  placeholder String
+  options     Json?
+  isRequired  Boolean @default(false)
+  order       Int
+
+  form               Forms                @relation(fields: [formId], references: [id])
+  FormResponseFields FormResponseFields[]
+}
+
+model FormResponses {
+  id          String   @id @default(uuid())
+  formId      String
+  tenantId    String
+  submittedBy String?
+  submittedAt DateTime @default(now())
+
+  form   Forms                @relation(fields: [formId], references: [id])
+  tenant Tenant               @relation(fields: [tenantId], references: [id])
+  client ClientTenant?        @relation(fields: [submittedBy], references: [id])
+  fields FormResponseFields[]
+}
+
+model FormResponseFields {
+  id             String @id @default(uuid())
+  formResponseId String
+  formFieldId    String
+  value          String
+
+  formResponse FormResponses @relation(fields: [formResponseId], references: [id])
+  formField    FormFields    @relation(fields: [formFieldId], references: [id])
 }

@@ -51,6 +51,10 @@ import income_item_route from "./features/tenantPayroll/presentation/routes/inco
 import deduction_route from "./features/tenantPayroll/presentation/routes/deductionRoutes.js";
 import payroll_cycle_route from "./features/tenantPayroll/presentation/routes/payrollCycleRoutes.js";
 import payroll_record_route from "./features/tenantPayroll/presentation/routes/payrollRecordRoutes.js";
+import form_route from "./features/customForms/presentation/routes/formRoutes.js";
+import form_field_route from "./features/customForms/presentation/routes/formFieldRoutes.js";
+import form_response_route from "./features/customForms/presentation/routes/formResponseRoutes.js";
+import form_response_field_route from "./features/customForms/presentation/routes/formResponseFieldRoutes.js";
 
 class App {
     constructor() {
@@ -130,6 +134,10 @@ class App {
         this.app.use("/api/v1/deductions", deduction_route);
         this.app.use("/api/v1/payroll-cycles", payroll_cycle_route);
         this.app.use("/api/v1/payroll-records", payroll_record_route);
+        this.app.use("/api/v1/forms", form_route);
+        this.app.use("/api/v1/form-fields", form_field_route);
+        this.app.use("/api/v1/form_responses", form_response_route);
+        this.app.use("/api/v1/form_response-fields", form_response_field_route);
     }
 
     initializeErrorHandler() {
