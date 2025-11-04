@@ -30,6 +30,19 @@ class FormField {
             order: this.order
         };
     }
+
+    get updateFormField() {
+        return {
+            id: this.id,
+            formId: this.formId,
+            fieldType: this.fieldType,
+            label: this.label,
+            placeholder: this.placeholder,
+            options: this.options,
+            isRequired: this.isRequired,
+            order: this.order
+        };
+    }
 }
 
 export default FormField;
