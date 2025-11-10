@@ -48,7 +48,7 @@ class FormController {
         const data = req.body;
 
         const formData = new Form(data);
-        const updatedForm = await this.formService.updateForm(formData.createForm);
+        const updatedForm = await this.formService.updateForm(formData.updateForm);
 
         if (!updatedForm) {
             return res.status(404).json({ message: "Form not found or failed to update" });
@@ -57,7 +57,7 @@ class FormController {
         for (const field of data.formFields || []) {
             if (field.id) {
                 const fieldData = new FormField({ ...field, formId: data.id });
-                const updatedField = await this.formFieldService.updateFormField(fieldData.createFormField);
+                const updatedField = await this.formFieldService.updateFormField(fieldData.updateFormField);
 
                 if (!updatedField) {
                     return res.status(500).json({ message: "Failed to update form field" });
