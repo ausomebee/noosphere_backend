@@ -4,6 +4,7 @@ class FormFieldService {
     }
 
     async createFormField(data) {
+        console.log(data)
         const fieldExists = await this.formFieldRepository.findFirstDynamic({
             where: { label: data.label, formId: data.formId },
             select: { label: true }

@@ -5,7 +5,7 @@ class FormResponseFieldDto {
     static createFormResponseFieldDto = (req, res, next) => {
         const schema = Joi.object({
             formResponseId: Joi.string().uuid().required(),
-            fieldId: Joi.string().uuid().required(),
+            formFieldId: Joi.string().uuid().required(),
             value: Joi.alternatives()
                 .try(Joi.string(), Joi.number(), Joi.boolean(), Joi.array())
                 .required()
@@ -20,8 +20,6 @@ class FormResponseFieldDto {
                 "any.required": "Form Response Field ID is required for update",
                 "string.guid": "Form Response Field ID must be a valid UUID"
             }),
-            formResponseId: Joi.string().uuid().required(),
-            fieldId: Joi.string().uuid().required(),
             value: Joi.alternatives()
                 .try(Joi.string(), Joi.number(), Joi.boolean(), Joi.array())
                 .required()

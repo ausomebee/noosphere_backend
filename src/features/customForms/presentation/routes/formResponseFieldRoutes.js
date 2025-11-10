@@ -9,11 +9,11 @@ import FormResponseFieldsController from "../controllers/formResponseFieldsContr
  *     FormResponseFieldCreateDto:
  *       type: object
  *       required:
- *         - responseId
+ *         - formResponseId
  *         - formFieldId
  *         - value
  *       properties:
- *         responseId:
+ *         formResponseId:
  *           type: string
  *           format: uuid
  *           description: The form response ID this field belongs to
@@ -111,13 +111,13 @@ class FormResponseFieldRoutes {
 
         /**
          * @swagger
-         * /api/v1/form-response-fields/response/{responseId}:
+         * /api/v1/form-response-fields/response/{formResponseId}:
          *   get:
          *     summary: Get all form response fields for a specific form response
          *     tags: [form-response-fields]
          *     parameters:
          *       - in: path
-         *         name: responseId
+         *         name: formResponseId
          *         required: true
          *         schema:
          *           type: string
@@ -125,7 +125,7 @@ class FormResponseFieldRoutes {
          *       200:
          *         description: List of form response fields fetched successfully
          */
-        this.router.get("/response/:responseId", this.controller.getFormResponseFields.bind(this.controller));
+        this.router.get("/response/:formResponseId", this.controller.getFormResponseFields.bind(this.controller));
     }
 
     getRouter() {

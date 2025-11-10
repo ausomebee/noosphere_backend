@@ -136,8 +136,8 @@ class App {
         this.app.use("/api/v1/payroll-records", payroll_record_route);
         this.app.use("/api/v1/forms", form_route);
         this.app.use("/api/v1/form-fields", form_field_route);
-        this.app.use("/api/v1/form_responses", form_response_route);
-        this.app.use("/api/v1/form_response-fields", form_response_field_route);
+        this.app.use("/api/v1/form-responses", form_response_route);
+        this.app.use("/api/v1/form-response-fields", form_response_field_route);
     }
 
     initializeErrorHandler() {

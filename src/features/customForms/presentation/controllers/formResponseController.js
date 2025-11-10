@@ -29,7 +29,7 @@ class FormResponseController {
         }
 
         for (const field of data.responseFields || []) {
-            const fieldData = new FormResponseField({ ...field, responseId: response.id });
+            const fieldData = new FormResponseField({ ...field, formResponseId: response.id });
             const responseField = await this.formResponseFieldService.createFormResponseField(fieldData.createFormResponseField);
 
             if (!responseField) {
@@ -48,7 +48,7 @@ class FormResponseController {
         const data = req.body;
 
         const formResponseData = new FormResponse(data);
-        const updatedResponse = await this.formResponseService.updateFormResponse(formResponseData.createFormResponse);
+        const updatedResponse = await this.formResponseService.updateFormResponse(formResponseData.updateFormResponse);
 
         if (!updatedResponse) {
             return res.status(404).json({ message: "Form response not found or failed to update" });
@@ -56,8 +56,8 @@ class FormResponseController {
 
         for (const field of data.responseFields || []) {
             if (field.id) {
-                const fieldData = new FormResponseField({ ...field, responseId: data.id });
-                const updatedField = await this.formResponseFieldService.updateFormResponseField(fieldData.createFormResponseField);
+                const fieldData = new FormResponseField({ ...field, formResponseId: data.id });
+                const updatedField = await this.formResponseFieldService.updateFormResponseField(fieldData.updateFormResponseField);
 
                 if (!updatedField) {
                     return res.status(500).json({ message: "Failed to update form response field" });
@@ -93,8 +93,8 @@ class FormResponseController {
         });
     });
 
-    getTenantFormResponses = expressAsyncHandler(async (req, res) => {
-        const responses = await this.formResponseService.getTenantFormResponses(req.params.tenantId);
+    getFormResponses = expressAsyncHandler(async (req, res) => {
+        const responses = await this.formResponseService.getFormResponses(req.params.formId);
 
         if (!responses) {
             return res.status(404).json({ message: "No form responses found" });

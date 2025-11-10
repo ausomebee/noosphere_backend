@@ -12,7 +12,6 @@ class FormFieldsController {
     async createFormField(req, res) {
         try {
             const data = req.body;
-
             const formField = await this.formFieldService.createFormField(data);
 
             return res.status(201).json({
