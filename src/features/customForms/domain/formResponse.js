@@ -14,7 +14,6 @@ class FormResponse {
             tenantId: this.tenantId,
             submittedBy: this.submittedBy,
             submittedAt: this.submittedAt,
-            responseFields: this.responseFields
         };
     }
 

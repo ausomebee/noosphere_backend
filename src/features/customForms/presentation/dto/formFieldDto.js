@@ -24,7 +24,6 @@ class FormFieldDto {
                 "any.required": "Form Field ID is required for update",
                 "string.guid": "Form Field ID must be a valid UUID"
             }),
-            formId: Joi.string().uuid().required(),
             fieldType: Joi.string()
                 .valid("text", "number", "email", "date", "select", "checkbox", "radio", "textarea")
                 .optional(),

@@ -12,6 +12,8 @@ import FormFieldsDto from "../dto/formFieldDto.js";
  *         - tenantId
  *         - formId
  *         - label
+ *         - placeholder
+ *         - order
  *         - fieldType
  *       properties:
  *         tenantId:
@@ -22,6 +24,14 @@ import FormFieldsDto from "../dto/formFieldDto.js";
  *           type: string
  *           format: uuid
  *           description: The form ID this field belongs to
+ *         placeholder:
+ *           type: string
+ *           description: Placeholder text for the form field
+ *           example: "Enter your full name"
+ *         order:
+ *           type: integer
+ *           description: Order of the field in the form
+ *           example: 1
  *         label:
  *           type: string
  *           description: Label of the form field
@@ -45,15 +55,15 @@ import FormFieldsDto from "../dto/formFieldDto.js";
  *       type: object
  *       required:
  *         - id
- *         - tenantId
+ *         - placeholder
+ *         - order
  *       properties:
  *         id:
  *           type: string
  *           format: uuid
  *           description: Unique form field ID
- *         tenantId:
- *           type: string
- *           format: uuid
+ *         order:
+ *           type: integer
  *         label:
  *           type: string
  *         fieldType:
@@ -62,6 +72,8 @@ import FormFieldsDto from "../dto/formFieldDto.js";
  *           type: array
  *           items:
  *             type: string
+ *         placeholder:
+ *           type: string
  *         isRequired:
  *           type: boolean
  *         isDeleted:
@@ -94,7 +106,7 @@ class FormFieldsRoutes {
 		 *       201:
 		 *         description: Form field created successfully
 		 */
-		this.router.post("/", FormFieldsDto.createFormFieldDto, this.controller.createFormField);
+		this.router.post("/", FormFieldsDto.createFormFieldDto, this.controller.createFormField.bind(this.controller));
 
 		/**
 		 * @swagger
@@ -112,7 +124,7 @@ class FormFieldsRoutes {
 		 *       200:
 		 *         description: Form field updated successfully
 		 */
-		this.router.put("/", FormFieldsDto.updateFormFieldDto, this.controller.updateFormField);
+		this.router.put("/", FormFieldsDto.updateFormFieldDto, this.controller.updateFormField.bind(this.controller));
 
 		/**
 		 * @swagger
@@ -130,7 +142,7 @@ class FormFieldsRoutes {
 		 *       200:
 		 *         description: List of form fields for the given form
 		 */
-		this.router.get("/form/:formId", this.controller.getFormFields);
+		this.router.get("/form/:formId", this.controller.getFormFields.bind(this.controller));
 
 		/**
 		 * @swagger
@@ -148,7 +160,7 @@ class FormFieldsRoutes {
 		 *       200:
 		 *         description: Form field fetched successfully
 		 */
-		this.router.get("/:id", this.controller.getSingleFormField);
+		this.router.get("/:id", this.controller.getSingleFormField.bind(this.controller));
 
 		// /**
 		//  * @swagger

@@ -10,7 +10,7 @@ class FormResponseDto {
             responseFields: Joi.array()
                 .items(
                     Joi.object({
-                        fieldId: Joi.string().uuid().required(),
+                        formFieldId: Joi.string().uuid().required(),
                         value: Joi.alternatives()
                             .try(Joi.string(), Joi.number(), Joi.boolean(), Joi.array())
                             .required(),
@@ -29,14 +29,12 @@ class FormResponseDto {
                 "any.required": "Form Response ID is required for update",
                 "string.guid": "Form Response ID must be a valid UUID"
             }),
-            formId: Joi.string().uuid().required(),
-            tenantId: Joi.string().uuid().required(),
             submittedBy: Joi.string().min(2).max(150).optional(),
             responseFields: Joi.array()
                 .items(
                     Joi.object({
                         id: Joi.string().uuid().optional(),
-                        fieldId: Joi.string().uuid().required(),
+                        formFieldId: Joi.string().uuid().required(),
                         value: Joi.alternatives()
                             .try(Joi.string(), Joi.number(), Joi.boolean(), Joi.array())
                             .required(),

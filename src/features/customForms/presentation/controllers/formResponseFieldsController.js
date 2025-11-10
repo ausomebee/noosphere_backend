@@ -65,9 +65,9 @@ class FormResponseFieldsController {
 
     async getFormResponseFields(req, res) {
         try {
-            const responseId = req.params.responseId;
+            const formResponseId = req.params.formResponseId;
 
-            const fields = await this.formResponseFieldService.getFormResponseFields(responseId);
+            const fields = await this.formResponseFieldService.getResponseFieldsByResponseId(formResponseId);
 
             return res.status(200).json({
                 message: "Form response fields fetched successfully",

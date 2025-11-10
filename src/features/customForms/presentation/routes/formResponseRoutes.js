@@ -11,6 +11,7 @@ import FormResponseController from "../controllers/formResponseController.js";
  *       required:
  *         - formId
  *         - tenantId
+ *         - submittedBy
  *       properties:
  *         formId:
  *           type: string
@@ -20,6 +21,9 @@ import FormResponseController from "../controllers/formResponseController.js";
  *           type: string
  *           format: uuid
  *           description: Tenant identifier
+ *         submittedBy:
+ *           type: string
+ *           description: Identifier of the user who submitted the form response
  *         responseFields:
  *           type: array
  *           description: Array of response field entries
@@ -39,16 +43,11 @@ import FormResponseController from "../controllers/formResponseController.js";
  *       type: object
  *       required:
  *         - id
- *         - tenantId
  *       properties:
  *         id:
  *           type: string
  *           format: uuid
  *           description: Unique form response identifier
- *         tenantId:
- *           type: string
- *           format: uuid
- *           description: Tenant identifier
  *         responseFields:
  *           type: array
  *           items:
@@ -130,21 +129,21 @@ class FormResponseRoutes {
 
         /**
          * @swagger
-         * /api/v1/form-responses/tenant/{tenantId}:
+         * /api/v1/form-responses/form/{formId}:
          *   get:
-         *     summary: Get all form responses for a specific tenant
+         *     summary: Get all form responses for a specific form
          *     tags: [form-responses]
          *     parameters:
          *       - in: path
-         *         name: tenantId
+         *         name: formId
          *         required: true
          *         schema:
          *           type: string
          *     responses:
          *       200:
-         *         description: Tenant form responses fetched successfully
+         *         description: form form responses fetched successfully
          */
-        this.router.get("/tenant/:tenantId", this.controller.getTenantFormResponses);
+        this.router.get("/form/:formId", this.controller.getFormResponses);
 
         /**
          * @swagger

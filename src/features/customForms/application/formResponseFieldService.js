@@ -43,8 +43,8 @@ class FormResponseFieldService {
         return field;
     }
 
-    async getResponseFieldsByResponseId(responseId) {
-        const fields = await this.formResponseFieldRepository.findAll({ responseId });
+    async getResponseFieldsByResponseId(formResponseId) {
+        const fields = await this.formResponseFieldRepository.findAll({ formResponseId });
 
         if (!fields) {
             throw new Error("Form Response Fields not found");
