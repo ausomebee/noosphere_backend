@@ -1,9 +1,10 @@
 class Form {
-    constructor({ id, tenantId, name, isDraft }) {
+    constructor({ id, tenantId, name, isDraft, isTemplate }) {
         this.id = id;
         this.tenantId = tenantId;
         this.name = name;
-        this.isDraft     = isDraft;
+        this.isDraft = isDraft;
+        this.isTemplate = isTemplate;
     }
 
     get createForm() {
@@ -11,6 +12,7 @@ class Form {
             tenantId: this.tenantId,
             name: this.name,
             isDraft: this.isDraft,
+            isTemplate: this.isTemplate
         };
     }
 
@@ -20,6 +22,7 @@ class Form {
             tenantId: this.tenantId,
             name: this.name,
             isDraft: this.isDraft,
+            isTemplate: this.isTemplate
         };
     }
 }

@@ -929,12 +929,13 @@ model PayrollRecord {
 }
 
 model Forms {
-  id        String   @id @default(uuid())
-  tenantId  String
-  name      String
-  isDraft   Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(uuid())
+  tenantId   String
+  name       String
+  isDraft    Boolean  @default(false)
+  isTemplate Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   FormFields    FormFields[]
   tenant        Tenant          @relation(fields: [tenantId], references: [id])

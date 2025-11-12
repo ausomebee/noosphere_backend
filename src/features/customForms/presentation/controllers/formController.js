@@ -95,6 +95,34 @@ class FormController {
         });
     });
 
+    duplicateForm = expressAsyncHandler(async (req, res) => {
+        const form = await this.formService.getSingleForm({ id: req.params.id });
+
+        if (!form) {
+            return res.status(404).json({ message: "Form not found" });
+        }
+
+        const formFields = await this.formFieldService.getFormFields(form.id);
+
+        const formData = new Form({ ...form, name: `${form.name} copy` });
+        const newForm = await this.formService.createForm(formData.createForm);
+
+        for (const field of formFields || []) {
+            const fieldData = new FormField({ ...field, formId: newForm.id });
+            const formField = await this.formFieldService.createFormField(fieldData.createFormField);
+
+            if (!formField) {
+                return res.status(500).json({ message: "Failed to create form field" });
+            }
+        }
+
+        return res.status(200).json({
+            message: "Form fetched successfully",
+            status: "ok",
+            data: newForm
+        });
+    });
+
     getTenantForms = expressAsyncHandler(async (req, res) => {
         const forms = await this.formService.getTenantForms(req.params.tenantId);
 
@@ -104,6 +132,34 @@ class FormController {
 
         return res.status(200).json({
             message: "Forms fetched successfully",
+            status: "ok",
+            data: forms
+        });
+    });
+
+    getTenantDrafts = expressAsyncHandler(async (req, res) => {
+        const forms = await this.formService.getTenantDrafts(req.params.tenantId);
+
+        if (!forms) {
+            return res.status(404).json({ message: "No forms found" });
+        }
+
+        return res.status(200).json({
+            message: "Drafts fetched successfully",
+            status: "ok",
+            data: forms
+        });
+    });
+
+    getTenantTemplates = expressAsyncHandler(async (req, res) => {
+        const forms = await this.formService.getTenantTemplates(req.params.tenantId);
+
+        if (!forms) {
+            return res.status(404).json({ message: "No forms found" });
+        }
+
+        return res.status(200).json({
+            message: "Templates fetched successfully",
             status: "ok",
             data: forms
         });

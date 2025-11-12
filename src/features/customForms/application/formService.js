@@ -60,6 +60,36 @@ class FormService {
 
         return forms;
     }
+
+    async getTenantDrafts(tenantId) {
+        const forms = await this.formRepository.findAll({
+            AND: [
+                { tenantId: tenantId },
+                { isDraft: true }
+            ]
+        });
+
+        if (!forms) {
+            throw new Error("Forms not found");
+        }
+
+        return forms;
+    }
+
+    async getTenantTemplates(tenantId) {
+        const forms = await this.formRepository.findAll({
+            AND: [
+                { tenantId: tenantId },
+                { isTemplate: true }
+            ]
+        });
+
+        if (!forms) {
+            throw new Error("Forms not found");
+        }
+
+        return forms;
+    }
 }
 
 export default FormService;
