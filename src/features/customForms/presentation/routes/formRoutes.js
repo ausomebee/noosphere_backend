@@ -20,6 +20,8 @@ import FormController from "../controllers/formController.js";
  *           type: string
  *           description: Form name
  *           example: "Patient Intake Form"
+ *         isDraft:
+ *           type: boolean
  *         formFields:
  *           type: array
  *           description: Array of form fields for the form
@@ -60,6 +62,8 @@ import FormController from "../controllers/formController.js";
  *           type: string
  *           format: uuid
  *           description: Unique form identifier
+ *         isDraft:
+ *           type: boolean
  *         tenantId:
  *           type: string
  *           format: uuid
@@ -175,9 +179,9 @@ class FormRoutes {
 
         /**
          * @swagger
-         * /api/v1/forms/{id}/{active}:
+         * /api/v1/forms/{id}/{delete}:
          *   patch:
-         *     summary: Deactivate or activate a form
+         *     summary: delete or restore a form
          *     tags: [forms]
          *     parameters:
          *       - in: path
@@ -192,9 +196,9 @@ class FormRoutes {
          *           type: boolean
          *     responses:
          *       200:
-         *         description: Form activation status updated successfully
+         *         description: Form deleted successfully
          */
-        this.router.patch("/:id/:active", this.controller.deactivateForm);
+        this.router.patch("/:id/:delete", this.controller.deactivateForm);
     }
 
     getRouter() {

@@ -6,6 +6,7 @@ class FormDto {
         const schema = Joi.object({
             tenantId: Joi.string().uuid().required(),
             name: Joi.string().min(2).max(150).required(),
+            isDraft: Joi.boolean().default(false),
             formFields: Joi.array()
                 .items(
                     Joi.object({
@@ -34,6 +35,7 @@ class FormDto {
             }),
             tenantId: Joi.string().uuid().required(),
             name: Joi.string().min(2).max(150).optional(),
+            isDraft: Joi.boolean().default(false),
             formFields: Joi.array()
                 .items(
                     Joi.object({
