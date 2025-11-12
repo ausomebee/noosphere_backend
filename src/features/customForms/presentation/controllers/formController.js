@@ -86,10 +86,12 @@ class FormController {
             return res.status(404).json({ message: "Form not found" });
         }
 
+        const formFields = await this.formFieldService.getFormFields({ formId: form.id });
+
         return res.status(200).json({
             message: "Form fetched successfully",
             status: "ok",
-            data: form
+            data: { form, formFields }
         });
     });
 
@@ -110,7 +112,7 @@ class FormController {
     deactivateForm = expressAsyncHandler(async (req, res) => {
         const form = await this.formService.updateForm({
             id: req.params.id,
-            isDeleted: req.params.deleted === "true"
+            isDeleted: req.params.delete === "true"
         });
 
         if (!form) {
