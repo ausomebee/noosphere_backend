@@ -22,6 +22,8 @@ import FormController from "../controllers/formController.js";
  *           example: "Patient Intake Form"
  *         isDraft:
  *           type: boolean
+ *         isTemplate:
+ *           type: boolean
  *         formFields:
  *           type: array
  *           description: Array of form fields for the form
@@ -63,6 +65,8 @@ import FormController from "../controllers/formController.js";
  *           format: uuid
  *           description: Unique form identifier
  *         isDraft:
+ *           type: boolean
+ *         isTemplate:
  *           type: boolean
  *         tenantId:
  *           type: string
@@ -161,6 +165,42 @@ class FormRoutes {
 
         /**
          * @swagger
+         * /api/v1/forms/tenant/drafts/{tenantId}:
+         *   get:
+         *     summary: Get all drafts for a tenant
+         *     tags: [forms]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: List of tenant forms
+         */
+        this.router.get("/tenant/drafts/:tenantId", this.controller.getTenantDrafts);
+
+        /**
+         * @swagger
+         * /api/v1/forms/tenant/templates/{tenantId}:
+         *   get:
+         *     summary: Get all templates for a tenant
+         *     tags: [forms]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: List of tenant forms
+         */
+        this.router.get("/tenant/templates/:tenantId", this.controller.getTenantTemplates);
+
+        /**
+         * @swagger
          * /api/v1/forms/{id}:
          *   get:
          *     summary: Get a single form with its fields
@@ -176,6 +216,24 @@ class FormRoutes {
          *         description: Form fetched successfully
          */
         this.router.get("/:id", this.controller.getSingleForm);
+
+        /**
+         * @swagger
+         * /api/v1/forms/duplicate/{id}:
+         *   get:
+         *     summary: duplicate form 
+         *     tags: [forms]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: Form duplicated successfully
+         */
+        this.router.post("/duplicate/:id", this.controller.duplicateForm);
 
         /**
          * @swagger
