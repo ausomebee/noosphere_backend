@@ -86,7 +86,7 @@ class FormController {
             return res.status(404).json({ message: "Form not found" });
         }
 
-        const formFields = await this.formFieldService.getFormFields({ formId: form.id });
+        const formFields = await this.formFieldService.getFormFields(form.id);
 
         return res.status(200).json({
             message: "Form fetched successfully",
