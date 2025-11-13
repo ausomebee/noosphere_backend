@@ -22,8 +22,10 @@ import FormController from "../controllers/formController.js";
  *           example: "Patient Intake Form"
  *         isDraft:
  *           type: boolean
+ *           description: Whether the form is saved as a draft
  *         isTemplate:
  *           type: boolean
+ *           description: Whether the form is a reusable template
  *         formFields:
  *           type: array
  *           description: Array of form fields for the form
@@ -32,7 +34,7 @@ import FormController from "../controllers/formController.js";
  *             properties:
  *               fieldType:
  *                 type: string
- *                 enum: [text, number, email, date, select, checkbox, radio, textarea]
+ *                 enum: [text, number, email, date, select, checkbox, radio, textarea, fileUpload, starRating, signature]
  *                 description: Type of form field
  *               label:
  *                 type: string
@@ -44,9 +46,24 @@ import FormController from "../controllers/formController.js";
  *                 example: "Enter your email"
  *               options:
  *                 type: array
+ *                 description: Options for select, radio, or checkbox fields
  *                 items:
  *                   type: string
- *                 description: Options for select, radio, or checkbox fields
+ *               fileUpload:
+ *                 type: array
+ *                 description: File upload field configuration (if applicable)
+ *                 items:
+ *                   type: string
+ *               starRating:
+ *                 type: array
+ *                 description: Star rating field configuration (if applicable)
+ *                 items:
+ *                   type: integer
+ *               signature:
+ *                 type: array
+ *                 description: Signature field configuration (if applicable)
+ *                 items:
+ *                   type: string
  *               isRequired:
  *                 type: boolean
  *                 description: Whether the field is mandatory
@@ -64,10 +81,6 @@ import FormController from "../controllers/formController.js";
  *           type: string
  *           format: uuid
  *           description: Unique form identifier
- *         isDraft:
- *           type: boolean
- *         isTemplate:
- *           type: boolean
  *         tenantId:
  *           type: string
  *           format: uuid
@@ -75,8 +88,15 @@ import FormController from "../controllers/formController.js";
  *         name:
  *           type: string
  *           description: Updated name of the form
+ *         isDraft:
+ *           type: boolean
+ *           description: Whether the form is saved as a draft
+ *         isTemplate:
+ *           type: boolean
+ *           description: Whether the form is a reusable template
  *         formFields:
  *           type: array
+ *           description: Array of form fields for update
  *           items:
  *             type: object
  *             properties:
@@ -86,13 +106,31 @@ import FormController from "../controllers/formController.js";
  *                 description: Unique field ID (for existing fields)
  *               fieldType:
  *                 type: string
- *                 enum: [text, number, email, date, select, checkbox, radio, textarea]
+ *                 enum: [text, number, email, date, select, checkbox, radio, textarea, fileUpload, starRating, signature]
+ *                 description: Type of form field
  *               label:
  *                 type: string
+ *                 description: Field label
  *               placeholder:
  *                 type: string
  *               options:
  *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Options for select, radio, or checkbox fields
+ *               fileUpload:
+ *                 type: array
+ *                 description: File upload field configuration
+ *                 items:
+ *                   type: string
+ *               starRating:
+ *                 type: array
+ *                 description: Star rating field configuration
+ *                 items:
+ *                   type: integer
+ *               signature:
+ *                 type: array
+ *                 description: Signature field configuration
  *                 items:
  *                   type: string
  *               isRequired:
