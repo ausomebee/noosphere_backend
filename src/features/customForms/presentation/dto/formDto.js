@@ -12,7 +12,6 @@ class FormDto {
                 .items(
                     Joi.object({
                         fieldType: Joi.string()
-                            .valid("text", "number", "email", "date", "select", "checkbox", "radio", "textarea")
                             .required(),
                         label: Joi.string().min(2).max(100).required(),
                         placeholder: Joi.string().allow(null, ""),
@@ -43,7 +42,6 @@ class FormDto {
                     Joi.object({
                         id: Joi.string().uuid().optional(),
                         fieldType: Joi.string()
-                            .valid("text", "number", "email", "date", "select", "checkbox", "radio", "textarea")
                             .optional(),
                         label: Joi.string().min(2).max(100).optional(),
                         placeholder: Joi.string().allow(null, ""),
