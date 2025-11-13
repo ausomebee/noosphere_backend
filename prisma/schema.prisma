@@ -949,6 +949,9 @@ model FormFields {
   label       String
   placeholder String
   options     Json?
+  fileUpload  Json?
+  starRating  Json?
+  signature   Json?
   isRequired  Boolean @default(false)
   order       Int
 

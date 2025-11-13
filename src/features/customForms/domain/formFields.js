@@ -1,13 +1,16 @@
 class FormField {
-    constructor({ 
-        id, 
-        formId, 
-        fieldType, 
-        label, 
-        placeholder, 
-        options, 
-        isRequired, 
-        order 
+    constructor({
+        id,
+        formId,
+        fieldType,
+        label,
+        placeholder,
+        options,
+        isRequired,
+        order,
+        fileUpload,
+        starRating,
+        signature,
     }) {
         this.id = id;
         this.formId = formId;
@@ -17,6 +20,9 @@ class FormField {
         this.options = options;
         this.isRequired = isRequired;
         this.order = order;
+        this.fileUpload = fileUpload;
+        this.starRating = starRating;
+        this.signature = signature;
     }
 
     get createFormField() {
@@ -26,6 +32,9 @@ class FormField {
             label: this.label,
             placeholder: this.placeholder,
             options: this.options,
+            fileUpload: this.fileUpload,
+            starRating: this.starRating,
+            signature: this.signature,
             isRequired: this.isRequired,
             order: this.order
         };
@@ -40,6 +49,9 @@ class FormField {
             placeholder: this.placeholder,
             options: this.options,
             isRequired: this.isRequired,
+            fileUpload: this.fileUpload,
+            starRating: this.starRating,
+            signature: this.signature,
             order: this.order
         };
     }
