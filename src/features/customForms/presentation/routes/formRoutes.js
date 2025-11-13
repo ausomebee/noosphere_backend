@@ -220,7 +220,7 @@ class FormRoutes {
         /**
          * @swagger
          * /api/v1/forms/duplicate/{id}:
-         *   get:
+         *   post:
          *     summary: duplicate form 
          *     tags: [forms]
          *     parameters:
