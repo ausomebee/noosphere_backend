@@ -32,6 +32,8 @@ class FormService {
         const update = await this.formRepository.update(data.id, {
             name: data.name || form.name,
             tenantId: data.tenantId || form.tenantId,
+            isDraft: data.isDraft ?? form.isDraft,
+            isTemplate: data.isTemplate ?? form.isTemplate
         });
 
         if (!update) {

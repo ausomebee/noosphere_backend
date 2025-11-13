@@ -20,7 +20,7 @@ class FormController {
 
     createForm = expressAsyncHandler(async (req, res) => {
         const data = req.body;
-console.log(data.formFields[9])
+
         const formData = new Form(data);
         const form = await this.formService.createForm(formData.createForm);
 
