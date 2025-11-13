@@ -16,6 +16,9 @@ class FormDto {
                         label: Joi.string().min(2).max(100).required(),
                         placeholder: Joi.string().allow(null, ""),
                         options: Joi.array().items(Joi.string()).optional(),
+                        fileUpload: Joi.array().optional(),
+                        starRating: Joi.array().optional(),
+                        signature: Joi.array().optional(),
                         isRequired: Joi.boolean().default(false),
                         order: Joi.number().integer().min(1).optional()
                     })
@@ -46,6 +49,9 @@ class FormDto {
                         label: Joi.string().min(2).max(100).optional(),
                         placeholder: Joi.string().allow(null, ""),
                         options: Joi.array().items(Joi.string()).optional(),
+                        fileUpload: Joi.array().optional(),
+                        starRating: Joi.array().optional(),
+                        signature: Joi.array().optional(),
                         isRequired: Joi.boolean().default(false),
                         order: Joi.number().integer().min(1).optional()
                     })
