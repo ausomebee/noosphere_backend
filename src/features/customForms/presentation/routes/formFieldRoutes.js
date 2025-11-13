@@ -42,10 +42,14 @@ import FormFieldsDto from "../dto/formFieldDto.js";
  *           example: "text"
  *         options:
  *           type: array
- *           items:
- *             type: string
  *           description: Options for dropdown or checkbox fields
  *           example: ["Option 1", "Option 2"]
+ *         fileUpload:
+ *           type: array
+ *         starRating:
+ *           type: array
+ *         signature:
+ *           type: array
  *         isRequired:
  *           type: boolean
  *           description: Whether this field is mandatory
@@ -72,6 +76,12 @@ import FormFieldsDto from "../dto/formFieldDto.js";
  *           type: array
  *           items:
  *             type: string
+ *         fileUpload:
+ *           type: array
+ *         starRating:
+ *           type: array
+ *         signature:
+ *           type: array
  *         placeholder:
  *           type: string
  *         isRequired:
