@@ -1,38 +1,110 @@
 class Client {
-    constructor({ id, fullName, createdBy, email, phoneNumber, stage, password, tenantId, DOB, gender, clientId, dbAccess, streetAddress, city, state, country, zipCode, pipelineStageId, ass }) {
+    constructor({
+        id,
+        firstName,
+        lastName,
+        preferredName,
+        email,
+        phoneNumber,
+        DOB,
+        gender,
+        primaryPayer,
+        streetAddress,
+        city,
+        state,
+        country,
+        zipCode,
+        tenantId,
+
+        caregiverName,
+        caregiverRelationship,
+        caregiverPhone,
+        caregiverEmail,
+        caregiverStreetAddress,
+        caregiverCity,
+        caregiverState,
+        caregiverCountry,
+        caregiverZip,
+        createdBy,
+        documents,
+        clientPortalAccess,
+        stage,
+        isVerified,
+        isDeleted,
+        createdAt,
+        updatedAt,
+        password
+    }) {
         this.id = id;
-        this.fullName = fullName;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.preferredName = preferredName;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.stage = stage;
-        this.password = password;
-        this.tenantId = tenantId;
         this.DOB = DOB;
         this.gender = gender;
-        this.clientId = clientId;
-        this.dbAccess = dbAccess;
+        this.primaryPayer = primaryPayer;
         this.streetAddress = streetAddress;
         this.city = city;
         this.state = state;
         this.country = country;
         this.zipCode = zipCode;
-        this.pipelineStageId = pipelineStageId;
+
+        this.caregiverName = caregiverName;
+        this.caregiverRelationship = caregiverRelationship;
+        this.caregiverPhone = caregiverPhone;
+        this.caregiverEmail = caregiverEmail;
+        this.caregiverStreetAddress = caregiverStreetAddress;
+        this.caregiverCity = caregiverCity;
+        this.caregiverState = caregiverState;
+        this.caregiverCountry = caregiverCountry;
+        this.caregiverZip = caregiverZip;
+
+        this.documents = documents;
+        this.dbAccess = clientPortalAccess;
+        this.stage = stage;
+        this.isVerified = isVerified ?? false;
+        this.isDeleted = isDeleted ?? false;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.password = password;
+        this.tenantId = tenantId;
         this.createdBy = createdBy;
     }
 
     get createClient() {
         return {
-            fullName: this.fullName,
+            id: this.id,
+            firstName: this.firstName,
+            lastName: this.lastName,
+            preferredName: this.preferredName,
+
             email: this.email,
             phoneNumber: this.phoneNumber,
-            password: this.password,
+
             DOB: this.DOB,
             gender: this.gender,
+            primaryPayer: this.primaryPayer,
+
             streetAddress: this.streetAddress,
             city: this.city,
             state: this.state,
             country: this.country,
-            zipCode: this.zipCode
+            zipCode: this.zipCode,
+
+            caregiverName: this.caregiverName,
+            caregiverRelationship: this.caregiverRelationship,
+            caregiverPhone: this.caregiverPhone,
+            caregiverEmail: this.caregiverEmail,
+            caregiverStreetAddress: this.caregiverStreetAddress,
+            caregiverCity: this.caregiverCity,
+            caregiverState: this.caregiverState,
+            caregiverCountry: this.caregiverCountry,
+            caregiverZip: this.caregiverZip,
+
+            documents: this.documents,
+
+            password: this.password,
         };
     }
 

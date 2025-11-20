@@ -33,8 +33,6 @@ class Pipeline {
     get createStage() {
         return {
             pipelineId: this.pipelineId,
-            tasks: this.tasks,
-            documents: this.documents,
             name: this.name,
             colourCode: this.colourCode,
             order: this.order,

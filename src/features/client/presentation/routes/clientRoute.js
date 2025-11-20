@@ -1,7 +1,6 @@
 import express from "express";
 import ClientController from "../controllers/clientController.js";
 import ClientDto from "../dto/clientDto.js";
-
 /**
  * @swagger
  * components:
@@ -9,82 +8,114 @@ import ClientDto from "../dto/clientDto.js";
  *     CreateClientDto:
  *       type: object
  *       required:
- *         - fullName
+ *         - firstName
+ *         - lastName
  *         - email
- *         - streetAddress
- *         - city
- *         - state
- *         - country
- *         - zipCode
  *         - phoneNumber
- *         - stage
  *         - gender
- *         - DOB
  *         - tenantId
  *         - pipelineStageId
- *         - assignToTenantStaff
- *         - dbAccess
- *         - createdBy
+ *         - stage
  *       properties:
- *         fullName:
+ *         firstName:
  *           type: string
- *           minLength: 3
- *           maxLength: 20
- *           example: John Doe
+ *           example: "John"
+ *         stage:
+ *           type: string
+ *           example: "John"
+ *         lastName:
+ *           type: string
+ *           example: "Doe"
+ *         preferredName:
+ *           type: string
+ *           example: "Johnny"
  *         email:
  *           type: string
  *           format: email
- *           example: johndoe@example.com
- *         streetAddress:
- *           type: string
- *           example: 123 Banana Street
- *         city:
- *           type: string
- *           example: Lagos
- *         state:
- *           type: string
- *           example: Lagos State
- *         country:
- *           type: string
- *           example: Nigeria
- *         zipCode:
- *           type: string
- *           example: 100001
+ *           example: "johndoe@example.com"
  *         phoneNumber:
  *           type: string
- *           minLength: 10
- *           maxLength: 15
  *           example: "+2348123456789"
- *         stage:
- *           type: string
- *           example: onboarding
  *         gender:
  *           type: string
  *           enum: [male, female, other]
- *           example: male
+ *           example: "male"
  *         DOB:
  *           type: string
  *           format: date
- *           example: 1995-06-15
+ *           example: "1995-06-15"
+ *         primaryPayer:
+ *           type: string
+ *           example: "Insurance Co."
+ *         streetAddress:
+ *           type: string
+ *           example: "123 Banana Street"
+ *         city:
+ *           type: string
+ *           example: "Lagos"
+ *         state:
+ *           type: string
+ *           example: "Lagos State"
+ *         country:
+ *           type: string
+ *           example: "Nigeria"
+ *         zipCode:
+ *           type: string
+ *           example: "100001"
  *         tenantId:
  *           type: string
  *           format: uuid
- *           example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *           example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
  *         pipelineStageId:
  *           type: string
  *           format: uuid
- *           example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
- *         assignToTenantStaff:
+ *           example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+ *         assignToClinician:
  *           type: string
  *           format: uuid
- *           example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
- *         dbAccess:
- *           type: boolean
- *           example: true
+ *           example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
  *         createdBy:
  *           type: string
  *           format: uuid
- *           example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *           example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+ *         clientPortalAccess:
+ *           type: boolean
+ *           default: false
+ *           example: false
+ *         caregiverName:
+ *           type: string
+ *           example: "Mary Doe"
+ *         caregiverRelationship:
+ *           type: string
+ *           example: "Mother"
+ *         caregiverPhone:
+ *           type: string
+ *           example: "+2348098765432"
+ *         caregiverEmail:
+ *           type: string
+ *           format: email
+ *           example: "caregiver@example.com"
+ *         caregiverStreetAddress:
+ *           type: string
+ *           example: "45 Caregiver Street"
+ *         caregiverCity:
+ *           type: string
+ *           example: "Abuja"
+ *         caregiverState:
+ *           type: string
+ *           example: "FCT"
+ *         caregiverCountry:
+ *           type: string
+ *           example: "Nigeria"
+ *         caregiverZip:
+ *           type: string
+ *           example: "900001"
+ *         documents:
+ *           type: array
+ *           items:
+ *             type: object
+ *           example: [{ "fileName": "id-card.png", "url": "https://..." }]
+ *
  *     UpdateClientDto:
  *       type: object
  *       required:
@@ -94,6 +125,15 @@ import ClientDto from "../dto/clientDto.js";
  *           type: string
  *           format: uuid
  *           example: "123e4567-e89b-12d3-a456-426614174000"
+ *         firstName:
+ *           type: string
+ *           example: "Jane"
+ *         lastName:
+ *           type: string
+ *           example: "Doe"
+ *         preferredName:
+ *           type: string
+ *           example: "Janey"
  *         email:
  *           type: string
  *           format: email
@@ -101,19 +141,13 @@ import ClientDto from "../dto/clientDto.js";
  *         phoneNumber:
  *           type: string
  *           example: "+2348012345678"
- *         fullName:
+ *         gender:
  *           type: string
- *           example: "Jane Doe"
- *         isDeleted:
- *           type: boolean
- *           example: false
+ *           example: "female"
  *         DOB:
  *           type: string
  *           format: date
  *           example: "1990-01-01"
- *         gender:
- *           type: string
- *           example: "female"
  *         streetAddress:
  *           type: string
  *           example: "123 Banana Island"
@@ -129,10 +163,44 @@ import ClientDto from "../dto/clientDto.js";
  *         zipCode:
  *           type: string
  *           example: "100001"
- *         password:
+ *         primaryPayer:
  *           type: string
- *           format: password
- *           example: "SecurePass123"
+ *           example: "Private"
+ *         caregiverName:
+ *           type: string
+ *           example: "Mrs Doe"
+ *         caregiverRelationship:
+ *           type: string
+ *           example: "Mother"
+ *         caregiverPhone:
+ *           type: string
+ *           example: "+2348012345678"
+ *         caregiverEmail:
+ *           type: string
+ *           format: email
+ *           example: "caregiver@example.com"
+ *         caregiverStreetAddress:
+ *           type: string
+ *           example: "45 Care Street"
+ *         caregiverCity:
+ *           type: string
+ *           example: "Abuja"
+ *         caregiverState:
+ *           type: string
+ *           example: "FCT"
+ *         caregiverCountry:
+ *           type: string
+ *           example: "Nigeria"
+ *         caregiverZip:
+ *           type: string
+ *           example: "900001"
+ *         documents:
+ *           type: array
+ *           items:
+ *             type: object
+ *         isDeleted:
+ *           type: boolean
+ *           example: false
  */
 
 class ClientRoutes {
