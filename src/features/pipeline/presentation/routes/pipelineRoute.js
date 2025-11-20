@@ -91,8 +91,6 @@ import S3Service from "../../../../utilities/s3.js";
  *         - name
  *         - pipelineId
  *         - colourCode
- *         - tasks
- *         - documents
  *       properties:
  *         name:
  *           type: string
@@ -104,30 +102,6 @@ import S3Service from "../../../../utilities/s3.js";
  *           format: uuid
  *         colourCode:
  *           type: string
- *         tasks:
- *           type: array
- *           items:
- *             type: object
- *             required:
- *               - name
- *               - required
- *             properties:
- *               name:
- *                 type: string
- *               required:
- *                 type: boolean
- *         documents:
- *           type: array
- *           items:
- *             type: object
- *             required:
- *               - name
- *               - required
- *             properties:
- *               name:
- *                 type: string
- *               required:
- *                 type: boolean
  *
  *     GetStagesByPipelineIdParams:
  *       type: object
