@@ -54,7 +54,13 @@ class FormService {
     }
 
     async getTenantForms(tenantId) {
-        const forms = await this.formRepository.findAll({ tenantId });
+        const forms = await this.formRepository.findAll({
+            AND: [
+                { tenantId: tenantId },
+                { isDraft: false },
+                { isTemplate: true }
+            ]
+        });
 
         if (!forms) {
             throw new Error("Forms not found");
