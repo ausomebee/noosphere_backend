@@ -202,19 +202,19 @@ class PipelineService {
             throw new Error("Failed to fetch stage.");
         }
 
-        const updatedItems = items.map(item => {
-            const totalTasks = stage.tasks.length;
-            const completedTasks = stage.tasks?.filter(task => item.doneTasks && item.doneTasks[task.name] === true).length;
+        // const updatedItems = items.map(item => {
+        //     const totalTasks = stage.tasks.length;
+        //     const completedTasks = stage.tasks?.filter(task => item.doneTasks && item.doneTasks[task.name] === true).length;
 
-            const completionPercentage = (completedTasks / totalTasks) * 100;
+        //     const completionPercentage = (completedTasks / totalTasks) * 100;
 
-            return {
-                ...item,
-                completionPercentage
-            };
-        });
+        //     return {
+        //         ...item,
+        //         completionPercentage
+        //     };
+        // });
 
-        return updatedItems;
+        return items;
     }
 
     async getItemByStageIdClient(pipelineStageId) {
@@ -255,19 +255,19 @@ class PipelineService {
             throw new Error("Failed to fetch stage.");
         }
 
-        const updatedItems = items.map(item => {
-            const totalTasks = stage.tasks.length;
-            const completedTasks = stage.tasks?.filter(task => item.doneTasks && item.doneTasks[task.name] === true).length;
+        // const updatedItems = items.map(item => {
+        //     const totalTasks = stage.tasks.length;
+        //     const completedTasks = stage.tasks?.filter(task => item.doneTasks && item.doneTasks[task.name] === true).length;
 
-            const completionPercentage = (completedTasks / totalTasks) * 100;
+        //     const completionPercentage = (completedTasks / totalTasks) * 100;
 
-            return {
-                ...item,
-                completionPercentage
-            };
-        });
+        //     return {
+        //         ...item,
+        //         completionPercentage
+        //     };
+        // });
 
-        return updatedItems;
+        return items;
     }
 
     async getItemById(id) {
