@@ -222,7 +222,9 @@ class PipelineService {
             client: {
                 select: {
                     id: true,
-                    fullName: true,
+                    preferredName: true,
+                    firstName: true,
+                    lastName: true,
                     createdAt: true,
                     tenantLinks: {
                         select: {
