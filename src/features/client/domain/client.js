@@ -113,7 +113,7 @@ class Client {
             clientId: this.clientId,
             tenantId: this.tenantId,
             dbAccess: this.dbAccess,
-            stage: this.stage,
+            stage: "UNVERIFIED",
             createdBy: this.createdBy,
         };
     }
