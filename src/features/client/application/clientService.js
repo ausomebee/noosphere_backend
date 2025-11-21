@@ -42,6 +42,7 @@ class ClientService {
             const clientTenant = await this.clientTenantRepository.txCreate({ ...createData.createClientTenant, clientId: client.id }, tx);
             const pipelineItem = await this.itemRepository.txCreate({
                 clientId: client.id,
+                tenantId: clientTenant.tenantId,
                 pipelineStageId: data.pipelineStageId,
                 assignToTenantStaff: data.assignToTenantStaff
             }, tx)
