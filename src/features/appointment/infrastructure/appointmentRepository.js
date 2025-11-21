@@ -57,7 +57,9 @@ class AppointmentRepository {
                 client: {
                     select: {
                         id: true,
-                        fullName: true,
+                        firstName: true,
+                        lastName: true,
+                        preferredName: true,
                         email: true,
                     },
                 },
