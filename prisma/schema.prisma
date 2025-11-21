@@ -241,7 +241,7 @@ model Client {
   preferredName          String?
   email                  String   @unique
   phoneNumber            String   @unique
-  DOB                    DateTime
+  DOB                    DateTime?
   gender                 String
   primaryPayer           String?
   streetAddress          String?
