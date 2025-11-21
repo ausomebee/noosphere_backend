@@ -304,7 +304,9 @@ class AppointmentService {
             client: {
                 select: {
                     id: true,
-                    fullName: true,
+                    firstName: true,
+                    lastName: true,
+                    preferredName: true,
                     email: true,
                 },
             },
@@ -335,7 +337,9 @@ class AppointmentService {
             client: {
                 select: {
                     id: true,
-                    fullName: true,
+                    firstName: true,
+                    lastName: true,
+                    preferredName: true,
                     email: true,
                 },
             },
@@ -402,7 +406,9 @@ class AppointmentService {
             client: {
                 select: {
                     id: true,
-                    fullName: true,
+                    firstName: true,
+                    lastName: true,
+                    preferredName: true,
                     email: true,
                 },
             },
@@ -432,7 +438,9 @@ class AppointmentService {
             client: {
                 select: {
                     id: true,
-                    fullName: true,
+                    firstName: true,
+                    lastName: true,
+                    preferredName: true,
                     email: true,
                 },
             },
@@ -491,7 +499,13 @@ class AppointmentService {
         const allAppointments = await this.appointmentRepository.findAllAndPopulate(
             { isCanceled: false, tenantId },
             {
-                client: { select: { id: true, fullName: true, email: true } },
+                client: {
+                    select: {
+                        id: true, firstName: true,
+                        lastName: true,
+                        preferredName: true, email: true
+                    }
+                },
                 session: true,
                 clinicians: { select: { id: true, fullName: true, email: true } }
             }
@@ -512,7 +526,13 @@ class AppointmentService {
         const allAppointments = await this.appointmentRepository.findAllAndPopulate(
             { isCanceled: false, tenantId },
             {
-                client: { select: { id: true, fullName: true, email: true } },
+                client: {
+                    select: {
+                        id: true, firstName: true,
+                        lastName: true,
+                        preferredName: true, email: true
+                    }
+                },
                 session: true,
                 clinicians: { select: { id: true, fullName: true, email: true } }
             }
@@ -537,7 +557,13 @@ class AppointmentService {
                 }
             },
             {
-                client: { select: { id: true, fullName: true, email: true } },
+                client: {
+                    select: {
+                        id: true, firstName: true,
+                        lastName: true,
+                        preferredName: true, email: true
+                    }
+                },
                 session: true,
                 clinicians: { select: { id: true, fullName: true, email: true } }
             }
@@ -562,7 +588,13 @@ class AppointmentService {
                 }
             },
             {
-                client: { select: { id: true, fullName: true, email: true } },
+                client: {
+                    select: {
+                        id: true, firstName: true,
+                        lastName: true,
+                        preferredName: true, email: true
+                    }
+                },
                 session: true,
                 clinicians: { select: { id: true, fullName: true, email: true } }
             }
