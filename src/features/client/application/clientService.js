@@ -53,7 +53,7 @@ class ClientService {
             throw new Error("Failed to create candidate");
         }
 
-        return newCandidate.pipelineItem;
+        return { ...newCandidate.pipelineItem, email: newCandidate.Client.email };
     }
 
     async updateClient(data) {

@@ -225,6 +225,7 @@ class PipelineService {
                     preferredName: true,
                     firstName: true,
                     lastName: true,
+                    email: true,
                     createdAt: true,
                     tenantLinks: {
                         select: {
