@@ -45,14 +45,14 @@ class ClientService {
                 assignToTenantStaff: data.assignToTenantStaff
             }, tx)
 
-            return { pipelineItem, client };
+            return { pipelineItem, client, clientTenant };
         }, { timeout: 10_000 });
 
         if (!newCandidate) {
             throw new Error("Failed to create candidate");
         }
 
-        return { ...newCandidate.pipelineItem, email: newCandidate.client.email };
+        return { ...newCandidate.pipelineItem, email: newCandidate.client.email, tenantClientId: newCandidate.clientTenant.id };
     }
 
     async updateClient(data) {
@@ -119,7 +119,8 @@ class ClientService {
             dbAccess: data.dbAccess ?? client.dbAccess,
             active: data.active ?? client.active,
             stage: data.stage || client.stage,
-            documentRequests: data.documentRequests || client.documentRequests
+            requestAppointment: data.requestAppointment ?? client.requestAppointment,
+            documentAccess: data.documentAccess ?? client.documentAccess
         });
 
         if (!update) {
@@ -128,6 +129,7 @@ class ClientService {
 
         return update;
     }
+
 
 }
 
