@@ -1,6 +1,4 @@
 import Client from "../domain/client.js";
-import MailService from '../../../utilities/nodemailer.js';
-import argon2 from "argon2";
 
 class ClientService {
     constructor({ clientRepository, clientTenantRepository, generateCode, prisma, itemRepository }) {
@@ -65,19 +63,32 @@ class ClientService {
         }
 
         const update = await this.clientRepository.update(data.id, {
+            firstName: data.firstName || client.firstName,
+            lastName: data.lastName || client.lastName,
+            preferredName: data.preferredName || client.preferredName,
             email: data.email || client.email,
             phoneNumber: data.phoneNumber || client.phoneNumber,
-            fullName: data.fullName || client.fullName,
-            isDeleted: data.isDeleted ?? client.isDeleted,
             DOB: data.DOB || client.DOB,
             gender: data.gender || client.gender,
+            primaryPayer: data.primaryPayer || client.primaryPayer,
             streetAddress: data.streetAddress || client.streetAddress,
             city: data.city || client.city,
             state: data.state || client.state,
             country: data.country || client.country,
             zipCode: data.zipCode || client.zipCode,
-            password: data.password || client.password,
+            caregiverName: data.caregiverName || client.caregiverName,
+            caregiverRelationship: data.caregiverRelationship || client.caregiverRelationship,
+            caregiverPhone: data.caregiverPhone || client.caregiverPhone,
+            caregiverEmail: data.caregiverEmail || client.caregiverEmail,
+            caregiverStreetAddress: data.caregiverStreetAddress || client.caregiverStreetAddress,
+            caregiverCity: data.caregiverCity || client.caregiverCity,
+            caregiverState: data.caregiverState || client.caregiverState,
+            caregiverCountry: data.caregiverCountry || client.caregiverCountry,
+            caregiverZip: data.caregiverZip || client.caregiverZip,
+            documents: data.documents || client.documents,
             isVerified: data.isVerified ?? client.isVerified,
+            isDeleted: data.isDeleted ?? client.isDeleted,
+            password: data.password || client.password,
         });
 
         if (!update) {
@@ -96,6 +107,28 @@ class ClientService {
 
         return clients;
     }
+
+    async updateTenantClient(data) {
+        const client = await this.clientTenantRepository.findFirst({ clientId: data.clientId })
+
+        if (!client) {
+            throw new Error("client not found");
+        }
+
+        const update = await this.clientTenantRepository.update(client.id, {
+            dbAccess: data.dbAccess ?? client.dbAccess,
+            active: data.active ?? client.active,
+            stage: data.stage || client.stage,
+            documentRequests: data.documentRequests || client.documentRequests
+        });
+
+        if (!update) {
+            throw new Error("Failed to update client");
+        }
+
+        return update;
+    }
+
 }
 
 export default ClientService;

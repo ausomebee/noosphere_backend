@@ -116,6 +116,21 @@ import ClientDto from "../dto/clientDto.js";
  *             type: object
  *           example: [{ "fileName": "id-card.png", "url": "https://..." }]
  *
+ *     ManageDocumentRequest:
+ *       type: object
+ *       required:
+ *         - clientId
+ *         - documentRequests
+ *       properties:
+ *         documentRequests:
+ *           type: array
+ *           items:
+ *             type: object
+ *         clientId:
+ *           type: string
+ *           format: uuid
+ *           example: "5e8f361c-8f96-4b17-b1d3-39dfc2f67450"
+ * 
  *     UpdateClientDto:
  *       type: object
  *       required:
@@ -274,6 +289,48 @@ class ClientRoutes {
         *         description: Validation error
         */
         this.router.get("/tenant/:tenantId", this.controller.getTenantClients);
+
+        /**
+         * @swagger
+         * /api/v1/client/{clientId}/{active}:
+         *   patch:
+         *     summary: deactivate or activate a client
+         *     tags: [Clients]
+         *     parameters:
+         *       - in: path
+         *         name: clientId
+         *         required: true
+         *         schema:
+         *           type: string
+         *       - in: path
+         *         name: active
+         *         required: true
+         *         schema:
+         *           type: boolean
+         *     responses:
+         *       200:
+         *         description: Client deactivated successfully
+         */
+        this.router.patch("/:clientId/:delete", this.controller.deactivateClient);
+
+        /**
+         * @swagger
+         * /api/v1/client/document-request:
+         *   patch:
+         *     summary: manage document request
+         *     tags: [Clients]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/ManageDocumentRequest'
+         *     responses:
+         *       200:
+         *         description: Client deactivated successfully
+         */
+        this.router.patch("/document-request", this.controller.manageDocumentRequest);
+
     }
 
     getRouter() {

@@ -58,6 +58,36 @@ class ClientController {
         });
     });
 
+    deactivateClient = expressAsyncHandler(async (req, res) => {
+        const client = await this.service.updateTenantClient({
+            clientId: req.params.clientId,
+            active: req.params.active === "true"
+        });
+
+        if (!client) {
+            return res.status(500).json({ message: "Failed to deactivate client" });
+        }
+
+        return res.status(200).json({
+            message: "Client deactivated successfully",
+            status: "ok",
+            data: client
+        });
+    });
+
+    manageDocumentRequest = expressAsyncHandler(async (req, res) => {
+        const client = await this.service.updateTenantClient(req.body);
+
+        if (!client) {
+            return res.status(500).json({ message: "Failed to deactivate client" });
+        }
+
+        return res.status(200).json({
+            message: "Client deactivated successfully",
+            status: "ok",
+            data: client
+        });
+    });
 }
 
 export default ClientController;

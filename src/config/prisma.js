@@ -1,8 +1,10 @@
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg'
 
 class PrismaService {
     constructor() {
-        this.prisma = new PrismaClient();
+        this.adapter = new PrismaPg({ connectionString: `${process.env.DATABASE_URL}` })
+        this.prisma = new PrismaClient({ adapter: this.adapter });
     }
 
     async connect() {
