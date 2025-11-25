@@ -5,6 +5,9 @@ import ClientService from "../../application/clientService.js";
 import ReferralCodeGenerator from "../../../../utilities/generateCode.js";
 import ClientTenantRepository from "../../infrastructure/clientTenantRepository.js";
 import ItemRepository from "../../../pipeline/infrastructure/itemRepository.js";
+import ClientDocuments from "../../domain/clientDocument.js";
+import ClientDocumentsRepository from "../../infrastructure/clientDocumentsRepository.js";
+import ClientDocumentsService from "../../application/clientDocumentsService.js";
 
 class ClientController {
     constructor() {
@@ -14,6 +17,8 @@ class ClientController {
         this.itemRepository = new ItemRepository(this.prisma.pipelineItem);
         this.generateCode = new ReferralCodeGenerator(12);
         this.service = new ClientService({ clientRepository: this.clientRepository, clientTenantRepository: this.clientTenantRepository, generateCode: this.generateCode, prisma: this.prisma, itemRepository: this.itemRepository });
+        this.clientDocumentsRepository = new ClientDocumentsRepository(this.prisma.clientDocuments);
+        this.clientDocumentsService = new ClientDocumentsService({ clientDocumentsRepository: this.clientDocumentsRepository });
     }
 
     createClientCandidate = expressAsyncHandler(async (req, res) => {
@@ -21,6 +26,11 @@ class ClientController {
 
         if (!candidate) {
             res.status(500).json({ message: 'Failed to create client candidate' });
+        }
+
+        for (const field of req.body.documents || []) {
+            const documentsData = new ClientDocuments({...field, tenantClientId: candidate.tenantClientId});
+            const doc = await this.clientDocumentsService.createClientDocument(documentsData.createClientDocument);
         }
 
         return res.status(201).json({
@@ -70,6 +80,20 @@ class ClientController {
 
         return res.status(200).json({
             message: "Client deactivated successfully",
+            status: "ok",
+            data: client
+        });
+    });
+
+    clientPortalSettings = expressAsyncHandler(async (req, res) => {
+        const client = await this.service.updateTenantClient(req.body);
+
+        if (!client) {
+            return res.status(500).json({ message: "Failed to set client portal access" });
+        }
+
+        return res.status(200).json({
+            message: "Client portal access set successfully",
             status: "ok",
             data: client
         });

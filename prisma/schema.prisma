@@ -257,7 +257,6 @@ model Client {
   caregiverState         String?
   caregiverCountry       String?
   caregiverZip           String?
-  documents              Json?
 
   isVerified Boolean  @default(false)
   isDeleted  Boolean  @default(false)
@@ -274,23 +273,48 @@ model Client {
 }
 
 model ClientTenant {
-  id               String   @id @default(uuid())
-  clientId         String
-  tenantId         String
-  createdBy        String
-  dbAccess         Boolean  @default(false)
-  active           Boolean  @default(true)
-  stage            String
-  documentRequests Json?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id                 String   @id @default(uuid())
+  clientId           String
+  tenantId           String
+  createdBy          String
+  dbAccess           Boolean  @default(false)
+  active             Boolean  @default(true)
+  stage              String
+  requestAppointment Boolean  @default(true)
+  documentAccess     Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
-  tenantStaff   TenantStaff     @relation(fields: [createdBy], references: [id])
-  client        Client          @relation(fields: [clientId], references: [id])
-  tenant        Tenant          @relation(fields: [tenantId], references: [id])
-  FormResponses FormResponses[]
+  tenantStaff              TenantStaff                @relation(fields: [createdBy], references: [id])
+  client                   Client                     @relation(fields: [clientId], references: [id])
+  tenant                   Tenant                     @relation(fields: [tenantId], references: [id])
+  FormResponses            FormResponses[]
+  clientDocuments          ClientDocuments[]
+  clientRequestedDocuments ClientRequestedDocuments[]
 
   @@unique([clientId, tenantId])
+}
+
+model ClientDocuments {
+  id              String  @id @default(uuid())
+  tenantClientId  String
+  name            String
+  documentDetails Json
+  isDeleted       Boolean
+
+  tenantClient ClientTenant @relation(fields: [tenantClientId], references: [id])
+}
+
+model ClientRequestedDocuments {
+  id             String   @id @default(uuid())
+  tenantClientId String
+  name           String
+  description    String
+  allowMultiple  Boolean
+  dueDate        DateTime
+  isDeleted      Boolean
+
+  tenantClient ClientTenant @relation(fields: [tenantClientId], references: [id])
 }
 
 model Pipeline {

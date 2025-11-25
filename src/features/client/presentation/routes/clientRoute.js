@@ -22,7 +22,7 @@ import ClientDto from "../dto/clientDto.js";
  *           example: "John"
  *         stage:
  *           type: string
- *           example: "John"
+ *           example: "Initial"
  *         lastName:
  *           type: string
  *           example: "Doe"
@@ -65,72 +65,78 @@ import ClientDto from "../dto/clientDto.js";
  *         tenantId:
  *           type: string
  *           format: uuid
- *           example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
  *         pipelineStageId:
  *           type: string
  *           format: uuid
- *           example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
  *         assignToClinician:
  *           type: string
  *           format: uuid
- *           example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
  *         createdBy:
  *           type: string
  *           format: uuid
- *           example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
  *         clientPortalAccess:
  *           type: boolean
  *           default: false
- *           example: false
  *         caregiverName:
  *           type: string
- *           example: "Mary Doe"
  *         caregiverRelationship:
  *           type: string
- *           example: "Mother"
  *         caregiverPhone:
  *           type: string
- *           example: "+2348098765432"
  *         caregiverEmail:
  *           type: string
  *           format: email
- *           example: "caregiver@example.com"
  *         caregiverStreetAddress:
  *           type: string
- *           example: "45 Caregiver Street"
  *         caregiverCity:
  *           type: string
- *           example: "Abuja"
  *         caregiverState:
  *           type: string
- *           example: "FCT"
  *         caregiverCountry:
  *           type: string
- *           example: "Nigeria"
  *         caregiverZip:
  *           type: string
- *           example: "900001"
+ *
  *         documents:
  *           type: array
+ *           description: "List of uploaded client documents"
  *           items:
  *             type: object
- *           example: [{ "fileName": "id-card.png", "url": "https://..." }]
+ *             required:
+ *               - name
+ *               - documentDetails
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "National ID"
+ *               documentDetails:
+ *                 type: object
+ *                 description: "Any JSON metadata for the document"
+ *                 example:
+ *                   fileUrl: "https://uploads/documents/id-card.png"
+ *                   fileType: "image/png"
+ *                   uploadedAt: "2025-01-01T12:00:00Z"
  *
- *     ManageDocumentRequest:
+ *
+ *     ManagePortalAccess:
  *       type: object
  *       required:
  *         - clientId
- *         - documentRequests
+ *         - documentAccess
+ *         - requestAppointment
+ *         - dbAccess
  *       properties:
- *         documentRequests:
- *           type: array
- *           items:
- *             type: object
  *         clientId:
  *           type: string
  *           format: uuid
- *           example: "5e8f361c-8f96-4b17-b1d3-39dfc2f67450"
- * 
+ *         documentAccess:
+ *           type: boolean
+ *         requestAppointment:
+ *           type: boolean
+ *         dbAccess:
+ *           type: boolean
+ *
+ *
  *     UpdateClientDto:
  *       type: object
  *       required:
@@ -139,80 +145,69 @@ import ClientDto from "../dto/clientDto.js";
  *         id:
  *           type: string
  *           format: uuid
- *           example: "123e4567-e89b-12d3-a456-426614174000"
  *         firstName:
  *           type: string
- *           example: "Jane"
  *         lastName:
  *           type: string
- *           example: "Doe"
  *         preferredName:
  *           type: string
- *           example: "Janey"
  *         email:
  *           type: string
  *           format: email
- *           example: "client@example.com"
  *         phoneNumber:
  *           type: string
- *           example: "+2348012345678"
  *         gender:
  *           type: string
- *           example: "female"
  *         DOB:
  *           type: string
  *           format: date
- *           example: "1990-01-01"
  *         streetAddress:
  *           type: string
- *           example: "123 Banana Island"
  *         city:
  *           type: string
- *           example: "Lagos"
  *         state:
  *           type: string
- *           example: "Lagos"
  *         country:
  *           type: string
- *           example: "Nigeria"
  *         zipCode:
  *           type: string
- *           example: "100001"
  *         primaryPayer:
  *           type: string
- *           example: "Private"
  *         caregiverName:
  *           type: string
- *           example: "Mrs Doe"
  *         caregiverRelationship:
  *           type: string
- *           example: "Mother"
  *         caregiverPhone:
  *           type: string
- *           example: "+2348012345678"
  *         caregiverEmail:
  *           type: string
  *           format: email
- *           example: "caregiver@example.com"
  *         caregiverStreetAddress:
  *           type: string
- *           example: "45 Care Street"
  *         caregiverCity:
  *           type: string
- *           example: "Abuja"
  *         caregiverState:
  *           type: string
- *           example: "FCT"
  *         caregiverCountry:
  *           type: string
- *           example: "Nigeria"
  *         caregiverZip:
  *           type: string
- *           example: "900001"
  *         documents:
  *           type: array
  *           items:
  *             type: object
+ *             required:
+ *               - name
+ *               - documentDetails
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "Updated ID Card"
+ *               documentDetails:
+ *                 type: object
+ *                 example:
+ *                   fileUrl: "https://uploads/new-file.pdf"
+ *                   fileType: "application/pdf"
  *         isDeleted:
  *           type: boolean
  *           example: false
@@ -315,21 +310,21 @@ class ClientRoutes {
 
         /**
          * @swagger
-         * /api/v1/client/document-request:
+         * /api/v1/client/portal-access:
          *   patch:
-         *     summary: manage document request
+         *     summary: set client portal access
          *     tags: [Clients]
          *     requestBody:
          *       required: true
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/ManageDocumentRequest'
+         *             $ref: '#/components/schemas/ManagePortalAccess'
          *     responses:
          *       200:
-         *         description: Client deactivated successfully
+         *         description: Client portal access set successfully
          */
-        this.router.patch("/document-request", this.controller.manageDocumentRequest);
+        this.router.patch("/portal-access", this.controller.clientPortalSettings);
 
     }
 
