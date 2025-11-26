@@ -4,13 +4,15 @@ class ClientDocuments {
         tenantClientId = null,
         name = "",
         documentDetails = {},
-        isDeleted = false
+        isDeleted = false,
+        requestId
     } = {}) {
         this.id = id;
         this.tenantClientId = tenantClientId;
         this.name = name;
         this.documentDetails = documentDetails;
         this.isDeleted = isDeleted;
+        this.requestId = requestId;
     }
 
     get createClientDocument() {
@@ -18,7 +20,8 @@ class ClientDocuments {
             tenantClientId: this.tenantClientId,
             name: this.name,
             documentDetails: this.documentDetails,
-            isDeleted: this.isDeleted
+            isDeleted: this.isDeleted,
+            requestId: this.requestId
         };
     }
 

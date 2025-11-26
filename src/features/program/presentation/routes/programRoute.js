@@ -24,6 +24,25 @@ import ProgramDto from "../dto/programDto.js";
  *           format: uuid
  *           example: "3d3f1a5d-8a2b-4d2a-bb4f-7dd6b0f9a123"
  *
+ *     CreateCustomProgramDto:
+ *       type: object
+ *       required:
+ *         - name
+ *         - description
+ *         - clientId
+ *         - tenantId
+ *       properties:
+ *         name:
+ *           type: string
+ *           example: "Customer Onboarding"
+ *         description:
+ *           type: string
+ *           example: "A program to onboard new customers to our platform."
+ *         clientId:
+ *           type: string
+ *           format: uuid
+ *           example: "3d3f1a5d-8a2b-4d2a-bb4f-7dd6b0f9a123"
+ * 
  *     UpdateProgramDto:
  *       type: object
  *       required:
@@ -75,6 +94,26 @@ class ProgramRoutes {
 
         /**
          * @swagger
+         * /api/v1/programs/custom:
+         *   post:
+         *     summary: Create custom Program
+         *     tags: [program]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/CreateCustomProgramDto'
+         *     responses:
+         *       201:
+         *         description: Program created successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/", ProgramDto.createCustomProgramDto, this.controller.createCustomProgram);
+
+        /**
+         * @swagger
          * /api/v1/programs:
          *   patch:
          *     summary: Update Program
@@ -113,6 +152,27 @@ class ProgramRoutes {
         *         description: Validation error
         */
         this.router.get("/:domainId", this.controller.getAllDomainPrograms);
+
+         /**
+        * @swagger
+        * /api/v1/programs/tenant/{tenantId}:
+        *   get:
+        *     summary: gets tenant programs
+        *     tags: [program]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The tenant ID of the Program
+        *     responses:
+        *       200:
+        *         description: Programs fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/:tenantId", this.controller.getAllTenantPrograms);
 
         /**
          * @swagger

@@ -52,6 +52,26 @@ class ClientProgramRoutes {
          */
         this.router.post("/", ClientProgramDto.createClientProgramDto, this.controller.createClientProgram);
 
+        /**
+         * @swagger
+         * /api/v1/client-programs/{clientId}:
+         *   get:
+         *     summary: Gets client programs
+         *     tags: [program]
+         *     parameters:
+         *       - in: path
+         *         name: clientId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The tenant ID of the Domain
+         *     responses:
+         *       200:
+         *         description: programs fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/:clientId", this.controller.getClientPrograms);
     }
 
     getRouter() {

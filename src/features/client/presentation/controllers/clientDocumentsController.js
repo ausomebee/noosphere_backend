@@ -1,6 +1,7 @@
 import prismaService from "../../../../config/prisma.js";
 import ClientDocumentsService from "../../application/clientDocumentsService.js";
 import ClientDocumentsRepository from "../../infrastructure/clientDocumentsRepository.js";
+import expressAsyncHandler from "express-async-handler";
 
 class ClientDocumentsController {
     constructor() {
@@ -78,6 +79,40 @@ class ClientDocumentsController {
             });
         }
     }
+
+    async getRequestDocuments(req, res) {
+        try {
+            const requestId = req.params.requestId;
+
+            const docs = await this.clientDocumentsService.getClientDocuments(requestId);
+
+            return res.status(200).json({
+                message: "Client documents fetched successfully",
+                data: docs,
+            });
+        } catch (error) {
+            return res.status(404).json({
+                message: error.message || "Client documents not found",
+            });
+        }
+    }
+
+    deleteClientDocument = expressAsyncHandler(async (req, res) => {
+        const client = await this.service.updateClientDocument({
+            clientId: req.params.id,
+            isDeleted: true
+        });
+
+        if (!client) {
+            return res.status(500).json({ message: "Failed to delete client doc" });
+        }
+
+        return res.status(200).json({
+            message: "Client doc deleted successfully",
+            status: "ok",
+            data: client
+        });
+    });
 }
 
 export default ClientDocumentsController;

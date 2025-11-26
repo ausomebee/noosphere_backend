@@ -87,7 +87,7 @@ class ClientDto {
                     "string.guid": "Pipeline stage ID must be a valid UUID"
                 }),
 
-            assignToClinician: Joi.string()
+            assignToClinicians: Joi.string()
                 .uuid()
                 .optional()
                 .messages({
@@ -235,7 +235,7 @@ class ClientDto {
                     "string.guid": "Pipeline stage ID must be a valid UUID"
                 }),
 
-            assignToClinician: Joi.string()
+            assignToClinicians: Joi.string()
                 .uuid()
                 .optional()
                 .messages({
