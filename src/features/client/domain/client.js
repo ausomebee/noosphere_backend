@@ -15,7 +15,7 @@ class Client {
         country,
         zipCode,
         tenantId,
-
+        assignToClinicians,
         caregiverName,
         caregiverRelationship,
         caregiverPhone,
@@ -70,6 +70,7 @@ class Client {
         this.password = password;
         this.tenantId = tenantId;
         this.createdBy = createdBy;
+        this.assignToClinicians = assignToClinicians;
     }
 
     get createClient() {
@@ -115,6 +116,9 @@ class Client {
             dbAccess: this.dbAccess,
             stage: "UNVERIFIED",
             createdBy: this.createdBy,
+            clinicians: {
+                connect: this.assignToClinicians
+            },
         };
     }
 

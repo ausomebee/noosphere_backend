@@ -59,6 +59,21 @@ class ProgramService {
         return programs;
     }
 
+    async getAllTenantPrograms(tenantId) {
+        const programs = await this.programRepository.findAll({
+            isDeleted: false,
+            domain: {
+                tenantId: tenantId,
+                isDeleted: false
+            }
+        });
+
+        if (!programs) {
+            throw new Error("Programs not found")
+        }
+
+        return programs;
+    }
 }
 
 export default ProgramService;

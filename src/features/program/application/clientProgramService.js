@@ -40,7 +40,7 @@ class ClientProgramService {
                 if (clientTargetExists) continue;
 
                 const newClientTarget = await this.clientTargetRepository.create({
-                    clientId: data.clientId, 
+                    clientId: data.clientId,
                     targetId: t.id,
                 });
 
@@ -51,6 +51,19 @@ class ClientProgramService {
         }
 
         return newClientProgram;
+    }
+
+    async getAllClientProgram(clientId) {
+        const program = await this.clientProgramRepository.findAllAndPopulate({
+            clientId,
+            isDeleted: false,
+        }, { program: true });
+
+        if (!program) {
+            throw new Error("program not found")
+        }
+
+        return program;
     }
 
 }

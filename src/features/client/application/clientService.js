@@ -91,6 +91,17 @@ class ClientService {
             password: data.password || client.password,
         });
 
+        const updateClientTenant = await this.clientTenantRepository.update(client.id, {
+            dbAccess: data.dbAccess ?? client.dbAccess,
+            active: data.active ?? client.active,
+            stage: data.stage || client.stage,
+            clinicians: {
+                set: data.clinicians || appointment.clinicians
+            },
+            requestAppointment: data.requestAppointment ?? client.requestAppointment,
+            documentAccess: data.documentAccess ?? client.documentAccess
+        });
+
         if (!update) {
             throw new Error("Failed to update client");
         }
@@ -119,6 +130,9 @@ class ClientService {
             dbAccess: data.dbAccess ?? client.dbAccess,
             active: data.active ?? client.active,
             stage: data.stage || client.stage,
+            clinicians: {
+                set: data.clinicians || appointment.clinicians
+            },
             requestAppointment: data.requestAppointment ?? client.requestAppointment,
             documentAccess: data.documentAccess ?? client.documentAccess
         });

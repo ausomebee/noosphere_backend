@@ -56,6 +56,25 @@ class TargetService {
         return update;
     }
 
+    async getAllTenantTargets(tenantId) {
+        const targets = await this.targetRepository.findAll({
+            program: {
+                isDeleted: false,
+                domain: {
+                    tenantId: tenantId,  
+                    isDeleted: false
+                }
+            },
+            isDeleted: false
+        });
+
+        if (!targets) {
+            throw new Error("Targets not found")
+        }
+
+        return targets;
+    }
+
     async getAllProgramTargets(programId) {
         const targets = await this.targetRepository.findAll({
             programId,

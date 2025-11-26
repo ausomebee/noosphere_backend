@@ -68,9 +68,10 @@ import ClientDto from "../dto/clientDto.js";
  *         pipelineStageId:
  *           type: string
  *           format: uuid
- *         assignToClinician:
- *           type: string
- *           format: uuid
+ *         assignToClinicians:
+ *           type: array
+ *           items:
+ *              type: string
  *         createdBy:
  *           type: string
  *           format: uuid

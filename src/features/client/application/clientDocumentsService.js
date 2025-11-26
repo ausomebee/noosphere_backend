@@ -61,6 +61,16 @@ class ClientDocumentsService {
 
         return documents;
     }
+
+    async getDocumentsByRequestId(requestId) {
+        const documents = await this.clientDocumentsRepository.findAll({ requestId });
+
+        if (!documents) {
+            throw new Error("Client Documents not found");
+        }
+
+        return documents;
+    }
 }
 
 export default ClientDocumentsService;

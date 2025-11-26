@@ -429,6 +429,34 @@ class AppointmentService {
         return appointments;
     }
 
+    async getClientCanceledAppointments(tenantId) {
+        const appointments = await this.appointmentRepository.findAllAndPopulate({ clientId, isCanceled: true }, {
+            client: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    preferredName: true,
+                    email: true,
+                },
+            },
+            session: true,
+            clinicians: {
+                select: {
+                    id: true,
+                    fullName: true,
+                    email: true,
+                }
+            }
+        });
+
+        if (!appointments) {
+            throw new Error("Failed to fetch Appointment");
+        }
+
+        return appointments;
+    }
+
     async getStaffCanceledAppointments(staffId) {
         const appointments = await this.appointmentRepository.findAllAndPopulate({
             clinicians: {
@@ -587,6 +615,60 @@ class AppointmentService {
                     some: { id: staffId }
                 }
             },
+            {
+                client: {
+                    select: {
+                        id: true, firstName: true,
+                        lastName: true,
+                        preferredName: true, email: true
+                    }
+                },
+                session: true,
+                clinicians: { select: { id: true, fullName: true, email: true } }
+            }
+        );
+
+        return allAppointments
+            .filter(appt => this.isPast(appt, now))
+            .sort((a, b) => {
+                const aDate = new Date(`${a.date}T${a.startTime}:00`);
+                const bDate = new Date(`${b.date}T${b.startTime}:00`);
+                return bDate - aDate;
+            });
+    }
+
+    async getClientUpcomingAppointments(clientId) {
+        const now = new Date();
+
+        const allAppointments = await this.appointmentRepository.findAllAndPopulate(
+            { isCanceled: false, clientId },
+            {
+                client: {
+                    select: {
+                        id: true, firstName: true,
+                        lastName: true,
+                        preferredName: true, email: true
+                    }
+                },
+                session: true,
+                clinicians: { select: { id: true, fullName: true, email: true } }
+            }
+        );
+
+        return allAppointments
+            .filter(appt => this.isUpcoming(appt, now))
+            .sort((a, b) => {
+                const aDate = new Date(`${a.date}T${a.startTime}:00`);
+                const bDate = new Date(`${b.date}T${b.startTime}:00`);
+                return aDate - bDate;
+            });
+    }
+
+    async getClientPastAppointments(clientId) {
+        const now = new Date();
+
+        const allAppointments = await this.appointmentRepository.findAllAndPopulate(
+            { isCanceled: false, clientId },
             {
                 client: {
                     select: {

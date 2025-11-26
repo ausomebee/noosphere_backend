@@ -10,14 +10,17 @@ import ClientDocumentsDto from "../dto/clientDocumentsDto.js";
  *       type: object
  *       required:
  *         - tenantId
- *         - clientId
+ *         - tenantClientId
  *         - documentName
  *         - documentType
  *       properties:
  *         tenantId:
  *           type: string
  *           format: uuid
- *         clientId:
+ *         requestId:
+ *           type: string
+ *           format: uuid
+ *         tenantClientId:
  *           type: string
  *           format: uuid
  *         documentName:
@@ -99,13 +102,13 @@ class ClientDocumentsRoutes {
 
 		/**
 		 * @swagger
-		 * /api/v1/client-documents/client/{clientId}:
+		 * /api/v1/client-documents/client/{tenantClientId}:
 		 *   get:
 		 *     summary: Get all documents for a client
 		 *     tags: [client-documents]
 		 *     parameters:
 		 *       - in: path
-		 *         name: clientId
+		 *         name: tenantClientId
 		 *         required: true
 		 *         schema:
 		 *           type: string
@@ -113,7 +116,25 @@ class ClientDocumentsRoutes {
 		 *       200:
 		 *         description: Client documents fetched successfully
 		 */
-		this.router.get("/client/:clientId", this.controller.getClientDocuments.bind(this.controller));
+		this.router.get("/client/:tenantClientId", this.controller.getClientDocuments.bind(this.controller));
+
+        /**
+		 * @swagger
+		 * /api/v1/client-documents/requested/{requestId}:
+		 *   get:
+		 *     summary: Get requested documents for a client
+		 *     tags: [client-documents]
+		 *     parameters:
+		 *       - in: path
+		 *         name: requestId
+		 *         required: true
+		 *         schema:
+		 *           type: string
+		 *     responses:
+		 *       200:
+		 *         description: Client requested documents fetched successfully
+		 */
+		this.router.get("/requested/:requestId", this.controller.getRequestDocuments.bind(this.controller));
 
 		/**
 		 * @swagger
@@ -132,6 +153,24 @@ class ClientDocumentsRoutes {
 		 *         description: Client document retrieved
 		 */
 		this.router.get("/:id", this.controller.getSingleClientDocument.bind(this.controller));
+
+        /**
+         * @swagger
+         * /api/v1/client/{id}:
+         *   patch:
+         *     summary: delete document
+         *     tags: [Clients]
+         *     parameters:
+         *       - in: path
+         *         name: clientId
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: document deleted successfully
+         */
+        this.router.patch("/:id", this.controller.deleteClientDocument);
 	}
 
 	getRouter() {
