@@ -112,7 +112,7 @@ class ClientService {
     }
 
     async getTenantClients(tenantId) {
-        const clients = await this.clientTenantRepository.findAllAndPopulate({ tenantId }, { client: true });
+        const clients = await this.clientTenantRepository.findAllAndPopulate({ tenantId }, { client: true, clinicians: true });
 
         if (!clients) {
             throw new Error("clients not found")
