@@ -287,6 +287,27 @@ class ClientRoutes {
         this.router.get("/tenant/:tenantId", this.controller.getTenantClients);
 
         /**
+        * @swagger
+        * /api/v1/client/client/{clientId}:
+        *   get:
+        *     summary: gets client clients
+        *     tags: [Clients]
+        *     parameters:
+        *       - in: path
+        *         name: clientId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the client
+        *     responses:
+        *       200:
+        *         description: client fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/client/:clientId", this.controller.getSingleClient);
+
+        /**
          * @swagger
          * /api/v1/client/portal-access:
          *   patch:

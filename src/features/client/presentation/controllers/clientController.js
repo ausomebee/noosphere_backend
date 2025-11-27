@@ -68,6 +68,20 @@ class ClientController {
         });
     });
 
+    getSingleClient = expressAsyncHandler(async (req, res) => {
+        const client = await this.service.getTenantClients(req.params.clientId);
+
+        if (!client) {
+            res.status(500).json({ message: 'Failed to fetch client' });
+        }
+
+        return res.status(201).json({
+            message: "client fetched successfully",
+            status: 'ok',
+            data: client
+        });
+    });
+
     deactivateClient = expressAsyncHandler(async (req, res) => {
         const client = await this.service.updateTenantClient({
             clientTenantId: req.params.clientTenantId,
