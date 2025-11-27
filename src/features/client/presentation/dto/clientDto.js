@@ -115,9 +115,6 @@ class ClientDto {
             caregiverCountry: Joi.string().optional().trim(),
             caregiverZip: Joi.string().optional().trim(),
 
-            documents: Joi.array()
-                .items(Joi.object().unknown(true))
-                .optional(),
             stage: Joi.string().optional().trim(),
             createdBy: Joi.string()
                 .uuid()
@@ -262,10 +259,6 @@ class ClientDto {
             caregiverState: Joi.string().optional().trim(),
             caregiverCountry: Joi.string().optional().trim(),
             caregiverZip: Joi.string().optional().trim(),
-
-            documents: Joi.array()
-                .items(Joi.object().unknown(true))
-                .optional()
         });
 
         Validator.validateRequest(req, next, schema);
