@@ -218,6 +218,11 @@ class PipelineService {
     }
 
     async getItemByStageIdClient(pipelineStageId) {
+        const stage = await this.stageRepository.findOne({ id: pipelineStageId });
+
+        if (!stage) {
+            throw new Error("Failed to fetch stage.");
+        }
         const items = await this.itemRepository.findAllAndPopulate({ pipelineStageId: pipelineStageId }, {
             client: {
                 select: {
@@ -228,13 +233,18 @@ class PipelineService {
                     email: true,
                     createdAt: true,
                     tenantLinks: {
+                        where: {
+                            tenantId: stage.tenantId,
+                        },
+                        take: 1,
                         select: {
+                            id: true,
                             tenantStaff: {
                                 select: {
                                     fullName: true
                                 }
                             }
-                        }
+                        },
                     }
                 }
             }, tenantStaff: {
@@ -252,11 +262,9 @@ class PipelineService {
             return [];
         }
 
-        const stage = await this.stageRepository.findOne({ id: items[0]?.pipelineStageId })
+        // const stage = await this.stageRepository.findOne({ id: items[0]?.pipelineStageId })
 
-        if (!stage) {
-            throw new Error("Failed to fetch stage.");
-        }
+
 
         // const updatedItems = items.map(item => {
         //     const totalTasks = stage.tasks.length;
