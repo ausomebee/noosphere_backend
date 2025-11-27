@@ -7,6 +7,7 @@ import ItemRepository from "../../infrastructure/itemRepository.js";
 import TenantRepository from "../../../tenant/infrastructure/tenantRepository.js";
 import ClientRepository from "../../../client/infrastructure/clientRepository.js";
 import ClientService from "../../../client/application/clientService.js";
+import ClientTenantRepository from "../../../client/infrastructure/clientTenantRepository.js";
 
 class PipelineController {
     constructor() {
@@ -18,6 +19,7 @@ class PipelineController {
         this.service = new PipelineService({ pipelineRepository: this.pipelineRepository, stageRepository: this.stageRepository, itemRepository: this.itemRepository, tenantRepository: this.tenantRepository });
         this.clientRepository = new ClientRepository(this.prisma.client);
         this.clientService = new ClientService({ clientRepository: this.clientRepository });
+        this.clientTenantRepository = new ClientTenantRepository(this.prisma.clientTenant);
     }
 
     createPipeline = expressAsyncHandler(async (req, res) => {
@@ -195,10 +197,16 @@ class PipelineController {
             res.status(500).json({ message: 'Failed to fetch item' });
         }
 
+        const clientTenant = await this.clientTenantRepository.findFirst({ tenantId: item.tenantId, clientId: item.clientId })
+
+        if (!item) {
+            res.status(500).json({ message: 'Failed to fetch item' });
+        }
+
         return res.status(201).json({
             message: "Item fetched successfully",
             status: 'ok',
-            data: item
+            data: { ...item, tenantClientId: clientTenant.id }
         });
     });
 
