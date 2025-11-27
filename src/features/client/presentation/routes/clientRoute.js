@@ -122,12 +122,12 @@ import ClientDto from "../dto/clientDto.js";
  *     ManagePortalAccess:
  *       type: object
  *       required:
- *         - clientId
+ *         - clientTenantId
  *         - documentAccess
  *         - requestAppointment
  *         - dbAccess
  *       properties:
- *         clientId:
+ *         clientTenantId:
  *           type: string
  *           format: uuid
  *         documentAccess:
@@ -288,29 +288,6 @@ class ClientRoutes {
 
         /**
          * @swagger
-         * /api/v1/client/{clientId}/{active}:
-         *   patch:
-         *     summary: deactivate or activate a client
-         *     tags: [Clients]
-         *     parameters:
-         *       - in: path
-         *         name: clientId
-         *         required: true
-         *         schema:
-         *           type: string
-         *       - in: path
-         *         name: active
-         *         required: true
-         *         schema:
-         *           type: boolean
-         *     responses:
-         *       200:
-         *         description: Client deactivated successfully
-         */
-        this.router.patch("/:clientId/:delete", this.controller.deactivateClient);
-
-        /**
-         * @swagger
          * /api/v1/client/portal-access:
          *   patch:
          *     summary: set client portal access
@@ -326,6 +303,30 @@ class ClientRoutes {
          *         description: Client portal access set successfully
          */
         this.router.patch("/portal-access", this.controller.clientPortalSettings);
+
+         /**
+         * @swagger
+         * /api/v1/client/{clientTenantId}/{active}:
+         *   patch:
+         *     summary: deactivate or activate a client
+         *     tags: [Clients]
+         *     parameters:
+         *       - in: path
+         *         name: clientTenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *       - in: path
+         *         name: active
+         *         required: true
+         *         schema:
+         *           type: boolean
+         *     responses:
+         *       200:
+         *         description: Client deactivated successfully
+         */
+        this.router.patch("/:clientTenantId/:active", this.controller.deactivateClient);
+
 
     }
 

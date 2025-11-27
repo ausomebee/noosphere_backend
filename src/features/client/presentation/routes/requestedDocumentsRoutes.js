@@ -6,29 +6,30 @@ import ClientRequestedDocumentsDto from "../dto/clientRequestedDocumentsDto.js";
  * @swagger
  * components:
  *   schemas:
- *     RequestedDocumentCreateDto:
+ *     ClientRequestedDocumentCreateDto:
  *       type: object
  *       required:
- *         - tenantId
- *         - requestId
- *         - documentName
+ *         - tenantClientId
+ *         - name
+ *         - dueDate
  *       properties:
- *         tenantId:
+ *         tenantClientId:
  *           type: string
  *           format: uuid
- *         requestId:
+ *         name:
  *           type: string
- *           format: uuid
- *         documentName:
- *           type: string
- *           example: "Proof of Address"
+ *           example: "National ID Card"
  *         description:
  *           type: string
- *         isMandatory:
+ *           example: "Front and back required"
+ *         allowMultiple:
  *           type: boolean
- *           example: true
+ *           example: false
+ *         dueDate:
+ *           type: string
+ *           format: date-time
  *
- *     RequestedDocumentUpdateDto:
+ *     ClientRequestedDocumentUpdateDto:
  *       type: object
  *       required:
  *         - id
@@ -36,17 +37,23 @@ import ClientRequestedDocumentsDto from "../dto/clientRequestedDocumentsDto.js";
  *         id:
  *           type: string
  *           format: uuid
- *         documentName:
+ *         name:
  *           type: string
  *         description:
  *           type: string
- *         isMandatory:
+ *         allowMultiple:
  *           type: boolean
+ *         status:
+ *           type: string
+ *           enum: [PENDING, SUBMITTED, APPROVED, REJECTED]
+ *         dueDate:
+ *           type: string
+ *           format: date-time
  *         isDeleted:
  *           type: boolean
  */
 
-class RequestedDocumentsRoutes {
+class ClientRequestedDocumentsRoutes {
 	constructor() {
 		this.controller = new ClientRequestedDocumentsController();
 		this.router = express.Router();
@@ -56,49 +63,57 @@ class RequestedDocumentsRoutes {
 	initializeRoutes() {
 		/**
 		 * @swagger
-		 * /api/v1/requested-documents/:
+		 * /api/v1/client-requested-documents/:
 		 *   post:
-		 *     summary: Create requested document
-		 *     tags: [requested-documents]
+		 *     summary: Create client requested document
+		 *     tags: [client-requested-documents]
 		 *     requestBody:
 		 *       required: true
 		 *       content:
 		 *         application/json:
 		 *           schema:
-		 *             $ref: '#/components/schemas/RequestedDocumentCreateDto'
+		 *             $ref: '#/components/schemas/ClientRequestedDocumentCreateDto'
 		 *     responses:
 		 *       201:
-		 *         description: Requested document created successfully
+		 *         description: Document request created successfully
 		 */
-		this.router.post("/", ClientRequestedDocumentsDto.createRequestedDocumentDto, this.controller.createRequestedDocument.bind(this.controller));
+		this.router.post(
+			"/",
+			ClientRequestedDocumentsDto.createRequestedDocumentDto,
+			this.controller.createRequestedDocument.bind(this.controller)
+		);
 
 		/**
 		 * @swagger
-		 * /api/v1/requested-documents/:
+		 * /api/v1/client-requested-documents/:
 		 *   put:
-		 *     summary: Update requested document
-		 *     tags: [requested-documents]
+		 *     summary: Update client requested document
+		 *     tags: [client-requested-documents]
 		 *     requestBody:
 		 *       required: true
 		 *       content:
 		 *         application/json:
 		 *           schema:
-		 *             $ref: '#/components/schemas/RequestedDocumentUpdateDto'
+		 *             $ref: '#/components/schemas/ClientRequestedDocumentUpdateDto'
 		 *     responses:
 		 *       200:
-		 *         description: Requested document updated successfully
+		 *         description: Document request updated successfully
 		 */
-		this.router.put("/", ClientRequestedDocumentsDto.updateRequestedDocumentDto, this.controller.updateRequestedDocument.bind(this.controller));
+		this.router.put(
+			"/",
+			ClientRequestedDocumentsDto.updateRequestedDocumentDto,
+			this.controller.updateRequestedDocument.bind(this.controller)
+		);
 
 		/**
 		 * @swagger
-		 * /api/v1/requested-documents/request/{requestId}:
+		 * /api/v1/client-requested-documents/client/{tenantClientId}:
 		 *   get:
-		 *     summary: Get all requested documents for a request
-		 *     tags: [requested-documents]
+		 *     summary: Get all requested documents for a tenant client
+		 *     tags: [client-requested-documents]
 		 *     parameters:
 		 *       - in: path
-		 *         name: requestId
+		 *         name: tenantClientId
 		 *         required: true
 		 *         schema:
 		 *           type: string
@@ -106,14 +121,17 @@ class RequestedDocumentsRoutes {
 		 *       200:
 		 *         description: List of requested documents
 		 */
-		this.router.get("/request/:requestId", this.controller.getRequestedDocuments.bind(this.controller));
+		this.router.get(
+			"/client/:tenantClientId",
+			this.controller.getRequestedDocuments.bind(this.controller)
+		);
 
 		/**
 		 * @swagger
-		 * /api/v1/requested-documents/{id}:
+		 * /api/v1/client-requested-documents/{id}:
 		 *   get:
-		 *     summary: Get single requested document
-		 *     tags: [requested-documents]
+		 *     summary: Get single client requested document
+		 *     tags: [client-requested-documents]
 		 *     parameters:
 		 *       - in: path
 		 *         name: id
@@ -122,9 +140,12 @@ class RequestedDocumentsRoutes {
 		 *           type: string
 		 *     responses:
 		 *       200:
-		 *         description: Requested document retrieved
+		 *         description: Requested document retrieved successfully
 		 */
-		this.router.get("/:id", this.controller.getSingleRequestedDocument.bind(this.controller));
+		this.router.get(
+			"/:id",
+			this.controller.getSingleRequestedDocument.bind(this.controller)
+		);
 	}
 
 	getRouter() {
@@ -132,4 +153,4 @@ class RequestedDocumentsRoutes {
 	}
 }
 
-export default new RequestedDocumentsRoutes().getRouter();
+export default new ClientRequestedDocumentsRoutes().getRouter();

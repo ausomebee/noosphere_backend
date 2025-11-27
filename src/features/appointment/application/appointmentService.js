@@ -429,7 +429,7 @@ class AppointmentService {
         return appointments;
     }
 
-    async getClientCanceledAppointments(tenantId) {
+    async getClientCanceledAppointments(clientId) {
         const appointments = await this.appointmentRepository.findAllAndPopulate({ clientId, isCanceled: true }, {
             client: {
                 select: {

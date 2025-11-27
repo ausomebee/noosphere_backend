@@ -141,8 +141,8 @@ class App {
         this.app.use("/api/v1/form-fields", form_field_route);
         this.app.use("/api/v1/form-responses", form_response_route);
         this.app.use("/api/v1/form-response-fields", form_response_field_route);
-        this.app.use("/api/v1/client-documents-route", client_documents_route);
-        this.app.use("/api/v1/requested-documents-route", requested_documents_route);
+        this.app.use("/api/v1/client-documents", client_documents_route);
+        this.app.use("/api/v1/client-requested-documents", requested_documents_route);
         this.app.use("/api/v1/client-authorization", client_authorization_route);
     }
 

@@ -39,6 +39,7 @@ class BaseRepository {
     }
 
     async update(id, data) {
+        console.log(id)
         return await this.model.update({
             where: { id },
             data,

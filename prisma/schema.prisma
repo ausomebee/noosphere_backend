@@ -313,7 +313,8 @@ model ClientDocuments {
   requestId       String?
   isDeleted       Boolean
 
-  tenantClient ClientTenant @relation(fields: [tenantClientId], references: [id])
+  tenantClient ClientTenant              @relation(fields: [tenantClientId], references: [id])
+  request      ClientRequestedDocuments? @relation(fields: [requestId], references: [id])
 }
 
 model ClientRequestedDocuments {
@@ -326,7 +327,8 @@ model ClientRequestedDocuments {
   dueDate        DateTime
   isDeleted      Boolean
 
-  tenantClient ClientTenant @relation(fields: [tenantClientId], references: [id])
+  tenantClient    ClientTenant      @relation(fields: [tenantClientId], references: [id])
+  clientDocuments ClientDocuments[]
 }
 
 model Pipeline {

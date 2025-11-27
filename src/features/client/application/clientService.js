@@ -120,28 +120,30 @@ class ClientService {
     }
 
     async updateTenantClient(data) {
-        const client = await this.clientTenantRepository.findFirst({ clientId: data.clientId })
+        const client = await this.clientTenantRepository.findFirst({ id: data.clientTenantId })
 
         if (!client) {
             throw new Error("client not found");
         }
 
-        const update = await this.clientTenantRepository.update(client.id, {
+        const updatePayload = {
             dbAccess: data.dbAccess ?? client.dbAccess,
             active: data.active ?? client.active,
-            stage: data.stage || client.stage,
-            clinicians: {
-                set: data.clinicians || appointment.clinicians
-            },
+            stage: data.stage ?? client.stage,
+            clinicians: data.clinicians
+                ? { set: data.clinicians }
+                : undefined,
             requestAppointment: data.requestAppointment ?? client.requestAppointment,
-            documentAccess: data.documentAccess ?? client.documentAccess
-        });
+            documentAccess: data.documentAccess ?? client.documentAccess,
+        };
 
-        if (!update) {
+        const updated = await this.clientTenantRepository.update(client.id, updatePayload);
+
+        if (!updated) {
             throw new Error("Failed to update client");
         }
 
-        return update;
+        return updated;
     }
 
 

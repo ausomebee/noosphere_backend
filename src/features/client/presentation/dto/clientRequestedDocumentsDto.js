@@ -21,7 +21,6 @@ class ClientRequestedDocumentsDto {
                 "any.required": "Requested Document ID is required for update",
                 "string.guid": "Requested Document ID must be a valid UUID"
             }),
-            tenantClientId: Joi.string().uuid().required(),
             name: Joi.string().min(2).max(150).optional(),
             description: Joi.string().min(2).max(300).optional(),
             allowMultiple: Joi.boolean().optional(),

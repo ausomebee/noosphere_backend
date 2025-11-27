@@ -19,12 +19,6 @@ class ClientAuthorizationDto {
 
     static updateClientAuthorizationDto = (req, res, next) => {
         const schema = Joi.object({
-            id: Joi.string().uuid().required().messages({
-                "any.required": "Authorization ID is required for update",
-                "string.guid": "Authorization ID must be a valid UUID"
-            }),
-
-            tenantClientId: Joi.string().uuid().required(),
             title: Joi.string().min(2).max(200).optional(),
             authorizationNumber: Joi.string().min(2).max(150).optional(),
             startDate: Joi.string().optional(),
