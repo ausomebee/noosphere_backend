@@ -95,9 +95,9 @@ class ClientService {
             dbAccess: data.dbAccess ?? client.dbAccess,
             active: data.active ?? client.active,
             stage: data.stage || client.stage,
-            clinicians: {
-                set: data.clinicians || appointment.clinicians
-            },
+            clinicians: data.clinicians
+                ? { set: data.clinicians }
+                : undefined,
             requestAppointment: data.requestAppointment ?? client.requestAppointment,
             documentAccess: data.documentAccess ?? client.documentAccess
         });
