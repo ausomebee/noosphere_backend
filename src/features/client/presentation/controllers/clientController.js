@@ -69,7 +69,7 @@ class ClientController {
     });
 
     getSingleClient = expressAsyncHandler(async (req, res) => {
-        const client = await this.service.getTenantClients(req.params.clientId);
+        const client = await this.service.getSingleClient(req.params.clientId);
 
         if (!client) {
             res.status(500).json({ message: 'Failed to fetch client' });

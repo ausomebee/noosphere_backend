@@ -112,8 +112,8 @@ class ClientService {
     }
 
     async getTenantClients(tenantId) {
+        console.log(tenantId)
         const clients = await this.clientTenantRepository.findAllAndPopulate({ tenantId }, { client: true, clinicians: true });
-
         if (!clients) {
             throw new Error("clients not found")
         }
@@ -121,7 +121,7 @@ class ClientService {
         return clients;
     }
 
-    async getTenantClients(clientId) {
+    async getSingleClient(clientId) {
         const client = await this.clientTenantRepository.findFirstDynamic({
             where: {
                 clientId: clientId
