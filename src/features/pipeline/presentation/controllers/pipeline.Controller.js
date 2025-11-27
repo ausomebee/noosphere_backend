@@ -192,13 +192,14 @@ class PipelineController {
 
     getItemByIdClient = expressAsyncHandler(async (req, res) => {
         const item = await this.service.getItemByIdClient(req.params.id);
+
         if (!item) {
             res.status(500).json({ message: 'Failed to fetch item' });
         }
 
         const clientTenant = await this.clientTenantRepository.findFirst({ tenantId: item.tenantId, clientId: item.clientId })
 
-        if (!item) {
+        if (!clientTenant) {
             res.status(500).json({ message: 'Failed to fetch item' });
         }
 
