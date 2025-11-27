@@ -121,6 +121,24 @@ class ClientService {
         return clients;
     }
 
+    async getTenantClients(clientId) {
+        const client = await this.clientTenantRepository.findFirstDynamic({
+            where: {
+                clientId: clientId
+            },
+            include: {
+                client: true,
+                clinicians: true
+            },
+        });
+
+        if (!client) {
+            throw new Error("clients not found")
+        }
+
+        return client;
+    }
+
     async updateTenantClient(data) {
         const client = await this.clientTenantRepository.findFirst({ id: data.clientTenantId })
 
