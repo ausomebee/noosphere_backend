@@ -29,7 +29,7 @@ class ClientController {
         }
 
         for (const field of req.body.documents || []) {
-            const documentsData = new ClientDocuments({...field, tenantClientId: candidate.tenantClientId});
+            const documentsData = new ClientDocuments({ ...field, tenantClientId: candidate.tenantClientId });
             const doc = await this.clientDocumentsService.createClientDocument(documentsData.createClientDocument);
         }
 
@@ -70,7 +70,7 @@ class ClientController {
 
     deactivateClient = expressAsyncHandler(async (req, res) => {
         const client = await this.service.updateTenantClient({
-            clientId: req.params.clientId,
+            clientTenantId: req.params.clientTenantId,
             active: req.params.active === "true"
         });
 

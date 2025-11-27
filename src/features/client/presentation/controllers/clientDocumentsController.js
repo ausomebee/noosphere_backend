@@ -28,12 +28,7 @@ class ClientDocumentsController {
 
     async updateClientDocument(req, res) {
         try {
-            const data = {
-                id: req.params.id,
-                ...req.body,
-            };
-
-            const updated = await this.clientDocumentsService.updateClientDocument(data);
+            const updated = await this.clientDocumentsService.updateClientDocument(req.body);
 
             return res.status(200).json({
                 message: "Client document updated successfully",

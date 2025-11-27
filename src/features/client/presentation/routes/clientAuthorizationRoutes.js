@@ -1,7 +1,6 @@
 import express from "express";
 import ClientAuthorizationController from "../controllers/clientAuthorizationController.js";
 import ClientAuthorizationDto from "../dto/clientAuthorizationDto.js";
-
 /**
  * @swagger
  * tags:
@@ -32,7 +31,9 @@ import ClientAuthorizationDto from "../dto/clientAuthorizationDto.js";
  *         insuranceType:
  *           type: string
  *         serviceCodes:
- *           type: object
+ *           type: array
+ *           items:
+ *             type: object
  *         isDeleted:
  *           type: boolean
  *
@@ -60,7 +61,9 @@ import ClientAuthorizationDto from "../dto/clientAuthorizationDto.js";
  *               insuranceType:
  *                 type: string
  *               serviceCodes:
- *                 type: object
+ *                 type: array
+ *                 items:
+ *                   type: object
  *             required:
  *               - tenantClientId
  *               - title
@@ -78,9 +81,6 @@ import ClientAuthorizationDto from "../dto/clientAuthorizationDto.js";
  *           schema:
  *             type: object
  *             properties:
- *               tenantClientId:
- *                 type: string
- *                 format: uuid
  *               title:
  *                 type: string
  *               authorizationNumber:
@@ -94,7 +94,9 @@ import ClientAuthorizationDto from "../dto/clientAuthorizationDto.js";
  *               insuranceType:
  *                 type: string
  *               serviceCodes:
- *                 type: object
+ *                 type: array
+ *                 items:
+ *                   type: object
  */
 
 class ClientAuthorizationRoutes {

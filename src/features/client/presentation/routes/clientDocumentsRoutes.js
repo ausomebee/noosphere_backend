@@ -9,30 +9,26 @@ import ClientDocumentsDto from "../dto/clientDocumentsDto.js";
  *     ClientDocumentCreateDto:
  *       type: object
  *       required:
- *         - tenantId
  *         - tenantClientId
- *         - documentName
- *         - documentType
+ *         - name
+ *         - documentDetails
  *       properties:
- *         tenantId:
- *           type: string
- *           format: uuid
- *         requestId:
- *           type: string
- *           format: uuid
  *         tenantClientId:
  *           type: string
  *           format: uuid
- *         documentName:
+ *         name:
  *           type: string
- *           example: "National ID Card"
- *         documentType:
+ *           example: "Driver’s License"
+ *         documentDetails:
+ *           type: object
+ *           example:
+ *             fileUrl: "https://example.com/document.pdf"
+ *             size: 25000
+ *             type: "pdf"
+ *         requestId:
  *           type: string
- *           example: "ID"
- *         fileUrl:
- *           type: string
- *           example: "https://example.com/file.pdf"
- *         isVerified:
+ *           format: uuid
+ *         isDeleted:
  *           type: boolean
  *           example: false
  *
@@ -44,14 +40,10 @@ import ClientDocumentsDto from "../dto/clientDocumentsDto.js";
  *         id:
  *           type: string
  *           format: uuid
- *         documentName:
+ *         name:
  *           type: string
- *         documentType:
- *           type: string
- *         fileUrl:
- *           type: string
- *         isVerified:
- *           type: boolean
+ *         documentDetails:
+ *           type: object
  *         isDeleted:
  *           type: boolean
  */
@@ -68,7 +60,7 @@ class ClientDocumentsRoutes {
 		 * @swagger
 		 * /api/v1/client-documents/:
 		 *   post:
-		 *     summary: Upload client document
+		 *     summary: Upload or create a client document
 		 *     tags: [client-documents]
 		 *     requestBody:
 		 *       required: true
@@ -78,15 +70,19 @@ class ClientDocumentsRoutes {
 		 *             $ref: '#/components/schemas/ClientDocumentCreateDto'
 		 *     responses:
 		 *       201:
-		 *         description: Client document uploaded successfully
+		 *         description: Client document created successfully
 		 */
-		this.router.post("/", ClientDocumentsDto.createClientDocumentDto, this.controller.createClientDocument.bind(this.controller));
+		this.router.post(
+			"/",
+			ClientDocumentsDto.createClientDocumentDto,
+			this.controller.createClientDocument.bind(this.controller)
+		);
 
 		/**
 		 * @swagger
 		 * /api/v1/client-documents/:
 		 *   put:
-		 *     summary: Update client document
+		 *     summary: Update a client document
 		 *     tags: [client-documents]
 		 *     requestBody:
 		 *       required: true
@@ -98,13 +94,17 @@ class ClientDocumentsRoutes {
 		 *       200:
 		 *         description: Client document updated successfully
 		 */
-		this.router.put("/", ClientDocumentsDto.updateClientDocumentDto, this.controller.updateClientDocument.bind(this.controller));
+		this.router.put(
+			"/",
+			ClientDocumentsDto.updateClientDocumentDto,
+			this.controller.updateClientDocument.bind(this.controller)
+		);
 
 		/**
 		 * @swagger
 		 * /api/v1/client-documents/client/{tenantClientId}:
 		 *   get:
-		 *     summary: Get all documents for a client
+		 *     summary: Get all documents uploaded by a client
 		 *     tags: [client-documents]
 		 *     parameters:
 		 *       - in: path
@@ -114,33 +114,18 @@ class ClientDocumentsRoutes {
 		 *           type: string
 		 *     responses:
 		 *       200:
-		 *         description: Client documents fetched successfully
+		 *         description: List of client documents retrieved successfully
 		 */
-		this.router.get("/client/:tenantClientId", this.controller.getClientDocuments.bind(this.controller));
-
-        /**
-		 * @swagger
-		 * /api/v1/client-documents/requested/{requestId}:
-		 *   get:
-		 *     summary: Get requested documents for a client
-		 *     tags: [client-documents]
-		 *     parameters:
-		 *       - in: path
-		 *         name: requestId
-		 *         required: true
-		 *         schema:
-		 *           type: string
-		 *     responses:
-		 *       200:
-		 *         description: Client requested documents fetched successfully
-		 */
-		this.router.get("/requested/:requestId", this.controller.getRequestDocuments.bind(this.controller));
+		this.router.get(
+			"/client/:tenantClientId",
+			this.controller.getClientDocuments.bind(this.controller)
+		);
 
 		/**
 		 * @swagger
 		 * /api/v1/client-documents/{id}:
 		 *   get:
-		 *     summary: Get a single client document
+		 *     summary: Get a single client document by ID
 		 *     tags: [client-documents]
 		 *     parameters:
 		 *       - in: path
@@ -150,27 +135,12 @@ class ClientDocumentsRoutes {
 		 *           type: string
 		 *     responses:
 		 *       200:
-		 *         description: Client document retrieved
+		 *         description: Client document retrieved successfully
 		 */
-		this.router.get("/:id", this.controller.getSingleClientDocument.bind(this.controller));
-
-        /**
-         * @swagger
-         * /api/v1/client/{id}:
-         *   patch:
-         *     summary: delete document
-         *     tags: [Clients]
-         *     parameters:
-         *       - in: path
-         *         name: clientId
-         *         required: true
-         *         schema:
-         *           type: string
-         *     responses:
-         *       200:
-         *         description: document deleted successfully
-         */
-        this.router.patch("/:id", this.controller.deleteClientDocument);
+		this.router.get(
+			"/:id",
+			this.controller.getSingleClientDocument.bind(this.controller)
+		);
 	}
 
 	getRouter() {
