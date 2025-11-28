@@ -219,6 +219,52 @@ class ClientAuthorizationRoutes {
             this.controller.getClientAuthorizations.bind(this.controller)
         );
 
+        /**
+         * @swagger
+         * /api/v1/client-authorization/{id}/{active}:
+         *   patch:
+         *     summary: deactivate or activate a client
+         *     tags: [ClientAuthorization]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *       - in: path
+         *         name: active
+         *         required: true
+         *         schema:
+         *           type: boolean
+         *     responses:
+         *       200:
+         *         description: Client deactivated successfully
+         */
+        this.router.patch("/:id/:active", this.controller.deactivateAuth);
+
+        /**
+         * @swagger
+         * /api/v1/client-authorization/delete/{id}/{delete}:
+         *   patch:
+         *     summary: deactivate or activate a client
+         *     tags: [ClientAuthorization]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *       - in: path
+         *         name: delete
+         *         required: true
+         *         schema:
+         *           type: boolean
+         *     responses:
+         *       200:
+         *         description: Client deactivated successfully
+         */
+        this.router.patch("/:id/:delete", this.controller.deleteAuth);
+
     }
 
     getRouter() {

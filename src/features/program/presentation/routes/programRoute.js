@@ -110,7 +110,7 @@ class ProgramRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", ProgramDto.createCustomProgramDto, this.controller.createCustomProgram);
+        this.router.post("/custom", ProgramDto.createCustomProgramDto, this.controller.createCustomProgram);
 
         /**
          * @swagger
@@ -172,7 +172,7 @@ class ProgramRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/:tenantId", this.controller.getAllTenantPrograms);
+        this.router.get("/tenant/:tenantId", this.controller.getAllTenantPrograms);
 
         /**
          * @swagger

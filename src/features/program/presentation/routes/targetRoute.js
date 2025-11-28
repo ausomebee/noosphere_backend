@@ -114,7 +114,6 @@ import S3Service from "../../../../utilities/s3.js";
  *         - notes
  *         - masteryMetric
  *         - masteryCriteria
- *         - attachment
  *
  *     CreateCustomTarget:
  *       type: object
@@ -335,7 +334,7 @@ class TargetRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", this.S3Service.single("attachment"), TargetDto.createTargetDto, this.controller.createTarget);
+        this.router.post("/", this.S3Service.single("attachment"), this.controller.createTarget);
 
         /**
          * @swagger

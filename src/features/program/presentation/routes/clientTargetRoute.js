@@ -11,6 +11,7 @@ import ClientTargetController from "../controllers/clientTargetController.js";
  *       required:
  *         - clientId
  *         - targetId
+ *         - programId
  *       properties:
  *         clientId:
  *           type: string
@@ -21,6 +22,11 @@ import ClientTargetController from "../controllers/clientTargetController.js";
  *           type: string
  *           format: uuid
  *           description: Unique identifier of the target
+ *           example: "223e4567-e89b-12d3-a456-426614174111"
+ *         programId:
+ *           type: string
+ *           format: uuid
+ *           description: Unique identifier of the program
  *           example: "223e4567-e89b-12d3-a456-426614174111"
  */
 

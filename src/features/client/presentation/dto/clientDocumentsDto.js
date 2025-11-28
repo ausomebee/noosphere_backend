@@ -5,7 +5,7 @@ class ClientDocumentsDto {
     static createClientDocumentDto = (req, res, next) => {
         const schema = Joi.object({
             tenantClientId: Joi.string().uuid().required(),
-            requestId: Joi.string().uuid().required(),
+            requestId: Joi.string().uuid().optional(),
             name: Joi.string().min(2).max(150).required(),
             documentDetails: Joi.object().required(),
             isDeleted: Joi.boolean().default(false)

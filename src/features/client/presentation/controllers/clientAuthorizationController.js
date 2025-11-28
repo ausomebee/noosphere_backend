@@ -1,3 +1,4 @@
+import expressAsyncHandler from "express-async-handler";
 import prismaService from "../../../../config/prisma.js";
 import ClientAuthorizationService from "../../application/clientAuthorizationService.js";
 import ClientAuthorizationRepository from "../../infrastructure/clientAuthorizationRepository.js";
@@ -81,6 +82,41 @@ class ClientAuthorizationController {
             });
         }
     }
+
+    deactivateAuth = expressAsyncHandler(async (req, res) => {
+        const auth = await this.service.updateClientAuthorization({
+            authTenantId: req.params.id,
+            active: req.params.active === "true"
+        });
+
+        if (!auth) {
+            return res.status(500).json({ message: "Failed to deactivate auth" });
+        }
+
+        return res.status(200).json({
+            message: "auth deactivated successfully",
+            status: "ok",
+            data: auth
+        });
+    });
+
+    deleteAuth = expressAsyncHandler(async (req, res) => {
+        const auth = await this.service.updateClientAuthorization({
+            authTenantId: req.params.id,
+            delete: req.params.delete === "true"
+        });
+
+        if (!auth) {
+            return res.status(500).json({ message: "Failed to delete auth" });
+        }
+
+        return res.status(200).json({
+            message: "auth deleted successfully",
+            status: "ok",
+            data: auth
+        });
+    });
+
 }
 
 export default ClientAuthorizationController;
