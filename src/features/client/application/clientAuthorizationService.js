@@ -39,7 +39,9 @@ class ClientAuthorizationService {
             endDate: data.endDate ?? auth.endDate,
             payer: data.payer ?? auth.payer,
             insuranceType: data.insuranceType ?? auth.insuranceType,
-            serviceCodes: data.serviceCodes ?? auth.serviceCodes
+            serviceCodes: data.serviceCodes ?? auth.serviceCodes,
+            isDeleted: data.isDeleted ?? auth.isDeleted,
+            isActive: data.isActive ?? auth.isActive,
         });
 
         if (!update) {

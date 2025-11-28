@@ -97,8 +97,8 @@ class ClientService {
             dbAccess: data.dbAccess ?? client.dbAccess,
             active: data.active ?? client.active,
             stage: data.stage || client.stage,
-            clinicians: data.clinicians
-                ? { set: data.clinicians }
+            clinicians: data.assignToClinicians
+                ? { set: data.assignToClinicians }
                 : undefined,
             requestAppointment: data.requestAppointment ?? client.requestAppointment,
             documentAccess: data.documentAccess ?? client.documentAccess
@@ -150,8 +150,8 @@ class ClientService {
             dbAccess: data.dbAccess ?? client.dbAccess,
             active: data.active ?? client.active,
             stage: data.stage ?? client.stage,
-            clinicians: data.clinicians
-                ? { set: data.clinicians }
+            clinicians: data.assignToClinicians
+                ? { set: data.assignToClinicians }
                 : undefined,
             requestAppointment: data.requestAppointment ?? client.requestAppointment,
             documentAccess: data.documentAccess ?? client.documentAccess,

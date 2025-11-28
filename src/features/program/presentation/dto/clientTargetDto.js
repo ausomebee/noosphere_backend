@@ -6,6 +6,7 @@ class ClientTargetDto {
         const schema = Joi.object({
             clientId: Joi.string().uuid().required(),
             targetId: Joi.string().uuid().required(),
+            programId: Joi.string().uuid().optional(),
         });
 
         Validator.validateRequest(req, next, schema);

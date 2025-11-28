@@ -98,25 +98,7 @@ import ClientDto from "../dto/clientDto.js";
  *         caregiverZip:
  *           type: string
  *
- *         documents:
- *           type: array
- *           description: "List of uploaded client documents"
- *           items:
- *             type: object
- *             required:
- *               - name
- *               - documentDetails
- *             properties:
- *               name:
- *                 type: string
- *                 example: "National ID"
- *               documentDetails:
- *                 type: object
- *                 description: "Any JSON metadata for the document"
- *                 example:
- *                   fileUrl: "https://uploads/documents/id-card.png"
- *                   fileType: "image/png"
- *                   uploadedAt: "2025-01-01T12:00:00Z"
+ *         
  *
  *
  *     ManagePortalAccess:
@@ -193,22 +175,7 @@ import ClientDto from "../dto/clientDto.js";
  *           type: string
  *         caregiverZip:
  *           type: string
- *         documents:
- *           type: array
- *           items:
- *             type: object
- *             required:
- *               - name
- *               - documentDetails
- *             properties:
- *               name:
- *                 type: string
- *                 example: "Updated ID Card"
- *               documentDetails:
- *                 type: object
- *                 example:
- *                   fileUrl: "https://uploads/new-file.pdf"
- *                   fileType: "application/pdf"
+ 
  *         isDeleted:
  *           type: boolean
  *           example: false
