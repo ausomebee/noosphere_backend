@@ -123,6 +123,10 @@ import S3Service from "../../../../utilities/s3.js";
  *           minLength: 1
  *           maxLength: 255
  *           description: Name of the target.
+ *         programId:
+ *           type: string
+ *           format: uuid
+ *           description: UUID of the related program.
  *         description:
  *           type: string
  *           minLength: 1

@@ -27,7 +27,7 @@ class TargetDto {
                 req.body.promptingStrategy = req.body.promptingStrategy
                     .split(",")
                     .map(s => s.trim())
-                    .filter(Boolean); 
+                    .filter(Boolean);
             }
         } else if (
             req.body.promptingStrategy &&
@@ -90,7 +90,7 @@ class TargetDto {
                 req.body.promptingStrategy = req.body.promptingStrategy
                     .split(",")
                     .map(s => s.trim())
-                    .filter(Boolean); 
+                    .filter(Boolean);
             }
         } else if (
             req.body.promptingStrategy &&
@@ -116,6 +116,7 @@ class TargetDto {
             name: Joi.string().trim().min(1).max(255).required(),
             description: Joi.string().trim().min(1).max(5000).required(),
             clientId: Joi.string().uuid().required(),
+            programId: Joi.string().uuid().optional(),
             sd: Joi.string().trim().min(1).max(255).required(),
             expectedResponse: Joi.string().trim().min(1).max(2000).required(),
             teachingProcedure: Joi.string().trim().min(1).max(5000).required(),
@@ -153,7 +154,7 @@ class TargetDto {
                 req.body.promptingStrategy = req.body.promptingStrategy
                     .split(",")
                     .map(s => s.trim())
-                    .filter(Boolean); 
+                    .filter(Boolean);
             }
         } else if (
             req.body.promptingStrategy &&
