@@ -260,10 +260,7 @@ class ClientDto {
                                 "string.max": "Name must not exceed 150 characters",
                                 "any.required": "Name is required"
                             }),
-                        id: Joi.string().uuid().required().messages({
-                            "any.required": "Document ID is required for update",
-                            "string.guid": "Document ID must be a valid UUID"
-                        }),
+
                         documentDetails: Joi.object()
                             .required()
                             .messages({

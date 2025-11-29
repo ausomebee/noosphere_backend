@@ -108,7 +108,7 @@ class ClientService {
             throw new Error("Failed to update client");
         }
 
-        return update;
+        return { ...update, clientTenantId: clientTenant.id };
     }
 
     async getTenantClients(tenantId) {

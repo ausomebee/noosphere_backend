@@ -48,7 +48,8 @@ class ClientController {
         }
 
         for (const field of req.body.documents || []) {
-            const doc = await this.clientDocumentsService.updateClientDocument(field);
+            const documentsData = new ClientDocuments({ ...field, tenantClientId: client.clientTenantId });
+            const doc = await this.clientDocumentsService.createClientDocument(documentsData.createClientDocument);
         }
 
         return res.status(201).json({
