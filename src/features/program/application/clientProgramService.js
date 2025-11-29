@@ -54,10 +54,10 @@ class ClientProgramService {
     }
 
     async getAllClientProgram(clientId) {
-        const program = await this.clientProgramRepository.findAllAndPopulate({
+        const program = await this.clientProgramRepository.findAll({
             clientId,
             isDeleted: false
-        }, { });
+        });
 
         if (!program) {
             throw new Error("program not found")
