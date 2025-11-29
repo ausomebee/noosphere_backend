@@ -71,7 +71,14 @@ import ClientDto from "../dto/clientDto.js";
  *         assignToClinicians:
  *           type: array
  *           items:
- *              type: string
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 format: uuid
+ *                 example: "8309241f-d2a0-425c-ace9-134fdd58b7f4"
+ *             required:
+ *               - id
  *         createdBy:
  *           type: string
  *           format: uuid
@@ -175,7 +182,18 @@ import ClientDto from "../dto/clientDto.js";
  *           type: string
  *         caregiverZip:
  *           type: string
- 
+  *         assignToClinicians:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 format: uuid
+ *                 example: "8309241f-d2a0-425c-ace9-134fdd58b7f4"
+ *             required:
+ *               - id
+
  *         isDeleted:
  *           type: boolean
  *           example: false

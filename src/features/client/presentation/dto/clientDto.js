@@ -87,11 +87,22 @@ class ClientDto {
                     "string.guid": "Pipeline stage ID must be a valid UUID"
                 }),
 
-            assignToClinicians: Joi.string()
-                .uuid()
+           assignToClinicians: Joi.array()
+                .items(
+                    Joi.object({
+                        id: Joi.string()
+                            .uuid()
+                            .required()
+                            .messages({
+                                "string.guid": "Clinician ID must be a valid UUID",
+                                "any.required": "Clinician ID is required"
+                            })
+                    })
+                )
                 .optional()
                 .messages({
-                    "string.guid": "Clinician ID must be a valid UUID"
+                    "array.base": "assignToClinicians must be an array of objects",
+                    "array.includes": "Each clinician must be an object with an id field"
                 }),
 
             clientPortalAccess: Joi.boolean()
@@ -232,12 +243,24 @@ class ClientDto {
                     "string.guid": "Pipeline stage ID must be a valid UUID"
                 }),
 
-            assignToClinicians: Joi.string()
-                .uuid()
+            assignToClinicians: Joi.array()
+                .items(
+                    Joi.object({
+                        id: Joi.string()
+                            .uuid()
+                            .required()
+                            .messages({
+                                "string.guid": "Clinician ID must be a valid UUID",
+                                "any.required": "Clinician ID is required"
+                            })
+                    })
+                )
                 .optional()
                 .messages({
-                    "string.guid": "Clinician ID must be a valid UUID"
+                    "array.base": "assignToClinicians must be an array of objects",
+                    "array.includes": "Each clinician must be an object with an id field"
                 }),
+
 
             clientPortalAccess: Joi.boolean()
                 .optional()
