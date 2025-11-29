@@ -55,8 +55,7 @@ class ClientProgramService {
 
     async getAllClientProgram(clientId) {
         const program = await this.clientProgramRepository.findAll({
-            clientId,
-            isDeleted: false
+            clientId
         });
 
         if (!program) {
