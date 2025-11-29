@@ -281,22 +281,7 @@ class ClientDto {
             country: Joi.string().optional().trim(),
             zipCode: Joi.string().optional().trim(),
 
-            tenantId: Joi.string()
-                .uuid()
-                .required()
-                .messages({
-                    "string.empty": "Tenant ID is required",
-                    "string.guid": "Tenant ID must be a valid UUID"
-                }),
-
-            pipelineStageId: Joi.string()
-                .uuid()
-                .required()
-                .messages({
-                    "string.empty": "Pipeline stage ID is required",
-                    "string.guid": "Pipeline stage ID must be a valid UUID"
-                }),
-
+            
             assignToClinicians: Joi.array()
                 .items(
                     Joi.object({

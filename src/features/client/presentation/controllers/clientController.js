@@ -31,6 +31,9 @@ class ClientController {
         for (const field of req.body.documents || []) {
             const documentsData = new ClientDocuments({ ...field, tenantClientId: candidate.tenantClientId });
             const doc = await this.clientDocumentsService.createClientDocument(documentsData.createClientDocument);
+            if (!doc) {
+                res.status(500).json({ message: 'Failed to update client' });
+            }
         }
 
         return res.status(201).json({
@@ -50,6 +53,9 @@ class ClientController {
         for (const field of req.body.documents || []) {
             const documentsData = new ClientDocuments({ ...field, tenantClientId: client.clientTenantId });
             const doc = await this.clientDocumentsService.createClientDocument(documentsData.createClientDocument);
+            if (!doc) {
+                res.status(500).json({ message: 'Failed to update client' });
+            }
         }
 
         return res.status(201).json({

@@ -103,8 +103,6 @@ class Client {
             caregiverCountry: this.caregiverCountry,
             caregiverZip: this.caregiverZip,
 
-            documents: this.documents,
-
             password: this.password,
         };
     }
