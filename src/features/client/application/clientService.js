@@ -85,7 +85,6 @@ class ClientService {
             caregiverState: data.caregiverState || client.caregiverState,
             caregiverCountry: data.caregiverCountry || client.caregiverCountry,
             caregiverZip: data.caregiverZip || client.caregiverZip,
-            documents: data.documents || client.documents,
             isVerified: data.isVerified ?? client.isVerified,
             isDeleted: data.isDeleted ?? client.isDeleted,
             password: data.password || client.password,
