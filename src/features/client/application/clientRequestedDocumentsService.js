@@ -55,7 +55,7 @@ class ClientRequestedDocumentsService {
     }
 
     async getRequestedDocuments(tenantClientId) {
-        const requests = await this.clientRequestedDocumentsRepository.findAll({ tenantClientId });
+        const requests = await this.clientRequestedDocumentsRepository.findAllAndPopulate({ tenantClientId }, {clientDocuments: true});
 
         if (!requests) {
             throw new Error("Requested Documents not found");
