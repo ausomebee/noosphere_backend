@@ -901,9 +901,10 @@ model Payer {
   isDeleted       Boolean @default(false)
   isActive        Boolean @default(true)
 
-  tenant            Tenant              @relation(fields: [tenantId], references: [id])
-  insuranceType     InsuranceType       @relation(fields: [insuranceTypeId], references: [id])
-  PayerServiceCodes PayerServiceCodes[]
+  tenant               Tenant                @relation(fields: [tenantId], references: [id])
+  insuranceType        InsuranceType         @relation(fields: [insuranceTypeId], references: [id])
+  PayerServiceCodes    PayerServiceCodes[]
+  clientAuthorizations ClientAuthorization[]
 }
 
 model PayerServiceCodes {
@@ -1055,4 +1056,5 @@ model ClientAuthorization {
   isActive            Boolean @default(true)
 
   tenantClient ClientTenant @relation(fields: [tenantClientId], references: [id])
+  payerDetails Payer        @relation(fields: [payer], references: [id])
 }
