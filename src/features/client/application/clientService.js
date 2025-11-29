@@ -90,7 +90,7 @@ class ClientService {
             password: data.password || client.password,
         });
 
-        const clientTenant = await this.clientTenantRepository.findFirst({ id: data.clientTenantId })
+        const clientTenant = await this.clientTenantRepository.findFirst({ clientId: data.id })
 
         const updateClientTenant = await this.clientTenantRepository.update(clientTenant.id, {
             dbAccess: data.dbAccess ?? client.dbAccess,
