@@ -138,6 +138,9 @@ class ClientDto {
                                 "string.max": "Name must not exceed 150 characters",
                                 "any.required": "Name is required"
                             }),
+                        createdBy: Joi.string()
+                            .uuid()
+                            .optional(),
 
                         documentDetails: Joi.object()
                             .required()
@@ -260,6 +263,9 @@ class ClientDto {
                                 "string.max": "Name must not exceed 150 characters",
                                 "any.required": "Name is required"
                             }),
+                        createdBy: Joi.string()
+                            .uuid()
+                            .optional(),
 
                         documentDetails: Joi.object()
                             .required()
@@ -281,7 +287,7 @@ class ClientDto {
             country: Joi.string().optional().trim(),
             zipCode: Joi.string().optional().trim(),
 
-            
+
             assignToClinicians: Joi.array()
                 .items(
                     Joi.object({

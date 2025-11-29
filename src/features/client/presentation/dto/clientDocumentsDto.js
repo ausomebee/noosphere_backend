@@ -8,7 +8,10 @@ class ClientDocumentsDto {
             requestId: Joi.string().uuid().optional(),
             name: Joi.string().min(2).max(150).required(),
             documentDetails: Joi.object().required(),
-            isDeleted: Joi.boolean().default(false)
+            isDeleted: Joi.boolean().default(false),
+            createdBy: Joi.string()
+                .uuid()
+                .optional()
         });
 
         Validator.validateRequest(req, next, schema);
@@ -22,7 +25,10 @@ class ClientDocumentsDto {
             }),
             name: Joi.string().min(2).max(150).optional(),
             documentDetails: Joi.object().optional(),
-            isDeleted: Joi.boolean().optional()
+            isDeleted: Joi.boolean().optional(),
+            createdBy: Joi.string()
+                .uuid()
+                .optional()
         });
 
         Validator.validateRequest(req, next, schema);

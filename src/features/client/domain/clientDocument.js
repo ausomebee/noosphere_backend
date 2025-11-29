@@ -5,7 +5,8 @@ class ClientDocuments {
         name = "",
         documentDetails = {},
         isDeleted = false,
-        requestId
+        requestId,
+        createdBy
     } = {}) {
         this.id = id;
         this.tenantClientId = tenantClientId;
@@ -13,6 +14,7 @@ class ClientDocuments {
         this.documentDetails = documentDetails;
         this.isDeleted = isDeleted;
         this.requestId = requestId;
+        this.createdBy = createdBy;
     }
 
     get createClientDocument() {
@@ -21,7 +23,8 @@ class ClientDocuments {
             name: this.name,
             documentDetails: this.documentDetails,
             isDeleted: this.isDeleted,
-            requestId: this.requestId
+            requestId: this.requestId,
+            createdBy: this.createdBy
         };
     }
 

@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "ClientDocuments" ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN     "createdBy" TEXT,
+ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+-- AddForeignKey
+ALTER TABLE "ClientDocuments" ADD CONSTRAINT "ClientDocuments_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "TenantStaff"("id") ON DELETE SET NULL ON UPDATE CASCADE;
