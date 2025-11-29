@@ -6,16 +6,7 @@ class ClientDocumentsService {
     async createClientDocument(data) {
         const existing = await this.clientDocumentsRepository.findFirstDynamic({
             where: { name: data.name, tenantClientId: data.tenantClientId },
-            select: { id: true },
-            include: {
-                tenantStaff: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        email: true,
-                    }
-                }
-            }
+            select: { id: true }
         });
 
         if (existing) {
@@ -62,7 +53,15 @@ class ClientDocumentsService {
     }
 
     async getClientDocuments(tenantClientId) {
-        const documents = await this.clientDocumentsRepository.findAll({ tenantClientId });
+        const documents = await this.clientDocumentsRepository.findAllAndPopulate({ tenantClientId }, {
+            tenantStaff: {
+                select: {
+                    id: true,
+                    fullName: true,
+                    email: true,
+                }
+            }
+        });
 
         if (!documents) {
             throw new Error("Client Documents not found");
