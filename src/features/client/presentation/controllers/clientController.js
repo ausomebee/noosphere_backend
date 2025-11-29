@@ -47,6 +47,10 @@ class ClientController {
             res.status(500).json({ message: 'Failed to update client' });
         }
 
+        for (const field of req.body.documents || []) {
+            const doc = await this.clientDocumentsService.updateClientDocument(field);
+        }
+
         return res.status(201).json({
             message: "candidate updated successfully",
             status: 'ok',

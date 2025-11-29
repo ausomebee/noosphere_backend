@@ -87,7 +87,7 @@ class ClientDto {
                     "string.guid": "Pipeline stage ID must be a valid UUID"
                 }),
 
-           assignToClinicians: Joi.array()
+            assignToClinicians: Joi.array()
                 .items(
                     Joi.object({
                         id: Joi.string()
@@ -125,6 +125,33 @@ class ClientDto {
             caregiverState: Joi.string().optional().trim(),
             caregiverCountry: Joi.string().optional().trim(),
             caregiverZip: Joi.string().optional().trim(),
+            documents: Joi.array()
+                .items(
+                    Joi.object({
+                        name: Joi.string()
+                            .min(2)
+                            .max(150)
+                            .required()
+                            .messages({
+                                "string.base": "Name must be a string",
+                                "string.min": "Name must be at least 2 characters",
+                                "string.max": "Name must not exceed 150 characters",
+                                "any.required": "Name is required"
+                            }),
+
+                        documentDetails: Joi.object()
+                            .required()
+                            .messages({
+                                "object.base": "documentDetails must be an object",
+                                "any.required": "documentDetails is required"
+                            })
+                    })
+                )
+                .optional()
+                .messages({
+                    "array.base": "Documents must be an array",
+                    "array.includes": "Each document must contain name and documentDetails"
+                }),
 
             stage: Joi.string().optional().trim(),
             createdBy: Joi.string()
@@ -220,6 +247,36 @@ class ClientDto {
                 }),
 
             primaryPayer: Joi.string().optional().trim(),
+            documents: Joi.array()
+                .items(
+                    Joi.object({
+                        name: Joi.string()
+                            .min(2)
+                            .max(150)
+                            .required()
+                            .messages({
+                                "string.base": "Name must be a string",
+                                "string.min": "Name must be at least 2 characters",
+                                "string.max": "Name must not exceed 150 characters",
+                                "any.required": "Name is required"
+                            }),
+                        id: Joi.string().uuid().required().messages({
+                            "any.required": "Document ID is required for update",
+                            "string.guid": "Document ID must be a valid UUID"
+                        }),
+                        documentDetails: Joi.object()
+                            .required()
+                            .messages({
+                                "object.base": "documentDetails must be an object",
+                                "any.required": "documentDetails is required"
+                            })
+                    })
+                )
+                .optional()
+                .messages({
+                    "array.base": "Documents must be an array",
+                    "array.includes": "Each document must contain name and documentDetails"
+                }),
 
             streetAddress: Joi.string().optional().trim(),
             city: Joi.string().optional().trim(),
