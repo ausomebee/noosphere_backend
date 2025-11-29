@@ -275,6 +275,7 @@ model Client {
   pipelineItems PipelineItem[]
   tenantLinks   ClientTenant[]
   logs          Logs[]
+  payer         Payer?          @relation(fields: [primaryPayer], references: [id])
   ClientProgram ClientProgram[]
   ClientTarget  ClientTarget[]
   Appointment   Appointment[]
@@ -905,6 +906,7 @@ model Payer {
   insuranceType        InsuranceType         @relation(fields: [insuranceTypeId], references: [id])
   PayerServiceCodes    PayerServiceCodes[]
   clientAuthorizations ClientAuthorization[]
+  clients              Client[]
 }
 
 model PayerServiceCodes {
