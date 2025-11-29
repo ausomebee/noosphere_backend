@@ -79,6 +79,25 @@ import ClientDto from "../dto/clientDto.js";
  *                 example: "8309241f-d2a0-425c-ace9-134fdd58b7f4"
  *             required:
  *               - id
+ *         documents:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 150
+ *                 example: "Passport"
+ *               documentDetails:
+ *                 type: object
+ *                 example:
+ *                   number: "A12345678"
+ *                   issuedBy: "Nigeria Immigration Service"
+ *                   expiryDate: "2030-01-01"
+ *             required:
+ *               - name
+ *               - documentDetails
  *         createdBy:
  *           type: string
  *           format: uuid
@@ -182,7 +201,7 @@ import ClientDto from "../dto/clientDto.js";
  *           type: string
  *         caregiverZip:
  *           type: string
-  *         assignToClinicians:
+ *         assignToClinicians:
  *           type: array
  *           items:
  *             type: object
@@ -193,6 +212,28 @@ import ClientDto from "../dto/clientDto.js";
  *                 example: "8309241f-d2a0-425c-ace9-134fdd58b7f4"
  *             required:
  *               - id
+ *         documents:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 150
+ *                 example: "Passport"
+ *               documentDetails:
+ *                 type: object
+ *                 example:
+ *                   number: "A12345678"
+ *                   issuedBy: "Nigeria Immigration Service"
+ *                   expiryDate: "2030-01-01"
+ *               id:
+ *                 type: string
+ *                 format: uuid
+ *                 required:
+ *                   - name
+ *                   - documentDetails
 
  *         isDeleted:
  *           type: boolean
