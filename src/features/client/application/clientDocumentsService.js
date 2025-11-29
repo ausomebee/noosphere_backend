@@ -6,7 +6,16 @@ class ClientDocumentsService {
     async createClientDocument(data) {
         const existing = await this.clientDocumentsRepository.findFirstDynamic({
             where: { name: data.name, tenantClientId: data.tenantClientId },
-            select: { id: true }
+            select: { id: true },
+            include: {
+                tenantStaff: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                    }
+                }
+            }
         });
 
         if (existing) {
