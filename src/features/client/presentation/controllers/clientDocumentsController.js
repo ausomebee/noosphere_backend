@@ -94,7 +94,7 @@ class ClientDocumentsController {
 
     deleteClientDocument = expressAsyncHandler(async (req, res) => {
         const client = await this.service.updateClientDocument({
-            clientId: req.params.id,
+            id: req.params.id,
             isDeleted: true
         });
 

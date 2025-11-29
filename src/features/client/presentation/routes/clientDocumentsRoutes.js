@@ -141,6 +141,28 @@ class ClientDocumentsRoutes {
 			"/:id",
 			this.controller.getSingleClientDocument.bind(this.controller)
 		);
+
+        /**
+        * @swagger
+        * /api/v1/client-documents/{id}:
+        *   delete:
+        *     summary: deletes a document
+        *     tags: [client-documents]
+        *     parameters:
+        *       - in: path
+        *         name: id
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The ID of the document
+        *     responses:
+        *       200:
+        *         description: document deleted successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.delete("/:id", this.controller.deleteClientDocument);
+
 	}
 
 	getRouter() {
