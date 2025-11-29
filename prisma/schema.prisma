@@ -203,6 +203,7 @@ model TenantStaff {
   TenantStaffDocuments TenantStaffDocuments[]
   appointments         Appointment[]          @relation("AppointmentClinicians")
   clientTenants        ClientTenant[]
+  clientDocuments      ClientDocuments[]
 }
 
 model TenantStaffLicenses {
@@ -306,13 +307,17 @@ model ClientTenant {
 }
 
 model ClientDocuments {
-  id              String  @id @default(uuid())
+  id              String   @id @default(uuid())
   tenantClientId  String
   name            String
   documentDetails Json
   requestId       String?
   isDeleted       Boolean
+  createdBy       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
+  tenantStaff  TenantStaff?              @relation(fields: [createdBy], references: [id])
   tenantClient ClientTenant              @relation(fields: [tenantClientId], references: [id])
   request      ClientRequestedDocuments? @relation(fields: [requestId], references: [id])
 }

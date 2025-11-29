@@ -95,6 +95,9 @@ import ClientDto from "../dto/clientDto.js";
  *                   number: "A12345678"
  *                   issuedBy: "Nigeria Immigration Service"
  *                   expiryDate: "2030-01-01"
+ *               createdBy:
+ *                 type: string
+ *                 format: uuid
  *             required:
  *               - name
  *               - documentDetails
@@ -228,6 +231,9 @@ import ClientDto from "../dto/clientDto.js";
  *                   number: "A12345678"
  *                   issuedBy: "Nigeria Immigration Service"
  *                   expiryDate: "2030-01-01"
+ *               createdBy:
+ *                 type: string
+ *                 format: uuid
  
  *             required:
  *               - name
