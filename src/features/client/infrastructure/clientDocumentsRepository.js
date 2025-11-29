@@ -12,6 +12,13 @@ class ClientDocumentsRepository extends BaseRepository {
     async countAllClientDocuments() {
         return this.model.count();
     }
+
+    async findAllAndPopulate(query, populate) {
+        return await this.model.findMany({
+            where: query,
+            include: populate
+        });
+    }
 }
 
 export default ClientDocumentsRepository;
