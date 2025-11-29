@@ -315,7 +315,7 @@ model ClientDocuments {
   isDeleted       Boolean
   createdBy       String?
   createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
 
   tenantStaff  TenantStaff?              @relation(fields: [createdBy], references: [id])
   tenantClient ClientTenant              @relation(fields: [tenantClientId], references: [id])
@@ -331,6 +331,8 @@ model ClientRequestedDocuments {
   status         DocumentRequestStatus @default(PENDING)
   dueDate        DateTime
   isDeleted      Boolean
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @default(now()) @updatedAt
 
   tenantClient    ClientTenant      @relation(fields: [tenantClientId], references: [id])
   clientDocuments ClientDocuments[]
