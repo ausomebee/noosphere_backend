@@ -126,7 +126,9 @@ class ClientService {
                 clientId: clientId
             },
             include: {
-                client: true,
+                client: {
+                    include: { payer: true }
+                },
                 clinicians: true
             },
         });
