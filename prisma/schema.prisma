@@ -881,8 +881,9 @@ model InsuranceType {
   isDeleted   Boolean @default(false)
   isActive    Boolean @default(true)
 
-  tenant Tenant  @relation(fields: [tenantId], references: [id])
-  Payer  Payer[]
+  tenant               Tenant                @relation(fields: [tenantId], references: [id])
+  Payer                Payer[]
+  clientAuthorizations ClientAuthorization[]
 }
 
 model Payer {
@@ -1059,8 +1060,9 @@ model ClientAuthorization {
   isDeleted           Boolean @default(false)
   isActive            Boolean @default(true)
 
-  tenantClient ClientTenant @relation(fields: [tenantClientId], references: [id])
-  payerDetails Payer        @relation(fields: [payer], references: [id])
+  tenantClient ClientTenant  @relation(fields: [tenantClientId], references: [id])
+  payerDetails Payer         @relation(fields: [payer], references: [id])
+  insurance    InsuranceType @relation(fields: [insuranceType], references: [id])
 }
 
 model ClientForm {
