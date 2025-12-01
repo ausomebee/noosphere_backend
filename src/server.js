@@ -58,6 +58,7 @@ import form_response_field_route from "./features/customForms/presentation/route
 import client_documents_route from "./features/client/presentation/routes/clientDocumentsRoutes.js";
 import requested_documents_route from "./features/client/presentation/routes/requestedDocumentsRoutes.js";
 import client_authorization_route from "./features/client/presentation/routes/clientAuthorizationRoutes.js";
+import client_forms_route from "./features/customForms/presentation/routes/clientFormRoutes.js";
 
 class App {
     constructor() {
@@ -144,6 +145,7 @@ class App {
         this.app.use("/api/v1/client-documents", client_documents_route);
         this.app.use("/api/v1/client-requested-documents", requested_documents_route);
         this.app.use("/api/v1/client-authorization", client_authorization_route);
+        this.app.use("/api/v1/client-forms", client_forms_route);
     }
 
     initializeErrorHandler() {
