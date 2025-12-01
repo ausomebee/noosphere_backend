@@ -12,6 +12,7 @@ const jsonOptional = Joi.alternatives()
 
 class TargetDto {
     static createTargetDto = (req, res, next) => {
+        console.log(req.body)
         if (typeof req.body.promptingStrategy === "string") {
             if (
                 req.body.promptingStrategy.trim().startsWith("[") ||
