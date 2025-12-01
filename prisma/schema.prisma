@@ -303,6 +303,7 @@ model ClientTenant {
   clinicians               TenantStaff[]              @relation("ClientClinicians")
   forms                    Forms[]
   clientAuthorizations     ClientAuthorization[]
+  clientForms              ClientForm[]
 
   @@unique([clientId, tenantId])
 }
@@ -1002,6 +1003,7 @@ model Forms {
   tenant        Tenant          @relation(fields: [tenantId], references: [id])
   tenantClient  ClientTenant?   @relation(fields: [tenantClientId], references: [id])
   FormResponses FormResponses[]
+  clientForms   ClientForm[]
 }
 
 model FormFields {
@@ -1059,4 +1061,17 @@ model ClientAuthorization {
 
   tenantClient ClientTenant @relation(fields: [tenantClientId], references: [id])
   payerDetails Payer        @relation(fields: [payer], references: [id])
+}
+
+model ClientForm {
+  id             String   @id @default(uuid())
+  tenantClientId String
+  formId         String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  client ClientTenant @relation(fields: [tenantClientId], references: [id])
+  form   Forms        @relation(fields: [formId], references: [id])
+
+  @@unique([tenantClientId, formId])
 }
