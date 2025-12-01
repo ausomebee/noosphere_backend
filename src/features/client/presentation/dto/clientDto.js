@@ -81,7 +81,7 @@ class ClientDto {
 
             pipelineStageId: Joi.string()
                 .uuid()
-                .required()
+                .optional()
                 .messages({
                     "string.empty": "Pipeline stage ID is required",
                     "string.guid": "Pipeline stage ID must be a valid UUID"
