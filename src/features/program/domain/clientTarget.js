@@ -12,7 +12,6 @@ class ClientTarget {
         return {
             clientId: this.clientId,
             targetId: this.targetId,
-            programId: this.programId
         };
     }
 }
