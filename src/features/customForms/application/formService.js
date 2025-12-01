@@ -58,7 +58,7 @@ class FormService {
             AND: [
                 { tenantId: tenantId },
                 { isDraft: false },
-                { isTemplate: true }
+                { isTemplate: false }
             ]
         });
 
