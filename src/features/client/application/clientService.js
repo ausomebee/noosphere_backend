@@ -38,12 +38,15 @@ class ClientService {
         const newCandidate = await this.prisma.$transaction(async (tx) => {
             const client = await this.clientRepository.txCreate(createData.createClient, tx);
             const clientTenant = await this.clientTenantRepository.txCreate({ ...createData.createClientTenant, clientId: client.id }, tx);
-            const pipelineItem = await this.itemRepository.txCreate({
-                clientId: client.id,
-                tenantId: clientTenant.tenantId,
-                pipelineStageId: data.pipelineStageId,
-                assignToTenantStaff: data.assignToTenantStaff
-            }, tx)
+            let pipelineItem
+            if (data.pipelineStageId) {
+                pipelineItem = await this.itemRepository.txCreate({
+                    clientId: client.id,
+                    tenantId: clientTenant.tenantId,
+                    pipelineStageId: data.pipelineStageId,
+                    assignToTenantStaff: data.assignToTenantStaff
+                }, tx)
+            }
 
             return { pipelineItem, client, clientTenant };
         }, { timeout: 10_000 });
