@@ -648,6 +648,28 @@ class PipelineRoutes {
 
         this.router.get("/item/client/:id", PipelineDto.getByIdDto, this.controller.getItemByIdClient);
 
+         /**
+         * @swagger
+         * /api/v1/pipeline/overview/{tenantId}:
+         *   get:
+         *     summary: Get pipeline overview
+         *     tags: [Pipeline]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The ID of the tenant
+         *     responses:
+         *       201:
+         *         description: Pipeline overview fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+
+        this.router.get("/overview/:tenantId", this.controller.getTenantPipelineSummary);
+
         /**
          * @swagger
          * /api/v1/pipeline/item/stage:
