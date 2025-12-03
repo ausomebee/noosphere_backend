@@ -293,6 +293,16 @@ class PipelineService {
         return item;
     }
 
+    async getTenantPipelineSummary(tenantId) {
+        const overview = await this.pipelineRepository.overview(tenantId);
+
+        if (!overview) {
+            throw new Error("Failed to fetch overview.");
+        }
+
+        return overview;
+    }
+
     async getItemByIdClient(id) {
         const item = await this.itemRepository.findOneAndPopulate({ id: id }, {
             client: true, tenantStaff: true
