@@ -19,6 +19,24 @@ class ClientAuthorizationRepository extends BaseRepository {
             include: populate
         });
     }
+
+    async getClientAuthorizationsByStatus(tenantId, broadWhere) {
+        return await this.model.findMany({
+            where: {
+                ...broadWhere,
+                isActive: true,
+                isDeleted: false,
+                tenantClient: {
+                    tenantId,
+                },
+            },
+            include: {
+                tenantClient: true,
+                payerDetails: true,
+                insurance: true,
+            },
+        });
+    }
 }
 
 export default ClientAuthorizationRepository;

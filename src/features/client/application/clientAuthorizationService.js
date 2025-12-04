@@ -71,6 +71,58 @@ class ClientAuthorizationService {
         return auths;
     }
 
+    getAuthorizationFilters(status) {
+        const now = new Date();
+
+        return {
+            active: {
+                endDate: { gt: now.toISOString() },
+            },
+
+            expiring: {
+                endDate: { gt: now.toISOString() },
+            },
+
+            expired: {
+                endDate: { lte: now.toISOString() },
+            },
+        }[status];
+    }
+
+    percentRemaining(startStr, endStr) {
+        const now = new Date();
+        const start = new Date(startStr);
+        const end = new Date(endStr);
+        return (end - now) / (end - start);
+    }
+
+    async getClientAuthorizationsSummary(tenantId, status) {
+        const broadWhere = this.getAuthorizationFilters(status);
+        const auths = await this.clientAuthorizationRepository.getClientAuthorizationsByStatus(tenantId, broadWhere);
+
+        if (!auths) {
+            throw new Error("Client Authorizations not found");
+        }
+
+        let filteredRows;
+
+        if (status === "active") {
+            filteredRows = auths.filter(r => this.percentRemaining(r.startDate, r.endDate) > 0.25);
+        } else if (status === "expiring") {
+            filteredRows = auths.filter(r => {
+                const p = this.percentRemaining(r.startDate, r.endDate);
+                return p <= 0.25 && p > 0;
+            });
+        } else if (status === "expired") {
+            filteredRows = auths.filter(r => this.percentRemaining(r.startDate, r.endDate) <= 0);
+        }
+
+        return {
+            count: filteredRows.length,
+            rows: filteredRows,
+        };
+    }
+
 }
 
 export default ClientAuthorizationService;
