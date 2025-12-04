@@ -1,6 +1,7 @@
 class AppointmentRepository {
-    constructor(model) {
+    constructor(model, prisma) {
         this.model = model;
+        this.prisma = prisma;
     }
 
     async create(data) {
@@ -48,6 +49,58 @@ class AppointmentRepository {
             where: query,
             include: populate
         });
+    }
+    async completedAppointmentsMetric(tenantId) {
+        const now = new Date()
+        const start = new Date(now.getFullYear(), now.getMonth() - 11, 1)
+
+        return await this.prisma.$queryRaw`
+        SELECT 
+            TO_CHAR(TO_DATE(a.date, 'YYYY-MM-DD'), 'YYYY-MM') AS month,
+            COUNT(*)::int AS count
+        FROM "Appointment" a
+        WHERE 
+            a."tenantId" = ${tenantId}
+            AND a."isCanceled" = false
+            AND a."rescheduled" = false
+            AND TO_DATE(a.date, 'YYYY-MM-DD') >= ${start}
+        GROUP BY month
+        ORDER BY month ASC;
+    `
+    }
+    async canceledAppointmentsMetric(tenantId) {
+        const now = new Date()
+        const start = new Date(now.getFullYear(), now.getMonth() - 11, 1)
+
+        return await this.prisma.$queryRaw`
+        SELECT 
+            TO_CHAR(TO_DATE(a.date, 'YYYY-MM-DD'), 'YYYY-MM') AS month,
+            COUNT(*)::int AS count
+        FROM "Appointment" a
+        WHERE 
+            a."tenantId" = ${tenantId}
+            AND a."isCanceled" = true
+            AND TO_DATE(a.date, 'YYYY-MM-DD') >= ${start}
+        GROUP BY month
+        ORDER BY month ASC;
+    `
+    }
+    async rescheduledAppointmentsMetric(tenantId) {
+        const now = new Date()
+        const start = new Date(now.getFullYear(), now.getMonth() - 11, 1)
+
+        return await this.prisma.$queryRaw`
+        SELECT 
+            TO_CHAR(TO_DATE(a.date, 'YYYY-MM-DD'), 'YYYY-MM') AS month,
+            COUNT(*)::int AS count
+        FROM "Appointment" a
+        WHERE 
+            a."tenantId" = ${tenantId}
+            AND a."rescheduled" = true
+            AND TO_DATE(a.date, 'YYYY-MM-DD') >= ${start}
+        GROUP BY month
+        ORDER BY month ASC;
+    `
     }
 
     async getAppointmentsByTenant(tenantId) {

@@ -489,6 +489,36 @@ class AppointmentService {
         return appointments;
     }
 
+    async completedAppointmentsMetric(tenantId) {
+        const appointments = await this.appointmentRepository.completedAppointmentsMetric(tenantId);
+
+        if (!appointments) {
+            throw new Error("Failed to fetch Appointment");
+        }
+
+        return appointments;
+    }
+
+    async canceledAppointmentsMetric(tenantId) {
+        const appointments = await this.appointmentRepository.canceledAppointmentsMetric(tenantId);
+
+        if (!appointments) {
+            throw new Error("Failed to fetch Appointment");
+        }
+
+        return appointments;
+    }
+
+    async rescheduledAppointmentsMetric(tenantId) {
+        const appointments = await this.appointmentRepository.rescheduledAppointmentsMetric(tenantId);
+
+        if (!appointments) {
+            throw new Error("Failed to fetch Appointment");
+        }
+
+        return appointments;
+    }
+
     isUpcoming(appt, now = new Date()) {
         const start = new Date(`${appt.date}T${appt.startTime}:00`);
 

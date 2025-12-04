@@ -7,7 +7,7 @@ import Appointment from "../../domain/appointment.js";
 class AppointmentController {
     constructor() {
         this.prisma = prismaService.getClient();
-        this.appointmentRepository = new AppointmentRepository(this.prisma.appointment);
+        this.appointmentRepository = new AppointmentRepository(this.prisma.appointment, this.prisma);
         this.service = new AppointmentService({ appointmentRepository: this.appointmentRepository });
     }
 
@@ -43,6 +43,48 @@ class AppointmentController {
 
     getTenantAppointments = expressAsyncHandler(async (req, res) => {
         const appointments = await this.service.getTenantAppointments(req.params.tenantId);
+
+        if (!appointments) {
+            res.status(500).json({ message: 'Failed to fetch appointments' });
+        }
+
+        return res.status(201).json({
+            message: "appointments fetched successfully",
+            status: 'ok',
+            data: appointments
+        });
+    });
+
+    completedAppointmentsMetric = expressAsyncHandler(async (req, res) => {
+        const appointments = await this.service.completedAppointmentsMetric(req.params.tenantId);
+
+        if (!appointments) {
+            res.status(500).json({ message: 'Failed to fetch appointments' });
+        }
+
+        return res.status(201).json({
+            message: "appointments fetched successfully",
+            status: 'ok',
+            data: appointments
+        });
+    });
+
+    canceledAppointmentsMetric = expressAsyncHandler(async (req, res) => {
+        const appointments = await this.service.canceledAppointmentsMetric(req.params.tenantId);
+
+        if (!appointments) {
+            res.status(500).json({ message: 'Failed to fetch appointments' });
+        }
+
+        return res.status(201).json({
+            message: "appointments fetched successfully",
+            status: 'ok',
+            data: appointments
+        });
+    });
+
+    rescheduledAppointmentsMetric = expressAsyncHandler(async (req, res) => {
+        const appointments = await this.service.rescheduledAppointmentsMetric(req.params.tenantId);
 
         if (!appointments) {
             res.status(500).json({ message: 'Failed to fetch appointments' });
