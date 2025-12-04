@@ -257,6 +257,37 @@ class ClientAuthorizationRoutes {
         );
 
         /**
+        * @swagger
+        * /api/v1/client-authorization/summary/{tenantId}:
+        *   get:
+        *     summary: Get authorizations overview for a tenant client
+        *     tags: [ClientAuthorization]
+        *     parameters:
+        *       - name: tenantId
+        *         in: path
+        *         description: Tenant ID
+        *         required: true
+        *         schema:
+        *           type: string
+        *           format: uuid
+        *     responses:
+        *       200:
+        *         description: Authorizations fetched successfully
+        *         content:
+        *           application/json:
+        *             schema:
+        *               type: array
+        *               items:
+        *                 $ref: '#/components/schemas/ClientAuthorization'
+        *       404:
+        *         description: No authorizations found
+        */
+        this.router.get(
+            "/summary/:tenantId",
+            this.controller.countAuthorizationStatsByTenant.bind(this.controller)
+        );
+
+        /**
          * @swagger
          * /api/v1/client-authorization/{id}/{active}:
          *   patch:
