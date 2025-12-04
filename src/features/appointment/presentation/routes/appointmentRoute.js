@@ -485,6 +485,69 @@ class AppointmentRoutes {
 
         /**
         * @swagger
+        * /api/v1/appointments/tenant/metric/{tenantId}:
+        *   get:
+        *     summary: get tenant completed appointments metrics
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the tenant
+        *     responses:
+        *       200:
+        *         description: tenant appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant/metric/:tenantId", this.controller.completedAppointmentsMetric);
+
+        /**
+        * @swagger
+        * /api/v1/appointments/tenant/metric/rescheduled/{tenantId}:
+        *   get:
+        *     summary: get tenant rescheduled appointments metrics
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the tenant
+        *     responses:
+        *       200:
+        *         description: tenant appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant/metric/rescheduled/:tenantId", this.controller.rescheduledAppointmentsMetric);
+
+        /**
+        * @swagger
+        * /api/v1/appointments/tenant/metric/canceled/{tenantId}:
+        *   get:
+        *     summary: get tenant canceled appointments metrics
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the tenant
+        *     responses:
+        *       200:
+        *         description: tenant appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant/metric/canceled/:tenantId", this.controller.canceledAppointmentsMetric);
+
+        /**
+        * @swagger
         * /api/v1/appointments/client/upcoming/{clientId}:
         *   get:
         *     summary: get client upcoming appointments
