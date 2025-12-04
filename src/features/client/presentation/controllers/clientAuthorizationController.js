@@ -101,6 +101,23 @@ class ClientAuthorizationController {
         }
     }
 
+    async countAuthorizationStatsByTenant(req, res) {
+        try {
+            const tenantId = req.params.tenantId;
+
+            const auths = await this.clientAuthorizationService.countAuthorizationStatsByTenant(tenantId);
+
+            return res.status(200).json({
+                message: "Client authorizations fetched successfully",
+                data: auths,
+            });
+        } catch (error) {
+            return res.status(404).json({
+                message: error.message || "Client authorizations not found",
+            });
+        }
+    }
+
     deactivateAuth = expressAsyncHandler(async (req, res) => {
         const auth = await this.service.updateClientAuthorization({
             authTenantId: req.params.id,

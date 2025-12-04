@@ -37,6 +37,23 @@ class ClientAuthorizationRepository extends BaseRepository {
             },
         });
     }
+
+    async countAuthorizationStatsByTenant(tenantId) {
+        return await this.model.findMany({
+            where: {
+                isDeleted: false,
+                isActive: true,
+                tenantClient: {
+                    tenantId,
+                },
+            },
+            select: {
+                id: true,
+                startDate: true,
+                endDate: true,
+            },
+        });
+    }
 }
 
 export default ClientAuthorizationRepository;

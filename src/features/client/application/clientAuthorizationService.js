@@ -123,6 +123,39 @@ class ClientAuthorizationService {
         };
     }
 
+    async countAuthorizationStatsByTenant(tenantId) {
+        const today = new Date();
+        const authorizations = await this.clientAuthorizationRepository.countAuthorizationStatsByTenant(tenantId);
+
+        let active = 0;
+        let expiring = 0;
+        let expired = 0;
+
+        for (const auth of authorizations) {
+            const start = new Date(auth.startDate);
+            const end = new Date(auth.endDate);
+
+            const totalDuration = end - start;
+            const remaining = end - today;
+            const threshold = totalDuration * 0.25;
+
+            if (remaining <= 0) {
+                expired++;
+            } else if (remaining <= threshold) {
+                expiring++;
+            } else {
+                active++;
+            }
+        }
+
+        return {
+            active,
+            expiring,
+            expired,
+            total: authorizations.length,
+        };
+    }
+
 }
 
 export default ClientAuthorizationService;
