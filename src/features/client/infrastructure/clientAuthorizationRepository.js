@@ -31,7 +31,9 @@ class ClientAuthorizationRepository extends BaseRepository {
                 },
             },
             include: {
-                tenantClient: true,
+                tenantClient: {
+                    select: { client: true }
+                },
                 payerDetails: true,
                 insurance: true,
             },
