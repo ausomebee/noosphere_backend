@@ -55,36 +55,12 @@ class AppointmentController {
         });
     });
 
-    completedAppointmentsMetric = expressAsyncHandler(async (req, res) => {
-        const appointments = await this.service.completedAppointmentsMetric(req.params.tenantId);
-
-        if (!appointments) {
-            res.status(500).json({ message: 'Failed to fetch appointments' });
-        }
-
-        return res.status(201).json({
-            message: "appointments fetched successfully",
-            status: 'ok',
-            data: appointments
-        });
-    });
-
-    canceledAppointmentsMetric = expressAsyncHandler(async (req, res) => {
-        const appointments = await this.service.canceledAppointmentsMetric(req.params.tenantId);
-
-        if (!appointments) {
-            res.status(500).json({ message: 'Failed to fetch appointments' });
-        }
-
-        return res.status(201).json({
-            message: "appointments fetched successfully",
-            status: 'ok',
-            data: appointments
-        });
-    });
-
-    rescheduledAppointmentsMetric = expressAsyncHandler(async (req, res) => {
-        const appointments = await this.service.rescheduledAppointmentsMetric(req.params.tenantId);
+    appointmentsMetric = expressAsyncHandler(async (req, res) => {
+        const appointments = await this.service.appointmentsMetric(
+            req.params.tenantId,
+            req.params.status,
+            req.params.period
+        );
 
         if (!appointments) {
             res.status(500).json({ message: 'Failed to fetch appointments' });

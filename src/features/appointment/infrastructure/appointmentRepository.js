@@ -50,57 +50,51 @@ class AppointmentRepository {
             include: populate
         });
     }
-    async completedAppointmentsMetric(tenantId) {
-        const now = new Date()
-        const start = new Date(now.getFullYear(), now.getMonth() - 11, 1)
+    getPeriodStart(period) {
+        const now = new Date();
 
-        return await this.prisma.$queryRaw`
-        SELECT 
-            TO_CHAR(TO_DATE(a.date, 'YYYY-MM-DD'), 'YYYY-MM') AS month,
-            COUNT(*)::int AS count
-        FROM "Appointment" a
-        WHERE 
-            a."tenantId" = ${tenantId}
-            AND a."isCanceled" = false
-            AND a."rescheduled" = false
-            AND TO_DATE(a.date, 'YYYY-MM-DD') >= ${start}
-        GROUP BY month
-        ORDER BY month ASC;
-    `
+        switch (period) {
+            case 'year':
+                return new Date(now.getFullYear(), now.getMonth() - 11, 1); 
+
+            case 'month':
+                return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30); 
+
+            case 'day':
+                return new Date(now.getFullYear(), now.getMonth(), now.getDate()); 
+        }
     }
-    async canceledAppointmentsMetric(tenantId) {
-        const now = new Date()
-        const start = new Date(now.getFullYear(), now.getMonth() - 11, 1)
 
-        return await this.prisma.$queryRaw`
-        SELECT 
-            TO_CHAR(TO_DATE(a.date, 'YYYY-MM-DD'), 'YYYY-MM') AS month,
-            COUNT(*)::int AS count
-        FROM "Appointment" a
-        WHERE 
-            a."tenantId" = ${tenantId}
-            AND a."isCanceled" = true
-            AND TO_DATE(a.date, 'YYYY-MM-DD') >= ${start}
-        GROUP BY month
-        ORDER BY month ASC;
-    `
-    }
-    async rescheduledAppointmentsMetric(tenantId) {
-        const now = new Date()
-        const start = new Date(now.getFullYear(), now.getMonth() - 11, 1)
+    async appointmentsMetric(tenantId, status, period) {
+        const start = this.getPeriodStart(period);
 
-        return await this.prisma.$queryRaw`
-        SELECT 
-            TO_CHAR(TO_DATE(a.date, 'YYYY-MM-DD'), 'YYYY-MM') AS month,
-            COUNT(*)::int AS count
-        FROM "Appointment" a
-        WHERE 
-            a."tenantId" = ${tenantId}
-            AND a."rescheduled" = true
-            AND TO_DATE(a.date, 'YYYY-MM-DD') >= ${start}
-        GROUP BY month
-        ORDER BY month ASC;
-    `
+        const statusFilter =
+            status === 'completed'
+                ? `a."isCanceled" = false AND a."rescheduled" = false`
+                : status === 'canceled'
+                    ? `a."isCanceled" = true`
+                    : `a."rescheduled" = true`;
+
+        const groupFormat =
+            period === 'day'
+                ? 'YYYY-MM-DD'
+                : period === 'month'
+                    ? 'YYYY-MM-DD'
+                    : 'YYYY-MM'; 
+
+        return await this.prisma.$queryRawUnsafe(`
+                SELECT 
+                TO_CHAR(TO_DATE(a.date, 'YYYY-MM-DD'), '${groupFormat}') AS period,
+                COUNT(*)::int AS count
+                FROM "Appointment" a
+                WHERE 
+                a."tenantId" = '${tenantId}'
+                AND ${statusFilter}
+                AND TO_DATE(a.date, 'YYYY-MM-DD') >= '${start.toISOString().split('T')[0]}'
+                GROUP BY period
+                ORDER BY period ASC;
+            `
+        );
     }
 
     async getAppointmentsByTenant(tenantId) {
