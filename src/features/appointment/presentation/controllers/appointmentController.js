@@ -87,6 +87,20 @@ class AppointmentController {
         });
     });
 
+    getAppointment = expressAsyncHandler(async (req, res) => {
+        const appointment = await this.service.getAppointment(req.params.id);
+
+        if (!appointment) {
+            res.status(500).json({ message: 'Failed to fetch appointment' });
+        }
+
+        return res.status(201).json({
+            message: "appointment fetched successfully",
+            status: 'ok',
+            data: appointment
+        });
+    });
+
     getTenantCanceledAppointments = expressAsyncHandler(async (req, res) => {
         const appointments = await this.service.getTenantCanceledAppointments(req.params.tenantId);
 

@@ -72,6 +72,27 @@ class ClientProgramRoutes {
          *         description: Validation error
          */
         this.router.get("/:clientId", this.controller.getClientPrograms);
+
+        /**
+         * @swagger
+         * /api/v1/client-programs/target/{clientId}:
+         *   get:
+         *     summary: Gets client program with targets
+         *     tags: [program]
+         *     parameters:
+         *       - in: path
+         *         name: clientId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The tenant ID of the Domain
+         *     responses:
+         *       200:
+         *         description: programs fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/target/:clientId", this.controller.getClientProgramAndTraget);
     }
 
     getRouter() {

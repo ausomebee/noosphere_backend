@@ -65,6 +65,20 @@ class ClientProgramService {
         return program;
     }
 
+    async getClientProgramAndTraget(clientId) {
+        const program = await this.clientProgramRepository.findAllAndPopulate({
+            clientId,
+        }, {
+            program: { include: { target: true } }
+        });
+
+        if (!program) {
+            throw new Error("program not found")
+        }
+
+        return program;
+    }
+
 }
 
 export default ClientProgramService;

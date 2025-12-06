@@ -43,6 +43,20 @@ class ClientProgramController {
             data: clientProgram
         });
     });
+
+    getClientProgramAndTraget = expressAsyncHandler(async (req, res) => {
+        const clientProgram = await this.service.getClientProgramAndTraget(req.params.clientId);
+
+        if (!clientProgram) {
+            res.status(500).json({ message: 'Failed to fetch client program' });
+        }
+
+        return res.status(201).json({
+            message: "client programs fetched successfully",
+            status: 'ok',
+            data: clientProgram
+        });
+    });
 }
 
 export default ClientProgramController;

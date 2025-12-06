@@ -47,6 +47,16 @@ enum DocumentRequestStatus {
   CANCELLED
 }
 
+enum WeekDay {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
 model Admin {
   id                    String   @id @default(uuid())
   fullName              String
@@ -204,6 +214,7 @@ model TenantStaff {
   appointments         Appointment[]          @relation("AppointmentClinicians")
   clientTenants        ClientTenant[]
   clientDocuments      ClientDocuments[]
+  staffAvailabilities  StaffAvailability[]
 }
 
 model TenantStaffLicenses {
@@ -1076,4 +1087,23 @@ model ClientForm {
   form   Forms        @relation(fields: [formId], references: [id])
 
   @@unique([tenantClientId, formId])
+}
+
+model StaffAvailability {
+  id      String @id @default(uuid())
+  staffId String
+
+  staff            TenantStaff        @relation(fields: [staffId], references: [id])
+  availabilityDays AvailabilityDays[]
+}
+
+model AvailabilityDays {
+  id             String  @id @default(uuid())
+  dayOfWeek      WeekDay
+  available      Boolean
+  from           String
+  to             String
+  availabilityId String
+
+  availability StaffAvailability @relation(fields: [availabilityId], references: [id])
 }
