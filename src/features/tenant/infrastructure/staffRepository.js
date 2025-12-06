@@ -30,6 +30,50 @@ class StaffRepository extends BaseRepository {
             data: { ...data },
         });
     }
+
+    async totalStaff(tenantId) {
+        return await this.model.count({
+            where: { tenantId, isDeleted: false }
+        });
+    }
+
+    async availableStaff(tenantId) {
+        const now = new Date();
+        const jsDay = now.toLocaleString("en-US", { weekday: "long" });
+
+        const dayMap = {
+            Monday: "MONDAY",
+            Tuesday: "TUESDAY",
+            Wednesday: "WEDNESDAY",
+            Thursday: "THURSDAY",
+            Friday: "FRIDAY",
+            Saturday: "SATURDAY",
+            Sunday: "SUNDAY",
+        };
+
+        const currentDay = dayMap[jsDay];
+        const currentTime = now.toTimeString().slice(0, 5);
+
+        return await this.model.count({
+            where: {
+                tenantId,
+                isDeleted: false,
+                staffAvailabilities: {
+                    some: {
+                        availabilityDays: {
+                            some: {
+                                dayOfWeek: currentDay,
+                                available: true,
+                                from: { lte: currentTime },
+                                to: { gte: currentTime }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
 }
 
 export default StaffRepository;

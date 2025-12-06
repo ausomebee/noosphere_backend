@@ -50,18 +50,19 @@ class AppointmentRepository {
             include: populate
         });
     }
+
     getPeriodStart(period) {
         const now = new Date();
 
         switch (period) {
             case 'year':
-                return new Date(now.getFullYear(), now.getMonth() - 11, 1); 
+                return new Date(now.getFullYear(), now.getMonth() - 11, 1);
 
             case 'month':
-                return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30); 
+                return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30);
 
             case 'day':
-                return new Date(now.getFullYear(), now.getMonth(), now.getDate()); 
+                return new Date(now.getFullYear(), now.getMonth(), now.getDate());
         }
     }
 
@@ -80,7 +81,7 @@ class AppointmentRepository {
                 ? 'YYYY-MM-DD'
                 : period === 'month'
                     ? 'YYYY-MM-DD'
-                    : 'YYYY-MM'; 
+                    : 'YYYY-MM';
 
         return await this.prisma.$queryRawUnsafe(`
                 SELECT 

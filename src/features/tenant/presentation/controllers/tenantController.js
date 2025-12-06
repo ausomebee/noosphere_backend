@@ -82,6 +82,20 @@ class TenantController {
         });
     });
 
+    availaibleStaffs = expressAsyncHandler(async (req, res) => {
+        const count = await this.service.availaibleStaffs(req.params.tenantId);
+
+        if (!count) {
+            res.status(500).json({ message: 'Failed to count staffs.' });
+        }
+
+        return res.status(201).json({
+            message: "staffs counted successfully",
+            status: 'ok',
+            data: count
+        });
+    });
+
     countAllTenant = expressAsyncHandler(async (req, res) => {
         const totalTenants = await this.service.countAllTenant();
 

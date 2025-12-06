@@ -518,6 +518,27 @@ class AppointmentRoutes {
 
         /**
         * @swagger
+        * /api/v1/appointments/{id}:
+        *   get:
+        *     summary: get appointment
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: id
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the appointment
+        *     responses:
+        *       200:
+        *         description: appointment fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/:tenantId", this.controller.getAppointment);
+
+        /**
+        * @swagger
         * /api/v1/appointments/client/upcoming/{clientId}:
         *   get:
         *     summary: get client upcoming appointments

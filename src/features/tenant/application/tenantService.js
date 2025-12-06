@@ -409,6 +409,17 @@ class TenantService {
         return tenants;
     }
 
+    async availaibleStaffs(tenantId) {
+        const totalStaff = await this.staffRepository.totalStaff(tenantId);
+        if (!totalStaff) {
+            throw new Error("staffs not found")
+        }
+        
+        const availableStaff = await this.staffRepository.availableStaff(tenantId);
+
+        return {totalStaff, availableStaff};
+    }
+
     async countAllTenant() {
         const totalTenants = await this.tenantRepository.countAllTenants();
 

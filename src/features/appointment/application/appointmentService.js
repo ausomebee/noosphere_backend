@@ -701,6 +701,23 @@ class AppointmentService {
             });
     }
 
+    async getAppointment(id) {
+        const appointment = await this.appointmentRepository.findFirstDynamic({
+            where: {
+                id: id,
+            },
+            include: {
+                client: true,
+                clinicians: true
+            }
+        });
+
+        if (!appointment) {
+            throw new Error("appointment not found.");
+        }
+
+        return appointment;
+    }
 }
 
 export default AppointmentService;
