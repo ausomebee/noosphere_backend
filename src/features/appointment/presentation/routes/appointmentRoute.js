@@ -535,7 +535,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/:tenantId", this.controller.getAppointment);
+        this.router.get("/:id", this.controller.getAppointment);
 
         /**
         * @swagger
