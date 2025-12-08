@@ -707,8 +707,9 @@ class AppointmentService {
                 id: id,
             },
             include: {
-                client: true,
-                clinicians: true
+                client: { include: { payer: true } },
+                clinicians: true,
+                session: true
             }
         });
 
