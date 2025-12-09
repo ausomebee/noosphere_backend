@@ -98,7 +98,7 @@ class SessionController {
     });
 
     getSessions = expressAsyncHandler(async (req, res) => {
-        const sessions = await this.sessionService.getSessions({ appointmentId: req.params.appointmentId });
+        const sessions = await this.sessionService.getSessions(req.params.tenantId);
 
         if (!sessions) {
             return res.status(404).json({ message: "No sessions found" });

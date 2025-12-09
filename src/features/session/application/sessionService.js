@@ -61,8 +61,8 @@ class SessionService {
         return session;
     }
 
-    async getSessions(filter = {}) {
-        const sessions = await this.sessionRepository.findAllAndPopulate(filter, {
+    async getSessions(tenantId) {
+        const sessions = await this.sessionRepository.findAllAndPopulate({ appointment: { tenantId: tenantId } }, {
             sessionDatas: true,
             sessionApprovals: true,
             timesheetHistories: true,
