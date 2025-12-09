@@ -73,12 +73,12 @@ class SessionService {
                             preferredName: true
                         }
                     },
-                    session: { select: { name: true } }
-                },
-            },
-            approver: {
-                select: {
-                    fullName: true,
+                    session: { select: { name: true } },
+                    clinicians: {
+                        select: {
+                            fullName: true,
+                        },
+                    }
                 },
             },
             clientApprovalStatus: true,
