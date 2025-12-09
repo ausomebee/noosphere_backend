@@ -63,12 +63,29 @@ class SessionService {
 
     async getSessions(tenantId) {
         const sessions = await this.sessionRepository.findAllAndPopulate({ appointment: { tenantId: tenantId } }, {
-            sessionDatas: true,
-            sessionApprovals: true,
-            timesheetHistories: true,
-            sessionUpdateRequests: true,
-            appointment: true,
-            approver: true
+            id: true,
+            appointment: {
+                select: {
+                    client: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                            preferredName: true
+                        }
+                    },
+                    session: { select: { name: true } }
+                },
+            },
+            approver: {
+                select: {
+                    fullName: true,
+                },
+            },
+            clientApprovalStatus: true,
+            supervisorApprovalStatus: true,
+            startTime: true,
+            endTime: true,
+            createdAt: true
         });
 
         if (!sessions) {
