@@ -104,10 +104,27 @@ class SessionController {
             return res.status(404).json({ message: "No sessions found" });
         }
 
+        const formatted = sessions.map((s) => {
+            const totalHours =
+                (new Date(s.endTime) - new Date(s.startTime)) / (1000 * 60 * 60);
+
+            return {
+                id: s.id,
+                clientName:
+                    s.appointment.client.preferredName ||
+                    `${s.appointment.client.firstName} ${s.appointment.client.lastName}`,
+                sessionTypeName: s.appointment.session.name,
+                clinician: s.approver?.fullName,
+                clientApprovalStatus: s.clientApprovalStatus,
+                supervisorApprovalStatus: s.supervisorApprovalStatus,
+                totalHours,
+            };
+        });
+
         return res.status(200).json({
             message: "Sessions fetched successfully",
             status: "ok",
-            data: sessions,
+            data: formatted,
         });
     });
 }
