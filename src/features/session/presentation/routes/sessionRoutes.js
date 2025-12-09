@@ -179,23 +179,23 @@ class SessionRoutes {
 
         /**
          * @swagger
-         * /api/v1/sessions/appointment/{appointmentId}:
+         * /api/v1/sessions/appointment/{tenantId}:
          *   get:
-         *     summary: Get all sessions for a given appointmentId
+         *     summary: Get all sessions for a given tenantId
          *     tags: [sessions]
          *     parameters:
          *       - in: path
-         *         name: appointmentId
+         *         name: tenantId
          *         schema:
          *           type: string
          *         required: true
-         *         description: appointment ID (foreign key)
+         *         description: tenant ID (foreign key)
          *     responses:
          *       200:
          *         description: Sessions fetched successfully
          */
         this.router.get(
-            "/appointment/:appointmentId",
+            "/appointment/:tenantId",
             this.controller.getSessions
         );
     }
