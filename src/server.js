@@ -61,6 +61,11 @@ import client_authorization_route from "./features/client/presentation/routes/cl
 import client_forms_route from "./features/customForms/presentation/routes/clientFormRoutes.js";
 import availabilityDaysRoute from "./features/organization/presentation/routes/availabilityDaysRoutes.js";
 import staffAvailabilityRoute from "./features/organization/presentation/routes/staffAvailabilityRoutes.js";
+import sessionRoute from "./features/session/presentation/routes/sessionRoutes.js";
+import sessionDataRoute from "./features/session/presentation/routes/sessionDataRoutes.js";
+import sessionApprovalRoute from "./features/session/presentation/routes/sessionApprovalRoutes.js";
+import timesheetHistoryRoute from "./features/session/presentation/routes/timesheetHistoryRoutes.js";
+import sessionUpdateRequestRoute from "./features/session/presentation/routes/sessionUpdateRequestRoutes.js";
 
 class App {
     constructor() {
@@ -150,6 +155,11 @@ class App {
         this.app.use("/api/v1/client-forms", client_forms_route);
         this.app.use("/api/v1/organization/availability-days", availabilityDaysRoute);
         this.app.use("/api/v1/organization/staff-availability", staffAvailabilityRoute);
+        this.app.use("/api/v1/sessions", sessionRoute);
+        this.app.use("/api/v1/session-data", sessionDataRoute);
+        this.app.use("/api/v1/sessions-approvals", sessionApprovalRoute);
+        this.app.use("/api/v1/sessions-timesheet-history", timesheetHistoryRoute);
+        this.app.use("/api/v1/sessions-update-requests", sessionUpdateRequestRoute);
     }
 
     initializeErrorHandler() {

@@ -57,6 +57,12 @@ enum WeekDay {
   SUNDAY
 }
 
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model Admin {
   id                    String   @id @default(uuid())
   fullName              String
@@ -204,17 +210,20 @@ model TenantStaff {
   authQuestion String?
   auth2FADone  Boolean  @default(false)
 
-  role                 Role                   @relation(fields: [roleId], references: [id])
-  tenant               Tenant                 @relation(fields: [tenantId], references: [id])
-  PipelineItem         PipelineItem[]
-  ClientTenant         ClientTenant[]         @relation("ClientClinicians")
-  TenantStaffLicenses  TenantStaffLicenses[]
-  TenantStaffPayroll   TenantStaffPayroll[]
-  TenantStaffDocuments TenantStaffDocuments[]
-  appointments         Appointment[]          @relation("AppointmentClinicians")
-  clientTenants        ClientTenant[]
-  clientDocuments      ClientDocuments[]
-  staffAvailabilities  StaffAvailability[]
+  role                  Role                   @relation(fields: [roleId], references: [id])
+  tenant                Tenant                 @relation(fields: [tenantId], references: [id])
+  PipelineItem          PipelineItem[]
+  ClientTenant          ClientTenant[]         @relation("ClientClinicians")
+  TenantStaffLicenses   TenantStaffLicenses[]
+  TenantStaffPayroll    TenantStaffPayroll[]
+  TenantStaffDocuments  TenantStaffDocuments[]
+  appointments          Appointment[]          @relation("AppointmentClinicians")
+  clientTenants         ClientTenant[]
+  clientDocuments       ClientDocuments[]
+  staffAvailabilities   StaffAvailability[]
+  sessions              Session[]
+  timesheetHistories    TimesheetHistory[]
+  sessionUpdateRequests SessionUpdateRequest[]
 }
 
 model TenantStaffLicenses {
@@ -717,6 +726,7 @@ model Target {
 
   program      Program?       @relation(fields: [programId], references: [id])
   ClientTarget ClientTarget[]
+  sessionDatas SessionData[]
 }
 
 model ClientProgram {
@@ -854,6 +864,7 @@ model Appointment {
   relatedTo   Appointment?             @relation("AppointmentRelation", fields: [relatedAppointment], references: [id])
   relatedFrom Appointment[]            @relation("AppointmentRelation")
   clinicians  TenantStaff[]            @relation("AppointmentClinicians")
+  sessions    Session[]
 }
 
 model ServiceCodes {
@@ -1106,4 +1117,76 @@ model AvailabilityDays {
   availabilityId String
 
   availability StaffAvailability @relation(fields: [availabilityId], references: [id])
+}
+
+model Session {
+  id                       String         @id @default(uuid())
+  note                     String
+  appointmentId            String
+  supervisorApprovalStatus ApprovalStatus @default(PENDING)
+  clientApprovalStatus     ApprovalStatus @default(PENDING)
+  supervisorId             String?
+  startTime                DateTime
+  endTime                  DateTime
+  travelStartTime          DateTime?
+  travelEndTime            DateTime?
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
+
+  appointment           Appointment            @relation(fields: [appointmentId], references: [id])
+  approver              TenantStaff?           @relation(fields: [supervisorId], references: [id])
+  sessionDatas          SessionData[]
+  sessionApprovals      SessionApproval[]
+  timesheetHistories    TimesheetHistory[]
+  sessionUpdateRequests SessionUpdateRequest[]
+}
+
+model SessionData {
+  id        String   @id @default(uuid())
+  sessionId String
+  data      Json
+  targetId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  session Session @relation(fields: [sessionId], references: [id])
+  target  Target  @relation(fields: [targetId], references: [id])
+}
+
+model SessionApproval {
+  id              String   @id @default(uuid())
+  sessionId       String
+  confirmDelivery Boolean
+  rateService     Int      @default(0)
+  rateTherapist   Int      @default(0)
+  feedback        String?
+  signature       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  session Session @relation(fields: [sessionId], references: [id])
+}
+
+model TimesheetHistory {
+  id        String   @id @default(uuid())
+  sessionId String
+  action    String
+  details   String?
+  createdBy String
+  createdAt DateTime @default(now())
+
+  staff   TenantStaff? @relation(fields: [createdBy], references: [id])
+  session Session      @relation(fields: [sessionId], references: [id])
+}
+
+model SessionUpdateRequest {
+  id          String   @id @default(uuid())
+  sessionId   String
+  description String
+  requestedBy String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  staff   TenantStaff? @relation(fields: [requestedBy], references: [id])
+  session Session      @relation(fields: [sessionId], references: [id])
 }

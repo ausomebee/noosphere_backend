@@ -414,10 +414,26 @@ class TenantService {
         if (!totalStaff) {
             throw new Error("staffs not found")
         }
-        
+
         const availableStaff = await this.staffRepository.availableStaff(tenantId);
 
-        return {totalStaff, availableStaff};
+        return { totalStaff, availableStaff };
+    }
+
+    async averageClinicians(tenantId) {
+        const clinicians = await this.staffRepository.cliniciansPerClient(tenantId);
+        if (!clinicians) {
+            throw new Error("clinicians not found")
+        }
+
+        const totalClients = clinicians.reduce(
+            (sum, c) => sum + c._count.ClientTenant,
+            0
+        );
+
+        const average = clinicians.length > 0 ? totalClients / clinicians.length : 0;
+
+        return { average };
     }
 
     async countAllTenant() {
@@ -936,7 +952,7 @@ class TenantService {
     }
 
     async getAllTenantStaffs(tenantId) {
-        const staffs = await this.staffRepository.findAll({tenantId});
+        const staffs = await this.staffRepository.findAll({ tenantId });
 
         if (!staffs) {
             throw new Error("staffs not found")
