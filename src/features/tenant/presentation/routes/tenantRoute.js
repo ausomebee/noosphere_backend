@@ -521,6 +521,28 @@ class TenantRoutes {
 
         /**
          * @swagger
+         * /api/v1/tenant/avg-staff/{tenantId}:
+         *   get:
+         *     summary: Count average client per therapist
+         *     tags: [Tenant]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         description: The ID of the tenant
+         *     responses:
+         *       200:
+         *         description: Staffs counted successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get("/avg-staff/:tenantId", this.controller.averageClinicians);
+
+        /**
+         * @swagger
          * /api/v1/tenant/forgotpassword/{email}:
          *   get:
          *     summary: send forgot password mail

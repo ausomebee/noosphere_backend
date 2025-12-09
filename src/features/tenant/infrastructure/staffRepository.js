@@ -37,6 +37,24 @@ class StaffRepository extends BaseRepository {
         });
     }
 
+    async cliniciansPerClient(tenantId) {
+        return await this.model.findMany({
+            where: {
+                tenantId,
+                isDeleted: false,
+            },
+            select: {
+                id: true,
+                fullName: true,
+                _count: {
+                    select: {
+                        ClientTenant: true,
+                    },
+                },
+            },
+        });
+    }
+
     async availableStaff(tenantId) {
         const now = new Date();
         const jsDay = now.toLocaleString("en-US", { weekday: "long" });
