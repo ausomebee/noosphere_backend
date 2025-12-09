@@ -110,14 +110,13 @@ class SessionController {
 
             return {
                 id: s.id,
-                clientName:
-                    s.appointment.client.preferredName ||
-                    `${s.appointment.client.firstName} ${s.appointment.client.lastName}`,
+                clientName: `${s.appointment.client.firstName} ${s.appointment.client.lastName}`,
                 sessionTypeName: s.appointment.session.name,
                 clinician: s.appointment.clinicians?.map(c => c.fullName).join(", "),
                 clientApprovalStatus: s.clientApprovalStatus,
                 supervisorApprovalStatus: s.supervisorApprovalStatus,
                 totalHours,
+                date: s.createdAt
             };
         });
 
