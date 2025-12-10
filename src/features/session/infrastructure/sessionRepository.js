@@ -11,6 +11,30 @@ class SessionRepository extends BaseRepository {
             select: populate
         });
     }
+
+    async findOneAndPopulate(id) {
+        return await this.model.findUnique({
+            where: { id },
+            include: {
+                appointment: {
+                    include: {
+                        client: {
+                            select: {
+                                tenantLinks: { select: { clientAuthorizations: true } }
+                            }
+                        },
+                        clinicians: true,
+                        session: true
+                    }
+                },
+                approver: true,
+                sessionDatas: true,
+                sessionApprovals: true,
+                timesheetHistories: true
+            }
+        });
+    }
+
 }
 
 export default SessionRepository;
