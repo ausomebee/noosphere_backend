@@ -83,6 +83,42 @@ class SessionController {
         });
     });
 
+    approveSession = expressAsyncHandler(async (req, res) => {
+        const data = {id: req.params.id, supervisorApprovalStatus: "APPROVED"};
+
+        const updatedSession = await this.sessionService.updateSession(data);
+
+        if (!updatedSession) {
+            return res.status(404).json({
+                message: "Session not found or failed to approve",
+            });
+        }
+
+        return res.status(200).json({
+            message: "Session approved successfully",
+            status: "ok",
+            data: updatedSession,
+        });
+    });
+
+    rejectSession = expressAsyncHandler(async (req, res) => {
+        const data = {id: req.params.id, supervisorApprovalStatus: "REJECTED"};
+
+        const updatedSession = await this.sessionService.updateSession(data);
+
+        if (!updatedSession) {
+            return res.status(404).json({
+                message: "Session not found or failed to reject",
+            });
+        }
+
+        return res.status(200).json({
+            message: "Session rejected successfully",
+            status: "ok",
+            data: updatedSession,
+        });
+    });
+
     getSingleSession = expressAsyncHandler(async (req, res) => {
         const session = await this.sessionService.getSingleSession(req.params.id);
 
