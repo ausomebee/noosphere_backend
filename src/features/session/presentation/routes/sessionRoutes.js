@@ -179,6 +179,50 @@ class SessionRoutes {
 
         /**
          * @swagger
+         * /api/v1/sessions/approve/{id}:
+         *   patch:
+         *     summary: approve a single session
+         *     tags: [sessions]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: Session ID
+         *     responses:
+         *       200:
+         *         description: Session approved successfully
+         */
+        this.router.patch(
+            "/approve/:id",
+            this.controller.approveSession
+        );
+
+        /**
+         * @swagger
+         * /api/v1/sessions/reject/{id}:
+         *   patch:
+         *     summary: reject a single session
+         *     tags: [sessions]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: Session ID
+         *     responses:
+         *       200:
+         *         description: Session rejected successfully
+         */
+        this.router.patch(
+            "/reject/:id",
+            this.controller.rejectSession
+        );
+
+        /**
+         * @swagger
          * /api/v1/sessions/appointment/{tenantId}:
          *   get:
          *     summary: Get all sessions for a given tenantId
