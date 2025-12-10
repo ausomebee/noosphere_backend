@@ -52,7 +52,7 @@ class SessionService {
     }
 
     async getSingleSession(id) {
-        const session = await this.sessionRepository.findOne({ id });
+        const session = await this.sessionRepository.findOneAndPopulate(id);
 
         if (!session) {
             throw new Error("Session not found");
