@@ -242,6 +242,28 @@ class SessionRoutes {
             "/appointment/:tenantId",
             this.controller.getSessions
         );
+
+        /**
+         * @swagger
+         * /api/v1/sessions/claims/{tenantId}:
+         *   get:
+         *     summary: Get all claims for a given tenantId
+         *     tags: [sessions]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: tenant ID (foreign key)
+         *     responses:
+         *       200:
+         *         description: claims fetched successfully
+         */
+        this.router.get(
+            "/claims/:tenantId",
+            this.controller.getClaims
+        );
     }
 
     getRouter() {
