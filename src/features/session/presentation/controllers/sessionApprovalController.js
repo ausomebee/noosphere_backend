@@ -4,12 +4,17 @@ import prismaService from "../../../../config/prisma.js";
 import SessionApprovalRepository from "../../infrastructure/sessionApprovalRepository.js";
 import SessionApprovalService from "../../application/sessionApprovalService.js";
 import SessionApproval from "../../domain/sessionApproval.js";
+import SessionRepository from "../../infrastructure/sessionRepository.js";
+import SessionService from "../../application/sessionService.js";
+import { id } from "date-fns/locale";
 
 class SessionApprovalController {
     constructor() {
         this.prisma = prismaService.getClient();
         this.repository = new SessionApprovalRepository(this.prisma.sessionApproval);
         this.service = new SessionApprovalService({ sessionApprovalRepository: this.repository });
+        const sessionRepository = new SessionRepository(this.prisma.session);
+        this.sessionService = new SessionService({ sessionRepository });
     }
 
     createSessionApproval = expressAsyncHandler(async (req, res) => {
@@ -18,6 +23,14 @@ class SessionApprovalController {
 
         if (!newRecord) {
             return res.status(500).json({ message: "Failed to create session approval" });
+        }
+
+        const updatedSession = await this.sessionService.updateSession({ id: data.sessionId, clientApprovalStatus: 'APPROVED' });
+
+        if (!updatedSession) {
+            return res.status(404).json({
+                message: "Session not found or failed to approve",
+            });
         }
 
         return res.status(201).json({
