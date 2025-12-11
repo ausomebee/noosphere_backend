@@ -84,7 +84,17 @@ class SessionController {
     });
 
     approveSession = expressAsyncHandler(async (req, res) => {
-        const data = {id: req.params.id, supervisorApprovalStatus: "APPROVED"};
+        const session = await this.sessionService.getSingleSession(req.params.id);
+
+        if (!session) {
+            return res.status(404).json({ message: "Session not found" });
+        }
+
+        if (session.clientApprovalStatus !== "APPROVED") {
+            return res.status(404).json({ message: "client approval not granted" });
+        }
+
+        const data = {id: session.id, supervisorApprovalStatus: "APPROVED"};
 
         const updatedSession = await this.sessionService.updateSession(data);
 
