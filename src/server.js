@@ -157,7 +157,7 @@ class App {
         this.app.use("/api/v1/organization/staff-availability", staffAvailabilityRoute);
         this.app.use("/api/v1/sessions", sessionRoute);
         this.app.use("/api/v1/session-data", sessionDataRoute);
-        this.app.use("/api/v1/sessions-approvals", sessionApprovalRoute);
+        this.app.use("/api/v1/sessions-approval", sessionApprovalRoute);
         this.app.use("/api/v1/sessions-timesheet-history", timesheetHistoryRoute);
         this.app.use("/api/v1/sessions-update-requests", sessionUpdateRequestRoute);
     }
