@@ -290,7 +290,6 @@ model Client {
   isDeleted  Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  password   String?
 
   pipelineItems PipelineItem[]
   tenantLinks   ClientTenant[]
@@ -311,6 +310,8 @@ model ClientTenant {
   stage              String
   requestAppointment Boolean  @default(true)
   documentAccess     Boolean  @default(true)
+  password           String
+  passwordChanged    Boolean  @default(false)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
@@ -767,6 +768,7 @@ model ClientTargetDataCollection {
 model OrganizationInformation {
   id            String @id @default(uuid())
   tenantId      String @unique
+  subDomain     String @unique
   name          String
   email         String
   phoneNumber   String

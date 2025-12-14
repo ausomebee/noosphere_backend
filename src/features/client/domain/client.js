@@ -102,13 +102,12 @@ class Client {
             caregiverState: this.caregiverState,
             caregiverCountry: this.caregiverCountry,
             caregiverZip: this.caregiverZip,
-
-            password: this.password,
         };
     }
 
     get createClientTenant() {
         return {
+            password: this.password,
             clientId: this.clientId,
             tenantId: this.tenantId,
             dbAccess: this.dbAccess,

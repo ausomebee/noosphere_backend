@@ -20,6 +20,7 @@ import InformationController from "../controller/informationController.js";
  *         - state
  *         - country
  *         - zipCode
+ *         - subDomain
  *       properties:
  *         tenantId:
  *           type: string
@@ -58,6 +59,9 @@ import InformationController from "../controller/informationController.js";
  *         zipCode:
  *           type: string
  *           description: Zip or postal code
+ *         subDomain:
+ *           type: string
+ *           description: Subdomain for the organization
  *
  *     InformationUpdateDto:
  *       type: object
@@ -116,6 +120,9 @@ import InformationController from "../controller/informationController.js";
  *         zipCode:
  *           type: string
  *           description: Zip or postal code
+ *         subDomain:
+ *           type: string
+ *           description: Subdomain for the organization
  */
 
 class InformationRoutes {
