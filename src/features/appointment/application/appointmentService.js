@@ -139,7 +139,7 @@ class AppointmentService {
         const appointments = await this.appointmentRepository.findAllAndPopulate(
             { clientId },
             {
-                tenant: true, client: true, session: true, clinicians: {
+                tenant: true, client: true, session: true, appointmentServices: true, clinicians: {
                     select: {
                         id: true,
                         fullName: true,
@@ -200,7 +200,7 @@ class AppointmentService {
                 }
             },
             {
-                tenant: true, client: true, session: true, clinicians: {
+                tenant: true, client: true, appointmentServices: true, session: true, clinicians: {
                     select: {
                         id: true,
                         fullName: true,
@@ -317,7 +317,8 @@ class AppointmentService {
                     fullName: true,
                     email: true,
                 }
-            }
+            },
+            appointmentServices: true,
         });
 
         if (!appointments) {
@@ -344,6 +345,7 @@ class AppointmentService {
                 },
             },
             session: true,
+            appointmentServices: true,
             clinicians: {
                 select: {
                     id: true,
@@ -413,6 +415,7 @@ class AppointmentService {
                 },
             },
             session: true,
+            appointmentServices: true,
             clinicians: {
                 select: {
                     id: true,
@@ -441,6 +444,7 @@ class AppointmentService {
                 },
             },
             session: true,
+            appointmentServices: true,
             clinicians: {
                 select: {
                     id: true,
@@ -473,6 +477,7 @@ class AppointmentService {
                 },
             },
             session: true,
+            appointmentServices: true,
             clinicians: {
                 select: {
                     id: true,
@@ -545,6 +550,7 @@ class AppointmentService {
                     }
                 },
                 session: true,
+                appointmentServices: true,
                 clinicians: { select: { id: true, fullName: true, email: true } }
             }
         );
@@ -572,6 +578,7 @@ class AppointmentService {
                     }
                 },
                 session: true,
+                appointmentServices: true,
                 clinicians: { select: { id: true, fullName: true, email: true } }
             }
         );
@@ -603,6 +610,7 @@ class AppointmentService {
                     }
                 },
                 session: true,
+                appointmentServices: true,
                 clinicians: { select: { id: true, fullName: true, email: true } }
             }
         );
@@ -634,6 +642,7 @@ class AppointmentService {
                     }
                 },
                 session: true,
+                appointmentServices: true,
                 clinicians: { select: { id: true, fullName: true, email: true } }
             }
         );
@@ -661,6 +670,7 @@ class AppointmentService {
                     }
                 },
                 session: true,
+                appointmentServices: true,
                 clinicians: { select: { id: true, fullName: true, email: true } }
             }
         );
@@ -688,6 +698,7 @@ class AppointmentService {
                     }
                 },
                 session: true,
+                appointmentServices: true,
                 clinicians: { select: { id: true, fullName: true, email: true } }
             }
         );
@@ -709,7 +720,8 @@ class AppointmentService {
             include: {
                 client: { include: { payer: true } },
                 clinicians: true,
-                session: true
+                session: true,
+                appointmentServices: true,
             }
         });
 
