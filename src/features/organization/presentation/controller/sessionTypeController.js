@@ -41,10 +41,45 @@ class OrganizationSessionTypesController {
     });
 
     updateSessionType = expressAsyncHandler(async (req, res) => {
-        const type = await this.service.updateOrganizationSessionType(req.body);
+        const data = req.body;
+        const type = await this.service.updateOrganizationSessionType(data);
 
         if (!type) {
-            res.status(500).json({ message: "Failed to update session type" });
+            return res.status(500).json({ message: "Failed to update session type" });
+        }
+
+        for (const sc of data.service || []) {
+            if (sc.id) {
+                const scPayload = {
+                    ...sc,
+                    sessionTypeId: type.id,
+                };
+
+                const updatedSc =
+                    await this.sessionTypeServiceService.updateSessionTypeService(scPayload);
+
+                if (!updatedSc) {
+                    return res
+                        .status(500)
+                        .json({ message: "Failed to update session type service" });
+                }
+            } else {
+                const scPayload = new SessionTypeServiceDomain({
+                    ...sc,
+                    sessionTypeId: type.id,
+                });
+
+                const newSc =
+                    await this.sessionTypeServiceService.createSessionTypeService(
+                        scPayload.createSessionTypeService
+                    );
+
+                if (!newSc) {
+                    return res
+                        .status(500)
+                        .json({ message: "Failed to create session type service" });
+                }
+            }
         }
 
         return res.status(200).json({
