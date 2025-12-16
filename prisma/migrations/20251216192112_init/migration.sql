@@ -1,0 +1,14 @@
+/*
+  Warnings:
+
+  - You are about to drop the column `serviceCodes` on the `ClientAuthorization` table. All the data in the column will be lost.
+  - Added the required column `per` to the `ClientAuthorizationService` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `units` to the `ClientAuthorizationService` table without a default value. This is not possible if the table is not empty.
+
+*/
+-- AlterTable
+ALTER TABLE "ClientAuthorization" DROP COLUMN "serviceCodes";
+
+-- AlterTable
+ALTER TABLE "ClientAuthorizationService" ADD COLUMN     "per" TEXT NOT NULL,
+ADD COLUMN     "units" INTEGER NOT NULL;

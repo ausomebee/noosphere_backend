@@ -18,11 +18,7 @@ class SessionRepository extends BaseRepository {
             include: {
                 appointment: {
                     include: {
-                        client: {
-                            select: {
-                                tenantLinks: { select: { clientAuthorizations: true } }
-                            }
-                        },
+                        client: true,
                         clinicians: true,
                         session: true
                     }
@@ -30,7 +26,8 @@ class SessionRepository extends BaseRepository {
                 approver: true,
                 sessionDatas: true,
                 sessionApprovals: true,
-                timesheetHistories: true
+                timesheetHistories: true,
+                authorizationsUsed: true
             }
         });
     }
