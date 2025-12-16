@@ -2,13 +2,20 @@ import expressAsyncHandler from "express-async-handler";
 import prismaService from "../../../../config/prisma.js";
 import ClientAuthorizationService from "../../application/clientAuthorizationService.js";
 import ClientAuthorizationRepository from "../../infrastructure/clientAuthorizationRepository.js";
+import ClientAuthorizationServiceRepository from "../../infrastructure/clientAuthorizationServiceRepository.js";
+import ClientAuthorizationServiceService from "../../application/clientAuthorizationServiceService.js";
+import ClientAuthorizationServiceDomain from "../../domain/clientAuthorizationService.js";
 
 class ClientAuthorizationController {
     constructor() {
         this.prisma = prismaService.getClient();
         this.clientAuthorizationRepository = new ClientAuthorizationRepository(this.prisma.clientAuthorization);
+        this.clientAuthorizationServiceRepository = new ClientAuthorizationServiceRepository(this.prisma.clientAuthorizationService);
         this.clientAuthorizationService = new ClientAuthorizationService({
             clientAuthorizationRepository: this.clientAuthorizationRepository
+        });
+        this.clientAuthorizationServiceService = new ClientAuthorizationServiceService({
+            clientAuthorizationServiceRepository: this.clientAuthorizationServiceRepository
         });
     }
 
@@ -17,6 +24,15 @@ class ClientAuthorizationController {
             const data = req.body;
 
             const auth = await this.clientAuthorizationService.createClientAuthorization(data);
+
+            for (const sc of data.serviceCodes || []) {
+                const scPayload = new ClientAuthorizationServiceDomain({ ...sc, ClientAuthorizationId: auth.id });
+                const newSc = await this.clientAuthorizationServiceService.createClientAuthorizationService(scPayload.createClientAuthorizationService);
+
+                if (!newSc) {
+                    return res.status(500).json({ message: "Failed to create client authorization service" });
+                }
+            }
 
             return res.status(201).json({
                 message: "Client authorization created successfully",

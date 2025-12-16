@@ -3,12 +3,17 @@ import prismaService from "../../../../config/prisma.js";
 import AppointmentRepository from "../../infrastructure/appointmentRepository.js";
 import AppointmentService from "../../application/appointmentService.js";
 import Appointment from "../../domain/appointment.js";
+import AppointmentServiceRepository from "../../infrastructure/appointmentServiceRepository.js";
+import AppointmentServiceService from "../../application/appointmentServiceService.js";
+import AppointmentServiceDomain from "../../domain/appointmentService.js";
 
 class AppointmentController {
     constructor() {
         this.prisma = prismaService.getClient();
         this.appointmentRepository = new AppointmentRepository(this.prisma.appointment, this.prisma);
         this.service = new AppointmentService({ appointmentRepository: this.appointmentRepository });
+        this.appointmentServiceRepository = new AppointmentServiceRepository(this.prisma.appointmentService, this.prisma);
+        this.appointmentServiceService = new AppointmentServiceService({ appointmentServiceRepository: this.appointmentServiceRepository });
     }
 
     createAppointment = expressAsyncHandler(async (req, res) => {
@@ -18,6 +23,15 @@ class AppointmentController {
 
         if (!appointment) {
             return res.status(500).json({ message: "Failed to create appointment" });
+        }
+
+        for (const as of data.serviceCodes || []) {
+            const asPayload = new AppointmentServiceDomain({ ...as, appointmentId: appointment.id });
+            const newAs = await this.appointmentServiceService.createAppointmentService(asPayload.createAppointmentService);
+
+            if (!newAs) {
+                return res.status(500).json({ message: "Failed to create appointment service" });
+            }
         }
 
         return res.status(201).json({
