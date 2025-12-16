@@ -1095,7 +1095,7 @@ model FormResponseFields {
 }
 
 model ClientAuthorization {
-  id                  String @id @default(uuid())
+  id                  String  @id @default(uuid())
   tenantClientId      String
   title               String
   authorizationNumber String
@@ -1103,10 +1103,9 @@ model ClientAuthorization {
   endDate             String
   payer               String
   insuranceType       String
-  serviceCodes        Json
   utilization         Int
-  isDeleted Boolean @default(false)
-  isActive  Boolean @default(true)
+  isDeleted           Boolean @default(false)
+  isActive            Boolean @default(true)
 
   tenantClient                ClientTenant                 @relation(fields: [tenantClientId], references: [id])
   payerDetails                Payer                        @relation(fields: [payer], references: [id])
@@ -1120,6 +1119,8 @@ model ClientAuthorizationService {
   serviceCodeId         String
   ClientAuthorizationId String
   modifiers             Json
+  units                 Int
+  per                   String
 
   serviceCode         ServiceCodes        @relation(fields: [serviceCodeId], references: [id])
   clientAuthorization ClientAuthorization @relation(fields: [ClientAuthorizationId], references: [id])
