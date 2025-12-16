@@ -46,7 +46,7 @@ import ClientDto from "../dto/clientDto.js";
  *           example: "1995-06-15"
  *         primaryPayer:
  *           type: string
- *           example: "Insurance Co."
+ *           example: "6d75ea7e-1909-497a-bedb-315671de1916"
  *         streetAddress:
  *           type: string
  *           example: "123 Banana Street"
@@ -242,6 +242,38 @@ import ClientDto from "../dto/clientDto.js";
  *         isDeleted:
  *           type: boolean
  *           example: false
+ 
+ *     ClientSigninDto:
+ *       type: object
+ *       required:
+ *         - email
+ *         - password
+ *       properties:
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: "johndoe@example.com"
+ *           description: Client registered email address
+ *         password:
+ *           type: string
+ *           format: password
+ *           example: "StrongP@ssw0rd!"
+ *           description: Client account password
+ * 
+ *     ResetPasswordDto:
+ *       type: object
+ *       required:
+ *         - clientTenantId
+ *         - password
+ *       properties:
+ *         clientTenantId:
+ *           type: string
+ *           format: uuid
+ *         password:
+ *           type: string
+ *           format: password
+ *           example: "StrongP@ssw0rd!"
+ *           description: Client account password
  */
 
 class ClientRoutes {
@@ -257,7 +289,7 @@ class ClientRoutes {
          * /api/v1/client/:
          *   post:
          *     summary: Create a new client candidate
-         *     tags: [Client candidate]
+         *     tags: [Clients]
          *     requestBody:
          *       required: true
          *       content:
@@ -271,6 +303,46 @@ class ClientRoutes {
          *         description: Validation error
          */
         this.router.post("/", ClientDto.createClientDto, this.controller.createClientCandidate);
+
+        /**
+         * @swagger
+         * /api/v1/client/login:
+         *   post:
+         *     summary: client login
+         *     tags: [Clients]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/ClientSigninDto'
+         *     responses:
+         *       201:
+         *         description: Client login successful
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/login", ClientDto.clientSigninDto, this.controller.login);
+
+        /**
+         * @swagger
+         * /api/v1/client/password-reset:
+         *   patch:
+         *     summary: client reset password
+         *     tags: [Clients]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/ResetPasswordDto'
+         *     responses:
+         *       201:
+         *         description: Client login successful
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/password-reset", ClientDto.resetPasswordDto, this.controller.resetPassword);
 
         /**
          * @swagger
@@ -378,6 +450,23 @@ class ClientRoutes {
          */
         this.router.patch("/:clientTenantId/:active", this.controller.deactivateClient);
 
+         /**
+         * @swagger
+         * /api/v1/client/initiate/password-reset/{clientTenantId}:
+         *   patch:
+         *     summary: initiate password reset for a client
+         *     tags: [Clients]
+         *     parameters:
+         *       - in: path
+         *         name: clientTenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: Email sent successfully
+         */
+        this.router.patch("/initiate/password-reset/:clientTenantId", this.controller.initiatePasswordReset);
 
     }
 

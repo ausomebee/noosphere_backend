@@ -3,12 +3,17 @@ import prismaService from "../../../../config/prisma.js";
 import OrganizationSessionTypesRepository from "../../infrastucture/sessionTypesRepository.js";
 import OrganizationSessionTypesService from "../../application/sessionTypeService.js";
 import OrganizationSessionType from "../../domain/sessionType.js";
+import SessionTypeServiceDomain from "../../domain/sessionTypeService.js";
+import SessionTypeServiceRepository from "../../infrastucture/sessionTypeServiceRepository.js";
+import SessionTypeServiceService from "../../application/sessionTypeServiceService.js";
 
 class OrganizationSessionTypesController {
     constructor() {
         this.prisma = prismaService.getClient();
         this.repository = new OrganizationSessionTypesRepository(this.prisma.organizationSessionTypes);
         this.service = new OrganizationSessionTypesService({ organizationSessionTypesRepository: this.repository });
+        this.sessionTypeServiceRepository = new SessionTypeServiceRepository(this.prisma.sessionTypeService);
+        this.sessionTypeServiceService = new SessionTypeServiceService({ sessionTypeServiceRepository: this.sessionTypeServiceRepository });
     }
 
     createSessionType = expressAsyncHandler(async (req, res) => {
@@ -17,6 +22,15 @@ class OrganizationSessionTypesController {
 
         if (!type) {
             res.status(500).json({ message: "Failed to create session type" });
+        }
+
+        for (const sc of data.serviceCodes || []) {
+            const scPayload = new SessionTypeServiceDomain({ ...sc, sessionTypeId: type.id });
+            const newSc = await this.sessionTypeServiceService.createSessionTypeService(scPayload.createSessionTypeService);
+
+            if (!newSc) {
+                return res.status(500).json({ message: "Failed to create client authorization service" });
+            }
         }
 
         return res.status(201).json({

@@ -290,7 +290,6 @@ model Client {
   isDeleted  Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  password   String?
 
   pipelineItems PipelineItem[]
   tenantLinks   ClientTenant[]
@@ -311,6 +310,8 @@ model ClientTenant {
   stage              String
   requestAppointment Boolean  @default(true)
   documentAccess     Boolean  @default(true)
+  password           String
+  passwordChanged    Boolean  @default(false)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
@@ -767,6 +768,7 @@ model ClientTargetDataCollection {
 model OrganizationInformation {
   id            String @id @default(uuid())
   tenantId      String @unique
+  subDomain     String @unique
   name          String
   email         String
   phoneNumber   String
@@ -820,15 +822,25 @@ model OrganizationSessionTypes {
   tenantId          String
   name              String
   category          String
-  service           Json
   staffRolesAllowed Json
   locationsAllowed  Json
   defaultDuration   Int
   isActive          Boolean
   isBillable        Boolean
 
-  tenant      Tenant        @relation(fields: [tenantId], references: [id])
-  Appointment Appointment[]
+  tenant              Tenant               @relation(fields: [tenantId], references: [id])
+  Appointment         Appointment[]
+  sessionTypeServices SessionTypeService[]
+}
+
+model SessionTypeService {
+  id            String @id @default(uuid())
+  serviceCodeId String
+  sessionTypeId String
+  modifiers     Json
+
+  serviceCode ServiceCodes             @relation(fields: [serviceCodeId], references: [id])
+  sessionType OrganizationSessionTypes @relation(fields: [sessionTypeId], references: [id])
 }
 
 model Appointment {
@@ -836,7 +848,6 @@ model Appointment {
   clientId           String
   tenantId           String
   sessionId          String
-  service            Json
   date               String
   isRecurring        Boolean
   startTime          String
@@ -858,13 +869,24 @@ model Appointment {
   previousStartTime  String?
   previousEndTime    String?
 
-  client      Client                   @relation(fields: [clientId], references: [id])
-  tenant      Tenant                   @relation(fields: [tenantId], references: [id])
-  session     OrganizationSessionTypes @relation(fields: [sessionId], references: [id])
-  relatedTo   Appointment?             @relation("AppointmentRelation", fields: [relatedAppointment], references: [id])
-  relatedFrom Appointment[]            @relation("AppointmentRelation")
-  clinicians  TenantStaff[]            @relation("AppointmentClinicians")
-  sessions    Session[]
+  client              Client                   @relation(fields: [clientId], references: [id])
+  tenant              Tenant                   @relation(fields: [tenantId], references: [id])
+  session             OrganizationSessionTypes @relation(fields: [sessionId], references: [id])
+  relatedTo           Appointment?             @relation("AppointmentRelation", fields: [relatedAppointment], references: [id])
+  relatedFrom         Appointment[]            @relation("AppointmentRelation")
+  clinicians          TenantStaff[]            @relation("AppointmentClinicians")
+  sessions            Session[]
+  appointmentServices AppointmentService[]
+}
+
+model AppointmentService {
+  id            String @id @default(uuid())
+  serviceCodeId String
+  appointmentId String
+  modifiers     Json
+
+  serviceCode ServiceCodes @relation(fields: [serviceCodeId], references: [id])
+  appointment Appointment  @relation(fields: [appointmentId], references: [id])
 }
 
 model ServiceCodes {
@@ -876,8 +898,11 @@ model ServiceCodes {
   isDeleted   Boolean @default(false)
   isActive    Boolean @default(true)
 
-  tenant            Tenant              @relation(fields: [tenantId], references: [id])
-  PayerServiceCodes PayerServiceCodes[]
+  tenant                      Tenant                       @relation(fields: [tenantId], references: [id])
+  PayerServiceCodes           PayerServiceCodes[]
+  sessionTypeServices         SessionTypeService[]
+  appointmentServices         AppointmentService[]
+  clientAuthorizationServices ClientAuthorizationService[]
 }
 
 model RoundingRules {
@@ -1070,7 +1095,7 @@ model FormResponseFields {
 }
 
 model ClientAuthorization {
-  id                  String  @id @default(uuid())
+  id                  String @id @default(uuid())
   tenantClientId      String
   title               String
   authorizationNumber String
@@ -1079,12 +1104,25 @@ model ClientAuthorization {
   payer               String
   insuranceType       String
   serviceCodes        Json
-  isDeleted           Boolean @default(false)
-  isActive            Boolean @default(true)
+  utilization         Int
+  isDeleted Boolean @default(false)
+  isActive  Boolean @default(true)
 
-  tenantClient ClientTenant  @relation(fields: [tenantClientId], references: [id])
-  payerDetails Payer         @relation(fields: [payer], references: [id])
-  insurance    InsuranceType @relation(fields: [insuranceType], references: [id])
+  tenantClient                ClientTenant                 @relation(fields: [tenantClientId], references: [id])
+  payerDetails                Payer                        @relation(fields: [payer], references: [id])
+  insurance                   InsuranceType                @relation(fields: [insuranceType], references: [id])
+  clientAuthorizationServices ClientAuthorizationService[]
+  sessions                    Session[]                    @relation("SessionAuthorizations")
+}
+
+model ClientAuthorizationService {
+  id                    String @id @default(uuid())
+  serviceCodeId         String
+  ClientAuthorizationId String
+  modifiers             Json
+
+  serviceCode         ServiceCodes        @relation(fields: [serviceCodeId], references: [id])
+  clientAuthorization ClientAuthorization @relation(fields: [ClientAuthorizationId], references: [id])
 }
 
 model ClientForm {
@@ -1139,6 +1177,7 @@ model Session {
   sessionApprovals      SessionApproval[]
   timesheetHistories    TimesheetHistory[]
   sessionUpdateRequests SessionUpdateRequest[]
+  authorizationsUsed    ClientAuthorization[]  @relation("SessionAuthorizations")
 }
 
 model SessionData {

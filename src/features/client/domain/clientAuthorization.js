@@ -8,7 +8,6 @@ class ClientAuthorization {
         endDate,
         payer,
         insuranceType,
-        serviceCodes
     }) {
         this.id = id;
         this.tenantClientId = tenantClientId;
@@ -18,7 +17,6 @@ class ClientAuthorization {
         this.endDate = endDate;
         this.payer = payer;
         this.insuranceType = insuranceType;
-        this.serviceCodes = serviceCodes;
     }
 
     get createAuthorization() {
@@ -30,7 +28,6 @@ class ClientAuthorization {
             endDate: this.endDate,
             payer: this.payer,
             insuranceType: this.insuranceType,
-            serviceCodes: this.serviceCodes
         };
     }
 }

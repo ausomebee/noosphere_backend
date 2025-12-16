@@ -331,6 +331,21 @@ class ClientDto {
 
         Validator.validateRequest(req, next, schema);
     };
+
+    static resetPasswordDto = (req, res, next) => {
+        const schema = Joi.object({
+            clientTenantId: Joi.string().uuid().required(),
+            password: Joi.string()
+                .regex(strongPasswordRegex)
+                .required()
+                .messages({
+                    "string.empty": "Password is required",
+                    "string.pattern.base": stringPasswordError,
+                })
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
 }
 
 export default ClientDto;

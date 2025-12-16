@@ -8,6 +8,8 @@ import ItemRepository from "../../../pipeline/infrastructure/itemRepository.js";
 import ClientDocuments from "../../domain/clientDocument.js";
 import ClientDocumentsRepository from "../../infrastructure/clientDocumentsRepository.js";
 import ClientDocumentsService from "../../application/clientDocumentsService.js";
+import InformationService from "../../../organization/application/informationService.js";
+import InformationRepository from "../../../organization/infrastucture/informationRepository.js";
 
 class ClientController {
     constructor() {
@@ -19,10 +21,18 @@ class ClientController {
         this.service = new ClientService({ clientRepository: this.clientRepository, clientTenantRepository: this.clientTenantRepository, generateCode: this.generateCode, prisma: this.prisma, itemRepository: this.itemRepository });
         this.clientDocumentsRepository = new ClientDocumentsRepository(this.prisma.clientDocuments);
         this.clientDocumentsService = new ClientDocumentsService({ clientDocumentsRepository: this.clientDocumentsRepository });
+        this.informationRepository = new InformationRepository(this.prisma.organizationInformation)
+        this.informationService = new InformationService({ informationRepository: this.informationRepository });
     }
 
     createClientCandidate = expressAsyncHandler(async (req, res) => {
-        const candidate = await this.service.createClientCandidate(req.body);
+        const information = await this.informationService.getInformation(req.body.tenantId);
+
+        if (!information) {
+            res.status(500).json({ message: 'Failed to fetch information' });
+        }
+
+        const candidate = await this.service.createClientCandidate(req.body, information);
 
         if (!candidate) {
             res.status(500).json({ message: 'Failed to create client candidate' });
@@ -79,6 +89,34 @@ class ClientController {
         });
     });
 
+    login = expressAsyncHandler(async (req, res) => {
+        const client = await this.service.login({...req.body, subdomain: req.headers.host.split('.')[0]});
+
+        if (!client) {
+            res.status(500).json({ message: 'Failed to login' });
+        }
+
+        return res.status(201).json({
+            message: "login successful",
+            status: 'ok',
+            data: client
+        });
+    });
+
+    resetPassword = expressAsyncHandler(async (req, res) => {
+        const client = await this.service.updateTenantClient({...req.body, passwordChanged: true});
+
+        if (!client) {
+            res.status(500).json({ message: 'Failed to reset password' });
+        }
+
+        return res.status(201).json({
+            message: "password reset successful",
+            status: 'ok',
+            data: client
+        });
+    });
+
     getSingleClient = expressAsyncHandler(async (req, res) => {
         const client = await this.service.getSingleClient(req.params.clientId);
 
@@ -88,6 +126,20 @@ class ClientController {
 
         return res.status(201).json({
             message: "client fetched successfully",
+            status: 'ok',
+            data: client
+        });
+    });
+
+    initiatePasswordReset = expressAsyncHandler(async (req, res) => {
+        const client = await this.service.initiatePasswordReset(req.params.clientTenantId);
+
+        if (!client) {
+            res.status(500).json({ message: 'Failed to send email' });
+        }
+
+        return res.status(201).json({
+            message: "email sent successfully",
             status: 'ok',
             data: client
         });
