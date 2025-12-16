@@ -4,7 +4,6 @@ class Appointment {
         clientId,
         sessionId,
         clinicians,
-        service,
         date,
         isRecurring,
         startTime,
@@ -25,7 +24,6 @@ class Appointment {
         this.clientId = clientId;
         this.sessionId = sessionId;
         this.clinicians = clinicians;
-        this.service = service;
         this.date = date;
         this.isRecurring = isRecurring;
         this.startTime = startTime;
@@ -50,7 +48,6 @@ class Appointment {
             clinicians: {
                 connect: this.clinicians
             },
-            service: this.service,
             date: this.date,
             isRecurring: this.isRecurring,
             startTime: this.startTime,

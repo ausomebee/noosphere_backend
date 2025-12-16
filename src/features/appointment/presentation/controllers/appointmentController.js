@@ -25,7 +25,7 @@ class AppointmentController {
             return res.status(500).json({ message: "Failed to create appointment" });
         }
 
-        for (const as of data.serviceCodes || []) {
+        for (const as of data.service || []) {
             const asPayload = new AppointmentServiceDomain({ ...as, appointmentId: appointment.id });
             const newAs = await this.appointmentServiceService.createAppointmentService(asPayload.createAppointmentService);
 
