@@ -30,10 +30,8 @@ class OrganizationSessionTypesService {
         }
 
         const update = await this.organizationSessionTypesRepository.update(data.id, {
-            tenantId: data.tenantId || type.tenantId,
             name: data.name || type.name,
             category: data.category || type.category,
-            service: data.service || type.service,
             staffRolesAllowed: data.staffRolesAllowed || type.staffRolesAllowed,
             locationsAllowed: data.locationsAllowed || type.locationsAllowed,
             defaultDuration: data.defaultDuration || type.defaultDuration,
