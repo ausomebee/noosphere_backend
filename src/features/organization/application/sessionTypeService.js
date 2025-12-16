@@ -57,7 +57,7 @@ class OrganizationSessionTypesService {
     }
 
     async getTenantSessionTypes(tenantId) {
-        const sessionTypes = await this.organizationSessionTypesRepository.findAll({ tenantId });
+        const sessionTypes = await this.organizationSessionTypesRepository.findAllAndPopulate({ tenantId }, { sessionTypeServices: true });
 
         if (!sessionTypes) {
             throw new Error("Session types not found");
@@ -67,7 +67,7 @@ class OrganizationSessionTypesService {
     }
 
     async getActiveTenantSessionTypes(tenantId) {
-        const sessionTypes = await this.organizationSessionTypesRepository.findAll({ AND: [{ tenantId }, { isActive: true }] });
+        const sessionTypes = await this.organizationSessionTypesRepository.findAllAndPopulate({ AND: [{ tenantId }, { isActive: true }] }, { sessionTypeServices: true });
 
         if (!sessionTypes) {
             throw new Error("Session types not found");
