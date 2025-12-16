@@ -24,7 +24,7 @@ class OrganizationSessionTypesController {
             res.status(500).json({ message: "Failed to create session type" });
         }
 
-        for (const sc of data.serviceCodes || []) {
+        for (const sc of req.body.service || []) {
             const scPayload = new SessionTypeServiceDomain({ ...sc, sessionTypeId: type.id });
             const newSc = await this.sessionTypeServiceService.createSessionTypeService(scPayload.createSessionTypeService);
 
