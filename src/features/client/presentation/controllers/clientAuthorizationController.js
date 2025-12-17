@@ -25,7 +25,7 @@ class ClientAuthorizationController {
 
             const auth = await this.clientAuthorizationService.createClientAuthorization(data);
 
-            for (const sc of data.serviceCodes || []) {
+            for (const sc of data.service || []) {
                 const scPayload = new ClientAuthorizationServiceDomain({ ...sc, ClientAuthorizationId: auth.id });
                 const newSc = await this.clientAuthorizationServiceService.createClientAuthorizationService(scPayload.createClientAuthorizationService);
 
