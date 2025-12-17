@@ -112,6 +112,7 @@ class AppointmentRepository {
                     },
                 },
                 session: true,
+                appointmentServices: { include: { serviceCode: true } },
                 clinicians: {
                     select: {
                         id: true,
