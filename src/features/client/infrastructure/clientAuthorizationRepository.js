@@ -1,8 +1,9 @@
 import BaseRepository from "./baseRepository.js";
 
 class ClientAuthorizationRepository extends BaseRepository {
-    constructor(model) {
+    constructor(model, clientAuthorizationServiceModel) {
         super(model);
+        this.clientAuthorizationServiceModel = clientAuthorizationServiceModel;
     }
 
     async txCreate(data, tx) {
@@ -53,6 +54,41 @@ class ClientAuthorizationRepository extends BaseRepository {
                 id: true,
                 startDate: true,
                 endDate: true,
+            },
+        });
+    }
+
+    async getAuthorizationForTimesheet(tenantClientId, requiredServices) {
+        return await this.model.findMany({
+            where: {
+                tenantClientId,
+                isActive: true,
+                isDeleted: false,
+                clientAuthorizationServices: {
+                    some: {
+                        serviceCodeId: {
+                            in: requiredServices.map(s => s.serviceCodeId),
+                        },
+                        units: {
+                            gt: this.clientAuthorizationServiceModel.fields.usedUnit,
+                        },
+                    },
+                },
+            },
+            include: {
+                clientAuthorizationServices: {
+                    where: {
+                        serviceCodeId: {
+                            in: requiredServices.map(s => s.serviceCodeId),
+                        },
+                    },
+                    select: {
+                        id: true,
+                        serviceCodeId: true,
+                        units: true,
+                        usedUnit: true,
+                    },
+                },
             },
         });
     }

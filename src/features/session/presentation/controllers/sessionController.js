@@ -9,6 +9,10 @@ import SessionDataService from "../../application/sessionDataService.js";
 
 import Session from "../../domain/session.js";
 import SessionData from "../../domain/sessionData.js";
+import ClientAuthorizationRepository from "../../../client/infrastructure/clientAuthorizationRepository.js";
+import ClientAuthorizationService from "../../../client/application/clientAuthorizationService.js";
+import AppointmentRepository from "../../../appointment/infrastructure/appointmentRepository.js";
+import AppointmentService from "../../../appointment/application/appointmentService.js";
 
 class SessionController {
     constructor() {
@@ -19,10 +23,98 @@ class SessionController {
 
         this.sessionService = new SessionService({ sessionRepository });
         this.sessionDataService = new SessionDataService({ sessionDataRepository });
+
+        this.clientAuthorizationRepository = new ClientAuthorizationRepository(this.prisma.clientAuthorization, this.prisma.clientAuthorizationService);
+        this.clientAuthorizationService = new ClientAuthorizationService({
+            clientAuthorizationRepository: this.clientAuthorizationRepository
+        });
+
+        this.appointmentRepository = new AppointmentRepository(this.prisma.appointment, this.prisma);
+        this.appointmentService = new AppointmentService({ appointmentRepository: this.appointmentRepository });
     }
 
     createSession = expressAsyncHandler(async (req, res) => {
         const data = req.body;
+
+        const appointments = await this.appointmentService.getAppointmentsForTimesheet(data.appointmentId);
+
+        const candidateAuthorizations = await this.clientAuthorizationService.getAuthorizationForTimesheet(appointments.tenantClientId, appointments.requiredServices);
+
+        const usableAuthorizations = [];
+
+        for (const auth of candidateAuthorizations) {
+            const usableServices = [];
+
+            for (const svc of auth.clientAuthorizationServices) {
+                const remainingUnits = svc.units - svc.usedUnit;
+
+                if (remainingUnits > 0) {
+                    usableServices.push({
+                        serviceCodeId: svc.serviceCodeId,
+                        remainingUnits,
+                    });
+                }
+            }
+
+            if (usableServices.length > 0) {
+                usableAuthorizations.push({
+                    id: auth.id,
+                    services: usableServices,
+                });
+            }
+        }
+
+        const remaining = new Map(
+            appointments.requiredServices.map(s => [s.serviceCodeId, 1])
+        );
+
+        const selectedAuthIds = new Set();
+
+        while (remaining.size > 0) {
+            let bestAuth = null;
+            let bestCoverage = 0;
+
+            for (const auth of usableAuthorizations) {
+                let coverage = 0;
+
+                for (const svc of auth.services) {
+                    const requiredUnits = remaining.get(svc.serviceCodeId);
+                    if (!requiredUnits) continue;
+
+                    if (svc.remainingUnits >= requiredUnits) {
+                        coverage++;
+                    }
+                }
+
+                if (coverage > bestCoverage) {
+                    bestCoverage = coverage;
+                    bestAuth = auth;
+                }
+            }
+
+            if (!bestAuth) {
+                throw new Error(
+                    "Insufficient authorization units to cover appointment services"
+                );
+            }
+
+            selectedAuthIds.add(bestAuth.id);
+
+            for (const svc of bestAuth.services) {
+                const requiredUnits = remaining.get(svc.serviceCodeId);
+                if (!requiredUnits) continue;
+
+                if (svc.remainingUnits >= requiredUnits) {
+                    remaining.delete(svc.serviceCodeId);
+                }
+            }
+        }
+
+        const minimumAuthorizations = candidateAuthorizations.filter(auth =>
+            selectedAuthIds.has(auth.id)
+        );
+
+        console.log(minimumAuthorizations)
 
         const sessionPayload = new Session(data);
         const session = await this.sessionService.createSession(sessionPayload.createSession);
@@ -94,7 +186,7 @@ class SessionController {
             return res.status(404).json({ message: "client approval not granted" });
         }
 
-        const data = {id: session.id, supervisorApprovalStatus: "APPROVED"};
+        const data = { id: session.id, supervisorApprovalStatus: "APPROVED" };
 
         const updatedSession = await this.sessionService.updateSession(data);
 
@@ -112,7 +204,7 @@ class SessionController {
     });
 
     rejectSession = expressAsyncHandler(async (req, res) => {
-        const data = {id: req.params.id, supervisorApprovalStatus: "REJECTED"};
+        const data = { id: req.params.id, supervisorApprovalStatus: "REJECTED" };
 
         const updatedSession = await this.sessionService.updateSession(data);
 

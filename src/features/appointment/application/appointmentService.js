@@ -731,6 +731,26 @@ class AppointmentService {
 
         return appointment;
     }
+
+    async getAppointmentsForTimesheet(id) {
+        const appointment = await this.appointmentRepository.getAppointmentsForTimesheet(id);
+
+        if (!appointment) {
+            throw new Error("Appointment not found");
+        }
+
+        const tenantClientId = appointment.client.tenantLinks[0]?.id;
+
+        if (!tenantClientId) {
+            throw new Error("Client is not linked to tenant");
+        }
+
+        const requiredServices = appointment.appointmentServices.map(s => ({
+            serviceCodeId: s.serviceCodeId,
+        }));
+
+        return { tenantClientId, requiredServices };
+    }
 }
 
 export default AppointmentService;

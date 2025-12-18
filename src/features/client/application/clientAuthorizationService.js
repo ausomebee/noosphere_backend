@@ -155,6 +155,12 @@ class ClientAuthorizationService {
         };
     }
 
+    async getAuthorizationForTimesheet(tenantClientId, requiredServices) {
+        const authorizations = await this.clientAuthorizationRepository.getAuthorizationForTimesheet(tenantClientId, requiredServices);
+
+        return authorizations;
+    }
+
 }
 
 export default ClientAuthorizationService;
