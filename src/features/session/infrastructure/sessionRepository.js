@@ -27,7 +27,13 @@ class SessionRepository extends BaseRepository {
                 sessionDatas: true,
                 sessionApprovals: true,
                 timesheetHistories: true,
-                authorizationsUsed: true
+                authorizationsUsed: {
+                    include: {
+                        clientAuthorizationServices: {
+                            include: { serviceCode: true }
+                        }
+                    }
+                }
             }
         });
     }
