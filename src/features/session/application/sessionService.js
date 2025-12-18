@@ -96,7 +96,7 @@ class SessionService {
     }
 
     async getClaims(tenantId) {
-        const sessions = await this.sessionRepository.findAllAndPopulate({ appointment: { tenantId: tenantId },  supervisorApprovalStatus: "APPROVED" }, {
+        const sessions = await this.sessionRepository.findAllAndPopulate({ appointment: { tenantId: tenantId }, supervisorApprovalStatus: "APPROVED" }, {
             id: true,
             appointment: {
                 select: {
@@ -105,6 +105,7 @@ class SessionService {
                             firstName: true,
                             lastName: true,
                             preferredName: true
+
                         }
                     },
                     session: { select: { name: true } },
@@ -118,8 +119,10 @@ class SessionService {
             clientApprovalStatus: true,
             supervisorApprovalStatus: true,
             startTime: true,
+            approver: { select: { fullName: true } },
             endTime: true,
-            createdAt: true
+            createdAt: true,
+            authorizationsUsed: { select: { payerDetails: { select: { payerName: true } } } }
         });
 
         if (!sessions) {
