@@ -61,7 +61,7 @@ class ClientAuthorizationService {
     }
 
     async getClientAuthorizations(tenantClientId) {
-        const auths = await this.clientAuthorizationRepository.findAllAndPopulate({ tenantClientId, isDeleted: false }, { payerDetails: true, insurance: true });
+        const auths = await this.clientAuthorizationRepository.findAllAndPopulate({ tenantClientId, isDeleted: false }, { payerDetails: true, insurance: true, clientAuthorizationServices: { serviceCode: true } });
 
         if (!auths) {
             throw new Error("Client Authorizations not found");
