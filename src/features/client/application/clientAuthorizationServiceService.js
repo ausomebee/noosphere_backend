@@ -5,20 +5,6 @@ class ClientAuthorizationServiceService {
     }
 
     async createClientAuthorizationService(data) {
-        const exists = await this.clientAuthorizationServiceRepository.findFirstDynamic({
-            where: {
-                serviceCodeId: data.serviceCodeId,
-                clientAuthorizationId: data.clientAuthorizationId,
-            },
-            select: { id: true },
-        });
-
-        if (exists) {
-            throw new Error(
-                "Service code already exists for this client authorization."
-            );
-        }
-
         const newRecord = await this.clientAuthorizationServiceRepository.create(data);
 
         if (!newRecord) {
