@@ -318,7 +318,7 @@ class AppointmentService {
                     email: true,
                 }
             },
-            appointmentServices: true,
+            appointmentServices: { include: { serviceCode: true } },
         });
 
         if (!appointments) {
@@ -345,7 +345,7 @@ class AppointmentService {
                 },
             },
             session: true,
-            appointmentServices: true,
+            appointmentServices: { include: { serviceCode: true } },
             clinicians: {
                 select: {
                     id: true,
@@ -415,7 +415,7 @@ class AppointmentService {
                 },
             },
             session: true,
-            appointmentServices: true,
+            appointmentServices: { include: { serviceCode: true } },
             clinicians: {
                 select: {
                     id: true,
@@ -444,7 +444,7 @@ class AppointmentService {
                 },
             },
             session: true,
-            appointmentServices: true,
+            appointmentServices: { include: { serviceCode: true } },
             clinicians: {
                 select: {
                     id: true,
@@ -477,7 +477,7 @@ class AppointmentService {
                 },
             },
             session: true,
-            appointmentServices: true,
+            appointmentServices: { include: { serviceCode: true } },
             clinicians: {
                 select: {
                     id: true,
@@ -550,7 +550,7 @@ class AppointmentService {
                     }
                 },
                 session: true,
-                appointmentServices: true,
+                appointmentServices: { include: { serviceCode: true } },
                 clinicians: { select: { id: true, fullName: true, email: true } }
             }
         );
@@ -578,7 +578,7 @@ class AppointmentService {
                     }
                 },
                 session: true,
-                appointmentServices: true,
+                appointmentServices: { include: { serviceCode: true } },
                 clinicians: { select: { id: true, fullName: true, email: true } }
             }
         );
@@ -610,7 +610,7 @@ class AppointmentService {
                     }
                 },
                 session: true,
-                appointmentServices: true,
+                appointmentServices: { include: { serviceCode: true } },
                 clinicians: { select: { id: true, fullName: true, email: true } }
             }
         );
@@ -642,7 +642,7 @@ class AppointmentService {
                     }
                 },
                 session: true,
-                appointmentServices: true,
+                appointmentServices: { include: { serviceCode: true } },
                 clinicians: { select: { id: true, fullName: true, email: true } }
             }
         );
@@ -670,7 +670,7 @@ class AppointmentService {
                     }
                 },
                 session: true,
-                appointmentServices: true,
+                appointmentServices: { include: { serviceCode: true } },
                 clinicians: { select: { id: true, fullName: true, email: true } }
             }
         );
@@ -698,7 +698,7 @@ class AppointmentService {
                     }
                 },
                 session: true,
-                appointmentServices: true,
+                appointmentServices: { include: { serviceCode: true } },
                 clinicians: { select: { id: true, fullName: true, email: true } }
             }
         );
@@ -721,7 +721,7 @@ class AppointmentService {
                 client: { include: { payer: true } },
                 clinicians: true,
                 session: true,
-                appointmentServices: true,
+                appointmentServices: { include: { serviceCode: true } },
             }
         });
 
