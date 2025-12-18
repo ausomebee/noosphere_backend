@@ -28,7 +28,7 @@ class ClientAuthorizationController {
             const auth = await this.clientAuthorizationService.createClientAuthorization(authPayload.createAuthorization);
 
             for (const sc of data.serviceCodes || []) {
-                const scPayload = new ClientAuthorizationServiceDomain({ ...sc, ClientAuthorizationId: auth.id });
+                const scPayload = new ClientAuthorizationServiceDomain({ ...sc, clientAuthorizationId: auth.id });
                 const newSc = await this.clientAuthorizationServiceService.createClientAuthorizationService(scPayload.createClientAuthorizationService);
 
                 if (!newSc) {
@@ -67,7 +67,7 @@ class ClientAuthorizationController {
                 if (sc.id) {
                     const scPayload = {
                         ...sc,
-                        ClientAuthorizationId: auth.id,
+                        clientAuthorizationId: auth.id,
                     };
 
                     const updatedSc =
@@ -82,7 +82,7 @@ class ClientAuthorizationController {
                 } else {
                     const scPayload = new ClientAuthorizationServiceDomain({
                         ...sc,
-                        ClientAuthorizationId: auth.id,
+                        clientAuthorizationId: auth.id,
                     });
 
                     const newSc =
