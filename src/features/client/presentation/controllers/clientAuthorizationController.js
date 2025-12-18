@@ -23,7 +23,7 @@ class ClientAuthorizationController {
     async createClientAuthorization(req, res) {
         try {
             const data = req.body;
-        const authPayload = new ClientAuthorization(data);
+            const authPayload = new ClientAuthorization(data);
 
             const auth = await this.clientAuthorizationService.createClientAuthorization(authPayload.createAuthorization);
 
@@ -54,11 +54,54 @@ class ClientAuthorizationController {
                 ...req.body,
             };
 
-            const updated = await this.clientAuthorizationService.updateClientAuthorization(data);
+            const auth =
+                await this.clientAuthorizationService.updateClientAuthorization(data);
+
+            if (!auth) {
+                return res
+                    .status(500)
+                    .json({ message: "Failed to update client authorization" });
+            }
+
+            for (const sc of data.serviceCodes || []) {
+                if (sc.id) {
+                    const scPayload = {
+                        ...sc,
+                        ClientAuthorizationId: auth.id,
+                    };
+
+                    const updatedSc =
+                        await this.clientAuthorizationServiceService
+                            .updateClientAuthorizationService(scPayload);
+
+                    if (!updatedSc) {
+                        return res.status(500).json({
+                            message: "Failed to update client authorization service",
+                        });
+                    }
+                } else {
+                    const scPayload = new ClientAuthorizationServiceDomain({
+                        ...sc,
+                        ClientAuthorizationId: auth.id,
+                    });
+
+                    const newSc =
+                        await this.clientAuthorizationServiceService
+                            .createClientAuthorizationService(
+                                scPayload.createClientAuthorizationService
+                            );
+
+                    if (!newSc) {
+                        return res.status(500).json({
+                            message: "Failed to create client authorization service",
+                        });
+                    }
+                }
+            }
 
             return res.status(200).json({
                 message: "Client authorization updated successfully",
-                data: updated,
+                data: auth,
             });
         } catch (error) {
             return res.status(400).json({

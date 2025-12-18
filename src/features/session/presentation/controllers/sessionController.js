@@ -114,9 +114,7 @@ class SessionController {
             selectedAuthIds.has(auth.id)
         );
 
-        console.log(minimumAuthorizations)
-
-        const sessionPayload = new Session(data);
+        const sessionPayload = new Session({...data, authorizationsUsed: minimumAuthorizations});
         const session = await this.sessionService.createSession(sessionPayload.createSession);
 
         if (!session) {
