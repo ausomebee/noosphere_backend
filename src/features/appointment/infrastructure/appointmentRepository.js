@@ -98,6 +98,29 @@ class AppointmentRepository {
         );
     }
 
+    async getAppointmentsForTimesheet(appointmentId) {
+        const appointment = await this.model.findUnique({
+            where: { id: appointmentId },
+            include: {
+                appointmentServices: {
+                    select: {
+                        serviceCodeId: true,
+                    },
+                },
+                client: {
+                    select: {
+                        tenantLinks: {
+                            where: { active: true },
+                            select: { id: true },
+                        },
+                    },
+                },
+            },
+        });
+
+        return appointment;
+    }
+
     async getAppointmentsByTenant(tenantId) {
         const appointments = await this.model.findMany({
             where: { tenantId },

@@ -5,6 +5,7 @@ import ClientAuthorizationRepository from "../../infrastructure/clientAuthorizat
 import ClientAuthorizationServiceRepository from "../../infrastructure/clientAuthorizationServiceRepository.js";
 import ClientAuthorizationServiceService from "../../application/clientAuthorizationServiceService.js";
 import ClientAuthorizationServiceDomain from "../../domain/clientAuthorizationService.js";
+import ClientAuthorization from "../../domain/clientAuthorization.js";
 
 class ClientAuthorizationController {
     constructor() {
@@ -22,10 +23,11 @@ class ClientAuthorizationController {
     async createClientAuthorization(req, res) {
         try {
             const data = req.body;
+        const authPayload = new ClientAuthorization(data);
 
-            const auth = await this.clientAuthorizationService.createClientAuthorization(data);
+            const auth = await this.clientAuthorizationService.createClientAuthorization(authPayload.createAuthorization);
 
-            for (const sc of data.service || []) {
+            for (const sc of data.serviceCodes || []) {
                 const scPayload = new ClientAuthorizationServiceDomain({ ...sc, ClientAuthorizationId: auth.id });
                 const newSc = await this.clientAuthorizationServiceService.createClientAuthorizationService(scPayload.createClientAuthorizationService);
 

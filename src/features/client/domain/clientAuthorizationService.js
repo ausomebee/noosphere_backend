@@ -2,14 +2,14 @@ class ClientAuthorizationServiceDomain {
     constructor({
         id,
         serviceCodeId,
-        clientAuthorizationId,
+        ClientAuthorizationId,
         modifiers,
         units,
         per,
     }) {
         this.id = id;
         this.serviceCodeId = serviceCodeId;
-        this.clientAuthorizationId = clientAuthorizationId;
+        this.ClientAuthorizationId = ClientAuthorizationId;
         this.modifiers = modifiers;
         this.units = units;
         this.per = per;
@@ -18,7 +18,7 @@ class ClientAuthorizationServiceDomain {
     get createClientAuthorizationService() {
         return {
             serviceCodeId: this.serviceCodeId,
-            clientAuthorizationId: this.clientAuthorizationId,
+            ClientAuthorizationId: this.ClientAuthorizationId,
             modifiers: this.modifiers,
             units: this.units,
             per: this.per,

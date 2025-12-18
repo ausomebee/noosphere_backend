@@ -1103,7 +1103,6 @@ model ClientAuthorization {
   endDate             String
   payer               String
   insuranceType       String
-  utilization         Int
   isDeleted           Boolean @default(false)
   isActive            Boolean @default(true)
 
@@ -1120,6 +1119,7 @@ model ClientAuthorizationService {
   ClientAuthorizationId String
   modifiers             Json
   units                 Int
+  usedUnit              Int    @default(0)
   per                   String
 
   serviceCode         ServiceCodes        @relation(fields: [serviceCodeId], references: [id])
