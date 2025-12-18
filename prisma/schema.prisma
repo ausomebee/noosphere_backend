@@ -1116,14 +1116,14 @@ model ClientAuthorization {
 model ClientAuthorizationService {
   id                    String @id @default(uuid())
   serviceCodeId         String
-  ClientAuthorizationId String
+  clientAuthorizationId String
   modifiers             Json
   units                 Int
   usedUnit              Int    @default(0)
   per                   String
 
   serviceCode         ServiceCodes        @relation(fields: [serviceCodeId], references: [id])
-  clientAuthorization ClientAuthorization @relation(fields: [ClientAuthorizationId], references: [id])
+  clientAuthorization ClientAuthorization @relation(fields: [clientAuthorizationId], references: [id])
 }
 
 model ClientForm {
