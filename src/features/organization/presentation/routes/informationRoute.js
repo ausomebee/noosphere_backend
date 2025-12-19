@@ -194,6 +194,26 @@ class InformationRoutes {
         */
         this.router.get("/:tenantId", this.controller.getInformation);
 
+        /**
+        * @swagger
+        * /api/v1/organization/information/{subdomain}:
+        *   get:
+        *     summary: gets tenant organization information
+        *     tags: [organization]
+        *     parameters:
+        *       - in: path
+        *         name: subdomain
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The subdomain of the tenant
+        *     responses:
+        *       200:
+        *         description: subdomain checked successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/:subdomain", this.controller.checkDomain);
     }
 
     getRouter() {
