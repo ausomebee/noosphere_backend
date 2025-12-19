@@ -28,7 +28,7 @@ import SessionController from "../controllers/sessionController.js";
  *           type: string
  *           enum: [PENDING, APPROVED, REJECTED]
  *           example: PENDING
- *         supervisorId:
+ *         createdBy:
  *           type: string
  *           format: uuid
  *         startTime:
@@ -207,7 +207,7 @@ class SessionRoutes {
 
         /**
          * @swagger
-         * /api/v1/sessions/reject/{id}:
+         * /api/v1/sessions/reject/{id}/{supervisorId}:
          *   patch:
          *     summary: reject a single session
          *     tags: [sessions]
@@ -218,12 +218,18 @@ class SessionRoutes {
          *           type: string
          *         required: true
          *         description: Session ID
+         *       - in: path
+         *         name: supervisorId
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: Supervisor ID
          *     responses:
          *       200:
          *         description: Session rejected successfully
          */
         this.router.patch(
-            "/reject/:id",
+            "/reject/:id/:supervisorId",
             this.controller.rejectSession
         );
 

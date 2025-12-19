@@ -6,7 +6,8 @@ import SessionApprovalService from "../../application/sessionApprovalService.js"
 import SessionApproval from "../../domain/sessionApproval.js";
 import SessionRepository from "../../infrastructure/sessionRepository.js";
 import SessionService from "../../application/sessionService.js";
-import { id } from "date-fns/locale";
+import TimesheetHistoryRepository from "../../infrastructure/timesheetHistoryRepository.js";
+import TimesheetHistoryService from "../../application/timesheetHistoryService.js";
 
 class SessionApprovalController {
     constructor() {
@@ -15,6 +16,8 @@ class SessionApprovalController {
         this.service = new SessionApprovalService({ sessionApprovalRepository: this.repository });
         const sessionRepository = new SessionRepository(this.prisma.session);
         this.sessionService = new SessionService({ sessionRepository });
+        this.historyRepository = new TimesheetHistoryRepository(this.prisma.timesheetHistory);
+        this.historyService = new TimesheetHistoryService({ timesheetHistoryRepository: this.historyRepository });
     }
 
     createSessionApproval = expressAsyncHandler(async (req, res) => {
@@ -31,6 +34,18 @@ class SessionApprovalController {
             return res.status(404).json({
                 message: "Session not found or failed to approve",
             });
+        }
+
+        const historyData = new TimesheetHistory({
+            sessionId: data.sessionId,
+            action: "CLIENT APPROVED",
+            details: "Session approved successfully",
+            createdBy: data.createdBy
+        });
+        const newHistory = await this.historyService.createTimesheetHistory(historyData.createTimesheetHistory);
+
+        if (!newHistory) {
+            return res.status(500).json({ message: "Failed to create timesheet history" });
         }
 
         return res.status(201).json({

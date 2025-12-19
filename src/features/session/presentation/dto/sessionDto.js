@@ -8,7 +8,7 @@ class SessionDto {
             appointmentId: Joi.string().uuid().required(),
             supervisorApprovalStatus: Joi.string().valid("PENDING", "APPROVED", "REJECTED").optional(),
             clientApprovalStatus: Joi.string().valid("PENDING", "APPROVED", "REJECTED").optional(),
-            supervisorId: Joi.string().uuid().optional(),
+            createdBy: Joi.string().uuid().optional(),
             startTime: Joi.date().required(),
             endTime: Joi.date().required(),
             travelStartTime: Joi.date().optional(),
