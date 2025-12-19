@@ -179,7 +179,7 @@ class SessionRoutes {
 
         /**
          * @swagger
-         * /api/v1/sessions/approve/{id}:
+         * /api/v1/sessions/approve/{id}/{supervisorId}:
          *   patch:
          *     summary: approve a single session
          *     tags: [sessions]
@@ -190,12 +190,18 @@ class SessionRoutes {
          *           type: string
          *         required: true
          *         description: Session ID
+         *       - in: path
+         *         name: supervisorId
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: Supervisor ID
          *     responses:
          *       200:
          *         description: Session approved successfully
          */
         this.router.patch(
-            "/approve/:id",
+            "/approve/:id/:supervisorId",
             this.controller.approveSession
         );
 
