@@ -77,6 +77,20 @@ class ClientAuthorizationServiceService {
 
         return records;
     }
+
+    async updateUnitUsed(data) {
+        const update = await this.clientAuthorizationServiceRepository.update(data.id, {
+            usedUnit: { increment: data.unitsUsed }
+        });
+
+        if (!update) {
+            throw new Error(
+                "Failed to update client authorization service"
+            );
+        }
+
+        return update;
+    }
 }
 
 export default ClientAuthorizationServiceService;

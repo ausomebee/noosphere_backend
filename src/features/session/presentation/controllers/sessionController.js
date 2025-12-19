@@ -13,6 +13,8 @@ import ClientAuthorizationRepository from "../../../client/infrastructure/client
 import ClientAuthorizationService from "../../../client/application/clientAuthorizationService.js";
 import AppointmentRepository from "../../../appointment/infrastructure/appointmentRepository.js";
 import AppointmentService from "../../../appointment/application/appointmentService.js";
+import ClientAuthorizationServiceRepository from "../../../client/infrastructure/clientAuthorizationServiceRepository.js";
+import ClientAuthorizationServiceService from "../../../client/application/clientAuthorizationServiceService.js";
 
 class SessionController {
     constructor() {
@@ -31,10 +33,23 @@ class SessionController {
 
         this.appointmentRepository = new AppointmentRepository(this.prisma.appointment, this.prisma);
         this.appointmentService = new AppointmentService({ appointmentRepository: this.appointmentRepository });
+
+        this.clientAuthorizationServiceRepository = new ClientAuthorizationServiceRepository(this.prisma.clientAuthorizationService);
+        this.clientAuthorizationServiceService = new ClientAuthorizationServiceService({
+            clientAuthorizationServiceRepository: this.clientAuthorizationServiceRepository
+        });
     }
 
     createSession = expressAsyncHandler(async (req, res) => {
         const data = req.body;
+        let unitsUsed
+        const start = new Date(data.startTime);
+        const end = new Date(data.endTime);
+
+        const diffMs = end - start;         
+        const diffHours = diffMs / (1000 * 60 * 60);
+
+        unitsUsed = Math.ceil(diffHours);
 
         const appointments = await this.appointmentService.getAppointmentsForTimesheet(data.appointmentId);
 
@@ -49,7 +64,9 @@ class SessionController {
                 const remainingUnits = svc.units - svc.usedUnit;
 
                 if (remainingUnits > 0) {
+                    const updateService = await this.clientAuthorizationServiceService.updateUnitUsed({ id: svc.id, unitsUsed: unitsUsed })
                     usableServices.push({
+                        id: svc.id,
                         serviceCodeId: svc.serviceCodeId,
                         remainingUnits,
                     });
@@ -65,7 +82,7 @@ class SessionController {
         }
 
         const remaining = new Map(
-            appointments.requiredServices.map(s => [s.serviceCodeId, 1])
+            appointments.requiredServices.map(s => [s.serviceCodeId, unitsUsed])
         );
 
         const selectedAuthIds = new Set();
@@ -114,7 +131,7 @@ class SessionController {
             selectedAuthIds.has(auth.id)
         );
 
-        const sessionPayload = new Session({...data, authorizationsUsed: minimumAuthorizations});
+        const sessionPayload = new Session({ ...data, authorizationsUsed: minimumAuthorizations });
         const session = await this.sessionService.createSession(sessionPayload.createSession);
 
         if (!session) {
@@ -184,7 +201,7 @@ class SessionController {
             return res.status(404).json({ message: "client approval not granted" });
         }
 
-        const data = { id: session.id, supervisorApprovalStatus: "APPROVED" };
+        const data = { id: session.id, supervisorApprovalStatus: "APPROVED", supervisorId: req.body.supervisorId };
 
         const updatedSession = await this.sessionService.updateSession(data);
 
@@ -282,7 +299,9 @@ class SessionController {
                 clientApprovalStatus: s.clientApprovalStatus,
                 supervisorApprovalStatus: s.supervisorApprovalStatus,
                 totalHours,
-                date: s.createdAt
+                date: s.createdAt,
+                authorizationsUsed: s.authorizationsUsed,
+                approver: s.approver
             };
         });
 
