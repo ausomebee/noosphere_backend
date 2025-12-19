@@ -17,6 +17,7 @@ import ClientAuthorizationServiceRepository from "../../../client/infrastructure
 import ClientAuthorizationServiceService from "../../../client/application/clientAuthorizationServiceService.js";
 import TimesheetHistoryRepository from "../../infrastructure/timesheetHistoryRepository.js";
 import TimesheetHistoryService from "../../application/timesheetHistoryService.js";
+import TimesheetHistory from "../../domain/timesheetHistory.js";
 
 class SessionController {
     constructor() {
@@ -51,7 +52,7 @@ class SessionController {
         const start = new Date(data.startTime);
         const end = new Date(data.endTime);
 
-        const diffMs = end - start;         
+        const diffMs = end - start;
         const diffHours = diffMs / (1000 * 60 * 60);
 
         unitsUsed = Math.ceil(diffHours);
@@ -152,6 +153,18 @@ class SessionController {
             }
         }
 
+        const historyData = new TimesheetHistory({
+            sessionId: session.id,
+            action: "CREATED",
+            details: "Session created successfully",
+            createdBy: data.createdBy
+        });
+        const newHistory = await this.historyService.createTimesheetHistory(historyData.createTimesheetHistory);
+
+        if (!newHistory) {
+            return res.status(500).json({ message: "Failed to create timesheet history" });
+        }
+
         return res.status(201).json({
             message: "Session created successfully",
             status: "ok",
@@ -216,6 +229,18 @@ class SessionController {
             });
         }
 
+        const historyData = new TimesheetHistory({
+            sessionId: session.id,
+            action: "APPROVED",
+            details: "Session approved successfully",
+            createdBy: req.params.supervisorId
+        });
+        const newHistory = await this.historyService.createTimesheetHistory(historyData.createTimesheetHistory);
+
+        if (!newHistory) {
+            return res.status(500).json({ message: "Failed to create timesheet history" });
+        }
+
         return res.status(200).json({
             message: "Session approved successfully",
             status: "ok",
@@ -224,7 +249,7 @@ class SessionController {
     });
 
     rejectSession = expressAsyncHandler(async (req, res) => {
-        const data = { id: req.params.id, supervisorApprovalStatus: "REJECTED" };
+        const data = { id: req.params.id, supervisorApprovalStatus: "REJECTED", supervisorId: req.params.supervisorId };
 
         const updatedSession = await this.sessionService.updateSession(data);
 
@@ -232,6 +257,18 @@ class SessionController {
             return res.status(404).json({
                 message: "Session not found or failed to reject",
             });
+        }
+
+        const historyData = new TimesheetHistory({
+            sessionId: data.id,
+            action: "REJECTED",
+            details: "Session rejected successfully",
+            createdBy: req.params.supervisorId
+        });
+        const newHistory = await this.historyService.createTimesheetHistory(historyData.createTimesheetHistory);
+
+        if (!newHistory) {
+            return res.status(500).json({ message: "Failed to create timesheet history" });
         }
 
         return res.status(200).json({
