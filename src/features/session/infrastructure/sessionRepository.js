@@ -26,7 +26,7 @@ class SessionRepository extends BaseRepository {
                 approver: true,
                 sessionDatas: true,
                 sessionApprovals: true,
-                timesheetHistories: true,
+                timesheetHistories: { include: { staff: { select: { fullName: true } } } },
                 authorizationsUsed: {
                     include: {
                         clientAuthorizationServices: {
