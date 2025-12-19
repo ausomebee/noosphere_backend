@@ -15,6 +15,8 @@ import AppointmentRepository from "../../../appointment/infrastructure/appointme
 import AppointmentService from "../../../appointment/application/appointmentService.js";
 import ClientAuthorizationServiceRepository from "../../../client/infrastructure/clientAuthorizationServiceRepository.js";
 import ClientAuthorizationServiceService from "../../../client/application/clientAuthorizationServiceService.js";
+import TimesheetHistoryRepository from "../../infrastructure/timesheetHistoryRepository.js";
+import TimesheetHistoryService from "../../application/timesheetHistoryService.js";
 
 class SessionController {
     constructor() {
@@ -38,6 +40,9 @@ class SessionController {
         this.clientAuthorizationServiceService = new ClientAuthorizationServiceService({
             clientAuthorizationServiceRepository: this.clientAuthorizationServiceRepository
         });
+
+        this.historyRepository = new TimesheetHistoryRepository(this.prisma.timesheetHistory);
+        this.historyService = new TimesheetHistoryService({ timesheetHistoryRepository: this.historyRepository });
     }
 
     createSession = expressAsyncHandler(async (req, res) => {
@@ -201,7 +206,7 @@ class SessionController {
             return res.status(404).json({ message: "client approval not granted" });
         }
 
-        const data = { id: session.id, supervisorApprovalStatus: "APPROVED", supervisorId: req.body.supervisorId };
+        const data = { id: session.id, supervisorApprovalStatus: "APPROVED", supervisorId: req.params.supervisorId };
 
         const updatedSession = await this.sessionService.updateSession(data);
 
