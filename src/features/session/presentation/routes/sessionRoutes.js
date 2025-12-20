@@ -276,6 +276,84 @@ class SessionRoutes {
             "/claims/:tenantId",
             this.controller.getClaims
         );
+
+         /**
+         * @swagger
+         * /api/v1/sessions/client-approval/{tenantId}/{clientId}:
+         *   get:
+         *     summary: Get all sessions awaition approval for a given clientId
+         *     tags: [sessions]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: tenant ID (foreign key)
+         *       - in: path
+         *         name: clientId
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: client ID (foreign key)
+         *     responses:
+         *       200:
+         *         description: claims fetched successfully
+         */
+        this.router.get(
+            "/client-approval/:tenantId/:clientId",
+            this.controller.getClientAwaitingApproval
+        );
+
+        /**
+         * @swagger
+         * /api/v1/sessions/client/overview/{clientId}:
+         *   get:
+         *     summary: Get client session overview
+         *     tags: [sessions]
+         *     parameters:
+         *       - in: path
+         *         name: clientId
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: client Id
+         *     responses:
+         *       200:
+         *         description: Session overview fetched successfully
+         */
+        this.router.get(
+            "/client/overview/:clientId",
+            this.controller.getClientSessionOverview
+        );
+
+        /**
+         * @swagger
+         * /api/v1/sessions/client/overview-chart/{clientId}/{groupBy}:
+         *   get:
+         *     summary: Get client session overview chart
+         *     tags: [sessions]
+         *     parameters:
+         *       - in: path
+         *         name: clientId
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: client Id
+         *       - in: path
+         *         name: groupBy
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: group by (year, month)
+         *     responses:
+         *       200:
+         *         description: Session overview chart fetched successfully
+         */
+        this.router.get(
+            "/client/overview-chart/:clientId/:groupBy",
+            this.controller.clientOverviewGraph
+        );
     }
 
     getRouter() {

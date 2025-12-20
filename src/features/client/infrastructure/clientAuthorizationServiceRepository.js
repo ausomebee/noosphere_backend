@@ -11,6 +11,21 @@ class ClientAuthorizationServiceRepository extends BaseRepository {
             include: populate,
         });
     }
+
+    async getClientServices(tenantClientId) {
+        return await this.model.findMany({
+            where: {
+                clientAuthorization: {
+                    tenantClientId: tenantClientId,
+                    isDeleted: false,
+                    isActive: true,
+                },
+            },
+            include: {
+                serviceCode: true,
+            },
+        });
+    }
 }
 
 export default ClientAuthorizationServiceRepository;
