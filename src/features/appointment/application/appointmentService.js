@@ -507,33 +507,33 @@ class AppointmentService {
     isUpcoming(appt, now = new Date()) {
         const start = new Date(`${appt.date}T${appt.startTime}:00`);
 
-        if (!appt.isRecurring) {
-            return start >= now;
-        }
+        // if (!appt.isRecurring) {
+        return start >= now;
+        // }
 
-        const recurrenceEnd = appt.recurrence?.endOn
-            ? new Date(appt.recurrence.endOn)
-            : null;
+        // const recurrenceEnd = appt.recurrence?.endOn
+        //     ? new Date(appt.recurrence.endOn)
+        //     : null;
 
-        if (!recurrenceEnd) return true;
+        // if (!recurrenceEnd) return true;
 
-        return recurrenceEnd >= now;
+        // return recurrenceEnd >= now;
     }
 
     isPast(appt, now = new Date()) {
         const end = new Date(`${appt.date}T${appt.endTime}:00`);
 
-        if (!appt.isRecurring) {
-            return end < now;
-        }
+        // if (!appt.isRecurring) {
+        return end < now;
+        // }
 
-        const recurrenceEnd = appt.recurrence?.endOn
-            ? new Date(appt.recurrence.endOn)
-            : null;
+        // const recurrenceEnd = appt.recurrence?.endOn
+        //     ? new Date(appt.recurrence.endOn)
+        //     : null;
 
-        if (!recurrenceEnd) return false;
+        // if (!recurrenceEnd) return false;
 
-        return recurrenceEnd < now;
+        // return recurrenceEnd < now;
     }
 
     async getTenantUpcomingAppointments(tenantId) {

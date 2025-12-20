@@ -219,6 +219,32 @@ class ClientAuthorizationRoutes {
             this.controller.getClientAuthorizations.bind(this.controller)
         );
 
+         /**
+         * @swagger
+         * /api/v1/client-authorization/services/tenant-client/{tenantClientId}:
+         *   get:
+         *     summary: Get all authorization services for a client
+         *     tags: [ClientAuthorization]
+         *     parameters:
+         *       - name: tenantClientId
+         *         in: path
+         *         description: Tenant Client ID
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *     responses:
+         *       200:
+         *         description: Authorizations fetched successfully
+         *         
+         *       404:
+         *         description: No authorizations found
+         */
+        this.router.get(
+            "/services/tenant-client/:tenantClientId",
+            this.controller.getClientAuthorizationServices.bind(this.controller)
+        );
+
         /**
          * @swagger
          * /api/v1/client-authorization/summary/{tenantId}/{status}:

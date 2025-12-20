@@ -131,6 +131,78 @@ class SessionService {
 
         return sessions;
     }
+
+    async getClientSessionOverview(id) {
+        const completedSession = await this.sessionRepository.countClientSessions(id);
+
+        if (!completedSession) {
+            throw new Error("Sessions not found");
+        }
+
+        const avgSession = await this.sessionRepository.avgSessionDuration(id);
+
+        if (!avgSession) {
+            throw new Error("Sessions not found");
+        }
+
+        const awaitingApproval = await this.sessionRepository.countClientAwaitingApproval(id);
+
+        if (!awaitingApproval) {
+            throw new Error("Sessions not found");
+        }
+
+        return { completedSession, avgSession, awaitingApproval };
+    }
+
+    async clientOverviewGraph(id, groupBy) {
+        const session = await this.sessionRepository.getSessionCounts({
+            clientId: id,
+            groupBy,
+        });
+
+        if (!session) {
+            throw new Error("Sessions not found");
+        }
+
+        return session;
+    }
+
+    async getClientAwaitingApproval(clientId, tenantId) {
+        const sessions = await this.sessionRepository.findAllAndPopulate({ appointment: { tenantId: tenantId, clientId: clientId }, supervisorApprovalStatus: "PENDING" }, {
+            id: true,
+            appointment: {
+                select: {
+                    client: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                            preferredName: true
+
+                        }
+                    },
+                    session: { select: { name: true } },
+                    clinicians: {
+                        select: {
+                            fullName: true,
+                        },
+                    }
+                },
+            },
+            clientApprovalStatus: true,
+            supervisorApprovalStatus: true,
+            startTime: true,
+            approver: { select: { fullName: true } },
+            endTime: true,
+            createdAt: true,
+            authorizationsUsed: { select: { payerDetails: { select: { payerName: true } } } }
+        });
+
+        if (!sessions) {
+            throw new Error("Sessions not found");
+        }
+
+        return sessions;
+    }
 }
 
 export default SessionService;

@@ -91,6 +91,16 @@ class ClientAuthorizationServiceService {
 
         return update;
     }
+
+    async getClientAuthorizationServices(tenantClientId) {
+        const record = await this.clientAuthorizationServiceRepository.getClientServices(tenantClientId);
+
+        if (!record) {
+            throw new Error("Client authorization service not found");
+        }
+
+        return record;
+    }
 }
 
 export default ClientAuthorizationServiceService;
