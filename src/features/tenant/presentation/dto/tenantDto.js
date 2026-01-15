@@ -39,6 +39,7 @@ class TenantDto {
                 }),
             stage: Joi.string().trim().required(),
             companyName: Joi.string().trim().required(),
+            subdomain: Joi.string().trim().required(),
             contactPerson: Joi.string().trim().required(),
             companySize: Joi.string().trim().required(),
             organizationType: Joi.string().trim().required(),

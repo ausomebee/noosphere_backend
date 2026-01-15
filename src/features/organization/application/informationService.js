@@ -60,16 +60,6 @@ class InformationService {
         return information;
     }
 
-    async checkDomain(domain) {
-        const information = await this.informationRepository.findOne({ subDomain: domain });
-
-        if (information) {
-            throw new Error("Domain already exists")
-        }
-
-        return "valid domain";
-    }
-    
 }
 
 export default InformationService;

@@ -20,7 +20,6 @@ import InformationController from "../controller/informationController.js";
  *         - state
  *         - country
  *         - zipCode
- *         - subDomain
  *       properties:
  *         tenantId:
  *           type: string
@@ -59,9 +58,6 @@ import InformationController from "../controller/informationController.js";
  *         zipCode:
  *           type: string
  *           description: Zip or postal code
- *         subDomain:
- *           type: string
- *           description: Subdomain for the organization
  *
  *     InformationUpdateDto:
  *       type: object
@@ -120,9 +116,6 @@ import InformationController from "../controller/informationController.js";
  *         zipCode:
  *           type: string
  *           description: Zip or postal code
- *         subDomain:
- *           type: string
- *           description: Subdomain for the organization
  */
 
 class InformationRoutes {
@@ -194,26 +187,6 @@ class InformationRoutes {
         */
         this.router.get("/:tenantId", this.controller.getInformation);
 
-        /**
-        * @swagger
-        * /api/v1/organization/information/{subdomain}:
-        *   get:
-        *     summary: gets tenant organization information
-        *     tags: [organization]
-        *     parameters:
-        *       - in: path
-        *         name: subdomain
-        *         required: true
-        *         schema:
-        *           type: string
-        *         description: The subdomain of the tenant
-        *     responses:
-        *       200:
-        *         description: subdomain checked successfully
-        *       400:
-        *         description: Validation error
-        */
-        this.router.get("/:subdomain", this.controller.checkDomain);
     }
 
     getRouter() {

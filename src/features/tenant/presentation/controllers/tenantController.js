@@ -54,6 +54,20 @@ class TenantController {
         });
     });
 
+    checkDomain = expressAsyncHandler(async (req, res) => {
+        const tenant = await this.service.checkDomain(req.params.subdomain);
+
+        if (!tenant) {
+            res.status(500).json({ message: 'Failed to fetch information' });
+        }
+
+        return res.status(201).json({
+            message: "subdomain checked successfully",
+            status: 'ok',
+            data: tenant
+        });
+    });
+
     updateTenant = expressAsyncHandler(async (req, res) => {
         const tenant = await this.service.updateTenant(req.body);
 

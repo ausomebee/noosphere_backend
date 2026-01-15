@@ -36,8 +36,6 @@ class InformationDto {
                 .required(),
             zipCode: Joi.string()
                 .required(),
-            subDomain: Joi.string()
-                .required(),
         });
 
         Validator.validateRequest(req, next, schema);
@@ -80,8 +78,6 @@ class InformationDto {
                 .required(),
             zipCode: Joi.string()
                 .required(),
-            subDomain: Joi.string()
-                .optional(),
         });
 
         Validator.validateRequest(req, next, schema);

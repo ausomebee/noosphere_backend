@@ -137,6 +137,7 @@ model Tenant {
   phoneNumber      String   @unique
   active           Boolean  @default(true)
   isDeleted        Boolean  @default(false)
+  subdomain        String   @unique
   companyName      String
   contactPerson    String
   companySize      String
@@ -182,6 +183,8 @@ model Tenant {
   PayrollCycles              PayrollCycles[]
   Forms                      Forms[]
   FormResponses              FormResponses[]
+  reportTemplates            ClinicalReportTemplates[]
+  clinicalReports            ClinicalReport[]
 }
 
 model TenantStaff {
@@ -210,20 +213,24 @@ model TenantStaff {
   authQuestion String?
   auth2FADone  Boolean  @default(false)
 
-  role                  Role                   @relation(fields: [roleId], references: [id])
-  tenant                Tenant                 @relation(fields: [tenantId], references: [id])
-  PipelineItem          PipelineItem[]
-  ClientTenant          ClientTenant[]         @relation("ClientClinicians")
-  TenantStaffLicenses   TenantStaffLicenses[]
-  TenantStaffPayroll    TenantStaffPayroll[]
-  TenantStaffDocuments  TenantStaffDocuments[]
-  appointments          Appointment[]          @relation("AppointmentClinicians")
-  clientTenants         ClientTenant[]
-  clientDocuments       ClientDocuments[]
-  staffAvailabilities   StaffAvailability[]
-  sessions              Session[]
-  timesheetHistories    TimesheetHistory[]
-  sessionUpdateRequests SessionUpdateRequest[]
+  role                    Role                    @relation(fields: [roleId], references: [id])
+  tenant                  Tenant                  @relation(fields: [tenantId], references: [id])
+  PipelineItem            PipelineItem[]
+  ClientTenant            ClientTenant[]          @relation("ClientClinicians")
+  TenantStaffLicenses     TenantStaffLicenses[]
+  TenantStaffPayroll      TenantStaffPayroll[]
+  TenantStaffDocuments    TenantStaffDocuments[]
+  appointments            Appointment[]           @relation("AppointmentClinicians")
+  clientTenants           ClientTenant[]
+  clientDocuments         ClientDocuments[]
+  staffAvailabilities     StaffAvailability[]
+  sessions                Session[]
+  timesheetHistories      TimesheetHistory[]
+  sessionUpdateRequests   SessionUpdateRequest[]
+  clientFiles             ClientFiles[]
+  clinicalReportsCreator  ClinicalReport[]        @relation("ReportsCreator")
+  clinicalReportsApprover ClinicalReport[]        @relation("ReportsApprover")
+  clinicalReportHistories ClinicalReportHistory[]
 }
 
 model TenantStaffLicenses {
@@ -325,6 +332,7 @@ model ClientTenant {
   forms                    Forms[]
   clientAuthorizations     ClientAuthorization[]
   clientForms              ClientForm[]
+  clientFolders            ClientFolder[]
 
   @@unique([clientId, tenantId])
 }
@@ -768,7 +776,6 @@ model ClientTargetDataCollection {
 model OrganizationInformation {
   id            String @id @default(uuid())
   tenantId      String @unique
-  subDomain     String @unique
   name          String
   email         String
   phoneNumber   String
@@ -1229,4 +1236,92 @@ model SessionUpdateRequest {
 
   staff   TenantStaff? @relation(fields: [requestedBy], references: [id])
   session Session      @relation(fields: [sessionId], references: [id])
+}
+
+model ClientFolder {
+  id             String   @id @default(uuid())
+  name           String
+  clientTenantId String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  clientTenant ClientTenant  @relation(fields: [clientTenantId], references: [id])
+  clientFiles  ClientFiles[]
+}
+
+model ClientFiles {
+  id         String   @id @default(uuid())
+  name       String
+  url        String
+  size       String
+  uploadedBy String?
+  fileType   String
+  folderId   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  folder ClientFolder? @relation(fields: [folderId], references: [id])
+  staff  TenantStaff?  @relation(fields: [uploadedBy], references: [id])
+}
+
+model ClinicalReportTemplates {
+  id        String   @id @default(uuid())
+  tenantId  String
+  title     String
+  isActive  String
+  isDeleted String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant                 Tenant                          @relation(fields: [tenantId], references: [id])
+  reportTemplateSections ClinicalReportTemplateSection[]
+}
+
+model ClinicalReportTemplateSection {
+  id         String @id @default(uuid())
+  section    String
+  content    Json
+  templateId String
+
+  template ClinicalReportTemplates @relation(fields: [templateId], references: [id])
+}
+
+model ClinicalReport {
+  id             String   @id @default(uuid())
+  title          String
+  clientTenantId String
+  creatorId      String
+  approverId     String
+  tenantId       String
+  status         String
+  isDeleted      String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  creator                 TenantStaff             @relation("ReportsCreator", fields: [creatorId], references: [id])
+  approver                TenantStaff             @relation("ReportsApprover", fields: [approverId], references: [id])
+  tenant                  Tenant                  @relation(fields: [tenantId], references: [id])
+  clinicalReportSections  ClinicalReportSection[]
+  clinicalReportHistories ClinicalReportHistory[]
+}
+
+model ClinicalReportSection {
+  id               String @id @default(uuid())
+  section          String
+  content          Json
+  clinicalReportId String
+
+  clinicalReport ClinicalReport @relation(fields: [clinicalReportId], references: [id])
+}
+
+model ClinicalReportHistory {
+  id               String   @id @default(uuid())
+  clinicalReportId String
+  action           String
+  details          String?
+  createdBy        String
+  createdAt        DateTime @default(now())
+
+  staff          TenantStaff    @relation(fields: [createdBy], references: [id])
+  clinicalReport ClinicalReport @relation(fields: [clinicalReportId], references: [id])
 }

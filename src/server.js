@@ -5,7 +5,7 @@ import cors from "cors";
 import morgan from "morgan";
 import swaggerUi from 'swagger-ui-express';
 import { specs } from './config/swagger.js';
-import errorHandler from "./middleware/error-handler.js";
+import errorHandler from "../../internal/middleware/error-handler.js";
 import prismaService from "./config/prisma.js";
 import socketService from "./config/socket.js"
 import PassportUtil from "./config/passport.js";
@@ -66,6 +66,8 @@ import sessionDataRoute from "./features/session/presentation/routes/sessionData
 import sessionApprovalRoute from "./features/session/presentation/routes/sessionApprovalRoutes.js";
 import timesheetHistoryRoute from "./features/session/presentation/routes/timesheetHistoryRoutes.js";
 import sessionUpdateRequestRoute from "./features/session/presentation/routes/sessionUpdateRequestRoutes.js";
+import clientFilesRoute from "./features/folder/presentation/routes/clientFilesRoutes.js";
+import clientFolderRoute from "./features/folder/presentation/routes/clientFolderRoutes.js";
 
 class App {
     constructor() {
@@ -74,6 +76,11 @@ class App {
 
         this.prisma = prismaService;
         this.port = process.env.PORT || 5001;
+        this.allowedOrigins = [
+            /^https?:\/\/([a-z0-9-]+\.)*noospherehub\.net$/,
+            /^http:\/\/localhost:\d+$/,
+            /^http:\/\/127\.0\.0\.1:\d+$/,
+        ];
 
         this.initializeDatabase();
         this.initializeMiddlewares();
@@ -90,7 +97,19 @@ class App {
         new PassportUtil(this.app)
         this.app.use(morgan("dev"));
         this.app.use(cors({
-            origin: ["http://127.0.0.1:5173", "http://localhost:5173", "http://127.0.0.1:5174", "http://localhost:5174", "http://127.0.0.1:5175", "http://localhost:5175", "http://ec2-54-193-53-214.us-west-1.compute.amazonaws.com:5000/", "http://localhost:5001/"],
+            origin: function (origin, callback) {
+                if (!origin) return callback(null, true);
+
+                const isAllowed = this.allowedOrigins.some((pattern) =>
+                    pattern.test(origin)
+                );
+
+                if (isAllowed) {
+                    callback(null, true);
+                } else {
+                    callback(new Error("Not allowed by CORS"));
+                }
+            }, 
             methods: "GET, POST, PATCH, DELETE, PUT",
             credentials: true,
         }));
@@ -160,6 +179,8 @@ class App {
         this.app.use("/api/v1/sessions-approval", sessionApprovalRoute);
         this.app.use("/api/v1/sessions-timesheet-history", timesheetHistoryRoute);
         this.app.use("/api/v1/sessions-update-requests", sessionUpdateRequestRoute);
+        this.app.use("/api/v1/client-folders", clientFolderRoute);
+        this.app.use("/api/v1/client-files", clientFilesRoute);
     }
 
     initializeErrorHandler() {
