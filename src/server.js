@@ -80,6 +80,7 @@ class App {
             /^https?:\/\/([a-z0-9-]+\.)*noospherehub\.net$/,
             /^http:\/\/localhost:\d+$/,
             /^http:\/\/127\.0\.0\.1:\d+$/,
+            /^http:\/\/([a-z0-9-]+\.)*localhost:\d+$/
         ];
 
         this.initializeDatabase();
