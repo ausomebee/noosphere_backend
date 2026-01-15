@@ -76,12 +76,31 @@ class App {
 
         this.prisma = prismaService;
         this.port = process.env.PORT || 5001;
-        this.allowedOrigins = [
-            /^https?:\/\/([a-z0-9-]+\.)*noospherehub\.net$/,
-            /^http:\/\/localhost:\d+$/,
-            /^http:\/\/127\.0\.0\.1:\d+$/,
-            /^http:\/\/([a-z0-9-]+\.)*localhost:\d+$/
-        ];
+        this.allowedOrigins = {
+            origin(origin, callback) {
+                if (!origin) return callback(null, true);
+
+                const allowed =
+                    // prod
+                    /^https:\/\/([a-z0-9-]+\.)*noospherehub\.net$/.test(origin) ||
+
+                    // localhost root
+                    /^http:\/\/localhost:\d+$/.test(origin) ||
+                    /^http:\/\/127\.0\.0\.1:\d+$/.test(origin) ||
+
+                    // subdomain localhost (ab.localhost, tenant.localhost, etc)
+                    /^http:\/\/([a-z0-9-]+\.)*localhost:\d+$/.test(origin);
+
+                if (allowed) {
+                    callback(null, true);
+                } else {
+                    console.error("❌ Blocked by CORS:", origin);
+                    callback(new Error("CORS not allowed"));
+                }
+            },
+            credentials: true,
+            methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
+        };
 
         this.initializeDatabase();
         this.initializeMiddlewares();
@@ -101,23 +120,7 @@ class App {
             console.log("Incoming Origin:", req.headers.origin);
             next();
         });
-        this.app.use(cors({
-            origin: function (origin, callback) {
-                if (!origin) return callback(null, true);
-
-                const isAllowed = this.allowedOrigins.some((pattern) =>
-                    pattern.test(origin)
-                );
-
-                if (isAllowed) {
-                    callback(null, true);
-                } else {
-                    callback(new Error("Not allowed by CORS"));
-                }
-            },
-            methods: "GET, POST, PATCH, DELETE, PUT",
-            credentials: true,
-        }));
+        this.app.use(cors(this.allowedOrigins));
         this.app.use(express.json({ limit: "50mb" }));
         this.app.use(express.urlencoded({ extended: true, limit: "50mb" }));
     }
