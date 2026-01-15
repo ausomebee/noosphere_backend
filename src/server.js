@@ -5,7 +5,7 @@ import cors from "cors";
 import morgan from "morgan";
 import swaggerUi from 'swagger-ui-express';
 import { specs } from './config/swagger.js';
-import errorHandler from "../../internal/middleware/error-handler.js";
+import errorHandler from "./middleware/error-handler.js";
 import prismaService from "./config/prisma.js";
 import socketService from "./config/socket.js"
 import PassportUtil from "./config/passport.js";
