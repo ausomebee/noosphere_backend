@@ -96,6 +96,10 @@ class App {
     initializeMiddlewares() {
         new PassportUtil(this.app)
         this.app.use(morgan("dev"));
+        this.app.use((req, res, next) => {
+            console.log("Incoming Origin:", req.headers.origin);
+            next();
+        });
         this.app.use(cors({
             origin: function (origin, callback) {
                 if (!origin) return callback(null, true);
@@ -109,7 +113,7 @@ class App {
                 } else {
                     callback(new Error("Not allowed by CORS"));
                 }
-            }, 
+            },
             methods: "GET, POST, PATCH, DELETE, PUT",
             credentials: true,
         }));
