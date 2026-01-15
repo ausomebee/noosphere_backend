@@ -1,5 +1,5 @@
 class Information {
-    constructor({ id, tenantId, name, email, phoneNumber, website, practiceNPI, streetAddress, city, state, country, zipCode, subDomain }) {
+    constructor({ id, tenantId, name, email, phoneNumber, website, practiceNPI, streetAddress, city, state, country, zipCode }) {
         this.id = id;
         this.tenantId = tenantId;
         this.name = name;
@@ -12,7 +12,6 @@ class Information {
         this.state = state;
         this.country = country;
         this.zipCode = zipCode;
-        this.subDomain = subDomain;
     }
 
     get createInformation() {
@@ -28,7 +27,6 @@ class Information {
             state: this.state,
             country: this.country,
             zipCode: this.zipCode,
-            subDomain: this.subDomain
         };
     }
 

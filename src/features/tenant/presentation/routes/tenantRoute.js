@@ -24,6 +24,7 @@ import multer from "multer";
  *         - assignToAdmin
  *         - website
  *         - practiceNPI
+ *         - subdomain
  *       properties:
  *         fullName:
  *           type: string
@@ -46,6 +47,9 @@ import multer from "multer";
  *         stage:
  *           type: string
  *           example: "VERIFIED"
+ *         subdomain:
+ *           type: string
+ *           example: "ausomebee"
  *         website:
  *           type: string
  *           example: "http://nosphere.com"
@@ -352,6 +356,27 @@ class TenantRoutes {
          *         description: Bad request
          */
         this.router.get("/count", this.controller.countAllTenant);
+
+        /**
+         * @swagger
+         * /api/v1/tenant/subdomain/{subdomain}:
+         *   get:
+         *     summary: checks if tenant subdomain exists
+         *     tags: [Tenant]
+         *     parameters:
+         *       - in: path
+         *         name: subdomain
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The subdomain of the tenant
+         *     responses:
+         *       200:
+         *         description: subdomain checked successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/subdomain/:subdomain", this.controller.checkDomain);
 
         /**
          * @swagger

@@ -20,7 +20,7 @@ class TenantService {
     async createCandidate(data) {
         const tenantExists = await this.tenantRepository.findFirstDynamic({
             where: {
-                OR: [{ email: data.email }, { phoneNumber: data.phoneNumber }],
+                OR: [{ email: data.email }, { phoneNumber: data.phoneNumber }, {subdomain: data.subdomain}],
             },
             select: {
                 email: true,
@@ -359,6 +359,16 @@ class TenantService {
         return newCandidate.pipelineItem;
     }
 
+    async checkDomain(domain) {
+        const tenant = await this.tenantRepository.findOne({ subdomain: domain });
+
+        if (tenant) {
+            throw new Error("Domain already exists")
+        }
+
+        return "valid domain";
+    }
+    
     async updateTenant(data) {
         const tenant = await this.tenantRepository.findOne({ id: data.id })
 

@@ -54,20 +54,6 @@ class InformationController {
         });
     });
 
-    checkDomain = expressAsyncHandler(async (req, res) => {
-        const information = await this.service.checkDomain(req.params.subdomain);
-
-        if (!information) {
-            res.status(500).json({ message: 'Failed to fetch information' });
-        }
-
-        return res.status(201).json({
-            message: "subdomain checked successfully",
-            status: 'ok',
-            data: information
-        });
-    });
-
 }
 
 export default InformationController;
