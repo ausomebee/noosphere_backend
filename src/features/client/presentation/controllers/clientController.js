@@ -8,8 +8,8 @@ import ItemRepository from "../../../pipeline/infrastructure/itemRepository.js";
 import ClientDocuments from "../../domain/clientDocument.js";
 import ClientDocumentsRepository from "../../infrastructure/clientDocumentsRepository.js";
 import ClientDocumentsService from "../../application/clientDocumentsService.js";
-import InformationService from "../../../organization/application/informationService.js";
-import InformationRepository from "../../../organization/infrastucture/informationRepository.js";
+import TenantRepository from "../../../tenant/infrastructure/tenantRepository.js";
+import TenantService from "../../../tenant/application/tenantService.js";
 
 class ClientController {
     constructor() {
@@ -21,18 +21,18 @@ class ClientController {
         this.service = new ClientService({ clientRepository: this.clientRepository, clientTenantRepository: this.clientTenantRepository, generateCode: this.generateCode, prisma: this.prisma, itemRepository: this.itemRepository });
         this.clientDocumentsRepository = new ClientDocumentsRepository(this.prisma.clientDocuments);
         this.clientDocumentsService = new ClientDocumentsService({ clientDocumentsRepository: this.clientDocumentsRepository });
-        this.informationRepository = new InformationRepository(this.prisma.organizationInformation)
-        this.informationService = new InformationService({ informationRepository: this.informationRepository });
+        this.tenantRepository = new TenantRepository(this.prisma.tenant)
+        this.tenantService = new TenantService({ tenantRepository: this.tenantRepository });
     }
 
     createClientCandidate = expressAsyncHandler(async (req, res) => {
-        const information = await this.informationService.getInformation(req.body.tenantId);
+        const tenant = await this.tenantService.getTenant(req.body.tenantId);
 
-        if (!information) {
-            res.status(500).json({ message: 'Failed to fetch information' });
+        if (!tenant) {
+            res.status(500).json({ message: 'Failed to fetch tenant' });
         }
 
-        const candidate = await this.service.createClientCandidate(req.body, information);
+        const candidate = await this.service.createClientCandidate(req.body, tenant);
 
         if (!candidate) {
             res.status(500).json({ message: 'Failed to create client candidate' });

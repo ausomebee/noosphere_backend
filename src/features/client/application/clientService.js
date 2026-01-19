@@ -1,5 +1,6 @@
 import ReferralCodeGenerator from "../../../utilities/generateCode.js";
 import MailService from "../../../utilities/nodemailer.js";
+import emailService from "../../../utilities/ses.js";
 import Client from "../domain/client.js";
 import argon2 from "argon2";
 
@@ -13,7 +14,7 @@ class ClientService {
         this.generateCode = new ReferralCodeGenerator(12)
     }
 
-    async createClientCandidate(data, information) {
+    async createClientCandidate(data, tenant) {
         const existingClient = await this.clientTenantRepository.findFirstDynamic({
             where: {
                 tenantId: data.tenantId,
@@ -118,7 +119,7 @@ class ClientService {
                         <tr>
                             <td align="center" style="padding: 0 40px 10px 40px;">
                             <h1 style="margin: 0; font-size: 24px; font-weight: 400; color: #1a1a1a; line-height: 1.4;">
-                                Hello ${createData.preferredName},<br/>Welcome to ${information.name}
+                                Hello ${createData.preferredName},<br/>Welcome to ${tenant.companyName}
                             </h1>
                             </td>
                         </tr>
@@ -140,7 +141,7 @@ class ClientService {
                                 <td style="padding: 24px 24px 20px 24px;">
                                     
                                     <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: #666666;">
-                                    Log in here: <a href="https://www.${information.subDomain}.noosphere.org" style="color: #2563eb; text-decoration: none; font-weight: 500;">https://www.${information.subDomain}.noosphere.org</a>
+                                    Log in here: <a href="https://www.${tenant.subdomain}.noospherehub.net" style="color: #2563eb; text-decoration: none; font-weight: 500;">https://www.${tenant.subdomain}.noospherehub.net</a>
                                     </p>
                                     
                                     <p style="margin: 0 0 4px 0; font-size: 14px; line-height: 1.5; color: #1a1a1a;">
@@ -157,7 +158,7 @@ class ClientService {
                                     
                                     <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: #666666;">
                                     If you need help, we're just a message away at<br/>
-                                    <a href="mailto:support@${information.subDomain}.noosphere.com" style="color: #2563eb; text-decoration: none;">support@${information.subDomain}.noosphere.com</a>
+                                    <a href="mailto:${tenant.subdomain}.noospherehub.net" style="color: #2563eb; text-decoration: none;">${tenant.subdomain}.noospherehub.net</a>
                                     </p>
                                     <p style="margin: 0 0 4px 0; font-size: 14px; line-height: 1.5; color: #666666;">
                                     Warmly,
@@ -180,9 +181,14 @@ class ClientService {
                 </body>
             </html>
         `
-        const sendMail = await MailService.sendMail(createData.email, "Welcome to Noosphere", null, html, attachments)
+        const sendMail = await emailService.sendTenantEmail({
+            tenantSlug: tenant.subdomain,
+            to: [data.email],
+            subject: "Welcome to Noosphere",
+            html: html
+        });
 
-        if (!sendMail.success) {
+        if (!sendMail.messageId) {
             throw new Error("Failed to send mail");
         }
 

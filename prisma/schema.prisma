@@ -333,6 +333,7 @@ model ClientTenant {
   clientAuthorizations     ClientAuthorization[]
   clientForms              ClientForm[]
   clientFolders            ClientFolder[]
+  clinicalReports          ClinicalReport[]
 
   @@unique([clientId, tenantId])
 }
@@ -1268,8 +1269,8 @@ model ClinicalReportTemplates {
   id        String   @id @default(uuid())
   tenantId  String
   title     String
-  isActive  String
-  isDeleted String
+  isActive  Boolean  @default(false)
+  isDeleted Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -1291,15 +1292,16 @@ model ClinicalReport {
   title          String
   clientTenantId String
   creatorId      String
-  approverId     String
+  approverId     String?
   tenantId       String
   status         String
-  isDeleted      String
+  isDeleted      Boolean  @default(false)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   creator                 TenantStaff             @relation("ReportsCreator", fields: [creatorId], references: [id])
-  approver                TenantStaff             @relation("ReportsApprover", fields: [approverId], references: [id])
+  client                  ClientTenant            @relation(fields: [clientTenantId], references: [id])
+  approver                TenantStaff?            @relation("ReportsApprover", fields: [approverId], references: [id])
   tenant                  Tenant                  @relation(fields: [tenantId], references: [id])
   clinicalReportSections  ClinicalReportSection[]
   clinicalReportHistories ClinicalReportHistory[]

@@ -1,6 +1,6 @@
 import BaseRepository from "./baseRepository.js";
 
-class ClinicalReportRepository extends BaseRepository {
+class ClinicalReportSectionRepository extends BaseRepository {
     constructor(model) {
         super(model);
     }
@@ -13,4 +13,4 @@ class ClinicalReportRepository extends BaseRepository {
     }
 }
 
-export default ClinicalReportRepository;
+export default ClinicalReportSectionRepository;

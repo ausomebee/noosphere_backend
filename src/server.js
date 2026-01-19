@@ -68,6 +68,11 @@ import timesheetHistoryRoute from "./features/session/presentation/routes/timesh
 import sessionUpdateRequestRoute from "./features/session/presentation/routes/sessionUpdateRequestRoutes.js";
 import clientFilesRoute from "./features/folder/presentation/routes/clientFilesRoutes.js";
 import clientFolderRoute from "./features/folder/presentation/routes/clientFolderRoutes.js";
+import clinicalReportTemplatesRoute from "./features/clinicalReport/presentation/routes/reportTemplateRoutes.js";
+import clinicalReportTemplateSectionsRoute from "./features/clinicalReport/presentation/routes/reportTemplateSectionRoutes.js";
+import clinicalReportsRoute from "./features/clinicalReport/presentation/routes/reportRoutes.js";
+import clinicalReportSectionsRoute from "./features/clinicalReport/presentation/routes/reportSectionRoutes.js";
+import clinicalReportHistoriesRoute from "./features/clinicalReport/presentation/routes/reportHistoryRoutes.js";
 
 class App {
     constructor() {
@@ -81,12 +86,12 @@ class App {
                 if (!origin) return callback(null, true);
 
                 const allowed =
-                    /^https:\/\/([a-z0-9-]+\.)*noospherehub\.net$/.test(origin) 
+                    /^https:\/\/([a-z0-9-]+\.)*noospherehub\.net$/.test(origin) ||
 
-                    // /^http:\/\/localhost:\d+$/.test(origin) ||
-                    // /^http:\/\/127\.0\.0\.1:\d+$/.test(origin) ||
+                    /^http:\/\/localhost:\d+$/.test(origin) ||
+                    /^http:\/\/127\.0\.0\.1:\d+$/.test(origin) ||
 
-                    // /^http:\/\/([a-z0-9-]+\.)*localhost:\d+$/.test(origin);
+                    /^http:\/\/([a-z0-9-]+\.)*localhost:\d+$/.test(origin);
 
                 if (allowed) {
                     callback(null, true);
@@ -113,10 +118,6 @@ class App {
     initializeMiddlewares() {
         new PassportUtil(this.app)
         this.app.use(morgan("dev"));
-        this.app.use((req, res, next) => {
-            console.log("Incoming Origin:", req.headers.origin);
-            next();
-        });
         this.app.use(cors(this.allowedOrigins));
         this.app.use(express.json({ limit: "50mb" }));
         this.app.use(express.urlencoded({ extended: true, limit: "50mb" }));
@@ -186,6 +187,11 @@ class App {
         this.app.use("/api/v1/sessions-update-requests", sessionUpdateRequestRoute);
         this.app.use("/api/v1/client-folders", clientFolderRoute);
         this.app.use("/api/v1/client-files", clientFilesRoute);
+        this.app.use("/api/v1/clinical-report-templates", clinicalReportTemplatesRoute);
+        this.app.use("/api/v1/clinical-report-template-sections", clinicalReportTemplateSectionsRoute);
+        this.app.use("/api/v1/clinical-reports", clinicalReportsRoute);
+        this.app.use("/api/v1/clinical-report-sections", clinicalReportSectionsRoute);
+        this.app.use("/api/v1/clinical-report-histories", clinicalReportHistoriesRoute);
     }
 
     initializeErrorHandler() {
