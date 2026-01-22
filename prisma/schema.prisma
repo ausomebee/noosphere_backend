@@ -63,6 +63,15 @@ enum ApprovalStatus {
   REJECTED
 }
 
+enum ClinicalReportStatus {
+  DRAFT
+  SUBMITTED
+  SIGNED
+  APPROVED
+  AWAITING_SIGNATURE
+  CHANGES_REQUESTED
+}
+
 model Admin {
   id                    String   @id @default(uuid())
   fullName              String
@@ -1294,7 +1303,7 @@ model ClinicalReport {
   creatorId      String
   approverId     String?
   tenantId       String
-  status         String
+  status         ClinicalReportStatus @default(DRAFT)
   isDeleted      Boolean  @default(false)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
