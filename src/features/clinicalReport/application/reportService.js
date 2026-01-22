@@ -28,7 +28,7 @@ class ClinicalReportService {
     }
 
     async getReport(id) {
-        const record = await this.repository.findAllAndPopulate({ id }, {
+        const record = await this.repository.findOneAndPopulate({ id }, {
             creator: { select: { fullName: true } },
             client: { select: { client: { select: { firstName: true, lastName: true } } } },
             approver: { select: { fullName: true } }
