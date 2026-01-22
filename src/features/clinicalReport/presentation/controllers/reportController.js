@@ -89,6 +89,19 @@ class ClinicalReportController {
         });
     });
 
+    updateReportStatus = expressAsyncHandler(async (req, res) => {
+        const updated = await this.reportService.updateReport(
+            req.params.id,
+            req.query.status
+        );
+
+        return res.status(200).json({
+            status: "ok",
+            message: "Clinical report updated successfully",
+            data: updated
+        });
+    });
+
     getSingleReport = expressAsyncHandler(async (req, res) => {
         const report = await this.reportService.getReport(req.params.id);
         const sections = await this.sectionService.getSections(report.id);
@@ -98,6 +111,19 @@ class ClinicalReportController {
             status: "ok",
             message: "Clinical report fetched successfully",
             data: { ...report, sections, history }
+        });
+    });
+
+    getReportsByStatus = expressAsyncHandler(async (req, res) => {
+        const reports = await this.reportService.getReportsByStatus(
+            req.params.tenantId,
+            req.query.status
+        );
+
+        return res.status(200).json({
+            status: "ok",
+            message: "Clinical reports fetched successfully",
+            data: reports
         });
     });
 

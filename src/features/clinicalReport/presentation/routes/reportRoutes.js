@@ -187,6 +187,58 @@ class ClinicalReportRoutes {
             this.controller.getTenantReports
         );
 
+         /**
+         * @swagger
+         * /api/v1/clinical-reports/tenant/{tenantId}/status/{status}:
+         *   get:
+         *     summary: Get all clinical reports for a tenant by status
+         *     tags: [clinical-reports]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *       - in: path
+         *         name: status
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: List of clinical reports
+         */
+        this.router.get(
+            "/tenant/:tenantId/status/:status",
+            this.controller.getReportsByStatus
+        );
+
+         /**
+         * @swagger
+         * /api/v1/clinical-reports/:id/status/:status:
+         *   patch:
+         *     summary: Update a clinical report status
+         *     tags: [clinical-reports]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *       - in: path
+         *         name: status
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: List of clinical reports
+         */
+        this.router.patch(
+            "/:id/status/:status",
+            this.controller.updateReportStatus
+        );
+
         /**
          * @swagger
          * /api/v1/clinical-reports/{id}:
