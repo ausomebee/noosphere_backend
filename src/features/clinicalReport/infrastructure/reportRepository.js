@@ -24,6 +24,11 @@ class ClinicalReportRepository extends BaseRepository {
             where: {
                 tenantId: tenantId,
                 status: status
+            },
+            include: {
+                creator: { select: { fullName: true } },
+                client: { select: { client: { select: { firstName: true, lastName: true } } } },
+                approver: { select: { fullName: true } }
             }
         });
     }
