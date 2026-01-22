@@ -44,7 +44,7 @@ class ClinicalReportService {
     }
 
     async getReportsByStatus(tenantId, status) {
-        const records = await this.repository.findAllByStatus({ tenantId, status });
+        const records = await this.repository.findAllByStatus(tenantId, status);
         if (!records) throw new Error("No clinical reports found");
         return records;
     }

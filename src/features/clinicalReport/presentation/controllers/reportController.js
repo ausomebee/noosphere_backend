@@ -129,7 +129,7 @@ class ClinicalReportController {
     getReportsByStatus = expressAsyncHandler(async (req, res) => {
         const reports = await this.reportService.getReportsByStatus(
             req.params.tenantId,
-            req.query.status
+            req.params.status
         );
 
         return res.status(200).json({
