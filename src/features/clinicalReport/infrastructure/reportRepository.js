@@ -11,6 +11,15 @@ class ClinicalReportRepository extends BaseRepository {
             include: populate
         });
     }
+
+    async findAllByStatus(tenantId, status) {
+        return await this.model.findMany({
+            where: {
+                tenantId: tenantId,
+                status: status
+            }
+        });
+    }
 }
 
 export default ClinicalReportRepository;

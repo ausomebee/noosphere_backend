@@ -38,6 +38,12 @@ class ClinicalReportService {
         if (!records) throw new Error("No clinical reports found");
         return records;
     }
+
+    async getReportsByStatus(tenantId, status) {
+        const records = await this.repository.findAllByStatus({ tenantId, status });
+        if (!records) throw new Error("No clinical reports found");
+        return records;
+    }
 }
 
 export default ClinicalReportService
