@@ -259,6 +259,48 @@ class ClinicalReportRoutes {
             "/:id",
             this.controller.getSingleReport
         );
+
+        /**
+         * @swagger
+         * /api/v1/clinical-reports/duplicate/{id}:
+         *   post:
+         *     summary: duplicate a clinical report
+         *     tags: [clinical-reports]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: Clinical report duplicated successfully
+         */
+        this.router.post(
+            "/duplicate/:id",
+            this.controller.duplicateReport
+        );
+
+        /**
+         * @swagger
+         * /api/v1/clinical-reports/{id}:
+         *   delete:
+         *     summary: delete a clinical report
+         *     tags: [clinical-reports]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: Clinical report deleted successfully
+         */
+        this.router.delete(
+            "/:id",
+            this.controller.deleteReport
+        );
     }
 
     getRouter() {

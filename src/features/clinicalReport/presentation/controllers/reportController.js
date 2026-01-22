@@ -9,6 +9,7 @@ import ClinicalReportHistoryRepository from "../../infrastructure/reportHistoryR
 import ClinicalReport from "../../domain/report.js";
 import ClinicalReportSection from "../../domain/reportSection.js";
 import ClinicalReportHistory from "../../domain/reportHistory.js";
+import { is } from "date-fns/locale";
 
 class ClinicalReportController {
     constructor() {
@@ -89,10 +90,21 @@ class ClinicalReportController {
         });
     });
 
+    deleteReport = expressAsyncHandler(async (req, res) => {
+        const updated = await this.reportService.updateReport(
+            { id: req.params.id, isDeleted: true }
+        );
+
+        return res.status(200).json({
+            status: "ok",
+            message: "Clinical report updated successfully",
+            data: updated
+        });
+    });
+
     updateReportStatus = expressAsyncHandler(async (req, res) => {
         const updated = await this.reportService.updateReport(
-            req.params.id,
-            req.query.status
+            { id: req.params.id, status: req.query.status }
         );
 
         return res.status(200).json({
@@ -136,6 +148,37 @@ class ClinicalReportController {
             status: "ok",
             message: "Clinical reports fetched successfully",
             data: reports
+        });
+    });
+
+    duplicateReport = expressAsyncHandler(async (req, res) => {
+        const report = await this.reportService.getReport(req.params.id);
+        const sections = await this.sectionService.getSections(report.id);
+
+        const reportData = new ClinicalReport({
+            ...report,
+            title: `${report.title} copy`
+        });
+
+        const newReport = await this.reportService.createReport(
+            reportData.createReport
+        );
+
+        for (const section of sections) {
+            const sectionData = new ClinicalReportSection({
+                ...section,
+                reportId: newReport.id
+            });
+
+            await this.sectionService.createSection(
+                sectionData.createSection
+            );
+        }
+
+        return res.status(200).json({
+            status: "ok",
+            message: "Report duplicated successfully",
+            data: newReport
         });
     });
 }
