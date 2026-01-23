@@ -43,7 +43,7 @@ class ClinicalReportTemplateService {
     }
 
     async getTemplate(id) {
-        const record = await this.repository.findOne({ id });
+        const record = await this.repository.findOne({ id, isDeleted: false });
 
         if (!record) {
             throw new Error("Template not found");
@@ -53,7 +53,7 @@ class ClinicalReportTemplateService {
     }
 
     async getTemplates(tenantId) {
-        const records = await this.repository.findAll({ tenantId });
+        const records = await this.repository.findAll({ tenantId, isDeleted: false });
 
         if (!records) {
             throw new Error("No templates found");

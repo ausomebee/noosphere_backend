@@ -23,7 +23,8 @@ class ClinicalReportRepository extends BaseRepository {
         return await this.model.findMany({
             where: {
                 tenantId: tenantId,
-                status: status
+                status: status,
+                isDeleted: false
             },
             include: {
                 creator: { select: { fullName: true } },
