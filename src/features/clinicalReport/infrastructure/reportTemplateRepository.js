@@ -1,3 +1,4 @@
+import { is } from "date-fns/locale";
 import BaseRepository from "./baseRepository.js";
 
 class ClinicalReportTemplateRepository extends BaseRepository {

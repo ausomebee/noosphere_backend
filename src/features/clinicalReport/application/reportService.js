@@ -28,7 +28,7 @@ class ClinicalReportService {
     }
 
     async getReport(id) {
-        const record = await this.repository.findOneAndPopulate({ id }, {
+        const record = await this.repository.findOneAndPopulate({ id, isDeleted: false }, {
             creator: { select: { fullName: true } },
             client: { select: { client: { select: { firstName: true, lastName: true } } } },
             approver: { select: { fullName: true } }
@@ -38,7 +38,7 @@ class ClinicalReportService {
     }
 
     async getReports(tenantId) {
-        const records = await this.repository.findAllAndPopulate({ tenantId }, {
+        const records = await this.repository.findAllAndPopulate({ tenantId, isDeleted: false }, {
             creator: { select: { fullName: true } },
             client: { select: { client: { select: { firstName: true, lastName: true } } } },
             approver: { select: { fullName: true } }
