@@ -177,6 +177,27 @@ class ClinicalReportTemplateRoutes {
 
         /**
          * @swagger
+         * /api/v1/clinical-report-templates/{id}:
+         *   delete:
+         *     summary: Delete a clinical report template
+         *     tags: [clinical-report-templates]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: Clinical report template deleted successfully
+         */
+        this.router.delete(
+            "/:id",
+            this.controller.deleteTemplate
+        );
+
+        /**
+         * @swagger
          * /api/v1/clinical-report-templates/duplicate/{id}:
          *   post:
          *     summary: Duplicate a clinical report template

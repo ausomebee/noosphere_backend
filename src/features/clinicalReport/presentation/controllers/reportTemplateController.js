@@ -139,6 +139,18 @@ class ClinicalReportTemplateController {
             data: templates
         });
     });
+
+    deleteTemplate = expressAsyncHandler(async (req, res) => {
+        const updated = await this.templateService.updateTemplate(
+            { id: req.params.id, isDeleted: true }
+        );
+
+        return res.status(200).json({
+            status: "ok",
+            message: "Clinical template deleted successfully",
+            data: updated
+        });
+    });
 }
 
 export default ClinicalReportTemplateController;
