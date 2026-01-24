@@ -33,6 +33,21 @@ class ClinicalReportRepository extends BaseRepository {
             }
         });
     }
+
+    async findAllByApproverAndStatus(approverId) {
+        return await this.model.findMany({
+            where: {
+                approverId: approverId,
+                status: "SUBMITTED",
+                isDeleted: false
+            },
+            include: {
+                creator: { select: { fullName: true } },
+                client: { select: { client: { select: { firstName: true, lastName: true } } } },
+                approver: { select: { fullName: true } }
+            }
+        });
+    }
 }
 
 export default ClinicalReportRepository;

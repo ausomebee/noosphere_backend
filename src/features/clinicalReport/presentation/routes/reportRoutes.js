@@ -213,6 +213,28 @@ class ClinicalReportRoutes {
             this.controller.getReportsByStatus
         );
 
+        /**
+         * @swagger
+         * /api/v1/clinical-reports/approver/{approverId}:
+         *   get:
+         *     summary: Get all clinical reports for an approver that are submitted
+         *     tags: [clinical-reports]
+         *     parameters:
+         *       - in: path
+         *         name: approverId
+         *         required: true
+         *         schema:
+         *           type: string
+         *      
+         *     responses:
+         *       200:
+         *         description: List of clinical reports
+         */
+        this.router.get(
+            "/approver/:approverId",
+            this.controller.getReportsSubmittedForApprover
+        );
+
          /**
          * @swagger
          * /api/v1/clinical-reports/:id/status/:status:
