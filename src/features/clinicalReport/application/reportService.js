@@ -31,7 +31,8 @@ class ClinicalReportService {
         const record = await this.repository.findOneAndPopulate({ id, isDeleted: false }, {
             creator: { select: { fullName: true } },
             client: { select: { client: { select: { firstName: true, lastName: true } } } },
-            approver: { select: { fullName: true } }
+            approver: { select: { fullName: true } },
+            clinicalReportChangeRequests: true
         });
         if (!record) throw new Error("Clinical Report not found");
         return record;
@@ -41,7 +42,8 @@ class ClinicalReportService {
         const records = await this.repository.findAllAndPopulate({ tenantId, isDeleted: false }, {
             creator: { select: { fullName: true } },
             client: { select: { client: { select: { firstName: true, lastName: true } } } },
-            approver: { select: { fullName: true } }
+            approver: { select: { fullName: true } },
+            clinicalReportChangeRequests: true
         });
         if (!records) throw new Error("No clinical reports found");
         return records;

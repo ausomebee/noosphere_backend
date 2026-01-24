@@ -29,7 +29,8 @@ class ClinicalReportRepository extends BaseRepository {
             include: {
                 creator: { select: { fullName: true } },
                 client: { select: { client: { select: { firstName: true, lastName: true } } } },
-                approver: { select: { fullName: true } }
+                approver: { select: { fullName: true } },
+                clinicalReportChangeRequests: true
             }
         });
     }
@@ -44,7 +45,8 @@ class ClinicalReportRepository extends BaseRepository {
             include: {
                 creator: { select: { fullName: true } },
                 client: { select: { client: { select: { firstName: true, lastName: true } } } },
-                approver: { select: { fullName: true } }
+                approver: { select: { fullName: true } },
+                clinicalReportChangeRequests: true
             }
         });
     }
