@@ -73,6 +73,7 @@ import clinicalReportTemplateSectionsRoute from "./features/clinicalReport/prese
 import clinicalReportsRoute from "./features/clinicalReport/presentation/routes/reportRoutes.js";
 import clinicalReportSectionsRoute from "./features/clinicalReport/presentation/routes/reportSectionRoutes.js";
 import clinicalReportHistoriesRoute from "./features/clinicalReport/presentation/routes/reportHistoryRoutes.js";
+import clinicalReportRequestsRoute from "./features/clinicalReport/presentation/routes/reportRequestRoutes.js";
 
 class App {
     constructor() {
@@ -192,6 +193,7 @@ class App {
         this.app.use("/api/v1/clinical-reports", clinicalReportsRoute);
         this.app.use("/api/v1/clinical-report-sections", clinicalReportSectionsRoute);
         this.app.use("/api/v1/clinical-report-histories", clinicalReportHistoriesRoute);
+        this.app.use("/api/v1/clinical-report-change-requests", clinicalReportRequestsRoute);
     }
 
     initializeErrorHandler() {

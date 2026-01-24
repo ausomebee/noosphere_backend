@@ -222,24 +222,25 @@ model TenantStaff {
   authQuestion String?
   auth2FADone  Boolean  @default(false)
 
-  role                    Role                    @relation(fields: [roleId], references: [id])
-  tenant                  Tenant                  @relation(fields: [tenantId], references: [id])
-  PipelineItem            PipelineItem[]
-  ClientTenant            ClientTenant[]          @relation("ClientClinicians")
-  TenantStaffLicenses     TenantStaffLicenses[]
-  TenantStaffPayroll      TenantStaffPayroll[]
-  TenantStaffDocuments    TenantStaffDocuments[]
-  appointments            Appointment[]           @relation("AppointmentClinicians")
-  clientTenants           ClientTenant[]
-  clientDocuments         ClientDocuments[]
-  staffAvailabilities     StaffAvailability[]
-  sessions                Session[]
-  timesheetHistories      TimesheetHistory[]
-  sessionUpdateRequests   SessionUpdateRequest[]
-  clientFiles             ClientFiles[]
-  clinicalReportsCreator  ClinicalReport[]        @relation("ReportsCreator")
-  clinicalReportsApprover ClinicalReport[]        @relation("ReportsApprover")
-  clinicalReportHistories ClinicalReportHistory[]
+  role                         Role                          @relation(fields: [roleId], references: [id])
+  tenant                       Tenant                        @relation(fields: [tenantId], references: [id])
+  PipelineItem                 PipelineItem[]
+  ClientTenant                 ClientTenant[]                @relation("ClientClinicians")
+  TenantStaffLicenses          TenantStaffLicenses[]
+  TenantStaffPayroll           TenantStaffPayroll[]
+  TenantStaffDocuments         TenantStaffDocuments[]
+  appointments                 Appointment[]                 @relation("AppointmentClinicians")
+  clientTenants                ClientTenant[]
+  clientDocuments              ClientDocuments[]
+  staffAvailabilities          StaffAvailability[]
+  sessions                     Session[]
+  timesheetHistories           TimesheetHistory[]
+  sessionUpdateRequests        SessionUpdateRequest[]
+  clientFiles                  ClientFiles[]
+  clinicalReportsCreator       ClinicalReport[]              @relation("ReportsCreator")
+  clinicalReportsApprover      ClinicalReport[]              @relation("ReportsApprover")
+  clinicalReportHistories      ClinicalReportHistory[]
+  clinicalReportChangeRequests ClinicalReportChangeRequest[] @relation("ReportsRequestApprover")
 }
 
 model TenantStaffLicenses {
@@ -331,18 +332,19 @@ model ClientTenant {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  tenantStaff              TenantStaff                @relation(fields: [createdBy], references: [id])
-  client                   Client                     @relation(fields: [clientId], references: [id])
-  tenant                   Tenant                     @relation(fields: [tenantId], references: [id])
-  FormResponses            FormResponses[]
-  clientDocuments          ClientDocuments[]
-  clientRequestedDocuments ClientRequestedDocuments[]
-  clinicians               TenantStaff[]              @relation("ClientClinicians")
-  forms                    Forms[]
-  clientAuthorizations     ClientAuthorization[]
-  clientForms              ClientForm[]
-  clientFolders            ClientFolder[]
-  clinicalReports          ClinicalReport[]
+  tenantStaff                  TenantStaff                   @relation(fields: [createdBy], references: [id])
+  client                       Client                        @relation(fields: [clientId], references: [id])
+  tenant                       Tenant                        @relation(fields: [tenantId], references: [id])
+  FormResponses                FormResponses[]
+  clientDocuments              ClientDocuments[]
+  clientRequestedDocuments     ClientRequestedDocuments[]
+  clinicians                   TenantStaff[]                 @relation("ClientClinicians")
+  forms                        Forms[]
+  clientAuthorizations         ClientAuthorization[]
+  clientForms                  ClientForm[]
+  clientFolders                ClientFolder[]
+  clinicalReports              ClinicalReport[]
+  clinicalReportChangeRequests ClinicalReportChangeRequest[]
 
   @@unique([clientId, tenantId])
 }
@@ -1297,23 +1299,24 @@ model ClinicalReportTemplateSection {
 }
 
 model ClinicalReport {
-  id             String   @id @default(uuid())
+  id             String               @id @default(uuid())
   title          String
   clientTenantId String
   creatorId      String
   approverId     String?
   tenantId       String
   status         ClinicalReportStatus @default(DRAFT)
-  isDeleted      Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  isDeleted      Boolean              @default(false)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
 
-  creator                 TenantStaff             @relation("ReportsCreator", fields: [creatorId], references: [id])
-  client                  ClientTenant            @relation(fields: [clientTenantId], references: [id])
-  approver                TenantStaff?            @relation("ReportsApprover", fields: [approverId], references: [id])
-  tenant                  Tenant                  @relation(fields: [tenantId], references: [id])
-  clinicalReportSections  ClinicalReportSection[]
-  clinicalReportHistories ClinicalReportHistory[]
+  creator                      TenantStaff                   @relation("ReportsCreator", fields: [creatorId], references: [id])
+  client                       ClientTenant                  @relation(fields: [clientTenantId], references: [id])
+  approver                     TenantStaff?                  @relation("ReportsApprover", fields: [approverId], references: [id])
+  tenant                       Tenant                        @relation(fields: [tenantId], references: [id])
+  clinicalReportSections       ClinicalReportSection[]
+  clinicalReportHistories      ClinicalReportHistory[]
+  clinicalReportChangeRequests ClinicalReportChangeRequest[]
 }
 
 model ClinicalReportSection {
@@ -1335,4 +1338,19 @@ model ClinicalReportHistory {
 
   staff          TenantStaff    @relation(fields: [createdBy], references: [id])
   clinicalReport ClinicalReport @relation(fields: [clinicalReportId], references: [id])
+}
+
+model ClinicalReportChangeRequest {
+  id               String   @id @default(uuid())
+  description      String
+  viewed           Boolean  @default(false)
+  clinicalReportId String
+  clientTenantId   String?
+  approverId       String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  clinicalReport ClinicalReport @relation(fields: [clinicalReportId], references: [id])
+  client         ClientTenant?  @relation(fields: [clientTenantId], references: [id])
+  approver       TenantStaff?   @relation("ReportsRequestApprover", fields: [approverId], references: [id])
 }
