@@ -139,6 +139,18 @@ class ClinicalReportController {
         });
     });
 
+    getReportsSubmittedForApprover = expressAsyncHandler(async (req, res) => {
+        const reports = await this.reportService.getReportsSubmittedForApprover(
+            req.params.approverId
+        );
+
+        return res.status(200).json({
+            status: "ok",
+            message: "Clinical reports fetched successfully",
+            data: reports
+        });
+    });
+
     getTenantReports = expressAsyncHandler(async (req, res) => {
         const reports = await this.reportService.getReports(
             req.params.tenantId
