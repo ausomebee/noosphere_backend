@@ -284,6 +284,27 @@ class ClinicalReportRoutes {
 
         /**
          * @swagger
+         * /api/v1/clinical-reports/nudge-client/{id}:
+         *   get:
+         *     summary: nudge-client
+         *     tags: [clinical-reports]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: Clinical report fetched successfully
+         */
+        this.router.get(
+            "/nudge-client/:id",
+            this.controller.nudgeClient
+        );
+
+        /**
+         * @swagger
          * /api/v1/clinical-reports/duplicate/{id}:
          *   post:
          *     summary: duplicate a clinical report
