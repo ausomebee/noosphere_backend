@@ -74,6 +74,7 @@ import clinicalReportsRoute from "./features/clinicalReport/presentation/routes/
 import clinicalReportSectionsRoute from "./features/clinicalReport/presentation/routes/reportSectionRoutes.js";
 import clinicalReportHistoriesRoute from "./features/clinicalReport/presentation/routes/reportHistoryRoutes.js";
 import clinicalReportRequestsRoute from "./features/clinicalReport/presentation/routes/reportRequestRoutes.js";
+import PDFDocument from "pdfkit";
 
 class App {
     constructor() {
@@ -194,6 +195,17 @@ class App {
         this.app.use("/api/v1/clinical-report-sections", clinicalReportSectionsRoute);
         this.app.use("/api/v1/clinical-report-histories", clinicalReportHistoriesRoute);
         this.app.use("/api/v1/clinical-report-change-requests", clinicalReportRequestsRoute);
+        this.app.use("/pdf", (req, res) => {
+            const doc = new PDFDocument();
+
+            res.setHeader("Content-Type", "application/pdf");
+            res.setHeader("Content-Disposition", 'inline; filename="sample.pdf"');
+
+            doc.pipe(res);
+
+            doc.text("Hello from Node.js PDF 👋");
+            doc.end();
+        });
     }
 
     initializeErrorHandler() {

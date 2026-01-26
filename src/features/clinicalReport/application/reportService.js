@@ -38,6 +38,20 @@ class ClinicalReportService {
         return record;
     }
 
+    async getReportForExport(id) {
+        const record = await this.repository.findOneAndPopulate({ id, isDeleted: false }, {
+            creator: { select: { fullName: true } },
+            client: { select: { client: { select: { firstName: true, lastName: true } } } },
+            approver: { select: { fullName: true } },
+            clinicalReportChangeRequests: true,
+            tenant: true,
+            clinicalReportSections:true,
+            client: { select: { client: { select: { firstName: true, lastName: true, email: true } } } }
+        });
+        if (!record) throw new Error("Clinical Report not found");
+        return record;
+    }
+
     async getReports(tenantId) {
         const records = await this.repository.findAllAndPopulate({ tenantId, isDeleted: false }, {
             creator: { select: { fullName: true } },
