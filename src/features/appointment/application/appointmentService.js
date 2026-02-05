@@ -556,12 +556,12 @@ class AppointmentService {
         );
 
         return allAppointments
-            .filter(appt => this.isUpcoming(appt, now))
-            .sort((a, b) => {
-                const aDate = new Date(`${a.date}T${a.startTime}:00`);
-                const bDate = new Date(`${b.date}T${b.startTime}:00`);
-                return aDate - bDate;
-            });
+            // .filter(appt => this.isUpcoming(appt, now))
+            // .sort((a, b) => {
+            //     const aDate = new Date(`${a.date}T${a.startTime}:00`);
+            //     const bDate = new Date(`${b.date}T${b.startTime}:00`);
+            //     return aDate - bDate;
+            // });
     }
 
     async getTenantPastAppointments(tenantId) {
