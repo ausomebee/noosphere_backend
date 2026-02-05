@@ -141,7 +141,7 @@ class ClientService {
                                 <td style="padding: 24px 24px 20px 24px;">
                                     
                                     <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: #666666;">
-                                    Log in here: <a href="https://www.${tenant.subdomain}.noospherehub.net" style="color: #2563eb; text-decoration: none; font-weight: 500;">https://www.${tenant.subdomain}.noospherehub.net</a>
+                                    Log in here: <a href="https://www.${tenant.subdomain}.noospherehub.net/client/intialLogin" style="color: #2563eb; text-decoration: none; font-weight: 500;">https://www.${tenant.subdomain}.noospherehub.net/client/intialLogin</a>
                                     </p>
                                     
                                     <p style="margin: 0 0 4px 0; font-size: 14px; line-height: 1.5; color: #1a1a1a;">
