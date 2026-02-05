@@ -195,11 +195,16 @@ class ClientService {
         return { ...newCandidate.pipelineItem, email: newCandidate.client.email, tenantClientId: newCandidate.clientTenant.id };
     }
 
-    async initiatePasswordReset(id) {
+    async initiatePasswordReset(email) {
         const client = await this.clientTenantRepository.findFirstDynamic({
-            where: { id },
+            where: {
+                client: {
+                    email,
+                },
+            },
             include: {
                 client: true,
+                tenant: true
             },
         });
 
@@ -356,9 +361,14 @@ class ClientService {
         </html>
         `
 
-        const sendMail = await MailService.sendMail(client.client.email, "Password Reset", null, html, attachments)
+        const sendMail = await emailService.sendTenantEmail({
+            tenantSlug: client.tenant.subdomain,
+            to: [email],
+            subject: "Initiate password reset",
+            html: html
+        });
 
-        if (!sendMail.success) {
+        if (!sendMail.messageId) {
             throw new Error("Failed to send mail");
         }
 
