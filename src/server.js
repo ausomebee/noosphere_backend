@@ -87,15 +87,12 @@ class App {
         this.allowedOrigins = {
             origin(origin, callback) {
                 if (!origin) return callback(null, true);
-
                 const allowed =
                     /^https:\/\/([a-z0-9-]+\.)*noospherehub\.net$/.test(origin) ||
-
                     /^http:\/\/localhost:\d+$/.test(origin) ||
                     /^http:\/\/127\.0\.0\.1:\d+$/.test(origin) ||
-
-                    /^http:\/\/([a-z0-9-]+\.)*localhost:\d+$/.test(origin);
-
+                    /^http:\/\/([a-z0-9-]+\.)*localhost:\d+$/.test(origin) ||
+                    /^http:\/\/ec2-[\d-]+\.[\w-]+\.compute\.amazonaws\.com:\d+$/.test(origin);
                 if (allowed) {
                     callback(null, true);
                 } else {
@@ -106,7 +103,6 @@ class App {
             credentials: true,
             methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
         };
-
         this.initializeDatabase();
         this.initializeMiddlewares();
         this.initializeSwagger();
