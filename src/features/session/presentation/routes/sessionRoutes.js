@@ -208,7 +208,7 @@ class SessionRoutes {
         /**
          * @swagger
          * /api/v1/sessions/tenant/overview/{tenantId}:
-         *   patch:
+         *   get:
          *     summary: tenant sessions overview
          *     tags: [sessions]
          *     parameters:
@@ -223,7 +223,7 @@ class SessionRoutes {
          *       200:
          *         description: overvoew fetched successfully
          */
-        this.router.patch(
+        this.router.get(
             "/tenant/overview/:tenantId",
             this.controller.getProductivityOverview
         );
