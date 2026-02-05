@@ -281,11 +281,11 @@ model TenantStaffPayroll {
   ratePerHour     String
   tenantStaffId   String
   minimumHours    String?
-  otherPays       Json?
-  deductions      Json?
   isDeleted       Boolean @default(false)
 
-  tenantStaff TenantStaff @relation(fields: [tenantStaffId], references: [id])
+  tenantStaff TenantStaff   @relation(fields: [tenantStaffId], references: [id])
+  incomeItems IncomeItems[] @relation("PayrollIncomItems")
+  deductions  Deductions[]  @relation("PayrollDeductions")
 }
 
 model TenantStaffDocuments {
@@ -1035,7 +1035,8 @@ model IncomeItems {
   isDeleted Boolean @default(false)
   isActive  Boolean @default(true)
 
-  tenant Tenant @relation(fields: [tenantId], references: [id])
+  tenant             Tenant               @relation(fields: [tenantId], references: [id])
+  tenantStaffPayroll TenantStaffPayroll[] @relation("PayrollIncomItems")
 }
 
 model Deductions {
@@ -1047,7 +1048,8 @@ model Deductions {
   isDeleted Boolean @default(false)
   isActive  Boolean @default(true)
 
-  tenant Tenant @relation(fields: [tenantId], references: [id])
+  tenant             Tenant               @relation(fields: [tenantId], references: [id])
+  tenantStaffPayroll TenantStaffPayroll[] @relation("PayrollDeductions")
 }
 
 model PayrollCycles {
