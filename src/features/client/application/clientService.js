@@ -333,7 +333,7 @@ class ClientService {
                                                     <tr>
                                                         <td align="center"
                                                             style="border-radius: 100px; background-color: #0066FF;">
-                                                            <a href="#" target="_blank"
+                                                                <a href="https://www.${client.tenant.subdomain}.noospherehub.net/changePassword/${client.id}" target="_blank"
                                                                 style="display: inline-block; padding: 18px 0; width: 500px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 100px;">Reset
                                                                 password</a>
                                                         </td>
