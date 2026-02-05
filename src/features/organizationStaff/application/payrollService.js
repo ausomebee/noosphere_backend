@@ -15,8 +15,12 @@ class PayrollService {
             ratePerHour: data.ratePerHour || payroll.ratePerHour,
             tenantStaffId: data.tenantStaffId || payroll.tenantStaffId,
             minimumHours: data.minimumHours || payroll.minimumHours,
-            otherPays: data.otherPays || payroll.otherPays,
-            deductions: data.deductions || payroll.deductions,
+            otherPays: {
+                set: data.otherPays || appointment.otherPays
+            },
+            deductions: {
+                set: data.deductions || appointment.deductions
+            },
             isDeleted: data.isDeleted ?? payroll.isDeleted
         });
 
