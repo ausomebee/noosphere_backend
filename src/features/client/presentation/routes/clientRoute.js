@@ -452,13 +452,13 @@ class ClientRoutes {
 
          /**
          * @swagger
-         * /api/v1/client/initiate/password-reset/{clientTenantId}:
+         * /api/v1/client/initiate/password-reset/{email}:
          *   patch:
          *     summary: initiate password reset for a client
          *     tags: [Clients]
          *     parameters:
          *       - in: path
-         *         name: clientTenantId
+         *         name: email
          *         required: true
          *         schema:
          *           type: string
@@ -466,7 +466,7 @@ class ClientRoutes {
          *       200:
          *         description: Email sent successfully
          */
-        this.router.patch("/initiate/password-reset/:clientTenantId", this.controller.initiatePasswordReset);
+        this.router.patch("/initiate/password-reset/:email", this.controller.initiatePasswordReset);
 
     }
 

@@ -132,7 +132,7 @@ class ClientController {
     });
 
     initiatePasswordReset = expressAsyncHandler(async (req, res) => {
-        const client = await this.service.initiatePasswordReset(req.params.clientTenantId);
+        const client = await this.service.initiatePasswordReset(req.params.email);
 
         if (!client) {
             res.status(500).json({ message: 'Failed to send email' });
