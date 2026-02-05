@@ -224,7 +224,7 @@ class AdminService {
     }
 
     async AdminSignin(data) {
-        const admin = await this.repository.findOne({
+        const admin = await this.repository.findAdmin({
             email: data.email
         });
 
@@ -240,7 +240,13 @@ class AdminService {
             throw new Error('Incorrect password')
         }
 
-        return { ...admin, token: this.token.generateToken(admin.id) };
+        const claims = {
+            id: admin.id,
+            role: admin.roles.name,
+            permissions: admin.roles.access
+        }
+
+        return { ...admin, token: this.token.generateToken(claims) };
     }
 
     async getSingleAdmin(data) {
@@ -328,13 +334,13 @@ class AdminService {
             throw new Error("Admin not found.");
         }
 
-        if(!adminExists.auth2FADone && adminExists.superAdmin){
+        if (!adminExists.auth2FADone && adminExists.superAdmin) {
             throw new Error("2FA required.");
         }
 
         const setAll = await this.repository.findFirstChoice({});
 
-        if(!adminExists.auth2FADone && setAll.setForAll){
+        if (!adminExists.auth2FADone && setAll.setForAll) {
             throw new Error("2FA required.");
         }
 

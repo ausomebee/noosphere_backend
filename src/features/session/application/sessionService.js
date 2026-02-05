@@ -61,6 +61,16 @@ class SessionService {
         return session;
     }
 
+    async countTenantSessions(id) {
+        const session = await this.sessionRepository.countTenantSessions(id);
+
+        if (!session) {
+            throw new Error("Session not found");
+        }
+
+        return session;
+    }
+
     async getSessions(tenantId) {
         const sessions = await this.sessionRepository.findAllAndPopulate({ appointment: { tenantId: tenantId } }, {
             id: true,

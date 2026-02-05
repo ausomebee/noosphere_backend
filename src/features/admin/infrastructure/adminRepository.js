@@ -25,6 +25,20 @@ class AdminRepository {
         });
     }
 
+    async findAdmin(query) {
+        return await this.model.findUnique({
+            where: query,
+            include: {
+                roles:{
+                    select:{
+                        name: true,
+                        access: true
+                    }
+                }
+            }
+        });
+    }
+
     async findOneChoice(query) {
         return await this.superAdminChoices.findFirst({
             where: query,

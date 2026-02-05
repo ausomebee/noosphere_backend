@@ -89,7 +89,7 @@ model Admin {
   authQuestion          String?
   auth2FADone           Boolean  @default(false)
 
-  roles          Role           @relation(fields: [roleId], references: [id])
+  roles          Role            @relation(fields: [roleId], references: [id])
   pipelines      Pipeline[]
   departments    Department[]
   PipelineItem   PipelineItem[]
@@ -97,8 +97,9 @@ model Admin {
   logs           Logs[]
   BillingPlan    BillingPlan[]
   IssueComment   IssueComment[]
-  assignedIssues Issue[]        @relation("AssignedAdmin")
-  loggedIssues   Issue[]        @relation("LoggedByAdmin")
+  assignedIssues Issue[]         @relation("AssignedAdmin")
+  loggedIssues   Issue[]         @relation("LoggedByAdmin")
+  refreshTokens  RefreshTokens[]
 }
 
 model Auth {
@@ -140,6 +141,22 @@ model Role {
   TenantStaff TenantStaff[]
 }
 
+model RefreshTokens {
+  id          String   @id @default(uuid())
+  adminId     String?
+  staffId     String?
+  clientId    String?
+  tokenHash   String
+  fingerprint String
+  expires_at  DateTime
+  created_at  DateTime @default(now())
+  used        Boolean  @default(false)
+
+  client Client?      @relation(fields: [clientId], references: [id])
+  staff  TenantStaff? @relation(fields: [staffId], references: [id])
+  admin  Admin?       @relation(fields: [adminId], references: [id])
+}
+
 model Tenant {
   id               String   @id @default(uuid())
   email            String   @unique
@@ -160,40 +177,42 @@ model Tenant {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  pipelineItems              PipelineItem[]
-  clientLinks                ClientTenant[]
-  pipelines                  Pipeline[]
-  departments                Department[]
-  TenantStaff                TenantStaff[]
-  BillingMetadata            BillingMetadata?
-  Subscription               Subscription[]
-  admin                      Admin                        @relation(fields: [createdBy], references: [id])
-  Payment                    Payment[]
-  logs                       Logs[]
-  BillingPlan                BillingPlan[]
-  Invoice                    Invoice[]
-  PaymentMethod              PaymentMethod[]
-  issues                     Issue[]
-  tenantAdminChoices         TenantAdminChoices?
-  domain                     Domain[]
-  OrganizationInformation    OrganizationInformation?
-  OrganizationDocuments      OrganizationDocuments[]
-  OrganizationDiagnosisCodes OrganizationDiagnosisCodes[]
-  OrganizationSessionTypes   OrganizationSessionTypes[]
-  OrganizationLicenses       OrganizationLicenses[]
-  Appointment                Appointment[]
-  ServiceCodes               ServiceCodes[]
-  RoundingRules              RoundingRules[]
-  InsuranceType              InsuranceType[]
-  Payer                      Payer[]
-  CompensationTypes          CompensationTypes[]
-  IncomeItems                IncomeItems[]
-  Deductions                 Deductions[]
-  PayrollCycles              PayrollCycles[]
-  Forms                      Forms[]
-  FormResponses              FormResponses[]
-  reportTemplates            ClinicalReportTemplates[]
-  clinicalReports            ClinicalReport[]
+  pipelineItems                     PipelineItem[]
+  clientLinks                       ClientTenant[]
+  pipelines                         Pipeline[]
+  departments                       Department[]
+  TenantStaff                       TenantStaff[]
+  BillingMetadata                   BillingMetadata?
+  Subscription                      Subscription[]
+  admin                             Admin                               @relation(fields: [createdBy], references: [id])
+  Payment                           Payment[]
+  logs                              Logs[]
+  BillingPlan                       BillingPlan[]
+  Invoice                           Invoice[]
+  PaymentMethod                     PaymentMethod[]
+  issues                            Issue[]
+  tenantAdminChoices                TenantAdminChoices?
+  domain                            Domain[]
+  OrganizationInformation           OrganizationInformation?
+  OrganizationDocuments             OrganizationDocuments[]
+  OrganizationDiagnosisCodes        OrganizationDiagnosisCodes[]
+  OrganizationSessionTypes          OrganizationSessionTypes[]
+  OrganizationLicenses              OrganizationLicenses[]
+  Appointment                       Appointment[]
+  ServiceCodes                      ServiceCodes[]
+  RoundingRules                     RoundingRules[]
+  InsuranceType                     InsuranceType[]
+  Payer                             Payer[]
+  CompensationTypes                 CompensationTypes[]
+  IncomeItems                       IncomeItems[]
+  Deductions                        Deductions[]
+  PayrollCycles                     PayrollCycles[]
+  Forms                             Forms[]
+  FormResponses                     FormResponses[]
+  reportTemplates                   ClinicalReportTemplates[]
+  clinicalReports                   ClinicalReport[]
+  tenantGeneralSettings             TenantGeneralSettings[]
+  tenantAdditionalSecurityQuestions TenantAdditionalSecurityQuestions[]
 }
 
 model TenantStaff {
@@ -241,6 +260,7 @@ model TenantStaff {
   clinicalReportsApprover      ClinicalReport[]              @relation("ReportsApprover")
   clinicalReportHistories      ClinicalReportHistory[]
   clinicalReportChangeRequests ClinicalReportChangeRequest[] @relation("ReportsRequestApprover")
+  refreshTokens                RefreshTokens[]
 }
 
 model TenantStaffLicenses {
@@ -315,6 +335,7 @@ model Client {
   ClientProgram ClientProgram[]
   ClientTarget  ClientTarget[]
   Appointment   Appointment[]
+  refreshTokens RefreshTokens[]
 }
 
 model ClientTenant {
@@ -1353,4 +1374,26 @@ model ClinicalReportChangeRequest {
   clinicalReport ClinicalReport @relation(fields: [clinicalReportId], references: [id])
   client         ClientTenant?  @relation(fields: [clientTenantId], references: [id])
   approver       TenantStaff?   @relation("ReportsRequestApprover", fields: [approverId], references: [id])
+}
+
+model TenantGeneralSettings {
+  id         String   @id @default(uuid())
+  tenantId   String   @unique
+  dateFormat String
+  timeFormat String
+  currency   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model TenantAdditionalSecurityQuestions {
+  id        String   @id @default(uuid())
+  tenantId  String
+  question  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
 }

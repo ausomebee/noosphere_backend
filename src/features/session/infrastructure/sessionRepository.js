@@ -50,6 +50,16 @@ class SessionRepository extends BaseRepository {
         });
     }
 
+    async countTenantSessions(id) {
+        return await this.model.count({
+            where: {
+                appointment: {
+                    tenantId: id,
+                },
+            },
+        });
+    }
+
     async countClientAwaitingApproval(id) {
         return await this.model.count({
             where: {

@@ -74,7 +74,8 @@ import clinicalReportsRoute from "./features/clinicalReport/presentation/routes/
 import clinicalReportSectionsRoute from "./features/clinicalReport/presentation/routes/reportSectionRoutes.js";
 import clinicalReportHistoriesRoute from "./features/clinicalReport/presentation/routes/reportHistoryRoutes.js";
 import clinicalReportRequestsRoute from "./features/clinicalReport/presentation/routes/reportRequestRoutes.js";
-import PDFDocument from "pdfkit";
+import tenantGeneralSettingsRoute from "./features/tenant/presentation/routes/tenantGeneralSettingsRoutes.js";
+import tenantAdditionalSecurityQuestionsRoute from "./features/tenant/presentation/routes/tenantAdditionalSecurityQuestionsRoutes.js";
 
 class App {
     constructor() {
@@ -195,17 +196,8 @@ class App {
         this.app.use("/api/v1/clinical-report-sections", clinicalReportSectionsRoute);
         this.app.use("/api/v1/clinical-report-histories", clinicalReportHistoriesRoute);
         this.app.use("/api/v1/clinical-report-change-requests", clinicalReportRequestsRoute);
-        this.app.use("/pdf", (req, res) => {
-            const doc = new PDFDocument();
-
-            res.setHeader("Content-Type", "application/pdf");
-            res.setHeader("Content-Disposition", 'inline; filename="sample.pdf"');
-
-            doc.pipe(res);
-
-            doc.text("Hello from Node.js PDF 👋");
-            doc.end();
-        });
+        this.app.use("/api/v1/tenant-security-questions", tenantAdditionalSecurityQuestionsRoute);
+        this.app.use("/api/v1/tenant-general-settings", tenantGeneralSettingsRoute);
     }
 
     initializeErrorHandler() {
