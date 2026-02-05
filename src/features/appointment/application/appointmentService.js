@@ -732,6 +732,16 @@ class AppointmentService {
         return appointment;
     }
 
+    async countTenantAppointments(id) {
+        const appointment = await this.appointmentRepository.countTenantAppointments(id);
+
+        if (!appointment) {
+            throw new Error("appointment not found.");
+        }
+
+        return appointment;
+    }
+
     async getAppointmentsForTimesheet(id) {
         const appointment = await this.appointmentRepository.getAppointmentsForTimesheet(id);
 

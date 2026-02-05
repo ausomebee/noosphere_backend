@@ -815,7 +815,13 @@ class TenantService {
             throw new Error("Invalid password.");
         }
 
-        return { ...tenantStaff, token: this.token.generateToken(tenantStaff.id) };
+        const claims = {
+            id: tenantStaff.id,
+            role: tenantStaff.role.name,
+            permissions: tenantStaff.role.access
+        }
+
+        return { ...tenantStaff, token: this.token.generateToken(claims) };
     }
 
     async tenantAdminChoices(data) {

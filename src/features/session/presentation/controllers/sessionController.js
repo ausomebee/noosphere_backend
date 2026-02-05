@@ -208,6 +208,39 @@ class SessionController {
         });
     });
 
+    getProductivityOverview = expressAsyncHandler(async (req, res) => {
+        const sessions = await this.sessionService.countTenantSessions(
+            req.params.tenantId
+        );
+
+        if (sessions === null || sessions === undefined) {
+            return res.status(404).json({ message: "Sessions not found" });
+        }
+
+        const appointments = await this.appointmentService.countTenantAppointments(
+            req.params.tenantId
+        );
+
+        if (appointments === null || appointments === undefined) {
+            return res.status(404).json({ message: "Appointments not found" });
+        }
+
+        const sessionSatisfactionPercentage =
+            appointments === 0
+                ? 0
+                : Number(((sessions / appointments) * 100).toFixed(2));
+
+        return res.status(200).json({
+            message: "Productivity overview fetched successfully",
+            status: "ok",
+            data: {
+                sessionSatisfactionPercentage,
+                sessions,
+                appointments,
+            },
+        });
+    });
+
     getSingleSession = expressAsyncHandler(async (req, res) => {
         const session = await this.sessionService.getSingleSession(req.params.id);
 

@@ -2,14 +2,24 @@ import jwt from "jsonwebtoken";
 
 class TokenService {
     constructor() {
-        this.secret = process.env.JWT_SECRET;
-        this.expire = process.env.JWT_EXPIRE || "1h";
+        this.accessSecret = process.env.ACCESS_TOKEN_SECRET;
+        this.refreshSecret = process.env.REFRESH_TOKEN_SECRET;
+
+        this.accessExpire = process.env.ACCESS_TOKEN_EXPIRE || "15m";
+        this.refreshExpire = process.env.REFRESH_TOKEN_EXPIRE || "7d";
     }
 
-    generateToken(id) {
-        return jwt.sign({ id }, this.secret, {
-            expiresIn: this.expire,
+    generateAccessToken(claims) {
+        return jwt.sign(claims, this.accessSecret, {
+            expiresIn: this.accessExpire,
+        });
+    }
+
+    generateRefreshToken() {
+        return jwt.sign({}, this.refreshSecret, {
+            expiresIn: this.refreshExpire,
         });
     }
 }
+
 export default TokenService;

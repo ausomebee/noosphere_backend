@@ -207,6 +207,29 @@ class SessionRoutes {
 
         /**
          * @swagger
+         * /api/v1/sessions/tenant/overview/{tenantId}:
+         *   patch:
+         *     summary: tenant sessions overview
+         *     tags: [sessions]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: Tenant ID
+         *       
+         *     responses:
+         *       200:
+         *         description: overvoew fetched successfully
+         */
+        this.router.patch(
+            "/tenant/overview/:tenantId",
+            this.controller.getProductivityOverview
+        );
+
+        /**
+         * @swagger
          * /api/v1/sessions/reject/{id}/{supervisorId}:
          *   patch:
          *     summary: reject a single session

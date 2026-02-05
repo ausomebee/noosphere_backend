@@ -14,6 +14,14 @@ class AppointmentRepository {
         });
     }
 
+    async countTenantAppointments(id) {
+        return await this.model.count({
+            where: {
+                tenantId: id,
+            },
+        });
+    }
+
     async findAll(filter = {}) {
         return await this.model.findMany({
             where: filter,
