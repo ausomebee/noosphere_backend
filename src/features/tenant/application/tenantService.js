@@ -821,7 +821,7 @@ class TenantService {
             permissions: tenantStaff.role.access
         }
 
-        return { ...tenantStaff, token: this.token.generateToken(claims) };
+        return { ...tenantStaff, token: this.token.generateAccessToken(claims) };
     }
 
     async tenantAdminChoices(data) {
