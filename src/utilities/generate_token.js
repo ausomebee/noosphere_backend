@@ -2,8 +2,8 @@ import jwt from "jsonwebtoken";
 
 class TokenService {
     constructor() {
-        this.accessSecret = process.env.ACCESS_TOKEN_SECRET;
-        this.refreshSecret = process.env.REFRESH_TOKEN_SECRET;
+        this.accessSecret = process.env.ACCESS_TOKEN_SECRET || "hgsdjbsbhghdbbd";
+        this.refreshSecret = process.env.REFRESH_TOKEN_SECRET || "fghjbhsdbsdhjs";
 
         this.accessExpire = process.env.ACCESS_TOKEN_EXPIRE || "15m";
         this.refreshExpire = process.env.REFRESH_TOKEN_EXPIRE || "7d";
