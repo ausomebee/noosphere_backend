@@ -21,11 +21,12 @@ class ClientRequestedDocumentsRepository extends BaseRepository {
         }, {});
     }
 
-    async countAllRequestedDocumentsByDueDate() {
+    async countAllRequestedDocumentsByDueDate(clientTenantId) {
         const now = new Date();
 
         const overdueCount = await this.model.count({
             where: {
+                clientTenantId:clientTenantId,
                 dueDate: {
                     lt: now,
                 },
