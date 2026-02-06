@@ -153,7 +153,7 @@ class ClientFilesRoutes {
          */
         this.router.get(
             "/recent/:clientTenantId",
-            this.controller.findRecentFilesByTenant
+            this.controller.findRecentFilesByClientTenant
         );
 
         /**

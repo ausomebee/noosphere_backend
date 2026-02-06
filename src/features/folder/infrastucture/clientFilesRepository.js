@@ -12,19 +12,22 @@ class ClientFilesRepository extends BaseRepository {
         });
     }
 
-    async findRecentFilesByTenant(clientTenantId) {
+    async findRecentFilesByClientTenant(clientTenantId) {
+        console.log(clientTenantId)
         return await this.model.findMany({
             where: {
                 folder: {
-                    clientTenantId: clientTenantId
+                    clientTenantId: clientTenantId.clientTenantId
                 }
             },
             orderBy: {
                 createdAt: 'desc'
             },
-            take: 5
+            take: 5,
         });
     }
+
+
 
 }
 

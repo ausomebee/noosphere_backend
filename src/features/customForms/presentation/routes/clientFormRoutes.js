@@ -72,16 +72,21 @@ class ClientFormRoutes {
 
         /**
          * @swagger
-         * /api/v1/client-forms/count/status:
+         * /api/v1/client-forms/count/status/{tenantClientId}:
          *   get:
          *     summary: count client forms
          *     tags: [client-forms]
-         *    
+         *     parameters:
+         *       - in: path
+         *         name: tenantClientId
+         *         required: true
+         *         schema:
+         *           type: string
          *     responses:
          *       200:
          *         description: Forms counted successfully
          */
-        this.router.get("/count/status", this.controller.countAllClientFormsByStatus);
+        this.router.get("/count/status/:tenantClientId", this.controller.countAllClientFormsByStatus);
     }
 
     getRouter() {

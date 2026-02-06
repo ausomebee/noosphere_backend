@@ -47,8 +47,8 @@ class ClientFilesService {
         return updated;
     }
 
-    async findRecentFilesByTenant(id) {
-        const record = await this.clientFilesRepository.findRecentFilesByTenant({ id });
+    async findRecentFilesByClientTenant(clientTenantId) {
+        const record = await this.clientFilesRepository.findRecentFilesByClientTenant({ clientTenantId });
 
         if (!record) {
             throw new Error("Client File not found");

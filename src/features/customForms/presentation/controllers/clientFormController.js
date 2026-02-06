@@ -62,7 +62,7 @@ class ClientFormController {
     });
 
     countAllClientFormsByStatus = expressAsyncHandler(async (req, res) => {
-        const forms = await this.service.countAllClientFormsByStatus();
+        const forms = await this.service.countAllClientFormsByStatus(req.params.tenantClientId);
 
         return res.status(200).json({
             message: "forms counted successfully",

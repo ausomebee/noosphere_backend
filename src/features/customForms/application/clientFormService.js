@@ -37,8 +37,8 @@ class ClientFormService {
         return forms;
     }
 
-     async countAllClientFormsByStatus() {
-        const forms = await this.clientFormRepository.countAllClientFormsByStatus();
+     async countAllClientFormsByStatus( tenantClientId) {
+        const forms = await this.clientFormRepository.countAllClientFormsByStatus(tenantClientId);
 
         if (!forms) {
             throw new Error("Document not found");
