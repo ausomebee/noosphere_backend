@@ -69,6 +69,19 @@ class ClientFormRoutes {
          *         description: Forms fetched successfully
          */
         this.router.get("/:tenantClientId", this.controller.getClientForms);
+
+        /**
+         * @swagger
+         * /api/v1/client-forms/count/status:
+         *   get:
+         *     summary: count client forms
+         *     tags: [client-forms]
+         *    
+         *     responses:
+         *       200:
+         *         description: Forms counted successfully
+         */
+        this.router.get("/count/status", this.controller.countAllClientFormsByStatus);
     }
 
     getRouter() {

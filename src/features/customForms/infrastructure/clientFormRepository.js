@@ -11,6 +11,32 @@ class ClientFormRepository extends BaseRepository {
             include: populate
         });
     }
+
+    async countAllClientFormsByStatus() {
+        const result = await this.model.groupBy({
+            by: ["status"],
+            _count: { _all: true },
+        });
+
+        return result.reduce((acc, item) => {
+            acc[item.status] = item._count._all;
+            return acc;
+        }, {});
+    }
+
+    async countAllClientFormsByDueDate() {
+        const now = new Date();
+
+        const overdueCount = await this.model.count({
+            where: {
+                dueDate: {
+                    lt: now,
+                },
+            },
+        });
+
+        return overdueCount
+    }
 }
 
 export default ClientFormRepository;

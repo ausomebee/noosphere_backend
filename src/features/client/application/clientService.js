@@ -1,3 +1,4 @@
+import TokenService from "../../../utilities/generate_token.js";
 import ReferralCodeGenerator from "../../../utilities/generateCode.js";
 import MailService from "../../../utilities/nodemailer.js";
 import emailService from "../../../utilities/ses.js";
@@ -12,6 +13,7 @@ class ClientService {
         this.generateCode = generateCode;
         this.prisma = prisma;
         this.generateCode = new ReferralCodeGenerator(12)
+        this.token = TokenService;
     }
 
     async createClientCandidate(data, tenant) {
@@ -521,7 +523,11 @@ class ClientService {
             throw new Error('Incorrect password')
         }
 
-        return client;
+        const claims = {
+            id: client.tenantLinks.id,
+        }
+
+        return { ...client, accessToken: this.token.generateToken(claims), refreshToken: this.token.generateRefreshToken() };
     }
 }
 

@@ -72,6 +72,17 @@ enum ClinicalReportStatus {
   CHANGES_REQUESTED
 }
 
+enum TokenOwnerType {
+  ADMIN
+  STAFF
+  CLIENT
+}
+
+enum ClientFormStatus {
+  PENDING
+  FILLED
+}
+
 model Admin {
   id                    String   @id @default(uuid())
   fullName              String
@@ -89,7 +100,7 @@ model Admin {
   authQuestion          String?
   auth2FADone           Boolean  @default(false)
 
-  roles          Role            @relation(fields: [roleId], references: [id])
+  roles          Role           @relation(fields: [roleId], references: [id])
   pipelines      Pipeline[]
   departments    Department[]
   PipelineItem   PipelineItem[]
@@ -97,9 +108,8 @@ model Admin {
   logs           Logs[]
   BillingPlan    BillingPlan[]
   IssueComment   IssueComment[]
-  assignedIssues Issue[]         @relation("AssignedAdmin")
-  loggedIssues   Issue[]         @relation("LoggedByAdmin")
-  refreshTokens  RefreshTokens[]
+  assignedIssues Issue[]        @relation("AssignedAdmin")
+  loggedIssues   Issue[]        @relation("LoggedByAdmin")
 }
 
 model Auth {
@@ -142,19 +152,15 @@ model Role {
 }
 
 model RefreshTokens {
-  id          String   @id @default(uuid())
-  adminId     String?
-  staffId     String?
-  clientId    String?
+  id        String         @id @default(uuid())
+  ownerId   String
+  ownerType TokenOwnerType
+
   tokenHash   String
   fingerprint String
-  expires_at  DateTime
-  created_at  DateTime @default(now())
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
   used        Boolean  @default(false)
-
-  client Client?      @relation(fields: [clientId], references: [id])
-  staff  TenantStaff? @relation(fields: [staffId], references: [id])
-  admin  Admin?       @relation(fields: [adminId], references: [id])
 }
 
 model Tenant {
@@ -260,7 +266,6 @@ model TenantStaff {
   clinicalReportsApprover      ClinicalReport[]              @relation("ReportsApprover")
   clinicalReportHistories      ClinicalReportHistory[]
   clinicalReportChangeRequests ClinicalReportChangeRequest[] @relation("ReportsRequestApprover")
-  refreshTokens                RefreshTokens[]
 }
 
 model TenantStaffLicenses {
@@ -335,7 +340,6 @@ model Client {
   ClientProgram ClientProgram[]
   ClientTarget  ClientTarget[]
   Appointment   Appointment[]
-  refreshTokens RefreshTokens[]
 }
 
 model ClientTenant {
@@ -1169,11 +1173,13 @@ model ClientAuthorizationService {
 }
 
 model ClientForm {
-  id             String   @id @default(uuid())
+  id             String           @id @default(uuid())
   tenantClientId String
+  status         ClientFormStatus @default(PENDING)
+  dueDate        DateTime @default(now())
   formId         String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 
   client ClientTenant @relation(fields: [tenantClientId], references: [id])
   form   Forms        @relation(fields: [formId], references: [id])

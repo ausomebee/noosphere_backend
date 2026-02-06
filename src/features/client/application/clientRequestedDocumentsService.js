@@ -44,6 +44,22 @@ class ClientRequestedDocumentsService {
         return update;
     }
 
+    async countAllRequestedDocumentsByStatus(data) {
+        const request = await this.clientRequestedDocumentsRepository.countAllRequestedDocumentsByStatus();
+
+        if (!request) {
+            throw new Error("Document not found");
+        }
+
+        const overdue = await this.clientRequestedDocumentsRepository.countAllRequestedDocumentsByDueDate();
+
+        if (!overdue) {
+            throw new Error("Document not found");
+        }
+
+        return {request, overdue};
+    }
+
     async getSingleRequestedDocument(data) {
         const request = await this.clientRequestedDocumentsRepository.findOne({ id: data.id });
 

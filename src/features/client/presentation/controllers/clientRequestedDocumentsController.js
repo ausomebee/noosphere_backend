@@ -53,10 +53,43 @@ class ClientRequestedDocumentsController {
         try {
             const id = req.params.id;
 
-            const request = await this.clientRequestedDocumentsService.getSingleRequestedDocument({ id });
+            const request =
+                await this.clientRequestedDocumentsService.getSingleRequestedDocument({ id });
+
+            if (!request) {
+                return res.status(404).json({
+                    message: "Requested document not found",
+                });
+            }
+
+            const now = new Date();
+            const dueDate = new Date(request.dueDate);
+
+            const isOverdue =
+                request.status === "PENDING" && dueDate < now;
+
+            const updatedRequest = {
+                ...request,
+                status: isOverdue ? "OVERDUE" : request.status,
+            };
 
             return res.status(200).json({
                 message: "Requested document fetched successfully",
+                data: updatedRequest,
+            });
+        } catch (error) {
+            return res.status(404).json({
+                message: error.message || "Requested document not found",
+            });
+        }
+    }
+
+    async countAllRequestedDocumentsByStatus(req, res) {
+        try {
+            const request = await this.clientRequestedDocumentsService.countAllRequestedDocumentsByStatus();
+
+            return res.status(200).json({
+                message: "Requested documents counted successfully",
                 data: request,
             });
         } catch (error) {
@@ -70,11 +103,28 @@ class ClientRequestedDocumentsController {
         try {
             const tenantClientId = req.params.tenantClientId;
 
-            const requests = await this.clientRequestedDocumentsService.getRequestedDocuments(tenantClientId);
+            const requests =
+                await this.clientRequestedDocumentsService.getRequestedDocuments(
+                    tenantClientId
+                );
+
+            const now = new Date();
+
+            const updatedRequests = requests.map((doc) => {
+                const dueDate = new Date(doc.dueDate);
+
+                const isOverdue =
+                    doc.status === "PENDING" && dueDate < now;
+
+                return {
+                    ...doc,
+                    status: isOverdue ? "OVERDUE" : doc.status,
+                };
+            });
 
             return res.status(200).json({
                 message: "Requested documents fetched successfully",
-                data: requests,
+                data: updatedRequests,
             });
         } catch (error) {
             return res.status(404).json({
@@ -82,6 +132,7 @@ class ClientRequestedDocumentsController {
             });
         }
     }
+
 }
 
 export default ClientRequestedDocumentsController;
