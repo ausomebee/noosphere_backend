@@ -136,6 +136,28 @@ class ClientFilesRoutes {
 
         /**
          * @swagger
+         * /api/v1/client-files/recent/{clientTenantId}:
+         *   get:
+         *     summary: Get a recent client files
+         *     tags: [folder]
+         *     parameters:
+         *       - in: path
+         *         name: clientTenantId
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: Clienttenant ID
+         *     responses:
+         *       200:
+         *         description: Client files fetched successfully
+         */
+        this.router.get(
+            "/recent/:clientTenantId",
+            this.controller.findRecentFilesByTenant
+        );
+
+        /**
+         * @swagger
          * /api/v1/client-files/folder/{folderId}:
          *   get:
          *     summary: Get all client files in a given folder

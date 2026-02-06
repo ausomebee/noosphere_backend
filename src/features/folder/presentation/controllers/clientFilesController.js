@@ -46,6 +46,20 @@ class ClientFilesController {
         });
     });
 
+    findRecentFilesByTenant = expressAsyncHandler(async (req, res) => {
+        const record = await this.service.findRecentFilesByTenant(req.params.clientTenantId);
+
+        if (!record) {
+            return res.status(500).json({ message: "Failed to fetch client file" });
+        }
+
+        return res.status(200).json({
+            message: "Client file fetched successfully",
+            status: "ok",
+            data: record
+        });
+    });
+
     getSingleClientFile = expressAsyncHandler(async (req, res) => {
         const record = await this.service.getSingleClientFile(req.params.id);
 
