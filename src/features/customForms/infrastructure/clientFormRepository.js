@@ -24,11 +24,12 @@ class ClientFormRepository extends BaseRepository {
         }, {});
     }
 
-    async countAllClientFormsByDueDate() {
+    async countAllClientFormsByDueDate(tenantClientId) {
         const now = new Date();
 
         const overdueCount = await this.model.count({
             where: {
+                tenantClientId: tenantClientId,
                 dueDate: {
                     lt: now,
                 },

@@ -46,8 +46,8 @@ class ClientFilesController {
         });
     });
 
-    findRecentFilesByTenant = expressAsyncHandler(async (req, res) => {
-        const record = await this.service.findRecentFilesByTenant(req.params.clientTenantId);
+    findRecentFilesByClientTenant = expressAsyncHandler(async (req, res) => {
+        const record = await this.service.findRecentFilesByClientTenant(req.params.clientTenantId);
 
         if (!record) {
             return res.status(500).json({ message: "Failed to fetch client file" });
