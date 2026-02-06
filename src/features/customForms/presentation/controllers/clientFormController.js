@@ -31,18 +31,44 @@ class ClientFormController {
     });
 
     getClientForms = expressAsyncHandler(async (req, res) => {
-        const forms = await this.service.getAllClientForms(req.params.tenantClientId);
+        const forms =
+            await this.service.getAllClientForms(req.params.tenantClientId);
 
         if (!forms) {
-            return res.status(500).json({ message: "Failed to fetch client forms" });
+            return res.status(500).json({
+                message: "Failed to fetch client forms",
+            });
         }
 
+        const now = new Date();
+
+        const updatedForms = forms.map((form) => {
+            const isOverdue =
+                form.status === "PENDING" &&
+                form.dueDate &&
+                new Date(form.dueDate) < now;
+
+            return {
+                ...form,
+                status: isOverdue ? "OVERDUE" : form.status,
+            };
+        });
+
         return res.status(200).json({
-            message: "client forms fetched successfully",
+            message: "Client forms fetched successfully",
             status: "ok",
-            data: forms,
+            data: updatedForms,
         });
     });
+
+    countAllClientFormsByStatus = expressAsyncHandler(async (req, res) => {
+        const forms = await this.service.countAllClientFormsByStatus();
+
+        return res.status(200).json({
+            message: "forms counted successfully",
+            data: forms,
+        });
+    })
 }
 
 export default ClientFormController;

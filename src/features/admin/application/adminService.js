@@ -246,7 +246,7 @@ class AdminService {
             permissions: admin.roles.access
         }
 
-        return { ...admin, token: this.token.generateToken(claims) };
+        return { ...admin, accessToken: this.token.generateToken(claims), refreshToken: this.token.generateRefreshToken() };
     }
 
     async getSingleAdmin(data) {

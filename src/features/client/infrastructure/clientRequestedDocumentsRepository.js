@@ -9,8 +9,30 @@ class ClientRequestedDocumentsRepository extends BaseRepository {
         return tx.clientRequestedDocuments.create({ data });
     }
 
-    async countAllRequestedDocuments() {
-        return this.model.count();
+    async countAllRequestedDocumentsByStatus() {
+        const result = await this.model.groupBy({
+            by: ["status"],
+            _count: { _all: true },
+        });
+
+        return result.reduce((acc, item) => {
+            acc[item.status] = item._count._all;
+            return acc;
+        }, {});
+    }
+
+    async countAllRequestedDocumentsByDueDate() {
+        const now = new Date();
+
+        const overdueCount = await this.model.count({
+            where: {
+                dueDate: {
+                    lt: now,
+                },
+            },
+        });
+
+        return overdueCount
     }
 
     async findAllAndPopulate(query, populate) {

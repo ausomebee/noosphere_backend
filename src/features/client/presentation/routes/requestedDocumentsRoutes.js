@@ -128,6 +128,21 @@ class ClientRequestedDocumentsRoutes {
 
 		/**
 		 * @swagger
+		 * /api/v1/client-requested-documents/count/status:
+		 *   get:
+		 *     summary: count all documents for a client byu status
+		 *     tags: [client-requested-documents]
+		 *     responses:
+		 *       200:
+		 *         description: requested documents counted successfully
+		 */
+		this.router.get(
+			"/count/status",
+			this.controller.countAllRequestedDocumentsByStatus.bind(this.controller)
+		);
+
+		/**
+		 * @swagger
 		 * /api/v1/client-requested-documents/{id}:
 		 *   get:
 		 *     summary: Get single client requested document
