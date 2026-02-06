@@ -53,15 +53,49 @@ class ClientFolderService {
         return record;
     }
 
+    parseSizeToBytes(size) {
+        if (!size) return 0n;
+
+        const units = { B: 1n, KB: 1024n, MB: 1024n ** 2n, GB: 1024n ** 3n, TB: 1024n ** 4n };
+
+        if (typeof size === "number") return BigInt(size);
+
+        const str = size.toString().trim();
+        const regex = /^([\d.]+)\s*(B|KB|MB|GB|TB)$/i;
+        const match = str.match(regex);
+
+        if (!match) return 0n;
+
+        const value = parseFloat(match[1]);
+        const unit = match[2].toUpperCase();
+
+        return BigInt(Math.round(value * Number(units[unit])));
+    }
+
     async getClientFolders(clientTenantId) {
-        const records = await this.clientFolderRepository.findAll({ clientTenantId });
+        const records = await this.clientFolderRepository.findAllAndPopulate(
+            { clientTenantId },
+            { clientFiles: true }
+        );
 
         if (!records) {
             throw new Error("Client Folders not found");
         }
 
-        return records;
+        const foldersWithSize = records.map((folder) => {
+            const folderSize = folder.clientFiles.reduce((total, file) => {
+                return total + this.parseSizeToBytes(file.size);
+            }, 0n);
+
+            return {
+                ...folder,
+                folderSize: folderSize.toString(),
+            };
+        });
+
+        return foldersWithSize;
     }
+
 }
 
 export default ClientFolderService;

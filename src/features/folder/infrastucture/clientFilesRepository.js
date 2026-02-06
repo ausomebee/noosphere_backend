@@ -11,6 +11,21 @@ class ClientFilesRepository extends BaseRepository {
             include: populate
         });
     }
+
+    async findRecentFilesByTenant(clientTenantId) {
+        return await this.model.findMany({
+            where: {
+                folder: {
+                    clientTenantId: clientTenantId
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            },
+            take: 5
+        });
+    }
+
 }
 
 export default ClientFilesRepository;

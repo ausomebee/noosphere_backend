@@ -47,6 +47,16 @@ class ClientFilesService {
         return updated;
     }
 
+    async findRecentFilesByTenant(id) {
+        const record = await this.clientFilesRepository.findRecentFilesByTenant({ id });
+
+        if (!record) {
+            throw new Error("Client File not found");
+        }
+
+        return record;
+    }
+
     async getSingleClientFile(id) {
         const record = await this.clientFilesRepository.findOne({ id });
 
