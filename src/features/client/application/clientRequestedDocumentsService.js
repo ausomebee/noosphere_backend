@@ -44,8 +44,8 @@ class ClientRequestedDocumentsService {
         return update;
     }
 
-    async countAllRequestedDocumentsByStatus(data) {
-        const request = await this.clientRequestedDocumentsRepository.countAllRequestedDocumentsByStatus();
+    async countAllRequestedDocumentsByStatus(clientTenantId) {
+        const request = await this.clientRequestedDocumentsRepository.countAllRequestedDocumentsByStatus(clientTenantId);
 
         if (!request) {
             throw new Error("Document not found");

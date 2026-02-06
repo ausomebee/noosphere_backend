@@ -86,7 +86,7 @@ class ClientRequestedDocumentsController {
 
     async countAllRequestedDocumentsByStatus(req, res) {
         try {
-            const request = await this.clientRequestedDocumentsService.countAllRequestedDocumentsByStatus();
+            const request = await this.clientRequestedDocumentsService.countAllRequestedDocumentsByStatus(req.params.tenantClientId);
 
             return res.status(200).json({
                 message: "Requested documents counted successfully",
