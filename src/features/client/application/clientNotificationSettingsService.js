@@ -58,7 +58,20 @@ class ClientNotificationSettingsService {
         const record = await this.clientNotificationSettingsRepository.findByClientId(clientTenantId);
 
         if (!record) {
-            throw new Error("Notification settings not found for this client");
+            const newRecord = await this.clientNotificationSettingsRepository.create({
+                tenantClientId: clientTenantId,
+                reschedule: false,
+                starts: false,
+                completed: false,
+                awaitingReview: false,
+                approvedReschedule: false
+            });
+
+            if (!newRecord) {
+                throw new Error("Failed to create notification settings.");
+            }
+
+            return newRecord;
         }
 
         return record;
