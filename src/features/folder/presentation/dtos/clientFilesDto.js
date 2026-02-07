@@ -18,10 +18,13 @@ class ClientFilesDto {
                 .required(),
             folderId: Joi.string()
                 .uuid()
-                .required(),
+                .optional(),
             uploadedBy: Joi.string()
                 .uuid()
                 .optional(),
+            clientTenantId: Joi.string()
+                .uuid()
+                .required(),
         });
 
         Validator.validateRequest(req, next, schema);

@@ -370,6 +370,8 @@ model ClientTenant {
   clientFolders                ClientFolder[]
   clinicalReports              ClinicalReport[]
   clinicalReportChangeRequests ClinicalReportChangeRequest[]
+  clientFiles                  ClientFiles[]
+  clientNotificationSettings   clientNotificationSettings[]
 
   @@unique([clientId, tenantId])
 }
@@ -404,6 +406,18 @@ model ClientRequestedDocuments {
 
   tenantClient    ClientTenant      @relation(fields: [tenantClientId], references: [id])
   clientDocuments ClientDocuments[]
+}
+
+model clientNotificationSettings {
+  id                 String  @id @default(uuid())
+  tenantClientId     String
+  reschedule          Boolean
+  starts             Boolean
+  completed          Boolean
+  awaitingReview     Boolean
+  approvedReschedule Boolean
+
+  tenantClient ClientTenant @relation(fields: [tenantClientId], references: [id])
 }
 
 model Pipeline {
@@ -1176,7 +1190,6 @@ model ClientForm {
   id             String           @id @default(uuid())
   tenantClientId String
   status         ClientFormStatus @default(PENDING)
-  dueDate        DateTime @default(now())
   formId         String
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
@@ -1291,18 +1304,20 @@ model ClientFolder {
 }
 
 model ClientFiles {
-  id         String   @id @default(uuid())
-  name       String
-  url        String
-  size       String
-  uploadedBy String?
-  fileType   String
-  folderId   String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id             String   @id @default(uuid())
+  name           String
+  url            String
+  size           String
+  uploadedBy     String?
+  clientTenantId String
+  fileType       String
+  folderId       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  folder ClientFolder? @relation(fields: [folderId], references: [id])
-  staff  TenantStaff?  @relation(fields: [uploadedBy], references: [id])
+  clientTenant ClientTenant  @relation(fields: [clientTenantId], references: [id])
+  folder       ClientFolder? @relation(fields: [folderId], references: [id])
+  staff        TenantStaff?  @relation(fields: [uploadedBy], references: [id])
 }
 
 model ClinicalReportTemplates {

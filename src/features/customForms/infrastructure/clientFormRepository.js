@@ -24,20 +24,6 @@ class ClientFormRepository extends BaseRepository {
         }, {});
     }
 
-    async countAllClientFormsByDueDate(tenantClientId) {
-        const now = new Date();
-
-        const overdueCount = await this.model.count({
-            where: {
-                tenantClientId: tenantClientId,
-                dueDate: {
-                    lt: now,
-                },
-            },
-        });
-
-        return overdueCount
-    }
 }
 
 export default ClientFormRepository;

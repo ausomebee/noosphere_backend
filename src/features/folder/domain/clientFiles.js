@@ -7,6 +7,7 @@ class ClientFiles {
         uploadedBy,
         fileType,
         folderId,
+        clientTenantId,
         createdAt,
         updatedAt
     }) {
@@ -19,6 +20,7 @@ class ClientFiles {
         this.folderId = folderId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.clientTenantId = clientTenantId;
     }
 
     get createClientFile() {
@@ -28,7 +30,8 @@ class ClientFiles {
             size: this.size,
             uploadedBy: this.uploadedBy,
             fileType: this.fileType,
-            folderId: this.folderId
+            folderId: this.folderId,
+            clientTenantId: this.clientTenantId
         };
     }
 }

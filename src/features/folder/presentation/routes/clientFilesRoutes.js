@@ -13,7 +13,7 @@ import ClientFilesDto from "../dtos/clientFilesDto.js";
  *         - url
  *         - size
  *         - fileType
- *         - folderId
+ *         - clientTenantId
  *       properties:
  *         name:
  *           type: string
@@ -28,6 +28,9 @@ import ClientFilesDto from "../dtos/clientFilesDto.js";
  *         fileType:
  *           type: string
  *           example: "xlsx"
+ *         clientTenantId:
+ *           type: string
+ *           format: uuid
  *         folderId:
  *           type: string
  *           format: uuid

@@ -172,28 +172,6 @@ class FormFieldsRoutes {
 		 */
 		this.router.get("/:id", this.controller.getSingleFormField.bind(this.controller));
 
-		// /**
-		//  * @swagger
-		//  * /api/v1/form-fields/{id}/{active}:
-		//  *   patch:
-		//  *     summary: Deactivate or activate a form field
-		//  *     tags: [form-fields]
-		//  *     parameters:
-		//  *       - in: path
-		//  *         name: id
-		//  *         required: true
-		//  *         schema:
-		//  *           type: string
-		//  *       - in: path
-		//  *         name: active
-		//  *         required: true
-		//  *         schema:
-		//  *           type: boolean
-		//  *     responses:
-		//  *       200:
-		//  *         description: Form field status updated successfully
-		//  */
-		// this.router.patch("/:id/:active", this.controller.toggleFormFieldActiveStatus);
 	}
 
 	getRouter() {

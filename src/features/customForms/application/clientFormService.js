@@ -44,12 +44,6 @@ class ClientFormService {
             throw new Error("Document not found");
         }
 
-        const overdue = await this.clientFormRepository.countAllClientFormsByDueDate();
-
-        if (!overdue) {
-            throw new Error("Document not found");
-        }
-
         return forms;
     }
 }
