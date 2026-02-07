@@ -76,6 +76,7 @@ import clinicalReportHistoriesRoute from "./features/clinicalReport/presentation
 import clinicalReportRequestsRoute from "./features/clinicalReport/presentation/routes/reportRequestRoutes.js";
 import tenantGeneralSettingsRoute from "./features/tenant/presentation/routes/tenantGeneralSettingsRoutes.js";
 import tenantAdditionalSecurityQuestionsRoute from "./features/tenant/presentation/routes/tenantAdditionalSecurityQuestionsRoutes.js";
+import clientNotificationSettingsRoute from "./features/client/presentation/routes/clientNotificationSettingsRoutes.js";
 
 class App {
     constructor() {
@@ -194,6 +195,7 @@ class App {
         this.app.use("/api/v1/clinical-report-change-requests", clinicalReportRequestsRoute);
         this.app.use("/api/v1/tenant-security-questions", tenantAdditionalSecurityQuestionsRoute);
         this.app.use("/api/v1/tenant-general-settings", tenantGeneralSettingsRoute);
+        this.app.use("/api/v1/notification-settings", clientNotificationSettingsRoute);
     }
 
     initializeErrorHandler() {

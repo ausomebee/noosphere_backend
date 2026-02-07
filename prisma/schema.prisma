@@ -371,6 +371,7 @@ model ClientTenant {
   clinicalReports              ClinicalReport[]
   clinicalReportChangeRequests ClinicalReportChangeRequest[]
   clientFiles                  ClientFiles[]
+  clientNotificationSettings   clientNotificationSettings[]
 
   @@unique([clientId, tenantId])
 }
@@ -405,6 +406,18 @@ model ClientRequestedDocuments {
 
   tenantClient    ClientTenant      @relation(fields: [tenantClientId], references: [id])
   clientDocuments ClientDocuments[]
+}
+
+model clientNotificationSettings {
+  id                 String  @id @default(uuid())
+  tenantClientId     String
+  reschedule          Boolean
+  starts             Boolean
+  completed          Boolean
+  awaitingReview     Boolean
+  approvedReschedule Boolean
+
+  tenantClient ClientTenant @relation(fields: [tenantClientId], references: [id])
 }
 
 model Pipeline {
