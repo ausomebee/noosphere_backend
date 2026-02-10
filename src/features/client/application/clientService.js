@@ -388,6 +388,7 @@ class ClientService {
             firstName: data.firstName || client.firstName,
             lastName: data.lastName || client.lastName,
             preferredName: data.preferredName || client.preferredName,
+            avatarUrl: data.avatarUrl || client.avatarUrl,
             email: data.email || client.email,
             phoneNumber: data.phoneNumber || client.phoneNumber,
             DOB: data.DOB || client.DOB,
@@ -528,6 +529,29 @@ class ClientService {
         }
 
         return { ...client, accessToken: this.token.generateAccessToken(claims), refreshToken: this.token.generateRefreshToken() };
+    }
+
+    async updateClientPassword(data) {
+        const existingClient = await this.clientTenantRepository.findOne({ id: data.clientTenantId });
+
+        if (!existingClient.active) {
+            throw new Error("This client does not exist.");
+        }
+
+        if (!(await argon2.verify(existingClient.password, data.currentPassword))) {
+            throw new Error('Incorrect password')
+        }
+
+        const hashedPass = await argon2.hash(data.newPassword)
+        const updated = await this.clientTenantRepository.update(data.clientTenantId, {
+            password: hashedPass,
+        });
+
+        if (!updated) {
+            throw new Error("Failed to update password");
+        }
+
+        return updated;
     }
 }
 

@@ -190,6 +190,28 @@ class ClientDto {
         Validator.validateRequest(req, next, schema);
     };
 
+    static updatePasswordDto = (req, res, next) => {
+        const schema = Joi.object({
+            clientTenantId: Joi.string().uuid().required(),
+            newPassword: Joi.string()
+                .regex(strongPasswordRegex)
+                .required()
+                .messages({
+                    "string.empty": "Password is required",
+                    "string.pattern.base": stringPasswordError,
+                }),
+            currentPassword: Joi.string()
+                .regex(strongPasswordRegex)
+                .required()
+                .messages({
+                    "string.empty": "Password is required",
+                    "string.pattern.base": stringPasswordError,
+                })
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
     static updateClientDto = (req, res, next) => {
         const schema = Joi.object({
             id: Joi.string().uuid().required(),

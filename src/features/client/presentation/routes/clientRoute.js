@@ -274,6 +274,42 @@ import ClientDto from "../dto/clientDto.js";
  *           format: password
  *           example: "StrongP@ssw0rd!"
  *           description: Client account password
+ * 
+ *     UpdatePassword:
+ *       type: object
+ *       required:
+ *         - clientTenantId
+ *         - currentPassword
+ *         - newPassword
+ *       properties:
+ *         clientTenantId:
+ *           type: string
+ *           format: uuid
+ *         currentPassword:
+ *           type: string
+ *           format: password
+ *           example: "CurrentP@ssw0rd!"
+ *           description: Client current account password
+ *         newPassword:
+ *           type: string
+ *           format: password
+ *           example: "NewStr0ngP@ssw0rd!"
+ *           description: Client new account password
+ * 
+ *     UpdateAvatar:
+ *       type: object
+ *       required:
+ *         - clientId
+ *         - avatarUrl
+ *       properties:
+ *         clientId:
+ *           type: string
+ *           format: uuid
+ *         avatarUrl:
+ *           type: string
+ *           format: uri
+ *           example: "https://example.com/avatar.jpg"
+ *           description: URL of the client's new avatar image
  */
 
 class ClientRoutes {
@@ -467,6 +503,42 @@ class ClientRoutes {
          *         description: Email sent successfully
          */
         this.router.patch("/initiate/password-reset/:email", this.controller.initiatePasswordReset);
+
+         /**
+         * @swagger
+         * /api/v1/client/update-password:
+         *   patch:
+         *     summary: update client password
+         *     tags: [Clients]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdatePassword'
+         *     responses:
+         *       200:
+         *         description: Password updated successfully
+         */
+        this.router.patch("/update-password", ClientDto.updatePasswordDto, this.controller.updateClientPassword);
+
+        /**
+         * @swagger
+         * /api/v1/client/update-avatar:
+         *   patch:
+         *     summary: update client avatar
+         *     tags: [Clients]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateAvatar'
+         *     responses:
+         *       200:
+         *         description: Avatar updated successfully
+         */
+        this.router.patch("/update-avatar", this.controller.updateClientAvatar);
 
     }
 
