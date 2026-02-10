@@ -75,6 +75,37 @@ class ClientController {
         });
     });
 
+    updateClientPassword = expressAsyncHandler(async (req, res) => {
+        const client = await this.service.updateClientPassword(req.body);
+
+        if (!client) {
+            res.status(500).json({ message: 'Failed to update client password' });
+        }
+
+        return res.status(201).json({
+            message: "candidate password updated successfully",
+            status: 'ok',
+            data: client
+        });
+    });
+
+    updateClientAvatar = expressAsyncHandler(async (req, res) => {
+        const client = await this.service.updateClient({
+            id: req.body.clientId,
+            avatarUrl: req.body.avatarUrl
+        });
+
+        if (!client) {
+            res.status(500).json({ message: 'Failed to update client avatar' });
+        }
+
+        return res.status(201).json({
+            message: "candidate avatar updated successfully",
+            status: 'ok',
+            data: client
+        });
+    });
+
     getTenantClients = expressAsyncHandler(async (req, res) => {
         const clients = await this.service.getTenantClients(req.params.tenantId);
 

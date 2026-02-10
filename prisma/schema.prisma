@@ -100,7 +100,7 @@ model Admin {
   authQuestion          String?
   auth2FADone           Boolean  @default(false)
 
-  roles          Role           @relation(fields: [roleId], references: [id])
+  roles          Role            @relation(fields: [roleId], references: [id])
   pipelines      Pipeline[]
   departments    Department[]
   PipelineItem   PipelineItem[]
@@ -108,8 +108,9 @@ model Admin {
   logs           Logs[]
   BillingPlan    BillingPlan[]
   IssueComment   IssueComment[]
-  assignedIssues Issue[]        @relation("AssignedAdmin")
-  loggedIssues   Issue[]        @relation("LoggedByAdmin")
+  assignedIssues Issue[]         @relation("AssignedAdmin")
+  loggedIssues   Issue[]         @relation("LoggedByAdmin")
+  notifications  Notifications[]
 }
 
 model Auth {
@@ -266,6 +267,7 @@ model TenantStaff {
   clinicalReportsApprover      ClinicalReport[]              @relation("ReportsApprover")
   clinicalReportHistories      ClinicalReportHistory[]
   clinicalReportChangeRequests ClinicalReportChangeRequest[] @relation("ReportsRequestApprover")
+  notifications                Notifications[]
 }
 
 model TenantStaffLicenses {
@@ -309,6 +311,7 @@ model Client {
   lastName               String
   preferredName          String?
   email                  String    @unique
+  avatarUrl              String?
   phoneNumber            String    @unique
   DOB                    DateTime?
   gender                 String
@@ -372,6 +375,7 @@ model ClientTenant {
   clinicalReportChangeRequests ClinicalReportChangeRequest[]
   clientFiles                  ClientFiles[]
   clientNotificationSettings   clientNotificationSettings[]
+  notifications                Notifications[]
 
   @@unique([clientId, tenantId])
 }
@@ -411,7 +415,7 @@ model ClientRequestedDocuments {
 model clientNotificationSettings {
   id                 String  @id @default(uuid())
   tenantClientId     String
-  reschedule          Boolean
+  reschedule         Boolean
   starts             Boolean
   completed          Boolean
   awaitingReview     Boolean
@@ -1419,4 +1423,20 @@ model TenantAdditionalSecurityQuestions {
   updatedAt DateTime @updatedAt
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model Notifications {
+  id              String   @id @default(uuid())
+  tenantStaffId   String?
+  teanantClientId String?
+  adminId         String?
+  message         String
+  subject         String
+  isRead          Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenant TenantStaff?  @relation(fields: [tenantStaffId], references: [id])
+  client ClientTenant? @relation(fields: [teanantClientId], references: [id])
+  admin  Admin?        @relation(fields: [adminId], references: [id])
 }
