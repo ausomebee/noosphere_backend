@@ -25,7 +25,7 @@ class ClientFormService {
     }
 
     async updateClientForm(data) {
-        const existingForm = await this.clientFormRepository.findFirst({ formId: data.formId });
+        const existingForm = await this.clientFormRepository.findFirst({ formId: data.formId , tenantClientId: data.tenantClientId });
         if (!existingForm) {
             throw new Error("ClientForm not found");
         }

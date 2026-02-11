@@ -42,7 +42,7 @@ class FormResponseController {
             }
         }
 
-        const clientForm = await this.clientFormService.updateClientForm({ formId: data.formId, status: "FILLED" });
+        const clientForm = await this.clientFormService.updateClientForm({ formId: data.formId, tenantClientId: data.submittedBy, status: "FILLED" });
 
         return res.status(201).json({
             message: "Form response created successfully",
