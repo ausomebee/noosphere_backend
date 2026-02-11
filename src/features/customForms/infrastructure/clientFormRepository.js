@@ -12,10 +12,13 @@ class ClientFormRepository extends BaseRepository {
         });
     }
 
-    async countAllClientFormsByStatus() {
+    async countAllClientFormsByStatus(clientTenantId) {
         const result = await this.model.groupBy({
             by: ["status"],
             _count: { _all: true },
+            where: {
+                clientTenantId: clientTenantId
+            }
         });
 
         return result.reduce((acc, item) => {
