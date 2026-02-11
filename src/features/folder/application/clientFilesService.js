@@ -54,17 +54,51 @@ class ClientFilesService {
             throw new Error("Client File not found");
         }
 
-        return record;
+        const formattedRecords = record.map(file => {
+            let uploadedBy = null;
+
+            if (file.staff) {
+                uploadedBy = `${file.staff.firstName} ${file.staff.lastName}`;
+            } else if (file.clientTenant?.client) {
+                uploadedBy = `${file.clientTenant.client.firstName} ${file.clientTenant.client.lastName}`;
+            }
+
+            const { clientTenant, staff, ...rest } = file;
+
+            return {
+                ...rest,
+                uploadedBy
+            };
+        });
+
+        return formattedRecords;
     }
 
     async findFilesByClientTenant(clientTenantId) {
-        const record = await this.clientFilesRepository.findFilesByClientTenant({ clientTenantId });
+        const records = await this.clientFilesRepository.findFilesByClientTenant({ clientTenantId });
 
-        if (!record) {
-            throw new Error("Client File not found");
+        if (!records) {
+            throw new Error("Client Files not found");
         }
 
-        return record;
+        const formattedRecords = records.map(file => {
+            let uploadedBy = null;
+
+            if (file.staff) {
+                uploadedBy = `${file.staff.firstName} ${file.staff.lastName}`;
+            } else if (file.clientTenant?.client) {
+                uploadedBy = `${file.clientTenant.client.firstName} ${file.clientTenant.client.lastName}`;
+            }
+
+            const { clientTenant, staff, ...rest } = file;
+
+            return {
+                ...rest,
+                uploadedBy
+            };
+        });
+
+        return formattedRecords;
     }
 
     async getSingleClientFile(id) {
@@ -78,13 +112,30 @@ class ClientFilesService {
     }
 
     async getClientFiles(folderId) {
-        const records = await this.clientFilesRepository.findAll({ folderId });
+        const records = await this.clientFilesRepository.findFilesByFolder(folderId);
 
         if (!records) {
             throw new Error("Client Files not found");
         }
 
-        return records;
+        const formattedRecords = records.map(file => {
+            let uploadedBy = null;
+
+            if (file.staff) {
+                uploadedBy = `${file.staff.firstName} ${file.staff.lastName}`;
+            } else if (file.clientTenant?.client) {
+                uploadedBy = `${file.clientTenant.client.firstName} ${file.clientTenant.client.lastName}`;
+            }
+
+            const { clientTenant, staff, ...rest } = file;
+
+            return {
+                ...rest,
+                uploadedBy
+            };
+        });
+
+        return formattedRecords;
     }
 }
 
