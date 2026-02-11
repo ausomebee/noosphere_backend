@@ -26,39 +26,34 @@ class S3Service {
         },
       }),
       fileFilter: (req, file, cb) => {
-        // Allowed MIME types
-        const allowedTypes = [
-          // Images
+        const allowedMimes = [
           "image/jpeg",
           "image/png",
           "image/gif",
           "image/webp",
-          // PDFs
           "application/pdf",
-          // Word docs
           "application/msword",
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          // Excel / Spreadsheets
           "application/vnd.ms-excel",
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "text/csv",
-          // PowerPoint
           "application/vnd.ms-powerpoint",
           "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-          // Videos
           "video/mp4",
           "video/mpeg",
         ];
 
-        if (allowedTypes.includes(file.mimetype)) {
+        const allowedExtensions = [
+          ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".pdf", ".csv", ".jpeg", ".jpg", ".png", ".gif", ".webp", ".mp4", ".mpeg"
+        ];
+
+        const path = require("path");
+        const ext = path.extname(file.originalname).toLowerCase();
+
+        if (allowedMimes.includes(file.mimetype) || allowedExtensions.includes(ext)) {
           cb(null, true);
         } else {
-          cb(
-            new Error(
-              "Invalid file type. Allowed types: images, PDF, Word docs, Excel, CSV, PowerPoint, MP4, MPEG"
-            ),
-            false
-          );
+          cb(new Error("Invalid file type"), false);
         }
       },
       limits: { fileSize: 50 * 1024 * 1024 },
