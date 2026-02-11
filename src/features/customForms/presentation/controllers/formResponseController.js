@@ -6,10 +6,15 @@ import FormResponseFieldService from "../../application/formResponseFieldService
 import FormResponse from "../../domain/formResponse.js";
 import FormResponseField from "../../domain/formResponseField.js";
 import FormResponseService from "../../application/FormResponseService.js";
+import ClientFormRepository from "../../infrastructure/clientFormRepository.js";
+import ClientFormService from "../../application/clientFormService.js";
 
 class FormResponseController {
     constructor() {
         this.prisma = prismaService.getClient();
+
+        this.clientFormRepository = new ClientFormRepository(this.prisma.clientForm);
+        this.clientFormService = new ClientFormService({ clientFormRepository: this.clientFormRepository });
 
         const formResponseRepository = new FormResponsesRepository(this.prisma.formResponses);
         const formResponseFieldRepository = new FormResponseFieldsRepository(this.prisma.formResponseFields);
@@ -36,6 +41,8 @@ class FormResponseController {
                 return res.status(500).json({ message: "Failed to create form response field" });
             }
         }
+
+        const clientForm = await this.clientFormService.updateClientForm({ formId: data.formId, status: "FILLED" });
 
         return res.status(201).json({
             message: "Form response created successfully",

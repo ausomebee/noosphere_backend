@@ -24,6 +24,26 @@ class ClientFormService {
         return newClientForm;
     }
 
+    async updateClientForm(data) {
+        const existingForm = await this.clientFormRepository.findFirst({ formId: data.formId });
+        if (!existingForm) {
+            throw new Error("ClientForm not found");
+        }
+
+        const updatedForm = await this.clientFormRepository.update(existingForm.id, {
+            tenantClientId: data.tenantClientId || existingForm.tenantClientId,
+            formId: data.formId || existingForm.formId,
+            status: data.status || existingForm.status,
+            dueDate: data.dueDate || existingForm.dueDate,
+        });
+
+        if (!updatedForm) {
+            throw new Error("Failed to update ClientForm");
+        }
+
+        return updatedForm;
+    }
+
     async getAllClientForms(tenantClientId) {
         const forms = await this.clientFormRepository.findAllAndPopulate(
             { tenantClientId },
