@@ -51,7 +51,7 @@ class ClientRequestedDocumentsService {
             throw new Error("Document not found");
         }
 
-        const overdue = await this.clientRequestedDocumentsRepository.countAllRequestedDocumentsByDueDate();
+        const overdue = await this.clientRequestedDocumentsRepository.countAllRequestedDocumentsByDueDate(clientTenantId);
 
         if (!overdue) {
             throw new Error("Document not found");
