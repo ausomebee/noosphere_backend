@@ -13,11 +13,12 @@ class ClientFormRepository extends BaseRepository {
     }
 
     async countAllClientFormsByStatus(clientTenantId) {
+        console.log(clientTenantId)
         const result = await this.model.groupBy({
             by: ["status"],
             _count: { _all: true },
             where: {
-                clientTenantId: clientTenantId
+                tenantClientId: clientTenantId
             }
         });
 
