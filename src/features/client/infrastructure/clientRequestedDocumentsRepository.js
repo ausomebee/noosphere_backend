@@ -14,7 +14,7 @@ class ClientRequestedDocumentsRepository extends BaseRepository {
             by: ["status"],
             _count: { _all: true },
             where: {
-                clientTenantId: clientTenantId
+                tenantClientId: clientTenantId
             }
         });
 
