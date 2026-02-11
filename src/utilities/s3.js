@@ -1,6 +1,7 @@
 import { S3Client, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import multer from "multer";
 import multerS3 from "multer-s3";
+import path from "path"; // Use ES6 import for path
 
 class S3Service {
   constructor() {
@@ -26,37 +27,35 @@ class S3Service {
         },
       }),
       fileFilter: (req, file, cb) => {
+        // MIME types for images, PDFs, videos
         const allowedMimes = [
           "image/jpeg",
           "image/png",
           "image/gif",
           "image/webp",
           "application/pdf",
-          "application/msword",
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          "application/vnd.ms-excel",
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          "text/csv",
-          "application/vnd.ms-powerpoint",
-          "application/vnd.openxmlformats-officedocument.presentationml.presentation",
           "video/mp4",
           "video/mpeg",
         ];
 
+        // Extensions for documents
         const allowedExtensions = [
-          ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".pdf", ".csv", ".jpeg", ".jpg", ".png", ".gif", ".webp", ".mp4", ".mpeg"
+          ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".pdf", ".csv",
+          ".jpeg", ".jpg", ".png", ".gif", ".webp", ".mp4", ".mpeg"
         ];
 
-        const path = require("path");
         const ext = path.extname(file.originalname).toLowerCase();
 
+        // Accept if MIME is allowed OR extension is allowed (handles browsers sending weird MIME types)
         if (allowedMimes.includes(file.mimetype) || allowedExtensions.includes(ext)) {
           cb(null, true);
         } else {
-          cb(new Error("Invalid file type"), false);
+          cb(new Error(
+            "Invalid file type. Allowed: images, PDF, Word, Excel, PowerPoint, CSV, MP4/MPEG videos"
+          ), false);
         }
       },
-      limits: { fileSize: 50 * 1024 * 1024 },
+      limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB max
     });
   }
 
