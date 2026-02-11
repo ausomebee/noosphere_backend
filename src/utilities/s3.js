@@ -24,7 +24,31 @@ class S3Service {
         key: (req, file, cb) => {
           cb(null, `${Date.now()}-${file.originalname}`);
         },
-      })
+      }),
+      fileFilter: (req, file, cb) => {
+        // Allowed MIME types
+        const allowedTypes = [
+          "image/jpeg",
+          "image/png",
+          "image/gif",
+          "application/pdf",
+          "application/msword",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "video/mp4",
+        ];
+
+        if (allowedTypes.includes(file.mimetype)) {
+          cb(null, true);
+        } else {
+          cb(
+            new Error(
+              "Invalid file type. Allowed types: images, PDF, Word docs, MP4 videos"
+            ),
+            false
+          );
+        }
+      },
+      limits: { fileSize: 20 * 1024 * 1024 }, // Optional: 20 MB max size
     });
   }
 
