@@ -15,9 +15,15 @@ class ClientFilesRepository extends BaseRepository {
     async findRecentFilesByClientTenant(clientTenantId) {
         return await this.model.findMany({
             where: {
-                folder: {
-                    clientTenantId: clientTenantId.clientTenantId
-                }
+                clientTenantId: clientTenantId.clientTenantId
+            },
+            include: {
+                clientTenant: {
+                    select: {
+                        client: { select: { firstName: true, lastName: true } }
+                    }
+                },
+                staff: { select: { fullName: true } }
             },
             orderBy: {
                 createdAt: 'desc'
@@ -26,12 +32,39 @@ class ClientFilesRepository extends BaseRepository {
         });
     }
 
-    async findFilesByClientTenant(clientTenantId) {
+    async findFilesByFolder(folderId) {
         return await this.model.findMany({
             where: {
                 folder: {
-                    clientTenantId: clientTenantId.clientTenantId
+                    folderId: folderId.folderId
                 }
+            },
+            include: {
+                clientTenant: {
+                    select: {
+                        client: { select: { firstName: true, lastName: true } }
+                    }
+                },
+                staff: { select: { fullName: true } }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            },
+        });
+    }
+
+    async findFilesByClientTenant(clientTenantId) {
+        return await this.model.findMany({
+            where: {
+                clientTenantId: clientTenantId.clientTenantId
+            },
+            include: {
+                clientTenant: {
+                    select: {
+                        client: { select: { firstName: true, lastName: true } }
+                    }
+                },
+                staff: { select: { fullName: true } }
             },
             orderBy: {
                 createdAt: 'desc'
