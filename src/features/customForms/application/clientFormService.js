@@ -37,15 +37,11 @@ class ClientFormService {
         return forms;
     }
 
-     async countAllClientFormsByStatus( tenantClientId) {
-        const forms = await this.clientFormRepository.countAllClientFormsByStatus(tenantClientId);
-
-        if (!forms) {
-            throw new Error("Document not found");
-        }
-
-        return forms;
+    async countAllClientFormsByStatus(tenantClientId) {
+        return await this.clientFormRepository
+            .countAllClientFormsByStatus(tenantClientId);
     }
+
 }
 
 export default ClientFormService;

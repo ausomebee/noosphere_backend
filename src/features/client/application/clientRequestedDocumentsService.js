@@ -45,19 +45,18 @@ class ClientRequestedDocumentsService {
     }
 
     async countAllRequestedDocumentsByStatus(clientTenantId) {
-        const request = await this.clientRequestedDocumentsRepository.countAllRequestedDocumentsByStatus(clientTenantId);
+        const request =
+            await this.clientRequestedDocumentsRepository
+                .countAllRequestedDocumentsByStatus(clientTenantId);
 
-        if (!request) {
-            throw new Error("Document not found");
-        }
+        const overdue =
+            await this.clientRequestedDocumentsRepository
+                .countAllRequestedDocumentsByDueDate(clientTenantId);
 
-        const overdue = await this.clientRequestedDocumentsRepository.countAllRequestedDocumentsByDueDate(clientTenantId);
-
-        if (!overdue) {
-            throw new Error("Document not found");
-        }
-
-        return {request, overdue};
+        return {
+            request: request || {},
+            overdue: overdue || 0
+        };
     }
 
     async getSingleRequestedDocument(data) {
@@ -71,7 +70,7 @@ class ClientRequestedDocumentsService {
     }
 
     async getRequestedDocuments(tenantClientId) {
-        const requests = await this.clientRequestedDocumentsRepository.findAllAndPopulate({ tenantClientId }, {clientDocuments: true});
+        const requests = await this.clientRequestedDocumentsRepository.findAllAndPopulate({ tenantClientId }, { clientDocuments: true });
 
         if (!requests) {
             throw new Error("Requested Documents not found");
