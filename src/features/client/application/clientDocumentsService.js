@@ -53,7 +53,7 @@ class ClientDocumentsService {
     }
 
     async getClientDocuments(tenantClientId) {
-        const documents = await this.clientDocumentsRepository.findAllAndPopulate({ tenantClientId }, {
+        const documents = await this.clientDocumentsRepository.findAllAndPopulate({ tenantClientId, requestId: null }, {
             tenantStaff: {
                 select: {
                     id: true,
