@@ -24,7 +24,7 @@ class TenantController {
         this.choiceRepository = new ChoiceRepository(this.prisma.tenantAdminChoices);
         this.authRepository = new AuthRepository(this.prisma.auth);
         this.generateCode = new ReferralCodeGenerator(12);
-        this.token = new TokenService()
+        this.token = TokenService;
         this.service = new TenantService({
             tenantRepository: this.tenantRepository,
             prisma: this.prisma,
