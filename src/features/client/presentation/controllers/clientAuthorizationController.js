@@ -161,6 +161,23 @@ class ClientAuthorizationController {
         }
     }
 
+    async getClientAuthorizationChart(req, res) {
+        try {
+            const tenantClientId = req.params.tenantClientId;
+
+            const auths = await this.clientAuthorizationServiceService.getClientAuthorizationChart(tenantClientId);
+
+            return res.status(200).json({
+                message: "Client authorization services fetched successfully",
+                data: auths,
+            });
+        } catch (error) {
+            return res.status(404).json({
+                message: error.message || "Client authorization services not found",
+            });
+        }
+    }
+
     async getClientAuthorizationsSummary(req, res) {
         try {
             const tenantId = req.params.tenantId;
