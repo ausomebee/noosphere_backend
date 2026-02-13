@@ -237,6 +237,52 @@ class SessionRoutes {
 
         /**
          * @swagger
+         * /api/v1/sessions/client/{clientId}:
+         *   get:
+         *     summary: Get client sessions
+         *     tags: [sessions]
+         *     parameters:
+         *       - in: path
+         *         name: clientId
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         required: true
+         *         description: Client ID
+         *     responses:
+         *       200:
+         *         description: Session data fetched successfully
+         */
+        this.router.get(
+            "/client/:clientId",
+            this.controller.getClientSessions
+        );
+
+        /**
+         * @swagger
+         * /api/v1/sessions/client/awaiting-feedback/{clientId}:
+         *   get:
+         *     summary: Get client sessions awaiting feedback
+         *     tags: [sessions]
+         *     parameters:
+         *       - in: path
+         *         name: clientId
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         required: true
+         *         description: Client ID
+         *     responses:
+         *       200:
+         *         description: Session data fetched successfully
+         */
+        this.router.get(
+            "/client/awaiting-feedback/:clientId",
+            this.controller.getSessionsAwaitingApproval
+        );
+
+        /**
+         * @swagger
          * /api/v1/sessions/tenant/overview/{tenantId}:
          *   get:
          *     summary: tenant sessions overview
@@ -330,29 +376,29 @@ class SessionRoutes {
             this.controller.getClaims
         );
 
-         /**
-         * @swagger
-         * /api/v1/sessions/client-approval/{tenantId}/{clientId}:
-         *   get:
-         *     summary: Get all sessions awaition approval for a given clientId
-         *     tags: [sessions]
-         *     parameters:
-         *       - in: path
-         *         name: tenantId
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: tenant ID (foreign key)
-         *       - in: path
-         *         name: clientId
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: client ID (foreign key)
-         *     responses:
-         *       200:
-         *         description: claims fetched successfully
-         */
+        /**
+        * @swagger
+        * /api/v1/sessions/client-approval/{tenantId}/{clientId}:
+        *   get:
+        *     summary: Get all sessions awaition approval for a given clientId
+        *     tags: [sessions]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         schema:
+        *           type: string
+        *         required: true
+        *         description: tenant ID (foreign key)
+        *       - in: path
+        *         name: clientId
+        *         schema:
+        *           type: string
+        *         required: true
+        *         description: client ID (foreign key)
+        *     responses:
+        *       200:
+        *         description: claims fetched successfully
+        */
         this.router.get(
             "/client-approval/:tenantId/:clientId",
             this.controller.getClientAwaitingApproval

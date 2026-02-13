@@ -105,6 +105,40 @@ class SessionService {
         return sessions;
     }
 
+    async getSessionsAwaitingApproval(clientId) {
+        const sessions = await this.sessionRepository.findAllAndPopulate({ appointment: { clientId: clientId }, supervisorApprovalStatus: "APPROVED", clientApprovalStatus: "PENDING" }, {
+            id: true,
+            appointment: {
+                select: {
+                    client: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                            preferredName: true
+                        }
+                    },
+                    session: { select: { name: true } },
+                    clinicians: {
+                        select: {
+                            fullName: true,
+                        },
+                    }
+                },
+            },
+            clientApprovalStatus: true,
+            supervisorApprovalStatus: true,
+            startTime: true,
+            endTime: true,
+            createdAt: true
+        });
+
+        if (!sessions) {
+            throw new Error("Sessions not found");
+        }
+
+        return sessions;
+    }
+
     async getClaims(tenantId) {
         const sessions = await this.sessionRepository.findAllAndPopulate({ appointment: { tenantId: tenantId }, supervisorApprovalStatus: "APPROVED" }, {
             id: true,
@@ -169,6 +203,16 @@ class SessionService {
             clientId: id,
             groupBy,
         });
+
+        if (!session) {
+            throw new Error("Sessions not found");
+        }
+
+        return session;
+    }
+
+    async getClientSessions(clientId) {
+        const session = await this.sessionRepository.getClientSessions(clientId);
 
         if (!session) {
             throw new Error("Sessions not found");

@@ -106,6 +106,32 @@ class SessionRepository extends BaseRepository {
         return this.prisma.$queryRawUnsafe(query, clientId);
     }
 
+    async getClientSessions(clientId) {
+        return await this.model.findMany({
+            where: { appointment: { clientId } },
+            include: {
+                appointment: {
+                    include: {
+                        client: true,
+                        clinicians: true,
+                        session: true
+                    }
+                },
+                approver: true,
+                sessionDatas: true,
+                sessionApprovals: true,
+                timesheetHistories: { include: { staff: { select: { fullName: true } } } },
+                authorizationsUsed: {
+                    include: {
+                        clientAuthorizationServices: {
+                            include: { serviceCode: true }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     async getTargetPerformanceGraphData(targetId, clientId) {
         // Get all sessions for the client with the specific target data
         const sessions = await this.model.findMany({
