@@ -8,14 +8,15 @@ import SessionRepository from "../../infrastructure/sessionRepository.js";
 import SessionService from "../../application/sessionService.js";
 import TimesheetHistoryRepository from "../../infrastructure/timesheetHistoryRepository.js";
 import TimesheetHistoryService from "../../application/timesheetHistoryService.js";
+import TimesheetHistory from "../../domain/timesheetHistory.js";
 
 class SessionApprovalController {
     constructor() {
         this.prisma = prismaService.getClient();
         this.repository = new SessionApprovalRepository(this.prisma.sessionApproval);
         this.service = new SessionApprovalService({ sessionApprovalRepository: this.repository });
-        const sessionRepository = new SessionRepository(this.prisma.session);
-        this.sessionService = new SessionService({ sessionRepository });
+        this.sessionRepository = new SessionRepository(this.prisma);
+        this.sessionService = new SessionService({ sessionRepository: this.sessionRepository });
         this.historyRepository = new TimesheetHistoryRepository(this.prisma.timesheetHistory);
         this.historyService = new TimesheetHistoryService({ timesheetHistoryRepository: this.historyRepository });
     }
@@ -42,6 +43,7 @@ class SessionApprovalController {
             details: "Session approved successfully",
             createdBy: data.createdBy
         });
+
         const newHistory = await this.historyService.createTimesheetHistory(historyData.createTimesheetHistory);
 
         if (!newHistory) {
