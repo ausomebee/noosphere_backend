@@ -906,30 +906,32 @@ model SessionTypeService {
 }
 
 model Appointment {
-  id                 String    @id @default(uuid())
-  clientId           String
-  tenantId           String
-  sessionId          String
-  date               String
-  isRecurring        Boolean
-  startTime          String
-  endTime            String
-  recurrence         Json
-  isBillable         Boolean
-  serviceLocation    String
-  requiresTravel     Boolean
-  colourCode         String
-  relatedAppointment String?
-  isCanceled         Boolean   @default(false)
-  reasonForCancel    String?
-  rescheduled        Boolean   @default(false)
-  rescheduleAccepted Boolean   @default(false)
-  rescheduleRejected Boolean   @default(false)
-  canceledBy         String?
-  cancelTime         DateTime?
-  previousDate       String?
-  previousStartTime  String?
-  previousEndTime    String?
+  id                       String    @id @default(uuid())
+  clientId                 String
+  tenantId                 String
+  sessionId                String
+  date                     String
+  isRecurring              Boolean
+  startTime                String
+  endTime                  String
+  recurrence               Json
+  isBillable               Boolean
+  serviceLocation          String
+  requiresTravel           Boolean
+  colourCode               String
+  relatedAppointment       String?
+  isCanceled               Boolean   @default(false)
+  reasonForCancel          String?
+  rescheduled              Boolean   @default(false)
+  rescheduleAccepted       Boolean   @default(false)
+  rescheduleRejected       Boolean   @default(false)
+  clientRescheduleAccepted Boolean   @default(false)
+  clientRescheduleRejected Boolean   @default(false)
+  canceledBy               String?
+  cancelTime               DateTime?
+  previousDate             String?
+  previousStartTime        String?
+  previousEndTime          String?
 
   client              Client                   @relation(fields: [clientId], references: [id])
   tenant              Tenant                   @relation(fields: [tenantId], references: [id])

@@ -482,7 +482,7 @@ class AppointmentService {
     }
 
     async getClientRescheduledAppointments(clientId) {
-        const appointments = await this.appointmentRepository.findAllAndPopulate({ clientId, rescheduled: true }, {
+        const appointments = await this.appointmentRepository.findAllAndPopulate({ clientId, rescheduled: true, clientRescheduleAccepted: false, clientRescheduleRejected: false }, {
             client: {
                 select: {
                     id: true,
