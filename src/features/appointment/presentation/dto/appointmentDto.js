@@ -95,6 +95,7 @@ class AppointmentDto {
             relatedAppointment: Joi.string().uuid().allow(null),
             isCanceled: Joi.boolean(),
             reasonForCancel: Joi.string().allow(null, ''),
+            reasonForReschedule: Joi.string().allow(null, ''),
             rescheduled: Joi.boolean(),
             rescheduleAccepted: Joi.boolean(),
             forAll: Joi.boolean().default(false),

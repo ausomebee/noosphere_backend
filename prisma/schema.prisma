@@ -922,6 +922,7 @@ model Appointment {
   relatedAppointment       String?
   isCanceled               Boolean   @default(false)
   reasonForCancel          String?
+  reasonForReschedule      String?
   rescheduled              Boolean   @default(false)
   rescheduleAccepted       Boolean   @default(false)
   rescheduleRejected       Boolean   @default(false)

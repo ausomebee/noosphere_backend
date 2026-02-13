@@ -145,6 +145,10 @@ import AppointmentController from "../controllers/appointmentController.js";
  *           type: string
  *           description: Reason for cancellation
  *           example: "Client unavailable"
+ *         reasonForReschedule:
+ *           type: string
+ *           description: Reason for cancellation
+ *           example: "Client unavailable"
  *         rescheduled:
  *           type: boolean
  *           description: Indicates if the appointment has been rescheduled
