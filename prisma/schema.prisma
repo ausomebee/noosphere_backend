@@ -1279,7 +1279,7 @@ model TimesheetHistory {
   sessionId String
   action    String
   details   String?
-  createdBy String
+  createdBy String?
   createdAt DateTime @default(now())
 
   staff   TenantStaff? @relation(fields: [createdBy], references: [id])
