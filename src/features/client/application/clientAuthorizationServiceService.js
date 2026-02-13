@@ -101,6 +101,45 @@ class ClientAuthorizationServiceService {
 
         return record;
     }
+
+    async getClientAuthorizationChart(tenantClientId) {
+        const services = await this.clientAuthorizationServiceRepository.findAllAndPopulate({ clientAuthorization: { tenantClientId, isDeleted: false } }, { serviceCode: true });
+
+        if (!services) {
+            throw new Error("Client Authorizations not found");
+        }
+
+        const aggregatedMap = new Map();
+
+        services.forEach((item) => {
+            const {
+                serviceCodeId,
+                units,
+                usedUnit,
+                serviceCode: { code, description },
+            } = item;
+
+            if (!aggregatedMap.has(serviceCodeId)) {
+                aggregatedMap.set(serviceCodeId, {
+                    serviceCodeId,
+                    code,
+                    description,
+                    totalUnits: 0,
+                    totalUsed: 0,
+                    totalRemaining: 0,
+                });
+            }
+
+            const existing = aggregatedMap.get(serviceCodeId);
+
+            existing.totalUnits += units || 0;
+            existing.totalUsed += usedUnit || 0;
+            existing.totalRemaining = existing.totalUnits - existing.totalUsed;
+        });
+
+        return Array.from(aggregatedMap.values());
+    }
+
 }
 
 export default ClientAuthorizationServiceService;
