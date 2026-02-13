@@ -444,7 +444,7 @@ class AppointmentRoutes {
         /**
         * @swagger
         * /api/v1/appointments/reschedule:
-        *   post:
+        *   patch:
         *     summary: reschedule appointment
         *     tags: [appointments]
         *     requestBody:
@@ -452,7 +452,7 @@ class AppointmentRoutes {
         *       content:
         *         application/json:
         *           schema:
-        *             $ref: '#/components/schemas/AppointmentCreateDto'
+        *             $ref: '#/components/schemas/AppointmentUpdateDto'
         *     responses:
         *       200:
         *         description: Appointment updated successfully
@@ -461,7 +461,7 @@ class AppointmentRoutes {
         *       404:
         *         description: Appointment not found
         */
-        this.router.post("/reschedule", AppointmentDto.createAppointmentDto, this.controller.createAppointment);
+        this.router.patch("/reschedule", AppointmentDto.updateAppointmentDto, this.controller.updateAppointment);
 
         /**
         * @swagger
