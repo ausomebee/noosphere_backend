@@ -106,7 +106,7 @@ class SessionService {
     }
 
     async getSessionsAwaitingApproval(clientId) {
-        const sessions = await this.sessionRepository.findAllAndPopulate({ appointment: { clientId: clientId }, supervisorApprovalStatus: "APPROVED", clientApprovalStatus: "PENDING" }, {
+        const sessions = await this.sessionRepository.findAllAndPopulate({ appointment: { clientId: clientId }, clientApprovalStatus: "PENDING" }, {
             id: true,
             appointment: {
                 select: {
