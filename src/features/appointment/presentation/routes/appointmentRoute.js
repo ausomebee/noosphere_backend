@@ -583,7 +583,7 @@ class AppointmentRoutes {
         * @swagger
         * /api/v1/appointments/client/rescheduled/{clientId}:
         *   get:
-        *     summary: get client rescheduled appointments
+        *     summary: get client rescheduled appointments request
         *     tags: [appointments]
         *     parameters:
         *       - in: path
