@@ -192,6 +192,26 @@ class AppointmentService {
         return result;
     }
 
+    async getClientUpcomingAppointments(clientId) {
+        const appointments = await this.appointmentRepository.getUpcomingAppointments(clientId);
+
+        if (!appointments || appointments.length === 0) {
+            return [];
+        }
+
+        return appointments;
+    }
+
+    async getClientPastAppointments(clientId) {
+        const appointments = await this.appointmentRepository.getPastAppointments(clientId);
+
+        if (!appointments || appointments.length === 0) {
+            return [];
+        }
+
+        return appointments;
+    }
+
     async getStaffAppointments(staffId) {
         const appointments = await this.appointmentRepository.findAllAndPopulate(
             {
@@ -461,6 +481,35 @@ class AppointmentService {
         return appointments;
     }
 
+    async getClientRescheduledAppointments(clientId) {
+        const appointments = await this.appointmentRepository.findAllAndPopulate({ clientId, rescheduled: true }, {
+            client: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    preferredName: true,
+                    email: true,
+                },
+            },
+            session: true,
+            appointmentServices: { include: { serviceCode: true } },
+            clinicians: {
+                select: {
+                    id: true,
+                    fullName: true,
+                    email: true,
+                }
+            }
+        });
+
+        if (!appointments) {
+            throw new Error("Failed to fetch Appointment");
+        }
+
+        return appointments;
+    }
+
     async getStaffCanceledAppointments(staffId) {
         const appointments = await this.appointmentRepository.findAllAndPopulate({
             clinicians: {
@@ -656,33 +705,33 @@ class AppointmentService {
             });
     }
 
-    async getClientUpcomingAppointments(clientId) {
-        const now = new Date();
+    // async getClientUpcomingAppointments(clientId) {
+    //     const now = new Date();
 
-        const allAppointments = await this.appointmentRepository.findAllAndPopulate(
-            { isCanceled: false, clientId },
-            {
-                client: {
-                    select: {
-                        id: true, firstName: true,
-                        lastName: true,
-                        preferredName: true, email: true
-                    }
-                },
-                session: true,
-                appointmentServices: { include: { serviceCode: true } },
-                clinicians: { select: { id: true, fullName: true, email: true } }
-            }
-        );
+    //     const allAppointments = await this.appointmentRepository.findAllAndPopulate(
+    //         { isCanceled: false, clientId },
+    //         {
+    //             client: {
+    //                 select: {
+    //                     id: true, firstName: true,
+    //                     lastName: true,
+    //                     preferredName: true, email: true
+    //                 }
+    //             },
+    //             session: true,
+    //             appointmentServices: { include: { serviceCode: true } },
+    //             clinicians: { select: { id: true, fullName: true, email: true } }
+    //         }
+    //     );
 
-        return allAppointments
-            .filter(appt => this.isUpcoming(appt, now))
-            .sort((a, b) => {
-                const aDate = new Date(`${a.date}T${a.startTime}:00`);
-                const bDate = new Date(`${b.date}T${b.startTime}:00`);
-                return aDate - bDate;
-            });
-    }
+    //     return allAppointments
+    //         .filter(appt => this.isUpcoming(appt, now))
+    //         .sort((a, b) => {
+    //             const aDate = new Date(`${a.date}T${a.startTime}:00`);
+    //             const bDate = new Date(`${b.date}T${b.startTime}:00`);
+    //             return aDate - bDate;
+    //         });
+    // }
 
     async getClientPastAppointments(clientId) {
         const now = new Date();

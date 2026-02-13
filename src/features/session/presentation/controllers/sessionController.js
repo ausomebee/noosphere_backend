@@ -301,6 +301,36 @@ class SessionController {
         });
     });
 
+    getClientSessions = expressAsyncHandler(async (req, res) => {
+        const sessions = await this.sessionService.getClientSessions(req.params.clientId);
+
+        if (!sessions) {
+            return res.status(404).json({ message: "No sessions found" });
+        }
+
+        const formatted = sessions.map((s) => {
+            const totalHours =
+                (new Date(s.endTime) - new Date(s.startTime)) / (1000 * 60 * 60);
+
+            return {
+                id: s.id,
+                clientName: `${s.appointment.client.firstName} ${s.appointment.client.lastName}`,
+                sessionTypeName: s.appointment.session.name,
+                clinician: s.appointment.clinicians?.map(c => c.fullName).join(", "),
+                clientApprovalStatus: s.clientApprovalStatus,
+                supervisorApprovalStatus: s.supervisorApprovalStatus,
+                totalHours,
+                date: s.createdAt
+            };
+        });
+
+        return res.status(200).json({
+            message: "Sessions fetched successfully",
+            status: "ok",
+            data: formatted,
+        });
+    });
+
     approveSession = expressAsyncHandler(async (req, res) => {
         const session = await this.sessionService.getSingleSession(req.params.id);
 
@@ -444,6 +474,20 @@ class SessionController {
 
         return res.status(200).json({
             message: "overview data fetched successfully",
+            status: "ok",
+            data: overview,
+        });
+    });
+
+    getSessionsAwaitingApproval = expressAsyncHandler(async (req, res) => {
+        const overview = await this.sessionService.getSessionsAwaitingApproval(req.params.clientId);
+
+        if (!overview) {
+            return res.status(404).json({ message: "failed to fetch awaiting feedback" });
+        }
+
+        return res.status(200).json({
+            message: "awaiting feedback fetched successfully",
             status: "ok",
             data: overview,
         });
