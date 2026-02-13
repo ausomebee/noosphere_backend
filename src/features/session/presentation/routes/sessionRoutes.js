@@ -207,6 +207,36 @@ class SessionRoutes {
 
         /**
          * @swagger
+         * /api/v1/sessions/performance/{targetId}/{clientId}:
+         *   get:
+         *     summary: Get client performance graph
+         *     tags: [sessions]
+         *     parameters:
+         *       - in: path
+         *         name: targetId
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         required: true
+         *         description: target ID
+         *       - in: path
+         *         name: clientId
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         required: true
+         *         description: client ID
+         *     responses:
+         *       200:
+         *         description: Session data fetched successfully
+         */
+        this.router.get(
+            "/performance/:targetId/:clientId",
+            this.controller.getTargetPerformanceGraph
+        );
+
+        /**
+         * @swagger
          * /api/v1/sessions/tenant/overview/{tenantId}:
          *   get:
          *     summary: tenant sessions overview

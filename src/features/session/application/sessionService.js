@@ -213,6 +213,16 @@ class SessionService {
 
         return sessions;
     }
+
+    async getTargetPerformanceGraph(data) {
+        const graph = await this.sessionRepository.getTargetPerformanceGraphData(data.targetId, data.clientId);
+
+        if (!graph) {
+            throw new Error("Session data not found");
+        }
+
+        return graph;
+    }
 }
 
 export default SessionService;

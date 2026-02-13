@@ -208,6 +208,20 @@ class SessionController {
         });
     });
 
+    getTargetPerformanceGraph = expressAsyncHandler(async (req, res) => {
+        const record = await this.sessionService.getTargetPerformanceGraph({ targetId: req.params.targetId, clientId: req.params.clientId });
+
+        if (!record) {
+            return res.status(404).json({ message: "Session data not found" });
+        }
+
+        return res.status(200).json({
+            message: "Session data fetched successfully",
+            status: "ok",
+            data: record
+        });
+    });
+
     getProductivityOverview = expressAsyncHandler(async (req, res) => {
         const { tenantId } = req.params;
 
@@ -242,7 +256,6 @@ class SessionController {
             },
         });
     });
-
 
     getSingleSession = expressAsyncHandler(async (req, res) => {
         const session = await this.sessionService.getSingleSession(req.params.id);
