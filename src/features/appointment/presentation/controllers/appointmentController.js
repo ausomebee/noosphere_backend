@@ -213,6 +213,23 @@ class AppointmentController {
         });
     });
 
+    rescheduleAppointment = expressAsyncHandler(async (req, res) => {
+        const appointments = await this.service.updateAppointment({
+            id: req.params.id,
+            rescheduled: true
+        });
+
+        if (!appointments) {
+            res.status(500).json({ message: 'Failed to fetch appointments' });
+        }
+
+        return res.status(201).json({
+            message: "appointments fetched successfully",
+            status: 'ok',
+            data: appointments
+        });
+    });
+
     rejectRescheduleAppointment = expressAsyncHandler(async (req, res) => {
         const appointments = await this.service.rejectRescheduleAppointment(req.body);
 

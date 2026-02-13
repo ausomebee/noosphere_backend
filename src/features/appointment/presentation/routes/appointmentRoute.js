@@ -441,6 +441,29 @@ class AppointmentRoutes {
          */
         this.router.patch("/reject-reschedule", this.controller.rejectRescheduleAppointment);
 
+         /**
+         * @swagger
+         * /api/v1/appointments/reschedule/{id}:
+         *   patch:
+         *     summary: reschedule an appointment
+         *     tags: [appointments]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The Id of the tenant
+         *     responses:
+         *       200:
+         *         description: Appointments updated successfully
+         *       400:
+         *         description: Validation error
+         *       404:
+         *         description: Appointment not found
+         */
+        this.router.patch("/reschedule/:id", this.controller.rescheduleAppointment);
+
         /**
         * @swagger
         * /api/v1/appointments/tenant/upcoming/{tenantId}:
