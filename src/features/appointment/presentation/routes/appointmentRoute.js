@@ -356,25 +356,25 @@ class AppointmentRoutes {
         */
         this.router.get("/staff/rescheduled/:staffId", this.controller.getStaffRescheduledAppointments);
 
-         /**
-        * @swagger
-        * /api/v1/appointments/client/{clientId}:
-        *   get:
-        *     summary: get client appointments
-        *     tags: [appointments]
-        *     parameters:
-        *       - in: path
-        *         name: clientId
-        *         required: true
-        *         schema:
-        *           type: string
-        *         description: The Id of the client
-        *     responses:
-        *       200:
-        *         description: client appointments fetched successfully
-        *       400:
-        *         description: Validation error
-        */
+        /**
+       * @swagger
+       * /api/v1/appointments/client/{clientId}:
+       *   get:
+       *     summary: get client appointments
+       *     tags: [appointments]
+       *     parameters:
+       *       - in: path
+       *         name: clientId
+       *         required: true
+       *         schema:
+       *           type: string
+       *         description: The Id of the client
+       *     responses:
+       *       200:
+       *         description: client appointments fetched successfully
+       *       400:
+       *         description: Validation error
+       */
         this.router.get("/client/:clientId", this.controller.getClientAppointments);
 
         /**
@@ -441,28 +441,27 @@ class AppointmentRoutes {
          */
         this.router.patch("/reject-reschedule", this.controller.rejectRescheduleAppointment);
 
-         /**
-         * @swagger
-         * /api/v1/appointments/reschedule/{id}:
-         *   patch:
-         *     summary: reschedule an appointment
-         *     tags: [appointments]
-         *     parameters:
-         *       - in: path
-         *         name: id
-         *         required: true
-         *         schema:
-         *           type: string
-         *         description: The Id of the tenant
-         *     responses:
-         *       200:
-         *         description: Appointments updated successfully
-         *       400:
-         *         description: Validation error
-         *       404:
-         *         description: Appointment not found
-         */
-        this.router.patch("/reschedule/:id", this.controller.rescheduleAppointment);
+        /**
+        * @swagger
+        * /api/v1/appointments/reschedule:
+        *   post:
+        *     summary: reschedule appointment
+        *     tags: [appointments]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/AppointmentCreateDto'
+        *     responses:
+        *       200:
+        *         description: Appointment updated successfully
+        *       400:
+        *         description: Validation error
+        *       404:
+        *         description: Appointment not found
+        */
+        this.router.post("/reschedule", AppointmentDto.createAppointmentDto, this.controller.createAppointment);
 
         /**
         * @swagger
