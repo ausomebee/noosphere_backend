@@ -90,22 +90,43 @@ class ClinicalReportChangeRequestController {
     });
 
     getReportChangeRequests = expressAsyncHandler(async (req, res) => {
-        const records = await this.service.getChangeRequests(
-            req.params.clinicalReportId
-        );
+        const records = await this.service.getChangeRequests(req.params.clinicalReportId);
 
         if (!records) {
-            return res
-                .status(500)
-                .json({ message: "Failed to fetch report change requests" });
+            return res.status(500).json({
+                message: "Failed to fetch report change requests"
+            });
         }
+
+        const formattedRecords = records.map(record => {
+            let requester = null;
+
+            if (record.client?.client) {
+                requester = {
+                    type: "client",
+                    firstName: record.client.client.firstName,
+                    lastName: record.client.client.lastName
+                };
+            } else if (record.approver) {
+                requester = {
+                    type: "approver",
+                    fullName: record.approver.fullName
+                };
+            }
+
+            return {
+                ...record,
+                requester
+            };
+        });
 
         return res.status(200).json({
             message: "Report change requests fetched successfully",
             status: "ok",
-            data: records
+            data: formattedRecords
         });
     });
+
 }
 
 export default ClinicalReportChangeRequestController;
