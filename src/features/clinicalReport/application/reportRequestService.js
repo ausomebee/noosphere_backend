@@ -20,7 +20,18 @@ class ClinicalReportChangeRequestService {
     }
 
     async getChangeRequests(clinicalReportId) {
-        const records = await this.repository.findAllAndPopulate({ clinicalReportId }, { client: { select: { client: { firstName: true, lastName: true } } } });
+        const records = await this.repository.findAllAndPopulate({ clinicalReportId }, {
+            client: {
+                select: {
+                    client: {
+                        select: {
+                            firstName: true,
+                            lastName: true
+                        }
+                    }
+                }
+            }
+        });
         if (!records) {
             throw new Error("No change requests found for this report");
         }
