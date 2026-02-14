@@ -99,19 +99,12 @@ class ClinicalReportChangeRequestController {
         }
 
         const formattedRecords = records.map(record => {
-            let requester = null;
+            let requester = "";
 
             if (record.client?.client) {
-                requester = {
-                    type: "client",
-                    firstName: record.client.client.firstName,
-                    lastName: record.client.client.lastName
-                };
-            } else if (record.approver) {
-                requester = {
-                    type: "approver",
-                    fullName: record.approver.fullName
-                };
+                requester = `${record.client.client.firstName} ${record.client.client.lastName}`;
+            } else if (record.approver?.fullName) {
+                requester = record.approver.fullName;
             }
 
             return {
