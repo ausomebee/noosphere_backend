@@ -12,7 +12,19 @@ class ClinicalReportChangeRequestService {
     }
 
     async getChangeRequest(id) {
-        const record = await this.repository.findOneAndPopulate({ id }, { client: { select: { client: { firstName: true, lastName: true } } } });
+        const record = await this.repository.findOneAndPopulate({ id }, {
+            client: {
+                select: {
+                    client: {
+                        select: {
+                            firstName: true,
+                            lastName: true
+                        }
+                    }
+                }
+            },
+            approver: { select: { fullName: true } }
+        });
         if (!record) {
             throw new Error("Clinical Report Change Request not found");
         }
@@ -30,7 +42,8 @@ class ClinicalReportChangeRequestService {
                         }
                     }
                 }
-            }
+            },
+            approver: { select: { fullName: true } }
         });
         if (!records) {
             throw new Error("No change requests found for this report");

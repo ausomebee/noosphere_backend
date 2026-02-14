@@ -289,7 +289,7 @@ class ClinicalReportRoutes {
 
         /**
          * @swagger
-         * /api/v1/clinical-reports/approver/{approverId}:
+         * /api/v1/clinical-reports/approver/{approverId}/client/{clientTenantId}:
          *   get:
          *     summary: Get all clinical reports for an approver that are submitted
          *     tags: [clinical-reports]
@@ -299,13 +299,17 @@ class ClinicalReportRoutes {
          *         required: true
          *         schema:
          *           type: string
-         *      
+         *       - in: path
+         *         name: clientTenantId
+         *         required: true
+         *         schema:
+         *           type: string
          *     responses:
          *       200:
          *         description: List of clinical reports
          */
         this.router.get(
-            "/approver/:approverId",
+            "/approver/:approverId/client/:clientTenantId",
             this.controller.getReportsSubmittedForApprover
         );
 
