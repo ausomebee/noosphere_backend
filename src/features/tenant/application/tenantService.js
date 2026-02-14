@@ -20,7 +20,7 @@ class TenantService {
     async createCandidate(data) {
         const tenantExists = await this.tenantRepository.findFirstDynamic({
             where: {
-                OR: [{ email: data.email }, { phoneNumber: data.phoneNumber }, {subdomain: data.subdomain}],
+                OR: [{ email: data.email }, { phoneNumber: data.phoneNumber }, { subdomain: data.subdomain }],
             },
             select: {
                 email: true,
@@ -368,7 +368,7 @@ class TenantService {
 
         return "valid domain";
     }
-    
+
     async updateTenant(data) {
         const tenant = await this.tenantRepository.findOne({ id: data.id })
 
@@ -975,6 +975,29 @@ class TenantService {
         }
 
         return staffs;
+    }
+
+    async updateStaffPassword(data) {
+        const existingStaff = await this.staffRepository.findOne({ id: data.staffId });
+        
+        if (!existingStaff.active) {
+            throw new Error("This staff does not exist.");
+        }
+        
+        if (!(await argon2.verify(existingStaff.password, data.currentPassword))) {
+            throw new Error('Incorrect password')
+        }
+        
+        const hashedPass = await argon2.hash(data.newPassword)
+        const updated = await this.staffRepository.update(data.staffId, {
+            password: hashedPass,
+        });
+
+        if (!updated) {
+            throw new Error("Failed to update password");
+        }
+
+        return updated;
     }
 }
 

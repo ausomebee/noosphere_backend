@@ -702,7 +702,7 @@ model PaymentAndAccountAccess {
 }
 
 model Issue {
-  id                    String   @id @default(uuid())
+  id                    String    @id @default(uuid())
   category              String
   priority              String?
   tenantId              String
@@ -714,8 +714,8 @@ model Issue {
   attachments           Json?
   description           String
   resolutionDescription String?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   tenant     Tenant @relation(fields: [tenantId], references: [id])
   assignedTo Admin? @relation("AssignedAdmin", fields: [adminId], references: [id])
@@ -1358,6 +1358,7 @@ model ClinicalReport {
   tenantId       String
   status         ClinicalReportStatus @default(DRAFT)
   isDeleted      Boolean              @default(false)
+  tokenVersion   Int                  @default(0)
   createdAt      DateTime             @default(now())
   updatedAt      DateTime             @updatedAt
 

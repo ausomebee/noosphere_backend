@@ -11,6 +11,7 @@ import ClinicalReportSection from "../../domain/reportSection.js";
 import ClinicalReportHistory from "../../domain/reportHistory.js";
 import PDFDocument from "pdfkit";
 import emailService from "../../../../utilities/ses.js";
+import TokenService from "../../../../utilities/generate_token.js";
 
 class ClinicalReportController {
     constructor() {
@@ -31,6 +32,8 @@ class ClinicalReportController {
                 this.prisma.clinicalReportHistory
             )
         });
+
+        this.token = TokenService;
     }
 
     createReport = expressAsyncHandler(async (req, res) => {
@@ -149,6 +152,40 @@ class ClinicalReportController {
         });
     });
 
+    validateReportToken = expressAsyncHandler(async (req, res) => {
+        const { token } = req.params;
+
+        const decoded = await this.token.validateClinicalReportToken(
+            token,
+            this.prisma
+        );
+
+        const report = await this.reportService.getReport(decoded.id);
+
+        if (!report) {
+            return res.status(404).json({
+                status: "error",
+                message: "Clinical report not found"
+            });
+        }
+
+        return res.status(200).json({
+            status: "ok",
+            message: "Clinical report fetched successfully",
+            data: report
+        });
+    });
+
+    withdrawReportToken = expressAsyncHandler(async (req, res) => {
+        const { id } = req.params;
+
+        await this.token.withdrawClinicalReportToken(id, this.prisma);
+
+        return res.status(200).json({
+            status: "ok",
+            message: "Clinical report token withdrawn successfully"
+        });
+    });
 
     async generateClinicalReportPdf({ report, sections }) {
         return new Promise((resolve, reject) => {
@@ -447,7 +484,7 @@ class ClinicalReportController {
             to: [report.client.client.email],
             subject: "Clinical Report",
             text: "Please find the attached clinical report.",
-            html: "<p>Please find the attached clinical report.</p>",
+            html: `<p>Please find the attached clinical report.</p> ${await this.token.generateClinicalReportToken(report.id, this.prisma)}`,
             attachmentBuffer: pdfBuffer,
             attachmentName: "clinical-report.pdf"
         });
@@ -465,6 +502,19 @@ class ClinicalReportController {
     getReportsByStatus = expressAsyncHandler(async (req, res) => {
         const reports = await this.reportService.getReportsByStatus(
             req.params.tenantId,
+            req.params.status
+        );
+
+        return res.status(200).json({
+            status: "ok",
+            message: "Clinical reports fetched successfully",
+            data: reports
+        });
+    });
+
+    getClientReportsByStatus = expressAsyncHandler(async (req, res) => {
+        const reports = await this.reportService.getClientReportsByStatus(
+            req.params.clientTenantId,
             req.params.status
         );
 

@@ -184,6 +184,20 @@ class TenantController {
         });
     });
 
+    updateStaffPassword = expressAsyncHandler(async (req, res) => {
+        const staff = await this.service.updateStaffPassword(req.body);
+
+        if (!staff) {
+            return res.status(500).json({ message: 'Failed to update tenant staff password.' });
+        }
+
+        return res.status(200).json({
+            message: "Password updated successfully",
+            status: 'ok',
+            data: staff
+        });
+    });
+
     tenantAdminChoices = expressAsyncHandler(async (req, res) => {
         const choice = await this.service.tenantAdminChoices(req.body);
 
