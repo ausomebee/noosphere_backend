@@ -22,7 +22,8 @@ class ClinicalReportChangeRequestService {
                         }
                     }
                 }
-            }
+            },
+            approver: { select: { fullName: true } }
         });
         if (!record) {
             throw new Error("Clinical Report Change Request not found");
@@ -41,7 +42,8 @@ class ClinicalReportChangeRequestService {
                         }
                     }
                 }
-            }
+            },
+            approver: { select: { fullName: true } }
         });
         if (!records) {
             throw new Error("No change requests found for this report");
