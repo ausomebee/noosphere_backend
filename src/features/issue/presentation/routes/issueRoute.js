@@ -299,6 +299,48 @@ class IssueRoutes {
 
         /**
         * @swagger
+        * /api/v1/issue/tenant/{tenantId}:
+        *   get:
+        *     summary: gets tenant issue
+        *     tags: [Issue]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The ID of the tenant
+        *     responses:
+        *       200:
+        *         description: issue fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant/:tenantId",  this.controller.getTenantIssues);
+
+         /**
+        * @swagger
+        * /api/v1/issue/tenant-overview/{tenantId}:
+        *   get:
+        *     summary: gets tenant issue
+        *     tags: [Issue]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The ID of the tenant
+        *     responses:
+        *       200:
+        *         description: issue fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant-overview/:tenantId", this.controller.getTenantIssuesOverview);
+
+        /**
+        * @swagger
         * /api/v1/issue/resolution/time:
         *   get:
         *     summary: gets issue resolution time
