@@ -28,6 +28,40 @@ class IssueService {
         return issue;
     }
 
+    async getTenantIssues(tenantId) {
+        const issue = await this.issueRepository.findAllAndPopulate({ tenantId });
+
+        if (!issue) {
+            throw new Error("Failed to fetch issue");
+        }
+
+        return issue;
+    }
+
+    async getTenantIssuesOverview(tenantId) {
+        const allIssues = await this.issueRepository.totalCountDynamic({
+            tenantId
+        });
+
+        const pendingIssues = await this.issueRepository.totalCountDynamic({
+            tenantId,
+            status: {
+                not: "Resolved"
+            }
+        });
+
+        const resolvedIssues = await this.issueRepository.totalCountDynamic({
+            tenantId,
+            status: "Resolved"
+        });
+
+        return {
+            allIssues,
+            pendingIssues,
+            resolvedIssues
+        };
+    }
+
     async getTotalByStatus() {
         const All = await this.issueRepository.totalCountDynamic({});
         const Resolved = await this.issueRepository.totalCountDynamic({ status: "Resolved" });

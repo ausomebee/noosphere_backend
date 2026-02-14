@@ -55,6 +55,34 @@ class IssueController {
         });
     });
 
+    getTenantIssues = expressAsyncHandler(async (req, res) => {
+        const issue = await this.service.getTenantIssues(req.params.tenantId);
+
+        if (!issue) {
+            res.status(500).json({ message: 'Failed to get issue' });
+        }
+
+        return res.status(201).json({
+            message: "Issue fetched successfully",
+            status: 'ok',
+            data: issue
+        });
+    });
+
+    getTenantIssuesOverview = expressAsyncHandler(async (req, res) => {
+        const issue = await this.service.getTenantIssuesOverview(req.params.tenantId);
+
+        if (!issue) {
+            res.status(500).json({ message: 'Failed to get issue' });
+        }
+
+        return res.status(201).json({
+            message: "Issue fetched successfully",
+            status: 'ok',
+            data: issue
+        });
+    });
+
     getTotalByStatus = expressAsyncHandler(async (req, res) => {
         const issue = await this.service.getTotalByStatus();
 
