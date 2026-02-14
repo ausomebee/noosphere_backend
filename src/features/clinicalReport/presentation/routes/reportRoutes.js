@@ -363,7 +363,7 @@ class ClinicalReportRoutes {
         /**
          * @swagger
          * /api/v1/clinical-reports/nudge-client/{id}:
-         *   get:
+         *   post:
          *     summary: nudge-client
          *     tags: [clinical-reports]
          *     parameters:
@@ -376,7 +376,7 @@ class ClinicalReportRoutes {
          *       200:
          *         description: Clinical report fetched successfully
          */
-        this.router.get(
+        this.router.post(
             "/nudge-client/:id",
             this.controller.nudgeClient
         );
