@@ -704,13 +704,13 @@ model PaymentAndAccountAccess {
 model Issue {
   id                    String   @id @default(uuid())
   category              String
-  priority              String
+  priority              String?
   tenantId              String
   adminId               String?
   title                 String
   adminLoggedById       String?
   status                String
-  resolutionDeadline    DateTime
+  resolutionDeadline    DateTime?
   attachments           Json?
   description           String
   resolutionDescription String?

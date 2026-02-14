@@ -17,7 +17,7 @@ class IssueDto {
             category: Joi.string().required().messages({
                 'string.empty': 'Category is required'
             }),
-            priority: Joi.string().valid('P1', 'P2', 'P3', 'P4', 'EP1', 'EP2').required().messages({
+            priority: Joi.string().valid('P1', 'P2', 'P3', 'P4', 'EP1', 'EP2').optional().messages({
                 'any.only': 'Priority must be one of P1, P2, P3, P4, EP1, or EP2',
                 'string.empty': 'Priority is required'
             }),
@@ -25,7 +25,7 @@ class IssueDto {
                 'string.empty': 'Admin ID is required',
                 'string.guid': 'Admin ID must be a valid UUID'
             }),
-            resolutionDeadline: Joi.date().required().messages({
+            resolutionDeadline: Joi.date().optional().messages({
                 'date.base': 'Resolution deadline must be a valid date',
                 'any.required': 'Resolution deadline is required'
             }),
