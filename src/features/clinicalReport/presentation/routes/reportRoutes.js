@@ -242,7 +242,7 @@ class ClinicalReportRoutes {
         /**
          * @swagger
          * /api/v1/clinical-reports/validate/{token}:
-         *   get:
+         *   post:
          *     summary: Validate and fetch clinical report using token
          *     tags: [clinical-reports]
          *     parameters:
@@ -259,9 +259,32 @@ class ClinicalReportRoutes {
          *       404:
          *         description: Clinical report not found
          */
-        this.router.get(
+        this.router.post(
             "/validate/:token",
             this.controller.validateReportToken
+        );
+
+        /**
+        * @swagger
+        * /api/v1/clinical-reports/approve/{id}:
+        *   post:
+        *     summary: approve clinical report 
+        *     tags: [clinical-reports]
+        *     parameters:
+        *       - in: path
+        *         name: id
+        *         required: true
+        *         schema:
+        *           type: string
+        *     responses:
+        *       200:
+        *         description: Clinical report approved successfully
+        *       404:
+        *         description: Clinical report not found
+        */
+        this.router.post(
+            "/approve/:id",
+            this.controller.approveClinicalReport
         );
 
         /**
