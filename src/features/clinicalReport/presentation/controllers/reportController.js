@@ -527,7 +527,7 @@ class ClinicalReportController {
 
     getReportsSubmittedForApprover = expressAsyncHandler(async (req, res) => {
         const reports = await this.reportService.getReportsSubmittedForApprover(
-            req.params.approverId
+            req.params.approverId, req.params.clientTenantId
         );
 
         return res.status(200).json({

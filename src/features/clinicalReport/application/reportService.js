@@ -76,8 +76,8 @@ class ClinicalReportService {
         return records;
     }
 
-    async getReportsSubmittedForApprover(approverId) {
-        const records = await this.repository.findAllByApproverAndStatus(approverId);
+    async getReportsSubmittedForApprover(approverId, clientTenantId) {
+        const records = await this.repository.findAllByApproverAndStatus(approverId, clientTenantId);
         if (!records) throw new Error("No clinical reports found");
         return records;
     }
