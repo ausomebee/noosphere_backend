@@ -3,6 +3,11 @@ import prismaService from "../../../../config/prisma.js";
 import ClinicalReportChangeRequestRepository from "../../infrastructure/reportRequestRepository.js";
 import ClinicalReportChangeRequestService from "../../application/reportRequestService.js";
 import ClinicalReportChangeRequest from "../../domain/reportRequest.js";
+import ClinicalReportService from "../../application/reportService.js";
+import ClinicalReportRepository from "../../infrastructure/reportRepository.js";
+import ClinicalReportHistory from "../../domain/reportHistory.js";
+import ClinicalReportHistoryService from "../../application/reportHistoryService.js";
+import ClinicalReportHistoryRepository from "../../infrastructure/reportHistoryRepository.js";
 
 class ClinicalReportChangeRequestController {
     constructor() {
@@ -15,6 +20,17 @@ class ClinicalReportChangeRequestController {
         this.service = new ClinicalReportChangeRequestService({
             repository: this.repository
         });
+
+        this.reportService = new ClinicalReportService({
+            repository: new ClinicalReportRepository(this.prisma.clinicalReport)
+        });
+
+        this.historyService = new ClinicalReportHistoryService({
+            repository: new ClinicalReportHistoryRepository(
+                this.prisma.clinicalReportHistory
+            )
+        });
+
     }
 
     createChangeRequest = expressAsyncHandler(async (req, res) => {
@@ -22,6 +38,27 @@ class ClinicalReportChangeRequestController {
         const record = await this.service.createChangeRequest(
             data.createChangeRequest
         );
+
+        let status, updated
+        if (data.approverId) {
+            status = "DRAFT"
+            updated = await this.reportService.updateReport(
+                { id: req.params.id, status: status }
+            );
+        } else {
+            status = "AWAITING_SIGNATURE"
+            updated = await this.reportService.updateReport(
+                { id: req.params.id, status: status }
+            );
+        }
+
+        const history = new ClinicalReportHistory({
+            clinicalReportId: updated.id,
+            action: updated.status,
+            createdBy: updated.creatorId
+        });
+
+        await this.historyService.createHistory(history);
 
         if (!record) {
             return res
@@ -53,22 +90,43 @@ class ClinicalReportChangeRequestController {
     });
 
     getReportChangeRequests = expressAsyncHandler(async (req, res) => {
-        const records = await this.service.getChangeRequests(
-            req.params.clinicalReportId
-        );
+        const records = await this.service.getChangeRequests(req.params.clinicalReportId);
 
         if (!records) {
-            return res
-                .status(500)
-                .json({ message: "Failed to fetch report change requests" });
+            return res.status(500).json({
+                message: "Failed to fetch report change requests"
+            });
         }
+
+        const formattedRecords = records.map(record => {
+            let requester = null;
+
+            if (record.client?.client) {
+                requester = {
+                    type: "client",
+                    firstName: record.client.client.firstName,
+                    lastName: record.client.client.lastName
+                };
+            } else if (record.approver) {
+                requester = {
+                    type: "approver",
+                    fullName: record.approver.fullName
+                };
+            }
+
+            return {
+                ...record,
+                requester
+            };
+        });
 
         return res.status(200).json({
             message: "Report change requests fetched successfully",
             status: "ok",
-            data: records
+            data: formattedRecords
         });
     });
+
 }
 
 export default ClinicalReportChangeRequestController;
