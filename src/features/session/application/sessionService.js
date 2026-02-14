@@ -178,24 +178,22 @@ class SessionService {
 
     async getClientSessionOverview(id) {
         const completedSession = await this.sessionRepository.countClientSessions(id);
-
-        if (!completedSession) {
-            throw new Error("Sessions not found");
-        }
-
         const avgSession = await this.sessionRepository.avgSessionDuration(id);
-
-        if (!avgSession) {
-            throw new Error("Sessions not found");
-        }
-
         const awaitingApproval = await this.sessionRepository.countClientAwaitingApproval(id);
 
-        if (!awaitingApproval) {
-            throw new Error("Sessions not found");
+        if (
+            completedSession == null ||
+            avgSession == null ||
+            awaitingApproval == null
+        ) {
+            throw new Error("Failed to fetch session overview");
         }
 
-        return { completedSession, avgSession, awaitingApproval };
+        return {
+            completedSession,
+            avgSession,
+            awaitingApproval
+        };
     }
 
     async clientOverviewGraph(id, groupBy) {
