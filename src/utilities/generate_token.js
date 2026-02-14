@@ -30,7 +30,7 @@ class TokenService {
             },
             process.env.CLINICAL_REPORT_SECRET || "clinical_secret",
             {
-                expiresIn: process.env.CLINICAL_REPORT_EXPIRE || "30d",
+                expiresIn: process.env.CLINICAL_REPORT_EXPIRE || "1d",
             }
         );
     }
