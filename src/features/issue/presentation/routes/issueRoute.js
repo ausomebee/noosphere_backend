@@ -14,9 +14,7 @@ import S3Service from "../../../../utilities/s3.js";
  *         - title
  *         - description
  *         - category
- *         - priority
  *         - adminId
- *         - resolutionDeadline
  *       properties:
  *         tenantId:
  *           type: string
