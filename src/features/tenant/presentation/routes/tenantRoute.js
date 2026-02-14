@@ -256,6 +256,24 @@ import multer from "multer";
  *           type: string
  *           format: uuid
  *           example: "d6c6f7b4-b2f9-4d76-9f9c-9b292d3a1cfa"
+ * 
+ *     TenantUpdatePassword:
+ *       type: object
+ *       required:
+ *         - staffId
+ *         - newPassword
+ *         - currentPassword
+ *       properties:
+ *         currentPassword:
+ *           type: string
+ *           example: "string"
+ *         newPassword:
+ *           type: string
+ *           example: "string"
+ *         staffId:
+ *           type: string
+ *           format: uuid
+ *           example: "d6c6f7b4-b2f9-4d76-9f9c-9b292d3a1cfa"
  */
 
 class TenantRoutes {
@@ -307,6 +325,27 @@ class TenantRoutes {
          *         description: Bad request
          */
         this.router.patch("/", TenantDto.updateTenantDto, this.controller.updateTenant);
+
+        /**
+         * @swagger
+         * /api/v1/tenant/change-password:
+         *   patch:
+         *     summary: Update tenant staff password
+         *     description: Update the password of a staff.
+         *     tags: [Tenant]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/TenantUpdatePassword'
+         *     responses:
+         *       201:
+         *         description: Tenant staff password updated successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.patch("/change-password", TenantDto.updatePasswordDto, this.controller.updateStaffPassword);
 
         /**
          * @swagger

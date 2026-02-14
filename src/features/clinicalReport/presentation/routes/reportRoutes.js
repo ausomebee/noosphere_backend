@@ -187,15 +187,41 @@ class ClinicalReportRoutes {
             this.controller.getTenantReports
         );
 
-         /**
+        /**
+        * @swagger
+        * /api/v1/clinical-reports/tenant/{tenantId}/status/{status}:
+        *   get:
+        *     summary: Get all clinical reports for a tenant by status
+        *     tags: [clinical-reports]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *       - in: path
+        *         name: status
+        *         required: true
+        *         schema:
+        *           type: string
+        *     responses:
+        *       200:
+        *         description: List of clinical reports
+        */
+        this.router.get(
+            "/tenant/:tenantId/status/:status",
+            this.controller.getReportsByStatus
+        );
+
+        /**
          * @swagger
-         * /api/v1/clinical-reports/tenant/{tenantId}/status/{status}:
+         * /api/v1/clinical-reports/client/{clientTenantId}/status/{status}:
          *   get:
-         *     summary: Get all clinical reports for a tenant by status
+         *     summary: Get all clinical reports for a client by status
          *     tags: [clinical-reports]
          *     parameters:
          *       - in: path
-         *         name: tenantId
+         *         name: clientTenantId
          *         required: true
          *         schema:
          *           type: string
@@ -209,8 +235,56 @@ class ClinicalReportRoutes {
          *         description: List of clinical reports
          */
         this.router.get(
-            "/tenant/:tenantId/status/:status",
-            this.controller.getReportsByStatus
+            "/client/:clientTenantId/status/:status",
+            this.controller.getClientReportsByStatus
+        );
+
+        /**
+         * @swagger
+         * /api/v1/clinical-reports/validate/{token}:
+         *   get:
+         *     summary: Validate and fetch clinical report using token
+         *     tags: [clinical-reports]
+         *     parameters:
+         *       - in: path
+         *         name: token
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: Clinical report fetched successfully
+         *       400:
+         *         description: Invalid or expired token
+         *       404:
+         *         description: Clinical report not found
+         */
+        this.router.get(
+            "/validate/:token",
+            this.controller.validateReportToken
+        );
+
+        /**
+         * @swagger
+         * /api/v1/clinical-reports/{id}/withdraw-token:
+         *   patch:
+         *     summary: Withdraw clinical report token
+         *     tags: [clinical-reports]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: Clinical report token withdrawn successfully
+         *       404:
+         *         description: Clinical report not found
+         */
+        this.router.patch(
+            "/:id/withdraw-token",
+            this.controller.withdrawReportToken
         );
 
         /**
@@ -235,27 +309,27 @@ class ClinicalReportRoutes {
             this.controller.getReportsSubmittedForApprover
         );
 
-         /**
-         * @swagger
-         * /api/v1/clinical-reports/:id/status/:status:
-         *   patch:
-         *     summary: Update a clinical report status
-         *     tags: [clinical-reports]
-         *     parameters:
-         *       - in: path
-         *         name: id
-         *         required: true
-         *         schema:
-         *           type: string
-         *       - in: path
-         *         name: status
-         *         required: true
-         *         schema:
-         *           type: string
-         *     responses:
-         *       200:
-         *         description: List of clinical reports
-         */
+        /**
+        * @swagger
+        * /api/v1/clinical-reports/:id/status/:status:
+        *   patch:
+        *     summary: Update a clinical report status
+        *     tags: [clinical-reports]
+        *     parameters:
+        *       - in: path
+        *         name: id
+        *         required: true
+        *         schema:
+        *           type: string
+        *       - in: path
+        *         name: status
+        *         required: true
+        *         schema:
+        *           type: string
+        *     responses:
+        *       200:
+        *         description: List of clinical reports
+        */
         this.router.patch(
             "/:id/status/:status",
             this.controller.updateReportStatus

@@ -45,9 +45,10 @@ class ClinicalReportService {
             approver: { select: { fullName: true } },
             clinicalReportChangeRequests: true,
             tenant: true,
-            clinicalReportSections:true,
+            clinicalReportSections: true,
             client: { select: { client: { select: { firstName: true, lastName: true, email: true } } } }
         });
+
         if (!record) throw new Error("Clinical Report not found");
         return record;
     }
@@ -65,6 +66,12 @@ class ClinicalReportService {
 
     async getReportsByStatus(tenantId, status) {
         const records = await this.repository.findAllByStatus(tenantId, status);
+        if (!records) throw new Error("No clinical reports found");
+        return records;
+    }
+
+    async getClientReportsByStatus(clientTenantId, status) {
+        const records = await this.repository.findAllByStatusForClient(clientTenantId, status);
         if (!records) throw new Error("No clinical reports found");
         return records;
     }
