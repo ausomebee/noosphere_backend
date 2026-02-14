@@ -21,7 +21,7 @@ class IssueDto {
                 'any.only': 'Priority must be one of P1, P2, P3, P4, EP1, or EP2',
                 'string.empty': 'Priority is required'
             }),
-            adminId: Joi.string().uuid().required().messages({
+            adminId: Joi.string().uuid().optional().messages({
                 'string.empty': 'Admin ID is required',
                 'string.guid': 'Admin ID must be a valid UUID'
             }),
