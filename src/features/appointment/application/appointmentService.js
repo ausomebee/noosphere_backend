@@ -193,7 +193,7 @@ class AppointmentService {
     }
 
     async getClientUpcomingAppointments(clientId) {
-        const appointments = await this.appointmentRepository.getUpcomingAppointments(clientId);
+        const appointments = await this.appointmentRepository.getUpcomingAppointments({ clientId });
 
         if (!appointments || appointments.length === 0) {
             return [];
@@ -203,7 +203,7 @@ class AppointmentService {
     }
 
     async getClientPastAppointments(clientId) {
-        const appointments = await this.appointmentRepository.getPastAppointments(clientId);
+        const appointments = await this.appointmentRepository.getPastAppointments({clientId});
 
         if (!appointments || appointments.length === 0) {
             return [];
@@ -212,66 +212,66 @@ class AppointmentService {
         return appointments;
     }
 
-    async getStaffAppointments(staffId) {
-        const appointments = await this.appointmentRepository.findAllAndPopulate(
-            {
-                clinicians: {
-                    some: { id: staffId }
-                }
-            },
-            {
-                tenant: true, client: true, appointmentServices: true, session: true, clinicians: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        email: true,
-                    }
-                }
-            }
-        );
+    // async getStaffAppointments(staffId) {
+    //     const appointments = await this.appointmentRepository.findAllAndPopulate(
+    //         {
+    //             clinicians: {
+    //                 some: { id: staffId }
+    //             }
+    //         },
+    //         {
+    //             tenant: true, client: true, appointmentServices: true, session: true, clinicians: {
+    //                 select: {
+    //                     id: true,
+    //                     fullName: true,
+    //                     email: true,
+    //                 }
+    //             }
+    //         }
+    //     );
 
-        if (!appointments || appointments.length === 0) {
-            return [];
-        }
+    //     if (!appointments || appointments.length === 0) {
+    //         return [];
+    //     }
 
-        const grouped = {};
+    //     const grouped = {};
 
-        for (const appt of appointments) {
-            if (!appt.relatedAppointment) {
-                grouped[appt.id] = {
-                    ...appt,
-                    relatedAppointments: [],
-                };
-            }
-        }
+    //     for (const appt of appointments) {
+    //         if (!appt.relatedAppointment) {
+    //             grouped[appt.id] = {
+    //                 ...appt,
+    //                 relatedAppointments: [],
+    //             };
+    //         }
+    //     }
 
-        for (const appt of appointments) {
-            if (appt.relatedAppointment) {
-                if (grouped[appt.relatedAppointment]) {
-                    grouped[appt.relatedAppointment].relatedAppointments.push(appt);
-                } else {
-                    grouped[appt.id] = {
-                        ...appt,
-                        relatedAppointments: [],
-                    };
-                }
-            }
-        }
+    //     for (const appt of appointments) {
+    //         if (appt.relatedAppointment) {
+    //             if (grouped[appt.relatedAppointment]) {
+    //                 grouped[appt.relatedAppointment].relatedAppointments.push(appt);
+    //             } else {
+    //                 grouped[appt.id] = {
+    //                     ...appt,
+    //                     relatedAppointments: [],
+    //                 };
+    //             }
+    //         }
+    //     }
 
-        const result = Object.values(grouped).sort(
-            (a, b) => new Date(a.date) - new Date(b.date)
-        );
+    //     const result = Object.values(grouped).sort(
+    //         (a, b) => new Date(a.date) - new Date(b.date)
+    //     );
 
-        for (const item of result) {
-            item.relatedAppointments.sort((a, b) => {
-                const d = new Date(a.date) - new Date(b.date);
-                if (d !== 0) return d;
-                return a.startTime.localeCompare(b.startTime);
-            });
-        }
+    //     for (const item of result) {
+    //         item.relatedAppointments.sort((a, b) => {
+    //             const d = new Date(a.date) - new Date(b.date);
+    //             if (d !== 0) return d;
+    //             return a.startTime.localeCompare(b.startTime);
+    //         });
+    //     }
 
-        return result;
-    }
+    //     return result;
+    // }
 
     async getTenantAppointments(tenantId) {
         const appointments = await this.appointmentRepository.getAppointmentsByTenant(tenantId);
@@ -605,12 +605,12 @@ class AppointmentService {
         );
 
         return allAppointments
-            // .filter(appt => this.isUpcoming(appt, now))
-            // .sort((a, b) => {
-            //     const aDate = new Date(`${a.date}T${a.startTime}:00`);
-            //     const bDate = new Date(`${b.date}T${b.startTime}:00`);
-            //     return aDate - bDate;
-            // });
+        // .filter(appt => this.isUpcoming(appt, now))
+        // .sort((a, b) => {
+        //     const aDate = new Date(`${a.date}T${a.startTime}:00`);
+        //     const bDate = new Date(`${b.date}T${b.startTime}:00`);
+        //     return aDate - bDate;
+        // });
     }
 
     async getTenantPastAppointments(tenantId) {
@@ -642,35 +642,35 @@ class AppointmentService {
     }
 
     async getStaffUpcomingAppointments(staffId) {
-        const now = new Date();
-
-        const allAppointments = await this.appointmentRepository.findAllAndPopulate(
-            {
-                isCanceled: false, clinicians: {
-                    some: { id: staffId }
+        const appointments = await this.appointmentRepository.getUpcomingAppointments({
+            clinicians: {
+                some: {
+                    id: staffId
                 }
             },
-            {
-                client: {
-                    select: {
-                        id: true, firstName: true,
-                        lastName: true,
-                        preferredName: true, email: true
-                    }
-                },
-                session: true,
-                appointmentServices: { include: { serviceCode: true } },
-                clinicians: { select: { id: true, fullName: true, email: true } }
-            }
-        );
+        });
 
-        return allAppointments
-            .filter(appt => this.isUpcoming(appt, now))
-            .sort((a, b) => {
-                const aDate = new Date(`${a.date}T${a.startTime}:00`);
-                const bDate = new Date(`${b.date}T${b.startTime}:00`);
-                return aDate - bDate;
-            });
+        if (!appointments || appointments.length === 0) {
+            return [];
+        }
+
+        return appointments;
+    }
+
+    async getStaffAppointments(staffId) {
+        const appointments = await this.appointmentRepository.getAllAppointments({
+            clinicians: {
+                some: {
+                    id: staffId
+                }
+            },
+        });
+
+        if (!appointments || appointments.length === 0) {
+            return [];
+        }
+
+        return appointments;
     }
 
     async getStaffPastAppointments(staffId) {

@@ -288,6 +288,52 @@ class ClinicalReportRoutes {
         );
 
         /**
+        * @swagger
+        * /api/v1/clinical-reports/resubmit/{id}:
+        *   post:
+        *     summary: resubmit clinical report 
+        *     tags: [clinical-reports]
+        *     parameters:
+        *       - in: path
+        *         name: id
+        *         required: true
+        *         schema:
+        *           type: string
+        *     responses:
+        *       200:
+        *         description: Clinical report approved successfully
+        *       404:
+        *         description: Clinical report not found
+        */
+        this.router.post(
+            "/resubmit/:id",
+            this.controller.resubmitForSignature
+        );
+
+        /**
+         * @swagger
+         * /api/v1/clinical-reports/{id}/withdraw-token:
+         *   patch:
+         *     summary: Withdraw clinical report token
+         *     tags: [clinical-reports]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: Clinical report token withdrawn successfully
+         *       404:
+         *         description: Clinical report not found
+         */
+        this.router.patch(
+            "/:id/withdraw-token",
+            this.controller.withdrawReportToken
+        );
+
+        /**
          * @swagger
          * /api/v1/clinical-reports/{id}/withdraw-token:
          *   patch:
@@ -444,6 +490,52 @@ class ClinicalReportRoutes {
         this.router.delete(
             "/:id",
             this.controller.deleteReport
+        );
+
+        /**
+         * @swagger
+         * /api/v1/clinical-reports/submit-signature:
+         *   patch:
+         *     summary: Submit signature for clinical report
+         *     description: Updates the report section with signature data, changes status to SIGNED, generates PDF, and emails it to the client
+         *     tags: [clinical-reports]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             required:
+         *               - id
+         *               - content
+         *             properties:
+         *               id:
+         *                 type: string
+         *                 description: ID of the section being signed
+         *                 example: "c7a179a8-c818-4b29-8c35-1c58236044dc"
+         *               content:
+         *                 type: object
+         *                 example: { "notes": "Patient is stable" }
+         *               
+         *     responses:
+         *       200:
+         *         description: Clinical report signed and sent successfully
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 status:
+         *                   type: string
+         *                   example: "ok"
+         *                 message:
+         *                   type: string
+         *                   example: "Clinical report signed and sent successfully"
+         *               
+         */
+        this.router.patch(
+            "/submit-signature",
+            this.controller.submitSignature
         );
     }
 

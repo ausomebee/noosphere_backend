@@ -518,18 +518,38 @@ class TenantRoutes {
         this.router.post("/tenantadminchoices", TenantDto.tenantAdminChoicesDto, this.controller.tenantAdminChoices);
 
         /**
+        * @swagger
+        * /api/v1/tenant/tenantadminchoices:
+        *   patch:
+        *     summary: update tenant admin choices
+        *     tags: [choice]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/TenantAdminChoicesDto'
+        *     responses:
+        *       201:
+        *         description: Choice created successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.patch("/tenantadminchoices", TenantDto.updateTenantAdminChoicesDto, this.controller.updateTenantAdminChoices);
+
+        /**
          * @swagger
          * /api/v1/tenant/tenantadminchoices/{tenantId}:
          *   get:
          *     summary: Retrieve tenant admin choices
          *     tags: [choice]
          *     parameters:
-         *       - in: query
+         *       - in: path
          *         name: tenantId
+         *         required: true
          *         schema:
          *           type: string
          *           format: uuid
-         *         required: true
          *         description: The ID of the tenant to fetch choices for
          *     responses:
          *       200:

@@ -158,11 +158,11 @@ class AppointmentRepository {
         return appointments;
     }
 
-    async getUpcomingAppointments(clientId, fromDate = new Date(), limit = 100) {
+    async getUpcomingAppointments(query, fromDate = new Date(), limit = 100) {
         // Get all non-canceled appointments for the client
         const appointments = await this.model.findMany({
             where: {
-                clientId: clientId,
+                ...query,
                 isCanceled: false,
                 OR: [
                     // Non-recurring appointments on or after fromDate
@@ -177,7 +177,7 @@ class AppointmentRepository {
                     {
                         isRecurring: true,
                         date: {
-                            lte: this.formatDate(new Date(fromDate.getTime() + 365 * 24 * 60 * 60 * 1000)) // Look ahead 1 year
+                            lte: this.formatDate(new Date(fromDate.getTime() + 365 * 24 * 60 * 60 * 1000))
                         }
                     }
                 ]
@@ -204,7 +204,9 @@ class AppointmentRepository {
                         fullName: true,
                         email: true
                     }
-                }
+                },
+                relatedTo: true,  // Include the related appointment
+                relatedFrom: true  // Include appointments that relate to this one
             },
             orderBy: {
                 date: 'asc'
@@ -214,16 +216,24 @@ class AppointmentRepository {
         // Expand recurring appointments
         const expandedAppointments = [];
         const fromDateStr = this.formatDate(fromDate);
+        const processedIds = new Set(); // Track processed appointments to avoid duplicates
 
         for (const appointment of appointments) {
+            // Skip if this appointment has been rescheduled (and there's an accepted reschedule)
+            if (this.shouldSkipRescheduledAppointment(appointment)) {
+                continue;
+            }
+
             if (!appointment.isRecurring) {
                 // Add non-recurring appointments as-is
-                if (appointment.date >= fromDateStr) {
+                if (appointment.date >= fromDateStr && !processedIds.has(appointment.id)) {
                     expandedAppointments.push({
                         ...appointment,
                         isRecurringInstance: false,
-                        parentAppointmentId: null
+                        parentAppointmentId: null,
+                        rescheduleStatus: this.getRescheduleStatus(appointment)
                     });
+                    processedIds.add(appointment.id);
                 }
             } else {
                 // Expand recurring appointments
@@ -247,6 +257,289 @@ class AppointmentRepository {
         return expandedAppointments.slice(0, limit);
     }
 
+    async getPastAppointments(query, toDate = new Date(), limit = 100) {
+        // Get all appointments for the client that could have past instances
+        const appointments = await this.model.findMany({
+            where: {
+                ...query,
+                isCanceled: false,
+                OR: [
+                    // Non-recurring appointments before toDate
+                    {
+                        isRecurring: false,
+                        date: {
+                            lt: this.formatDate(toDate)
+                        }
+                    },
+                    // Recurring appointments that started before toDate
+                    {
+                        isRecurring: true,
+                        date: {
+                            lt: this.formatDate(toDate)
+                        }
+                    }
+                ]
+            },
+            include: {
+                client: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        preferredName: true,
+                        email: true
+                    }
+                },
+                session: true,
+                appointmentServices: {
+                    include: {
+                        serviceCode: true
+                    }
+                },
+                clinicians: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true
+                    }
+                },
+                relatedTo: true,
+                relatedFrom: true
+            },
+            orderBy: {
+                date: 'desc'
+            }
+        });
+
+        // Expand recurring appointments
+        const expandedAppointments = [];
+        const toDateStr = this.formatDate(toDate);
+        const processedIds = new Set();
+
+        for (const appointment of appointments) {
+            // Skip if this appointment has been rescheduled (and there's an accepted reschedule)
+            if (this.shouldSkipRescheduledAppointment(appointment)) {
+                continue;
+            }
+
+            if (!appointment.isRecurring) {
+                // Add non-recurring appointments as-is (they're already in the past)
+                if (!processedIds.has(appointment.id)) {
+                    expandedAppointments.push({
+                        ...appointment,
+                        isRecurringInstance: false,
+                        parentAppointmentId: null,
+                        rescheduleStatus: this.getRescheduleStatus(appointment)
+                    });
+                    processedIds.add(appointment.id);
+                }
+            } else {
+                // Expand recurring appointments for past instances only
+                const instances = this.generatePastRecurringInstances(
+                    appointment,
+                    toDate,
+                    limit
+                );
+                expandedAppointments.push(...instances);
+            }
+        }
+
+        // Sort by date and time (most recent first)
+        expandedAppointments.sort((a, b) => {
+            const dateCompare = b.date.localeCompare(a.date);
+            if (dateCompare !== 0) return dateCompare;
+            return b.startTime.localeCompare(a.startTime);
+        });
+
+        // Limit results
+        return expandedAppointments.slice(0, limit);
+    }
+
+    /**
+     * Determines if a rescheduled appointment should be skipped
+     * Skip original appointments that have been rescheduled AND the reschedule was accepted
+     */
+    shouldSkipRescheduledAppointment(appointment) {
+        if (!appointment.rescheduled) {
+            return false;
+        }
+
+        // If rescheduled and accepted by both parties, skip the original
+        if (appointment.rescheduleAccepted || appointment.clientRescheduleAccepted) {
+            return true;
+        }
+
+        // If rescheduled but rejected, don't skip (show original)
+        if (appointment.rescheduleRejected || appointment.clientRescheduleRejected) {
+            return false;
+        }
+
+        // If rescheduled but pending (no acceptance yet), you might want to show both
+        // Adjust this based on your business logic
+        return false; // Show original while pending
+    }
+
+    /**
+     * Get the reschedule status for an appointment
+     */
+    getRescheduleStatus(appointment) {
+        if (!appointment.rescheduled && !appointment.relatedAppointment) {
+            return 'none'; // No reschedule
+        }
+
+        if (appointment.rescheduled) {
+            // This is the original appointment that was rescheduled
+            if (appointment.rescheduleAccepted || appointment.clientRescheduleAccepted) {
+                return 'rescheduled_accepted';
+            }
+            if (appointment.rescheduleRejected || appointment.clientRescheduleRejected) {
+                return 'rescheduled_rejected';
+            }
+            return 'rescheduled_pending';
+        }
+
+        if (appointment.relatedAppointment && !appointment.rescheduled) {
+            // This is the new appointment (rescheduled to this time)
+            if (appointment.rescheduleAccepted || appointment.clientRescheduleAccepted) {
+                return 'is_rescheduled_appointment_accepted';
+            }
+            if (appointment.rescheduleRejected || appointment.clientRescheduleRejected) {
+                return 'is_rescheduled_appointment_rejected';
+            }
+            return 'is_rescheduled_appointment_pending';
+        }
+
+        return 'unknown';
+    }
+
+    generatePastRecurringInstances(appointment, toDate, maxInstances = 100) {
+        const instances = [];
+        const recurrence = appointment.recurrence;
+        const startDate = new Date(appointment.date);
+        const endDate = new Date(toDate);
+
+        // Determine if recurrence has ended
+        let recurrenceEndDate = null;
+        if (recurrence.endType === 'on' && recurrence.endDate) {
+            recurrenceEndDate = new Date(recurrence.endDate);
+        } else if (recurrence.endType === 'after' && recurrence.occurrences) {
+            recurrenceEndDate = this.calculateEndDateFromOccurrences(
+                startDate,
+                recurrence.type,
+                recurrence.occurrences
+            );
+        }
+
+        let currentInstanceDate = new Date(startDate);
+        let instanceCount = 0;
+
+        // Generate instances from start date up to (but not including) toDate
+        while (instanceCount < maxInstances) {
+            // Stop if we've reached or passed toDate
+            if (currentInstanceDate >= endDate) {
+                break;
+            }
+
+            // Stop if we've passed the recurrence end date
+            if (recurrenceEndDate && currentInstanceDate > recurrenceEndDate) {
+                break;
+            }
+
+            // Stop if we're looking too far back (e.g., 5 years)
+            const fiveYearsAgo = new Date(toDate);
+            fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
+            if (currentInstanceDate < fiveYearsAgo) {
+                break;
+            }
+
+            // Create instance
+            instances.push({
+                ...appointment,
+                id: `${appointment.id}_${this.formatDate(currentInstanceDate)}`,
+                date: this.formatDate(currentInstanceDate),
+                isRecurringInstance: true,
+                parentAppointmentId: appointment.id,
+                instanceDate: this.formatDate(currentInstanceDate),
+                rescheduleStatus: this.getRescheduleStatus(appointment)
+            });
+
+            instanceCount++;
+
+            // Move to next occurrence
+            currentInstanceDate = this.getNextOccurrenceDate(currentInstanceDate, recurrence.type);
+        }
+
+        return instances;
+    }
+
+    /**
+     * Get all appointments with reschedule history
+     * Useful for showing the full history including rescheduled appointments
+     */
+    async getAppointmentsWithRescheduleHistory(clientId, fromDate = new Date(), limit = 100) {
+        const appointments = await this.model.findMany({
+            where: {
+                clientId: clientId,
+                isCanceled: false,
+                date: {
+                    gte: this.formatDate(fromDate)
+                }
+            },
+            include: {
+                client: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        preferredName: true,
+                        email: true
+                    }
+                },
+                session: true,
+                appointmentServices: {
+                    include: {
+                        serviceCode: true
+                    }
+                },
+                clinicians: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true
+                    }
+                },
+                relatedTo: {
+                    include: {
+                        client: true,
+                        session: true,
+                        clinicians: true
+                    }
+                },
+                relatedFrom: {
+                    include: {
+                        client: true,
+                        session: true,
+                        clinicians: true
+                    }
+                }
+            },
+            orderBy: {
+                date: 'asc'
+            }
+        });
+
+        return appointments.map(appointment => ({
+            ...appointment,
+            rescheduleStatus: this.getRescheduleStatus(appointment),
+            hasRescheduleHistory: !!(appointment.rescheduled || appointment.relatedAppointment),
+            originalAppointment: appointment.rescheduled ? {
+                date: appointment.previousDate,
+                startTime: appointment.previousStartTime,
+                endTime: appointment.previousEndTime
+            } : null
+        }));
+    }
+
     generateRecurringInstances(appointment, fromDate, maxInstances = 100) {
         const instances = [];
         const recurrence = appointment.recurrence;
@@ -258,14 +551,12 @@ class AppointmentRepository {
         if (recurrence.endType === 'on' && recurrence.endDate) {
             endDate = new Date(recurrence.endDate);
         } else if (recurrence.endType === 'after' && recurrence.occurrences) {
-            // Calculate end date based on occurrences
             endDate = this.calculateEndDateFromOccurrences(
                 startDate,
                 recurrence.type,
                 recurrence.occurrences
             );
         }
-        // If endType is 'never', endDate remains null
 
         let currentInstanceDate = new Date(startDate);
         let instanceCount = 0;
@@ -291,11 +582,12 @@ class AppointmentRepository {
             // Create instance
             instances.push({
                 ...appointment,
-                id: `${appointment.id}_${this.formatDate(currentInstanceDate)}`, // Unique ID for instance
+                id: `${appointment.id}_${this.formatDate(currentInstanceDate)}`,
                 date: this.formatDate(currentInstanceDate),
                 isRecurringInstance: true,
                 parentAppointmentId: appointment.id,
-                instanceDate: this.formatDate(currentInstanceDate)
+                instanceDate: this.formatDate(currentInstanceDate),
+                rescheduleStatus: this.getRescheduleStatus(appointment)
             });
 
             instanceCount++;
@@ -314,7 +606,6 @@ class AppointmentRepository {
 
         switch (recurrenceType) {
             case 'day':
-                // Calculate days difference and advance
                 const daysDiff = Math.ceil((target - start) / (1000 * 60 * 60 * 24));
                 current.setDate(start.getDate() + daysDiff);
                 break;
@@ -407,310 +698,12 @@ class AppointmentRepository {
         return `${year}-${month}-${day}`;
     }
 
-    async getPastAppointments(clientId, toDate = new Date(), limit = 100) {
-        // Get all appointments for the client that could have past instances
-        const appointments = await this.model.findMany({
-            where: {
-                clientId: clientId,
-                isCanceled: false,
-                OR: [
-                    // Non-recurring appointments before toDate
-                    {
-                        isRecurring: false,
-                        date: {
-                            lt: this.formatDate(toDate)
-                        }
-                    },
-                    // Recurring appointments that started before toDate
-                    {
-                        isRecurring: true,
-                        date: {
-                            lt: this.formatDate(toDate)
-                        }
-                    }
-                ]
-            },
-            include: {
-                client: {
-                    select: {
-                        id: true,
-                        firstName: true,
-                        lastName: true,
-                        preferredName: true,
-                        email: true
-                    }
-                },
-                session: true,
-                appointmentServices: {
-                    include: {
-                        serviceCode: true
-                    }
-                },
-                clinicians: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        email: true
-                    }
-                }
-            },
-            orderBy: {
-                date: 'desc'
-            }
-        });
-
-        // Expand recurring appointments
-        const expandedAppointments = [];
-        const toDateStr = this.formatDate(toDate);
-
-        for (const appointment of appointments) {
-            if (!appointment.isRecurring) {
-                // Add non-recurring appointments as-is (they're already in the past)
-                expandedAppointments.push({
-                    ...appointment,
-                    isRecurringInstance: false,
-                    parentAppointmentId: null
-                });
-            } else {
-                // Expand recurring appointments for past instances only
-                const instances = this.generatePastRecurringInstances(
-                    appointment,
-                    toDate,
-                    limit
-                );
-                expandedAppointments.push(...instances);
-            }
-        }
-
-        // Sort by date and time (most recent first)
-        expandedAppointments.sort((a, b) => {
-            const dateCompare = b.date.localeCompare(a.date);
-            if (dateCompare !== 0) return dateCompare;
-            return b.startTime.localeCompare(a.startTime);
-        });
-
-        // Limit results
-        return expandedAppointments.slice(0, limit);
-    }
-
-    generatePastRecurringInstances(appointment, toDate, maxInstances = 100) {
-        const instances = [];
-        const recurrence = appointment.recurrence;
-        const startDate = new Date(appointment.date);
-        const endDate = new Date(toDate);
-
-        // Determine if recurrence has ended
-        let recurrenceEndDate = null;
-        if (recurrence.endType === 'on' && recurrence.endDate) {
-            recurrenceEndDate = new Date(recurrence.endDate);
-        } else if (recurrence.endType === 'after' && recurrence.occurrences) {
-            recurrenceEndDate = this.calculateEndDateFromOccurrences(
-                startDate,
-                recurrence.type,
-                recurrence.occurrences
-            );
-        }
-
-        let currentInstanceDate = new Date(startDate);
-        let instanceCount = 0;
-
-        // Generate instances from start date up to (but not including) toDate
-        while (instanceCount < maxInstances) {
-            // Stop if we've reached or passed toDate
-            if (currentInstanceDate >= endDate) {
-                break;
-            }
-
-            // Stop if we've passed the recurrence end date
-            if (recurrenceEndDate && currentInstanceDate > recurrenceEndDate) {
-                break;
-            }
-
-            // Stop if we're looking too far back (e.g., 5 years)
-            const fiveYearsAgo = new Date(toDate);
-            fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
-            if (currentInstanceDate < fiveYearsAgo) {
-                break;
-            }
-
-            // Create instance
-            instances.push({
-                ...appointment,
-                id: `${appointment.id}_${this.formatDate(currentInstanceDate)}`,
-                date: this.formatDate(currentInstanceDate),
-                isRecurringInstance: true,
-                parentAppointmentId: appointment.id,
-                instanceDate: this.formatDate(currentInstanceDate)
-            });
-
-            instanceCount++;
-
-            // Move to next occurrence
-            currentInstanceDate = this.getNextOccurrenceDate(currentInstanceDate, recurrence.type);
-        }
-
-        return instances;
-    }
-
-    // Alternative: Get past appointments within a specific date range
-    async getPastAppointmentsInRange(clientId, fromDate, toDate, limit = 100) {
-        const appointments = await this.model.findMany({
-            where: {
-                clientId: clientId,
-                isCanceled: false,
-                OR: [
-                    // Non-recurring appointments in range
-                    {
-                        isRecurring: false,
-                        date: {
-                            gte: this.formatDate(fromDate),
-                            lt: this.formatDate(toDate)
-                        }
-                    },
-                    // Recurring appointments that could have instances in range
-                    {
-                        isRecurring: true,
-                        date: {
-                            lt: this.formatDate(toDate)
-                        }
-                    }
-                ]
-            },
-            include: {
-                client: {
-                    select: {
-                        id: true,
-                        firstName: true,
-                        lastName: true,
-                        preferredName: true,
-                        email: true
-                    }
-                },
-                session: true,
-                appointmentServices: {
-                    include: {
-                        serviceCode: true
-                    }
-                },
-                clinicians: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        email: true
-                    }
-                }
-            }
-        });
-
-        const expandedAppointments = [];
-        const fromDateStr = this.formatDate(fromDate);
-        const toDateStr = this.formatDate(toDate);
-
-        for (const appointment of appointments) {
-            if (!appointment.isRecurring) {
-                // Add non-recurring appointments in range
-                if (appointment.date >= fromDateStr && appointment.date < toDateStr) {
-                    expandedAppointments.push({
-                        ...appointment,
-                        isRecurringInstance: false,
-                        parentAppointmentId: null
-                    });
-                }
-            } else {
-                // Expand recurring appointments for instances in range
-                const instances = this.generateRecurringInstancesInRange(
-                    appointment,
-                    fromDate,
-                    toDate,
-                    limit
-                );
-                expandedAppointments.push(...instances);
-            }
-        }
-
-        // Sort by date and time (most recent first)
-        expandedAppointments.sort((a, b) => {
-            const dateCompare = b.date.localeCompare(a.date);
-            if (dateCompare !== 0) return dateCompare;
-            return b.startTime.localeCompare(a.startTime);
-        });
-
-        return expandedAppointments.slice(0, limit);
-    }
-
-    generateRecurringInstancesInRange(appointment, fromDate, toDate, maxInstances = 100) {
-        const instances = [];
-        const recurrence = appointment.recurrence;
-        const startDate = new Date(appointment.date);
-        const rangeStart = new Date(fromDate);
-        const rangeEnd = new Date(toDate);
-
-        // Determine recurrence end date
-        let recurrenceEndDate = null;
-        if (recurrence.endType === 'on' && recurrence.endDate) {
-            recurrenceEndDate = new Date(recurrence.endDate);
-        } else if (recurrence.endType === 'after' && recurrence.occurrences) {
-            recurrenceEndDate = this.calculateEndDateFromOccurrences(
-                startDate,
-                recurrence.type,
-                recurrence.occurrences
-            );
-        }
-
-        // Start from the appointment start date or range start, whichever is later
-        let currentInstanceDate = rangeStart > startDate
-            ? this.getNextOccurrence(startDate, rangeStart, recurrence.type)
-            : new Date(startDate);
-
-        let instanceCount = 0;
-
-        while (instanceCount < maxInstances) {
-            // Stop if we've reached or passed the range end
-            if (currentInstanceDate >= rangeEnd) {
-                break;
-            }
-
-            // Stop if we've passed the recurrence end date
-            if (recurrenceEndDate && currentInstanceDate > recurrenceEndDate) {
-                break;
-            }
-
-            // Only add if within range
-            if (currentInstanceDate >= rangeStart && currentInstanceDate < rangeEnd) {
-                instances.push({
-                    ...appointment,
-                    id: `${appointment.id}_${this.formatDate(currentInstanceDate)}`,
-                    date: this.formatDate(currentInstanceDate),
-                    isRecurringInstance: true,
-                    parentAppointmentId: appointment.id,
-                    instanceDate: this.formatDate(currentInstanceDate)
-                });
-                instanceCount++;
-            }
-
-            // Move to next occurrence
-            currentInstanceDate = this.getNextOccurrenceDate(currentInstanceDate, recurrence.type);
-        }
-
-        return instances;
-    }
-
-    // Helper method to get appointments by month (useful for calendar views)
-    async getAppointmentsByMonth(clientId, year, month) {
-        const firstDay = new Date(year, month - 1, 1);
-        const lastDay = new Date(year, month, 0);
-        lastDay.setHours(23, 59, 59, 999);
-
-        return this.getPastAppointmentsInRange(clientId, firstDay, lastDay, 500);
-    }
-
-    // Helper method to get all appointments (past and upcoming)
-    async getAllAppointments(clientId, limit = 200) {
+    async getAllAppointments(query, limit = 200) {
         const now = new Date();
 
         const [past, upcoming] = await Promise.all([
-            this.getPastAppointments(clientId, now, limit / 2),
-            this.getUpcomingAppointments(clientId, now, limit / 2)
+            this.getPastAppointments(query, now, limit / 2),
+            this.getUpcomingAppointments(query, now, limit / 2)
         ]);
 
         return {
