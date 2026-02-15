@@ -12,6 +12,7 @@ class ClinicalReportSectionDto {
             clinicalReportId: Joi.string()
                 .uuid()
                 .required(),
+            order: Joi.number.required()
         });
 
         Validator.validateRequest(req, next, schema);

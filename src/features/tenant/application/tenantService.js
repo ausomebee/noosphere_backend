@@ -979,15 +979,15 @@ class TenantService {
 
     async updateStaffPassword(data) {
         const existingStaff = await this.staffRepository.findOne({ id: data.staffId });
-        
+
         if (!existingStaff.active) {
             throw new Error("This staff does not exist.");
         }
-        
+
         if (!(await argon2.verify(existingStaff.password, data.currentPassword))) {
             throw new Error('Incorrect password')
         }
-        
+
         const hashedPass = await argon2.hash(data.newPassword)
         const updated = await this.staffRepository.update(data.staffId, {
             password: hashedPass,
@@ -999,6 +999,32 @@ class TenantService {
 
         return updated;
     }
+
+    async updateTenantAdminChoices(data) {
+        const tenantAdminChoices = await this.choiceRepository.findOne({
+            tenantId: data.tenantId
+        });
+
+        if (!tenantAdminChoices) {
+            throw new Error("Tenant admin choices not found");
+        }
+
+        const update = await this.choiceRepository.update(
+            tenantAdminChoices.id,
+            {
+                Authenticator2FA: data.Authenticator2FA ?? tenantAdminChoices.Authenticator2FA,
+                securityQuestion: data.securityQuestion ?? tenantAdminChoices.securityQuestion,
+                setForAll: data.setForAll ?? tenantAdminChoices.setForAll,
+            }
+        );
+
+        if (!update) {
+            throw new Error("Failed to update tenant admin choices");
+        }
+
+        return update;
+    }
+
 }
 
 export default TenantService;

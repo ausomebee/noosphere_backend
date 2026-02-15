@@ -1375,6 +1375,7 @@ model ClinicalReportSection {
   id               String @id @default(uuid())
   section          String
   content          Json
+  order            Int
   clinicalReportId String
 
   clinicalReport ClinicalReport @relation(fields: [clinicalReportId], references: [id])

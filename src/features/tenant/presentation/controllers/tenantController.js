@@ -82,6 +82,22 @@ class TenantController {
         });
     });
 
+    updateTenantAdminChoices = expressAsyncHandler(async (req, res) => {
+        const tenantAdminChoices = await this.service.updateTenantAdminChoices(req.body);
+
+        if (!tenantAdminChoices) {
+            return res.status(500).json({
+                message: 'Failed to update tenant admin choices.'
+            });
+        }
+
+        return res.status(200).json({
+            message: "Tenant admin choices updated successfully",
+            status: 'ok',
+            data: tenantAdminChoices
+        });
+    });
+
     getAllTenant = expressAsyncHandler(async (req, res) => {
         const tenants = await this.service.getAllTenant();
 

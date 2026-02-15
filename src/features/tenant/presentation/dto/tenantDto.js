@@ -328,6 +328,20 @@ class TenantDto {
         Validator.validateRequest(req, next, schema);
     };
 
+    static updateTenantAdminChoicesDto = (req, res, next) => {
+        const schema = Joi.object({
+            Authenticator2FA: Joi.boolean().required(),
+            securityQuestion: Joi.boolean().required(),
+            setForAll: Joi.boolean().required(),
+            tenantId: Joi.string().uuid().required().messages({
+                "string.empty": "Tenant ID is required",
+                "string.guid": "Tenant ID must be a valid UUID",
+            }),
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
     static forgotPasswordDto = (req, res, next) => {
         const schema = Joi.object({
             email: Joi.string()
