@@ -447,6 +447,29 @@ class ClientRoutes {
 
         /**
          * @swagger
+         * /api/v1/client/clinician/{staffId}/{tenantId}:
+         *   get:
+         *     summary: gets clients by clinician
+         *     tags: [Clients]
+         *     parameters:
+         *       - in: path
+         *         name: staffId
+         *         required: true
+         *         schema:
+         *           type: string
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+        *       200:
+        *         description: clients fetched successfully
+        */
+        this.router.get("/clinician/:staffId/:tenantId", this.controller.getClientsByClinician);
+
+        /**
+         * @swagger
          * /api/v1/client/portal-access:
          *   patch:
          *     summary: set client portal access
@@ -463,63 +486,63 @@ class ClientRoutes {
          */
         this.router.patch("/portal-access", this.controller.clientPortalSettings);
 
-         /**
-         * @swagger
-         * /api/v1/client/{clientTenantId}/{active}:
-         *   patch:
-         *     summary: deactivate or activate a client
-         *     tags: [Clients]
-         *     parameters:
-         *       - in: path
-         *         name: clientTenantId
-         *         required: true
-         *         schema:
-         *           type: string
-         *       - in: path
-         *         name: active
-         *         required: true
-         *         schema:
-         *           type: boolean
-         *     responses:
-         *       200:
-         *         description: Client deactivated successfully
-         */
+        /**
+        * @swagger
+        * /api/v1/client/{clientTenantId}/{active}:
+        *   patch:
+        *     summary: deactivate or activate a client
+        *     tags: [Clients]
+        *     parameters:
+        *       - in: path
+        *         name: clientTenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *       - in: path
+        *         name: active
+        *         required: true
+        *         schema:
+        *           type: boolean
+        *     responses:
+        *       200:
+        *         description: Client deactivated successfully
+        */
         this.router.patch("/:clientTenantId/:active", this.controller.deactivateClient);
 
-         /**
-         * @swagger
-         * /api/v1/client/initiate/password-reset/{email}:
-         *   patch:
-         *     summary: initiate password reset for a client
-         *     tags: [Clients]
-         *     parameters:
-         *       - in: path
-         *         name: email
-         *         required: true
-         *         schema:
-         *           type: string
-         *     responses:
-         *       200:
-         *         description: Email sent successfully
-         */
+        /**
+        * @swagger
+        * /api/v1/client/initiate/password-reset/{email}:
+        *   patch:
+        *     summary: initiate password reset for a client
+        *     tags: [Clients]
+        *     parameters:
+        *       - in: path
+        *         name: email
+        *         required: true
+        *         schema:
+        *           type: string
+        *     responses:
+        *       200:
+        *         description: Email sent successfully
+        */
         this.router.patch("/initiate/password-reset/:email", this.controller.initiatePasswordReset);
 
-         /**
-         * @swagger
-         * /api/v1/client/update-password:
-         *   patch:
-         *     summary: update client password
-         *     tags: [Clients]
-         *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             $ref: '#/components/schemas/UpdatePassword'
-         *     responses:
-         *       200:
-         *         description: Password updated successfully
-         */
+        /**
+        * @swagger
+        * /api/v1/client/update-password:
+        *   patch:
+        *     summary: update client password
+        *     tags: [Clients]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/UpdatePassword'
+        *     responses:
+        *       200:
+        *         description: Password updated successfully
+        */
         this.router.patch("/update-password", ClientDto.updatePasswordDto, this.controller.updateClientPassword);
 
         /**
