@@ -51,7 +51,9 @@ class StaffAvailabilityService {
     }
 
     async getStaffAvailabilities(staffId) {
-        const records = await this.staffAvailabilityRepository.findAll({ staffId });
+        const records = await this.staffAvailabilityRepository.findAllAndPopulate({ staffId }, {
+            availabilityDays: true
+        });
 
         if (!records) {
             throw new Error("Staff Availability records not found");
