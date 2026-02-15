@@ -433,8 +433,16 @@ class ClientService {
         return { ...update, clientTenantId: clientTenant.id };
     }
 
+    async getClientsByClinician(staffId, tenantId) {
+        const clients = await this.clientRepository.getClientsByClinician(staffId, tenantId);
+        if (!clients) {
+            throw new Error("clients not found")
+        }
+
+        return clients;
+    }
+
     async getTenantClients(tenantId) {
-        console.log(tenantId)
         const clients = await this.clientTenantRepository.findAllAndPopulate({ tenantId }, { client: { include: { payer: true } }, clinicians: true });
         if (!clients) {
             throw new Error("clients not found")

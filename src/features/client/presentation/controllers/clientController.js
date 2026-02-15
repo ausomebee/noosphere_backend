@@ -120,6 +120,20 @@ class ClientController {
         });
     });
 
+    getClientsByClinician = expressAsyncHandler(async (req, res) => {
+        const clients = await this.service.getClientsByClinician(req.params.staffId, req.params.tenantId);
+
+        if (!clients) {
+            res.status(500).json({ message: 'Failed to fetch clients' });
+        }
+
+        return res.status(201).json({
+            message: "clients fetched successfully",
+            status: 'ok',
+            data: clients
+        });
+    });
+
     login = expressAsyncHandler(async (req, res) => {
         const client = await this.service.login({...req.body, subdomain: req.headers.host.split('.')[0]});
 
