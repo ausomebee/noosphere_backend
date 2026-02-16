@@ -1369,6 +1369,7 @@ model ClinicalReport {
   clinicalReportSections       ClinicalReportSection[]
   clinicalReportHistories      ClinicalReportHistory[]
   clinicalReportChangeRequests ClinicalReportChangeRequest[]
+  clinicalReportVersions       ClinicalReportVersion[]
 }
 
 model ClinicalReportSection {
@@ -1406,6 +1407,16 @@ model ClinicalReportChangeRequest {
   clinicalReport ClinicalReport @relation(fields: [clinicalReportId], references: [id])
   client         ClientTenant?  @relation(fields: [clientTenantId], references: [id])
   approver       TenantStaff?   @relation("ReportsRequestApprover", fields: [approverId], references: [id])
+}
+
+model ClinicalReportVersion {
+  id               String   @id @default(uuid())
+  clinicalReportId String
+  versionNumber    Int
+  url              String
+  createdAt        DateTime @default(now())
+
+  clinicalReport ClinicalReport @relation(fields: [clinicalReportId], references: [id])
 }
 
 model TenantGeneralSettings {

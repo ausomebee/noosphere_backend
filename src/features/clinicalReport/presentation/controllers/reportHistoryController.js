@@ -2,6 +2,7 @@ import expressAsyncHandler from "express-async-handler";
 import prismaService from "../../../../config/prisma.js";
 import ClinicalReportHistoryService from "../../application/reportHistoryService.js";
 import ClinicalReportHistoryRepository from "../../infrastructure/reportHistoryRepository.js";
+import ClinicalReportHistory from "../../domain/reportHistory.js";
 
 class ClinicalReportHistoryController {
     constructor() {

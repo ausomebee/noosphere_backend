@@ -32,7 +32,8 @@ class ClinicalReportService {
             creator: { select: { fullName: true } },
             client: { select: { client: { select: { firstName: true, lastName: true } } } },
             approver: { select: { fullName: true } },
-            clinicalReportChangeRequests: true
+            clinicalReportChangeRequests: true,
+            clinicalReportVersions: true
         });
         if (!record) throw new Error("Clinical Report not found");
         return record;

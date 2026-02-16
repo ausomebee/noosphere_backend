@@ -10,6 +10,8 @@ import ClientDocumentsRepository from "../../infrastructure/clientDocumentsRepos
 import ClientDocumentsService from "../../application/clientDocumentsService.js";
 import TenantRepository from "../../../tenant/infrastructure/tenantRepository.js";
 import TenantService from "../../../tenant/application/tenantService.js";
+import RefreshTokenRepository from "../../../auth/infrastructure/refreshTokenRepository.js";
+import RefreshTokenService from "../../../auth/application/refreshTokenService.js";
 
 class ClientController {
     constructor() {
@@ -23,6 +25,8 @@ class ClientController {
         this.clientDocumentsService = new ClientDocumentsService({ clientDocumentsRepository: this.clientDocumentsRepository });
         this.tenantRepository = new TenantRepository(this.prisma.tenant)
         this.tenantService = new TenantService({ tenantRepository: this.tenantRepository });
+        this.refreshTokenRepository = new RefreshTokenRepository(this.prisma.refreshTokens);
+        this.refreshTokenService = new RefreshTokenService({ refreshTokenRepository: this.refreshTokenRepository });
     }
 
     createClientCandidate = expressAsyncHandler(async (req, res) => {
@@ -139,6 +143,18 @@ class ClientController {
 
         if (!client) {
             res.status(500).json({ message: 'Failed to login' });
+        }
+
+        const refreshToken = await this.refreshTokenService.createRefreshToken({
+            ownerId: client.id,
+            ownerType: "client",
+            refreshToken: client.refreshToken,
+            fingerprint: req.headers["x-fingerprint"],
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
+        });
+
+        if (!refreshToken) {
+            res.status(500).json({ message: 'Failed to create refresh token' });
         }
 
         return res.status(201).json({
