@@ -13,6 +13,10 @@ import PDFDocument from "pdfkit";
 import emailService from "../../../../utilities/ses.js";
 import TokenService from "../../../../utilities/generate_token.js";
 import ClinicalReportPdfGenerator from "../../../../utilities/clinicalReportGenerator.js";
+import ClinicalReportVersionRepository from "../../infrastructure/clinicalReportVersionRepository.js";
+import ClinicalReportVersionService from "../../application/clinicalReportVersionService.js";
+import S3Service from "../../../../utilities/s3.js";
+import ClinicalReportVersion from "../../domain/clinicalReportVersion.js";
 
 class ClinicalReportController {
     constructor() {
@@ -34,8 +38,17 @@ class ClinicalReportController {
             )
         });
 
+        this.versionRepository = new ClinicalReportVersionRepository(
+            this.prisma.clinicalReportVersion
+        );
+
+        this.versionService = new ClinicalReportVersionService({
+            repository: this.versionRepository
+        });
+
         this.token = TokenService;
         this.pdfGenerator = new ClinicalReportPdfGenerator();
+        this.s3Service = new S3Service();
     }
 
     createReport = expressAsyncHandler(async (req, res) => {
@@ -605,6 +618,20 @@ class ClinicalReportController {
                 throw new Error("Failed to send email - no message ID returned");
             }
 
+            const s3Key = `clinical-reports/${report.id}/${this.sanitizeFilename(report.title)}.pdf`;
+            const url = await this.s3Service.uploadBuffer(s3Key, pdfBuffer);
+
+            const data = new ClinicalReportVersion({
+                clinicalReportId: report.id,
+                url: url
+            });
+
+            const record = await this.versionService.createVersion(data.createVersion);
+
+            if (!record) {
+                return res.status(500).json({ message: "Failed to create report version" });
+            }
+
             return res.status(200).json({
                 status: "ok",
                 message: "Clinical report signed and sent successfully",
@@ -617,8 +644,6 @@ class ClinicalReportController {
             });
 
         } catch (error) {
-            console.error("Error in submitSignature:", error);
-
             return res.status(500).json({
                 status: "error",
                 message: "Failed to process signature and send report",

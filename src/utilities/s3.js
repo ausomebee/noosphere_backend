@@ -1,7 +1,7 @@
-import { S3Client, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, GetObjectCommand, DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import multer from "multer";
 import multerS3 from "multer-s3";
-import path from "path"; // Use ES6 import for path
+import path from "path";
 
 class S3Service {
   constructor() {
@@ -27,7 +27,6 @@ class S3Service {
         },
       }),
       fileFilter: (req, file, cb) => {
-        // MIME types for images, PDFs, videos
         const allowedMimes = [
           "image/jpeg",
           "image/png",
@@ -38,7 +37,6 @@ class S3Service {
           "video/mpeg",
         ];
 
-        // Extensions for documents
         const allowedExtensions = [
           ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".pdf", ".csv",
           ".jpeg", ".jpg", ".png", ".gif", ".webp", ".mp4", ".mpeg"
@@ -46,7 +44,6 @@ class S3Service {
 
         const ext = path.extname(file.originalname).toLowerCase();
 
-        // Accept if MIME is allowed OR extension is allowed (handles browsers sending weird MIME types)
         if (allowedMimes.includes(file.mimetype) || allowedExtensions.includes(ext)) {
           cb(null, true);
         } else {
@@ -55,12 +52,25 @@ class S3Service {
           ), false);
         }
       },
-      limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB max
+      limits: { fileSize: 50 * 1024 * 1024 },
     });
   }
 
   getUploadMiddleware() {
     return this.upload;
+  }
+
+  async uploadBuffer(key, buffer, contentType = "application/pdf") {
+    const command = new PutObjectCommand({
+      Bucket: this.bucketName,
+      Key: key,
+      Body: buffer,
+      ContentType: contentType,
+      ACL: "private"
+    });
+
+    await this.s3.send(command);
+    return `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
   }
 
   async getObjectStream(key) {

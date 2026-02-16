@@ -13,7 +13,7 @@ class RefreshTokenService {
         const {
             ownerId,
             ownerType,
-            refreshToken, // JWT string
+            refreshToken, 
             fingerprint,
             expiresAt,
         } = data;
@@ -38,7 +38,6 @@ class RefreshTokenService {
     async verifyRefreshToken(data) {
         const { refreshToken, fingerprint } = data;
 
-        // 1. Verify JWT integrity + expiry
         let decoded;
         try {
             decoded = jwt.verify(refreshToken, this.refreshSecret);
@@ -46,7 +45,6 @@ class RefreshTokenService {
             throw new Error("Invalid or expired refresh token");
         }
 
-        // 2. Find non-used token for device
         const storedTokens = await this.repository.findAll({
             where: {
                 fingerprint,
@@ -58,7 +56,6 @@ class RefreshTokenService {
             throw new Error("Refresh token not found");
         }
 
-        // 3. Match hashed token
         let matchedToken = null;
         for (const token of storedTokens) {
             if (await argon2.verify(token.tokenHash, refreshToken)) {
@@ -93,7 +90,6 @@ class RefreshTokenService {
             fingerprint,
         });
 
-        // invalidate old token
         await this.repository.update(existing.id, { used: true });
 
         const newTokenHash = await argon2.hash(newRefreshToken);
