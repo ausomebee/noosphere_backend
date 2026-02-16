@@ -1048,7 +1048,6 @@ model CompensationTypes {
   isActive  Boolean @default(true)
 
   tenant        Tenant          @relation(fields: [tenantId], references: [id])
-  PayrollCycles PayrollCycles[]
 }
 
 model IncomeItems {
@@ -1081,7 +1080,7 @@ model PayrollCycles {
   id                 String  @id @default(uuid())
   tenantId           String
   name               String
-  compensationTypeId String
+  compensationType String
   interval           Int
   startDate          String
   autoRun            Boolean @default(false)
@@ -1089,7 +1088,6 @@ model PayrollCycles {
   isActive           Boolean @default(true)
 
   tenant           Tenant            @relation(fields: [tenantId], references: [id])
-  compensationType CompensationTypes @relation(fields: [compensationTypeId], references: [id])
   PayrollRecord    PayrollRecord[]
 }
 
