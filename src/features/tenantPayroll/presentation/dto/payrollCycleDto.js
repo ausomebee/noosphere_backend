@@ -6,7 +6,7 @@ class PayrollCycleDto {
         const schema = Joi.object({
             tenantId: Joi.string().uuid().required(),
             name: Joi.string().min(1).required(),
-            compensationTypeId: Joi.string().uuid().required(),
+            compensationType: Joi.string().uuid().required(),
             interval: Joi.number().required(),
             startDate: Joi.string().required(),
             autoRun: Joi.boolean().default(false)
@@ -20,7 +20,7 @@ class PayrollCycleDto {
             id: Joi.string().uuid().required(),
             tenantId: Joi.string().uuid().required(),
             name: Joi.string().min(1),
-            compensationTypeId: Joi.string().uuid(),
+            compensationType: Joi.string().uuid(),
             interval: Joi.number(),
             startDate: Joi.string(),
             autoRun: Joi.boolean(),

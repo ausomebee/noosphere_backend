@@ -3,7 +3,7 @@ class PayrollCycle {
         id,
         tenantId,
         name,
-        compensationTypeId,
+        compensationType,
         interval,
         startDate,
         autoRun,
@@ -13,7 +13,7 @@ class PayrollCycle {
         this.id = id;
         this.tenantId = tenantId;
         this.name = name;
-        this.compensationTypeId = compensationTypeId;
+        this.compensationType = compensationType;
         this.interval = interval;
         this.startDate = startDate;
         this.autoRun = autoRun;
@@ -25,7 +25,7 @@ class PayrollCycle {
         return {
             tenantId: this.tenantId,
             name: this.name,
-            compensationTypeId: this.compensationTypeId,
+            compensationType: this.compensationType,
             interval: this.interval,
             startDate: this.startDate,
             autoRun: this.autoRun,
@@ -39,7 +39,7 @@ class PayrollCycle {
             id: this.id,
             tenantId: this.tenantId,
             name: this.name,
-            compensationTypeId: this.compensationTypeId,
+            compensationType: this.compensationType,
             interval: this.interval,
             startDate: this.startDate,
             autoRun: this.autoRun,

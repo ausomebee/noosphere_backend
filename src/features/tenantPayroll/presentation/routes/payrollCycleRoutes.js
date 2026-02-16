@@ -11,7 +11,7 @@ import PayrollCycleDto from "../dto/payrollCycleDto.js";
  *       required:
  *         - tenantId
  *         - name
- *         - compensationTypeId
+ *         - compensationType
  *         - interval
  *         - startDate
  *       properties:
@@ -23,7 +23,7 @@ import PayrollCycleDto from "../dto/payrollCycleDto.js";
  *           type: string
  *           description: Name of the payroll cycle
  *           example: "Monthly Payroll"
- *         compensationTypeId:
+ *         compensationType:
  *           type: string
  *           format: uuid
  *           description: ID of the associated compensation type
@@ -57,7 +57,7 @@ import PayrollCycleDto from "../dto/payrollCycleDto.js";
  *         name:
  *           type: string
  *           description: Updated name of the payroll cycle
- *         compensationTypeId:
+ *         compensationType:
  *           type: string
  *           format: uuid
  *           description: Updated compensation type reference
