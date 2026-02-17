@@ -147,7 +147,7 @@ class ClientController {
 
         const refreshToken = await this.refreshTokenService.createRefreshToken({
             ownerId: client.id,
-            ownerType: "client",
+            ownerType: "CLIENT",
             refreshToken: client.refreshToken,
             fingerprint: req.headers["x-fingerprint"],
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
