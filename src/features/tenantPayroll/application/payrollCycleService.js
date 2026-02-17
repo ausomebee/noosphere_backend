@@ -1,3 +1,5 @@
+import { id } from "date-fns/locale";
+
 class PayrollCycleService {
     constructor({ payrollCycleRepository }) {
         this.payrollCycleRepository = payrollCycleRepository;
@@ -91,7 +93,8 @@ class PayrollCycleService {
                 payrollDate: cycle.startDate,
                 payPeriod: payPeriod.toISOString().split("T")[0],
                 numberOfStaffs,
-                totalPayrollValue
+                totalPayrollValue,
+                id: cycle.id
             };
         });
     }
