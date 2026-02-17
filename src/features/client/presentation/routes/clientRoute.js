@@ -340,12 +340,20 @@ class ClientRoutes {
          */
         this.router.post("/", ClientDto.createClientDto, this.controller.createClientCandidate);
 
-        /**
+       /**
          * @swagger
          * /api/v1/client/login:
          *   post:
          *     summary: client login
          *     tags: [Clients]
+         *     parameters:
+         *       - in: header
+         *         name: x-fingerprint
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: Unique device fingerprint (UUID)
+         *         example: 5d4ebdd2-fba0-4952-9b26-d1784757561e
          *     requestBody:
          *       required: true
          *       content:
