@@ -145,17 +145,17 @@ class ClientController {
             res.status(500).json({ message: 'Failed to login' });
         }
 
-        // const refreshToken = await this.refreshTokenService.createRefreshToken({
-        //     ownerId: client.id,
-        //     ownerType: "CLIENT",
-        //     refreshToken: client.refreshToken,
-        //     fingerprint: req.headers["x-fingerprint"],
-        //     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
-        // });
+        const refreshToken = await this.refreshTokenService.createRefreshToken({
+            ownerId: client.id,
+            ownerType: "CLIENT",
+            refreshToken: client.refreshToken,
+            fingerprint: req.headers["x-fingerprint"],
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
+        });
 
-        // if (!refreshToken) {
-        //     res.status(500).json({ message: 'Failed to create refresh token' });
-        // }
+        if (!refreshToken) {
+            res.status(500).json({ message: 'Failed to create refresh token' });
+        }
 
         return res.status(201).json({
             message: "login successful",
