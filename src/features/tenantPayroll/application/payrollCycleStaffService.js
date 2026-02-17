@@ -93,7 +93,8 @@ class PayrollCycleStaffService {
                     staffName: staff.fullName,
                     grossPay,
                     netPay,
-                    paymentSchedule: payroll.paymentSchedule
+                    paymentSchedule: payroll.paymentSchedule,
+                    record
                 };
             }
 
