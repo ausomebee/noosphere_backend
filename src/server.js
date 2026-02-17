@@ -77,7 +77,6 @@ import clinicalReportRequestsRoute from "./features/clinicalReport/presentation/
 import tenantGeneralSettingsRoute from "./features/tenant/presentation/routes/tenantGeneralSettingsRoutes.js";
 import tenantAdditionalSecurityQuestionsRoute from "./features/tenant/presentation/routes/tenantAdditionalSecurityQuestionsRoutes.js";
 import clientNotificationSettingsRoute from "./features/client/presentation/routes/clientNotificationSettingsRoutes.js";
-import payrollCycleStaffRoute from "./features/tenantPayroll/presentation/routes/payrollCycleStaffRoutes.js";
 
 class App {
     constructor() {
@@ -197,7 +196,6 @@ class App {
         this.app.use("/api/v1/tenant-security-questions", tenantAdditionalSecurityQuestionsRoute);
         this.app.use("/api/v1/tenant-general-settings", tenantGeneralSettingsRoute);
         this.app.use("/api/v1/notification-settings", clientNotificationSettingsRoute);
-        this.app.use("/api/v1/payroll-cycle-staffs", payrollCycleStaffRoute);
     }
 
     initializeErrorHandler() {

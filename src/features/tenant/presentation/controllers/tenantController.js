@@ -98,38 +98,6 @@ class TenantController {
         });
     });
 
-    getStaffByPaymentSchedule = expressAsyncHandler(async (req, res) => {
-        const staffs = await this.service.getStaffByPaymentSchedule(req.params.tenantId, req.params.paymentSchedule);
-
-        if (!staffs) {
-            return res.status(500).json({
-                message: 'Failed to fetch staff by payment schedule.'
-            });
-        }
-
-        return res.status(200).json({
-            message: "Staff fetched successfully",
-            status: 'ok',
-            data: staffs
-        });
-    });
-
-    getStaffPayrollSummary = expressAsyncHandler(async (req, res) => {
-        const summary = await this.service.getStaffPayrollSummary(req.params.tenantId);
-
-        if (!summary) {
-            return res.status(500).json({
-                message: 'Failed to fetch staff payroll summary.'
-            });
-        }
-
-        return res.status(200).json({
-            message: "Staff payroll summary fetched successfully",
-            status: 'ok',
-            data: summary
-        });
-    });
-
     getAllTenant = expressAsyncHandler(async (req, res) => {
         const tenants = await this.service.getAllTenant();
 

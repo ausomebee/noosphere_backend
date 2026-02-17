@@ -11,37 +11,6 @@ class PayrollCycleRepository extends BaseRepository {
             include: populate
         });
     }
-
-    async findPayrollCyclesWithStatsByTenant(tenantId) {
-        return await this.model.findMany({
-            where: {
-                tenantId,
-                isDeleted: false,
-                isActive: true
-            },
-            include: {
-                payrolCycleStaffs: {
-                    include: {
-                        staff: {
-                            include: {
-                                TenantStaffPayroll: {
-                                    where: { isDeleted: false },
-                                    include: {
-                                        incomeItems: {
-                                            where: { isDeleted: false, isActive: true }
-                                        },
-                                        deductions: {
-                                            where: { isDeleted: false, isActive: true }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
 }
 
 export default PayrollCycleRepository;

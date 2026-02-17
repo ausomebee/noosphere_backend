@@ -140,24 +140,6 @@ class PayrollCycleRoutes {
 
         /**
          * @swagger
-         * /api/v1/payroll-cycles/tenant/{tenantId}/stats:
-         *   get:
-         *     summary: Get payroll cycles stats for a tenant
-         *     tags: [payroll-cycles]
-         *     parameters:
-         *       - in: path
-         *         name: tenantId
-         *         required: true
-         *         schema:
-         *           type: string
-         *     responses:
-         *       200:
-         *         description: List of payroll cycles retrieved successfully
-         */
-        this.router.get("/tenant/:tenantId/stats", this.controller.getPayrollCyclesStatsByTenant);
-
-        /**
-         * @swagger
          * /api/v1/payroll-cycles/{id}:
          *   get:
          *     summary: Get a single payroll cycle by ID
