@@ -55,8 +55,7 @@ class PayrollCycleStaffService {
     }
 
     async getPayrollCycleStaffs(payrollCycleId) {
-        const records =
-            await this.payrollCycleStaffRepository.findPayrollCycleStaffWithDetails(payrollCycleId);
+        const records = await this.payrollCycleStaffRepository.findPayrollCycleStaffWithDetails(payrollCycleId);
 
         return records.map(record => {
             const staff = record.staff;
@@ -102,7 +101,8 @@ class PayrollCycleStaffService {
                 staffName: staff.fullName,
                 grossPay: 0,
                 netPay: 0,
-                paymentSchedule: "N/A"
+                paymentSchedule: "N/A",
+                record
             };
         });
     }
