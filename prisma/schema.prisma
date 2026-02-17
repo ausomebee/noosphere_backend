@@ -1110,7 +1110,7 @@ model PayrollRecord {
   noOfStaff      Int
   totalValue     Int
 
-  payrollCycle PayrollCycles @relation(fields: [payrollCycleId], references: [id])
+  payrollCycle PayrollCycles @relation(fields: [payrollCycleId], references: [id]) 
 }
 
 model Forms {
