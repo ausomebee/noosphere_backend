@@ -3,12 +3,20 @@ import prismaService from "../../../../config/prisma.js";
 import PayrollCycleRepository from "../../infrastructure/payrollCycleRepository.js";
 import PayrollCycleService from "../../application/payrollCycleService.js";
 import PayrollCycle from "../../domain/payrollCycle.js";
+import PayrollCycleStaffRepository from "../../infrastructure/payrollCycleStaffRepository.js";
+import PayrollCycleStaffService from "../../application/payrollCycleStaffService.js";
+import StaffRepository from "../../../tenant/infrastructure/staffRepository.js";
+import TenantService from "../../../tenant/application/tenantService.js";
 
 class PayrollCycleController {
     constructor() {
         this.prisma = prismaService.getClient();
         this.payrollCycleRepository = new PayrollCycleRepository(this.prisma.payrollCycles);
         this.service = new PayrollCycleService({ payrollCycleRepository: this.payrollCycleRepository });
+        this.payrollCycleStaffRepository = new PayrollCycleStaffRepository(this.prisma.payrollCycleStaffs);
+        this.payrollCycleStaffService = new PayrollCycleStaffService({ payrollCycleStaffRepository: this.payrollCycleStaffRepository });
+        this.staffRepository = new StaffRepository(this.prisma.tenantStaff);
+        this.tenantService = new TenantService({ staffRepository: this.staffRepository });
     }
 
     createPayrollCycle = expressAsyncHandler(async (req, res) => {
@@ -18,6 +26,15 @@ class PayrollCycleController {
 
         if (!payrollCycle) {
             return res.status(500).json({ message: "Failed to create payroll cycle" });
+        }
+
+        const staffs = await this.tenantService.getStaffByPaymentSchedule(payrollCycleData.tenantId, payrollCycleData.compensationType);
+
+        for (const staff of staffs) {
+            await this.payrollCycleStaffService.createPayrollCycleStaff({
+                payrollCycleId: payrollCycle.id,
+                staffId: staff.id
+            });
         }
 
         return res.status(201).json({
@@ -83,6 +100,20 @@ class PayrollCycleController {
             message: "Payroll cycle deactivated successfully",
             status: "ok",
             data: payrollCycle
+        });
+    });
+
+    getPayrollCyclesStatsByTenant = expressAsyncHandler(async (req, res) => {
+        const payrollCycles = await this.service.getPayrollCyclesStatsByTenant(req.params.tenantId);
+
+        if (!payrollCycles) {
+            return res.status(404).json({ message: "No payroll cycles found" });
+        }
+
+        return res.status(200).json({
+            message: "Payroll cycles fetched successfully",
+            status: "ok",
+            data: payrollCycles
         });
     });
 }
