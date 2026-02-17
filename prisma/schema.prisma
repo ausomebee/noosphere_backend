@@ -268,6 +268,7 @@ model TenantStaff {
   clinicalReportHistories      ClinicalReportHistory[]
   clinicalReportChangeRequests ClinicalReportChangeRequest[] @relation("ReportsRequestApprover")
   notifications                Notifications[]
+  payrolCycleStaffs            PayrollCycleStaffs[]
 }
 
 model TenantStaffLicenses {
@@ -1047,7 +1048,7 @@ model CompensationTypes {
   isDeleted Boolean @default(false)
   isActive  Boolean @default(true)
 
-  tenant        Tenant          @relation(fields: [tenantId], references: [id])
+  tenant Tenant @relation(fields: [tenantId], references: [id])
 }
 
 model IncomeItems {
@@ -1077,18 +1078,28 @@ model Deductions {
 }
 
 model PayrollCycles {
-  id                 String  @id @default(uuid())
-  tenantId           String
-  name               String
+  id               String  @id @default(uuid())
+  tenantId         String
+  name             String
   compensationType String
-  interval           Int
-  startDate          String
-  autoRun            Boolean @default(false)
-  isDeleted          Boolean @default(false)
-  isActive           Boolean @default(true)
+  interval         Int
+  startDate        String
+  autoRun          Boolean @default(false)
+  isDeleted        Boolean @default(false)
+  isActive         Boolean @default(true)
 
-  tenant           Tenant            @relation(fields: [tenantId], references: [id])
-  PayrollRecord    PayrollRecord[]
+  tenant            Tenant              @relation(fields: [tenantId], references: [id])
+  PayrollRecord     PayrollRecord[]
+  payrolCycleStaffs PayrollCycleStaffs[]
+}
+
+model PayrollCycleStaffs {
+  id             String @id @default(uuid())
+  payrollCycleId String
+  staffId        String
+
+  payrollCycle PayrollCycles @relation(fields: [payrollCycleId], references: [id])
+  staff        TenantStaff   @relation(fields: [staffId], references: [id])
 }
 
 model PayrollRecord {

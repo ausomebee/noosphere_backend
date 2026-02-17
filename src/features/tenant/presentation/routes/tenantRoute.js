@@ -538,6 +538,57 @@ class TenantRoutes {
         this.router.patch("/tenantadminchoices", TenantDto.updateTenantAdminChoicesDto, this.controller.updateTenantAdminChoices);
 
         /**
+        * @swagger
+        * /api/v1/tenant/getstaffbypaymentschedule/{tenantId}/{paymentSchedule}:
+        *   get:
+        *     summary: Get staff by payment schedule
+        *     tags: [Tenant]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *           format: uuid
+        *         description: The ID of the tenant
+        *       - in: path
+        *         name: paymentSchedule
+        *         required: true
+        *         schema:
+        *           type: string
+        *           enum: [Weekly, Monthly, Hourly]
+        *         description: The payment schedule of the staff to retrieve
+        *     responses:
+        *       200:
+        *         description: Staff retrieved successfully by payment schedule
+        *       400:
+        *         description: Bad request or invalid payment schedule value provided
+        */
+        this.router.get("/getstaffbypaymentschedule/:tenantId/:paymentSchedule", this.controller.getStaffByPaymentSchedule);
+
+        /**
+        * @swagger
+        * /api/v1/tenant/getstaffpayrollsummary/{tenantId}:
+        *   get:
+        *     summary: Get staff payroll summary for a tenant
+        *     tags: [Tenant]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *           format: uuid
+        *         description: The ID of the tenant
+        *     responses:
+        *       200:
+        *         description: Staff payroll summary retrieved successfully
+        *       400:
+        *         description: Bad request or invalid tenant ID provided
+        */
+        this.router.get("/getstaffpayrollsummary/:tenantId", this.controller.getStaffPayrollSummary);
+
+        /**
          * @swagger
          * /api/v1/tenant/tenantadminchoices/{tenantId}:
          *   get:
