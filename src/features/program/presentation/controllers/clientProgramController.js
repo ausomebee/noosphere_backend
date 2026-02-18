@@ -37,7 +37,7 @@ class ClientProgramController {
             res.status(500).json({ message: 'Failed to create program' });
         }
 
-        for (const target of program.Targets) {
+        for (const target of program.target) {
             const targetData = new Target({ ...target, programId: newProgram.id });
             const newTarget = await this.targetService.createTarget(targetData.createTarget);
 
