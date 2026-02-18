@@ -30,7 +30,7 @@ class ClientProgramController {
             return res.status(404).json({ message: "Program not found" });
         }
 
-        const programData = new Program(program);
+        const programData = new Program({...program, isCustom: true});
         const newProgram = await this.programService.createProgram(programData.createProgram);
 
         if (!newProgram) {
@@ -38,7 +38,7 @@ class ClientProgramController {
         }
 
         for (const target of program.target) {
-            const targetData = new Target({ ...target, programId: newProgram.id });
+            const targetData = new Target({ ...target, programId: newProgram.id, isCustom: true });
             const newTarget = await this.targetService.createTarget(targetData.createTarget);
 
             if (!newTarget) {

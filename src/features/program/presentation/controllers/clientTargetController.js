@@ -23,7 +23,7 @@ class ClientTargetController {
             return res.status(404).json({ message: "Target not found" });
         }
 
-        const targetData = new Target(target);
+        const targetData = new Target({...target, isCustom: true});
         const newTarget = await this.targetService.createTarget(targetData.createTarget);
 
         if (!newTarget) {

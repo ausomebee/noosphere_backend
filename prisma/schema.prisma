@@ -268,7 +268,7 @@ model TenantStaff {
   clinicalReportHistories      ClinicalReportHistory[]
   clinicalReportChangeRequests ClinicalReportChangeRequest[] @relation("ReportsRequestApprover")
   notifications                Notifications[]
-  payrollCycleStaffs            PayrollCycleStaffs[]
+  payrollCycleStaffs           PayrollCycleStaffs[]
 }
 
 model TenantStaffLicenses {
@@ -757,6 +757,7 @@ model Program {
   name        String
   description String
   domainId    String?
+  isCustom    Boolean  @default(false)
   isDeleted   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -771,6 +772,7 @@ model Target {
   name                 String
   description          String
   programId            String?
+  isCustom             Boolean  @default(false)
   isDeleted            Boolean  @default(false)
   sd                   String
   expectedResponse     String
@@ -1088,8 +1090,8 @@ model PayrollCycles {
   isDeleted        Boolean @default(false)
   isActive         Boolean @default(true)
 
-  tenant            Tenant              @relation(fields: [tenantId], references: [id])
-  PayrollRecord     PayrollRecord[]
+  tenant             Tenant               @relation(fields: [tenantId], references: [id])
+  PayrollRecord      PayrollRecord[]
   payrollCycleStaffs PayrollCycleStaffs[]
 }
 
@@ -1110,7 +1112,7 @@ model PayrollRecord {
   noOfStaff      Int
   totalValue     Int
 
-  payrollCycle PayrollCycles @relation(fields: [payrollCycleId], references: [id]) 
+  payrollCycle PayrollCycles @relation(fields: [payrollCycleId], references: [id])
 }
 
 model Forms {
