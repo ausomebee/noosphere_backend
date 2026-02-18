@@ -32,7 +32,7 @@ class PayrollService {
     }
 
     async getTenantStaffPayrolls(tenantStaffId) {
-        const payrolls = await this.payrollRepository.findAllAndPopulate({ tenantStaffId, isDeleted: false });
+        const payrolls = await this.payrollRepository.findAllAndPopulate({ tenantStaffId, isDeleted: false }, { deductions: true, incomeItems: true });
 
         if (!payrolls) {
             throw new Error("Payrolls not found");
