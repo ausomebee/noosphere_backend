@@ -31,7 +31,7 @@ class ClientProgramController {
         }
 
         const programData = new Program(program);
-        const newProgram = await this.service.createProgram(programData.createProgram);
+        const newProgram = await this.programService.createProgram(programData.createProgram);
 
         if (!newProgram) {
             res.status(500).json({ message: 'Failed to create program' });
