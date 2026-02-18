@@ -7,6 +7,8 @@ import PayrollCycleStaffRepository from "../../infrastructure/payrollCycleStaffR
 import PayrollCycleStaffService from "../../application/payrollCycleStaffService.js";
 import StaffRepository from "../../../tenant/infrastructure/staffRepository.js";
 import TenantService from "../../../tenant/application/tenantService.js";
+import PayrollRepository from "../../../organizationStaff/infrastructure/payrollRepository.js";
+import PayrollService from "../../../organizationStaff/application/payrollService.js";
 
 class PayrollCycleController {
     constructor() {
@@ -17,6 +19,10 @@ class PayrollCycleController {
         this.payrollCycleStaffService = new PayrollCycleStaffService({ payrollCycleStaffRepository: this.payrollCycleStaffRepository });
         this.staffRepository = new StaffRepository(this.prisma.tenantStaff);
         this.tenantService = new TenantService({ staffRepository: this.staffRepository });
+        this.payrollRepository = new PayrollRepository(this.prisma.tenantStaffPayroll);
+        this.payrollService = new PayrollService({
+            payrollRepository: this.payrollRepository
+        });
     }
 
     createPayrollCycle = expressAsyncHandler(async (req, res) => {
@@ -51,9 +57,7 @@ class PayrollCycleController {
         const end = new Date(data.endDate);
 
         if (isNaN(start) || isNaN(end)) {
-            return res.status(400).json({
-                message: "Invalid date format"
-            });
+            return res.status(400).json({ message: "Invalid date format" });
         }
 
         if (end <= start) {
@@ -64,22 +68,32 @@ class PayrollCycleController {
 
         const interval = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
 
-        const payrollCycleData = new PayrollCycle({
+        const payrollCycleData = {
             tenantId: data.tenantId,
-            interval: interval,
-            startDate: start.toISOString().split("T")[0],
-        });
+            compensationType: data.compensationType,
+            interval,
+            startDate: start.toISOString().split("T")[0]
+        };
 
-        const payrollCycle = await this.service.createPayrollCycle(payrollCycleData.createPayrollCycle);
+        const payrollCycle = await this.service.createPayrollCycle(payrollCycleData);
 
         if (!payrollCycle) {
-            return res.status(500).json({ message: "Failed to create payroll cycle" });
+            return res.status(500).json({
+                message: "Failed to create payroll cycle"
+            });
         }
 
         for (const staff of data.staffs) {
+
             await this.payrollCycleStaffService.createPayrollCycleStaff({
                 payrollCycleId: payrollCycle.id,
                 staffId: staff.id
+            });
+
+            await this.payrollService.updatePayroll({
+                id: staff.payrollId,
+                deductions: staff.deductions,
+                incomeItems: staff.incomeItems
             });
         }
 
@@ -89,6 +103,7 @@ class PayrollCycleController {
             data: payrollCycle
         });
     });
+
 
     updatePayrollCycle = expressAsyncHandler(async (req, res) => {
         const payrollCycle = await this.service.updatePayrollCycle(req.body);

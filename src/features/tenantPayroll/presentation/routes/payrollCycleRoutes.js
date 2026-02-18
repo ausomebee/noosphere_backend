@@ -25,16 +25,18 @@ import PayrollCycleDto from "../dto/payrollCycleDto.js";
  *           example: "Monthly Payroll"
  *         compensationType:
  *           type: string
- *           format: uuid
- *           description: ID of the associated compensation type
+ *           description: Payroll compensation type
+ *           enum: [DAILY, WEEKLY, BIWEEKLY, MONTHLY]
+ *           example: MONTHLY
  *         interval:
  *           type: integer
  *           description: Payroll interval in days
  *           example: 30
  *         startDate:
  *           type: string
+ *           format: date
  *           description: Start date of the payroll cycle (YYYY-MM-DD)
- *           example: "2025-01-01"
+ *           example: "2026-02-01"
  *         autoRun:
  *           type: boolean
  *           description: Whether the payroll cycle runs automatically
@@ -44,6 +46,7 @@ import PayrollCycleDto from "../dto/payrollCycleDto.js";
  *       type: object
  *       required:
  *         - tenantId
+ *         - compensationType
  *         - startDate
  *         - endDate
  *         - staffs
@@ -53,17 +56,23 @@ import PayrollCycleDto from "../dto/payrollCycleDto.js";
  *           format: uuid
  *           description: Unique tenant identifier
  *
+ *         compensationType:
+ *           type: string
+ *           description: Payroll compensation type
+ *           enum: [DAILY, WEEKLY, BIWEEKLY, MONTHLY]
+ *           example: MONTHLY
+ *
  *         startDate:
  *           type: string
  *           format: date
  *           description: Start date of the payroll cycle (YYYY-MM-DD)
- *           example: "2025-01-01"
+ *           example: "2026-02-01"
  *
  *         endDate:
  *           type: string
  *           format: date
  *           description: End date of the payroll cycle (YYYY-MM-DD)
- *           example: "2025-01-31"
+ *           example: "2026-02-28"
  *
  *         staffs:
  *           type: array
@@ -73,12 +82,42 @@ import PayrollCycleDto from "../dto/payrollCycleDto.js";
  *             type: object
  *             required:
  *               - id
+ *               - payrollId
  *             properties:
  *               id:
  *                 type: string
  *                 format: uuid
  *                 description: Staff ID
- * 
+ *
+ *               payrollId:
+ *                 type: string
+ *                 format: uuid
+ *                 description: Existing payroll record ID for the staff
+ *
+ *               deductions:
+ *                 type: array
+ *                 description: List of deductions to attach to payroll
+ *                 items:
+ *                   type: object
+ *                   required:
+ *                     - id
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       format: uuid
+ *
+ *               incomeItems:
+ *                 type: array
+ *                 description: List of income items to attach to payroll
+ *                 items:
+ *                   type: object
+ *                   required:
+ *                     - id
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       format: uuid
+ *
  *     PayrollCycleUpdateDto:
  *       type: object
  *       required:
@@ -98,13 +137,13 @@ import PayrollCycleDto from "../dto/payrollCycleDto.js";
  *           description: Updated name of the payroll cycle
  *         compensationType:
  *           type: string
- *           format: uuid
- *           description: Updated compensation type reference
+ *           enum: [DAILY, WEEKLY, BIWEEKLY, MONTHLY]
  *         interval:
  *           type: integer
  *           description: Updated interval in days
  *         startDate:
  *           type: string
+ *           format: date
  *           description: Updated start date (YYYY-MM-DD)
  *         autoRun:
  *           type: boolean

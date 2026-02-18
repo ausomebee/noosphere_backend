@@ -154,6 +154,94 @@ class PayrollCycleStaffRoutes {
             "/:id",
             this.controller.deletePayrollCycleStaff
         );
+
+        /**
+         * @swagger
+         * /api/v1/payroll-cycle-staffs/edit-breakdown:
+         *   put:
+         *     summary: Create or update payroll cycle staff breakdown
+         *     description: |
+         *       Updates payroll breakdown for multiple staff.
+         *       If `id` is provided, it updates an existing payroll cycle staff record.
+         *       If `id` is not provided, it creates a new payroll cycle staff record and updates the payroll breakdown.
+         *     tags:
+         *       - payroll-cycle-staffs
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             required:
+         *               - staffs
+         *             properties:
+         *               staffs:
+         *                 type: array
+         *                 minItems: 1
+         *                 items:
+         *                   type: object
+         *                   properties:
+         *                     id:
+         *                       type: string
+         *                       format: uuid
+         *                       description: Payroll cycle staff record ID (required for update)
+         *                     payrollCycleId:
+         *                       type: string
+         *                       format: uuid
+         *                       description: Payroll cycle ID (required for create)
+         *                     staffId:
+         *                       type: string
+         *                       format: uuid
+         *                       description: Staff ID (required for create)
+         *                     staffPayrollId:
+         *                       type: string
+         *                       format: uuid
+         *                       description: Payroll record ID to update
+         *                     deductions:
+         *                       type: array
+         *                       description: List of deductions to attach to payroll
+         *                       items:
+         *                         type: object
+         *                         required:
+         *                           - id
+         *                         properties:
+         *                           id:
+         *                             type: string
+         *                             format: uuid
+         *                     incomeItems:
+         *                       type: array
+         *                       description: List of income items to attach to payroll
+         *                       items:
+         *                         type: object
+         *                         required:
+         *                           - id
+         *                         properties:
+         *                           id:
+         *                             type: string
+         *                             format: uuid
+         *     responses:
+         *       200:
+         *         description: Payroll breakdown updated successfully
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 message:
+         *                   type: string
+         *                   example: Payroll breakdown updated successfully
+         *       400:
+         *         description: Invalid request payload
+         *       404:
+         *         description: Payroll cycle staff record not found
+         *       500:
+         *         description: Internal server error
+         */
+        this.router.put(
+            "/edit-breakdown",
+            this.controller.editBreakdown
+        );
+
     }
 
     getRouter() {

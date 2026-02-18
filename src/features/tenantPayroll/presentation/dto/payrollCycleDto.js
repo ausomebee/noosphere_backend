@@ -18,14 +18,34 @@ class PayrollCycleDto {
     static manuallyCreatePayrollCycleDto = (req, res, next) => {
         const schema = Joi.object({
             tenantId: Joi.string().uuid().required(),
-
+            compensationType: Joi.string()
+                .valid("Weekly", "Hourly", "Monthly")
+                .required(),
             startDate: Joi.date().required(),
-            endDate: Joi.date().greater(Joi.ref("startDate")).required(),
-
+            endDate: Joi.date()
+                .greater(Joi.ref("startDate"))
+                .required(),
             staffs: Joi.array()
                 .items(
                     Joi.object({
-                        id: Joi.string().uuid().required()
+                        id: Joi.string().uuid().required(),
+                        payrollId: Joi.string().uuid().required(),
+                        deductions: Joi.array()
+                            .items(
+                                Joi.object({
+                                    id: Joi.string().uuid().required()
+                                })
+                            )
+                            .optional()
+                            .default([]),
+                        incomeItems: Joi.array()
+                            .items(
+                                Joi.object({
+                                    id: Joi.string().uuid().required()
+                                })
+                            )
+                            .optional()
+                            .default([])
                     })
                 )
                 .min(1)
