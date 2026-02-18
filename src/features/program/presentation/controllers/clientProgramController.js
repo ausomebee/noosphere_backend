@@ -30,8 +30,8 @@ class ClientProgramController {
             return res.status(404).json({ message: "Program not found" });
         }
 
-        const programData = new Program({...program, isCustom: true});
-        const newProgram = await this.programService.createProgram(programData.createProgram);
+        const programData = new Program(program);
+        const newProgram = await this.programService.createProgram({ ...programData.createProgram, isCustom: true });
 
         if (!newProgram) {
             res.status(500).json({ message: 'Failed to create program' });
@@ -46,7 +46,7 @@ class ClientProgramController {
             }
         }
 
-        const clientProgramData = new ClientProgram({...req.body, programId: newProgram.id});
+        const clientProgramData = new ClientProgram({ ...req.body, programId: newProgram.id });
         const clientProgram = await this.service.createClientProgram(clientProgramData.createClientProgram);
 
         if (!clientProgram) {
