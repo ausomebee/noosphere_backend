@@ -1148,7 +1148,8 @@ class TenantService {
                 staffName: staff.fullName,
                 grossPay,
                 netPay,
-                paymentSchedule: payroll.paymentSchedule
+                paymentSchedule: payroll.paymentSchedule,
+                id: staff.id
             };
         });
     }
