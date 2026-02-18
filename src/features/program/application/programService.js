@@ -64,6 +64,7 @@ class ProgramService {
     async getAllTenantPrograms(tenantId) {
         const programs = await this.programRepository.findAll({
             isDeleted: false,
+            isCustom: false,
             domain: {
                 tenantId: tenantId,
                 isDeleted: false
