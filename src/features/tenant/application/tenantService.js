@@ -1165,7 +1165,7 @@ class TenantService {
                     grossPay: 0,
                     netPay: 0,
                     paymentSchedule: null,
-                    id: staff.id
+                    staff: staff
                 };
             }
 
@@ -1211,7 +1211,7 @@ class TenantService {
                 grossPay,
                 netPay,
                 paymentSchedule: payroll.paymentSchedule,
-                id: staff.id
+                staff: staff
             };
         });
     }
