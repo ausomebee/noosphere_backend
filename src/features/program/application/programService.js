@@ -36,7 +36,8 @@ class ProgramService {
     async getAllDomainPrograms(domainId) {
         const programs = await this.programRepository.findAll({
             domainId,
-            isDeleted: false
+            isDeleted: false,
+            isCustom: false,
         });
 
         if (!programs) {
@@ -49,7 +50,8 @@ class ProgramService {
     async getProgram(id) {
         const programs = await this.programRepository.findOneAndPopulate({
             id: id,
-            isDeleted: false
+            isDeleted: false,
+            isCustom: false,
         }, {
             target: true
         });
