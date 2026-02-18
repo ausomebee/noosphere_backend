@@ -15,6 +15,26 @@ class PayrollCycleDto {
         Validator.validateRequest(req, next, schema);
     };
 
+    static manuallyCreatePayrollCycleDto = (req, res, next) => {
+        const schema = Joi.object({
+            tenantId: Joi.string().uuid().required(),
+
+            startDate: Joi.date().required(),
+            endDate: Joi.date().greater(Joi.ref("startDate")).required(),
+
+            staffs: Joi.array()
+                .items(
+                    Joi.object({
+                        id: Joi.string().uuid().required()
+                    })
+                )
+                .min(1)
+                .required()
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
     static updatePayrollCycleDto = (req, res, next) => {
         const schema = Joi.object({
             id: Joi.string().uuid().required(),

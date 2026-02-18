@@ -44,6 +44,52 @@ class PayrollCycleController {
         });
     });
 
+    manuallyCreatePayrollCycle = expressAsyncHandler(async (req, res) => {
+        const data = req.body;
+
+        const start = new Date(data.startDate);
+        const end = new Date(data.endDate);
+
+        if (isNaN(start) || isNaN(end)) {
+            return res.status(400).json({
+                message: "Invalid date format"
+            });
+        }
+
+        if (end <= start) {
+            return res.status(400).json({
+                message: "End date must be greater than start date"
+            });
+        }
+
+        const interval = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+
+        const payrollCycleData = new PayrollCycle({
+            tenantId: data.tenantId,
+            interval: interval,
+            startDate: start.toISOString().split("T")[0],
+        });
+
+        const payrollCycle = await this.service.createPayrollCycle(payrollCycleData.createPayrollCycle);
+
+        if (!payrollCycle) {
+            return res.status(500).json({ message: "Failed to create payroll cycle" });
+        }
+
+        for (const staff of data.staffs) {
+            await this.payrollCycleStaffService.createPayrollCycleStaff({
+                payrollCycleId: payrollCycle.id,
+                staffId: staff.id
+            });
+        }
+
+        return res.status(201).json({
+            message: "Payroll cycle created successfully",
+            status: "ok",
+            data: payrollCycle
+        });
+    });
+
     updatePayrollCycle = expressAsyncHandler(async (req, res) => {
         const payrollCycle = await this.service.updatePayrollCycle(req.body);
 

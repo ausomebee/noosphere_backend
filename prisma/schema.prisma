@@ -268,7 +268,7 @@ model TenantStaff {
   clinicalReportHistories      ClinicalReportHistory[]
   clinicalReportChangeRequests ClinicalReportChangeRequest[] @relation("ReportsRequestApprover")
   notifications                Notifications[]
-  payrolCycleStaffs            PayrollCycleStaffs[]
+  payrollCycleStaffs            PayrollCycleStaffs[]
 }
 
 model TenantStaffLicenses {
@@ -1080,8 +1080,8 @@ model Deductions {
 model PayrollCycles {
   id               String  @id @default(uuid())
   tenantId         String
-  name             String
-  compensationType String
+  name             String?
+  compensationType String?
   interval         Int
   startDate        String
   autoRun          Boolean @default(false)
@@ -1090,7 +1090,7 @@ model PayrollCycles {
 
   tenant            Tenant              @relation(fields: [tenantId], references: [id])
   PayrollRecord     PayrollRecord[]
-  payrolCycleStaffs PayrollCycleStaffs[]
+  payrollCycleStaffs PayrollCycleStaffs[]
 }
 
 model PayrollCycleStaffs {

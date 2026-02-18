@@ -20,7 +20,7 @@ class PayrollCycleRepository extends BaseRepository {
                 isActive: true
             },
             include: {
-                payrolCycleStaffs: {
+                payrollCycleStaffs: {
                     include: {
                         staff: {
                             include: {

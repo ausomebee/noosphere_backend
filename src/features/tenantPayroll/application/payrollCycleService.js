@@ -6,15 +6,6 @@ class PayrollCycleService {
     }
 
     async createPayrollCycle(data) {
-        const exists = await this.payrollCycleRepository.findFirstDynamic({
-            where: { name: data.name, tenantId: data.tenantId },
-            select: { name: true }
-        });
-
-        if (exists) {
-            throw new Error("This Payroll Cycle already exists.");
-        }
-
         return await this.payrollCycleRepository.create(data);
     }
 
@@ -49,11 +40,11 @@ class PayrollCycleService {
         const cycles = await this.payrollCycleRepository.findPayrollCyclesWithStatsByTenant(tenantId);
 
         return cycles.map(cycle => {
-            const numberOfStaffs = cycle.payrolCycleStaffs.length;
+            const numberOfStaffs = cycle.payrollCycleStaffs.length;
 
             let totalPayrollValue = 0;
 
-            cycle.payrolCycleStaffs.forEach(staffRecord => {
+            cycle.payrollCycleStaffs.forEach(staffRecord => {
                 const payroll = staffRecord.staff.TenantStaffPayroll[0]; // assuming one payroll per staff
                 if (!payroll) return;
 

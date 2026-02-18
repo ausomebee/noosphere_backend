@@ -40,6 +40,45 @@ import PayrollCycleDto from "../dto/payrollCycleDto.js";
  *           description: Whether the payroll cycle runs automatically
  *           example: false
  *
+ *     PayrollCycleManualCreateDto:
+ *       type: object
+ *       required:
+ *         - tenantId
+ *         - startDate
+ *         - endDate
+ *         - staffs
+ *       properties:
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *           description: Unique tenant identifier
+ *
+ *         startDate:
+ *           type: string
+ *           format: date
+ *           description: Start date of the payroll cycle (YYYY-MM-DD)
+ *           example: "2025-01-01"
+ *
+ *         endDate:
+ *           type: string
+ *           format: date
+ *           description: End date of the payroll cycle (YYYY-MM-DD)
+ *           example: "2025-01-31"
+ *
+ *         staffs:
+ *           type: array
+ *           description: List of staff to attach to the payroll cycle
+ *           minItems: 1
+ *           items:
+ *             type: object
+ *             required:
+ *               - id
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 format: uuid
+ *                 description: Staff ID
+ * 
  *     PayrollCycleUpdateDto:
  *       type: object
  *       required:
@@ -101,6 +140,24 @@ class PayrollCycleRoutes {
          *         description: Payroll cycle created successfully
          */
         this.router.post("/", PayrollCycleDto.createPayrollCycleDto, this.controller.createPayrollCycle);
+
+         /**
+         * @swagger
+         * /api/v1/payroll-cycles/manual:
+         *   post:
+         *     summary: Create a manual payroll cycle
+         *     tags: [payroll-cycles]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/PayrollCycleManualCreateDto'
+         *     responses:
+         *       201:
+         *         description: Payroll cycle created successfully
+         */
+        this.router.post("/manual", PayrollCycleDto.manuallyCreatePayrollCycleDto, this.controller.manuallyCreatePayrollCycle);
 
         /**
          * @swagger
