@@ -130,6 +130,22 @@ class TenantController {
         });
     });
 
+    findStaffWithPayrollByTenantAndDateRange = expressAsyncHandler(async (req, res) => {
+        const summary = await this.service.findStaffWithPayrollByTenantAndDateRange(req.params.tenantId, req.query.startDate, req.query.endDate, req.query.paymentSchedule);
+
+        if (!summary) {
+            return res.status(500).json({
+                message: 'Failed to fetch staff payroll summary.'
+            });
+        }
+
+        return res.status(200).json({
+            message: "Staff payroll summary fetched successfully",
+            status: 'ok',
+            data: summary
+        });
+    });
+
     getAllTenant = expressAsyncHandler(async (req, res) => {
         const tenants = await this.service.getAllTenant();
 

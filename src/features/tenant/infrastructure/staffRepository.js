@@ -143,6 +143,53 @@ class StaffRepository extends BaseRepository {
             }
         });
     }
+
+    async findStaffWithPayrollByTenantAndDateRange(tenantId, startDate, endDate, paymentSchedule) {
+        return await this.model.findMany({
+            where: {
+                tenantId,
+                isDeleted: false,
+                TenantStaffPayroll: {
+                    some: {
+                        paymentSchedule,
+                        isDeleted: false
+                    }
+                },
+                appointments: {
+                    some: {
+                        sessions: {
+                            some: {
+                                startTime: {
+                                    gte: new Date(startDate),
+                                    lte: new Date(endDate)
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            include: {
+                TenantStaffPayroll: {
+                    where: { isDeleted: false },
+                    include: {
+                        incomeItems: {
+                            where: {
+                                isDeleted: false,
+                                isActive: true
+                            }
+                        },
+                        deductions: {
+                            where: {
+                                isDeleted: false,
+                                isActive: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
 }
 
 export default StaffRepository;

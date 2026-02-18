@@ -1,3 +1,4 @@
+import { id } from 'date-fns/locale';
 import MailService from '../../../utilities/nodemailer.js';
 import Tenant from '../domain/tenant.js';
 import argon2 from "argon2";
@@ -899,7 +900,6 @@ class TenantService {
 
             const ratePerHour = Number(payroll.ratePerHour || 0);
 
-            // ===== CALCULATE GROSS PAY =====
             let grossPay = 0;
 
             payroll.incomeItems.forEach(item => {
@@ -919,7 +919,6 @@ class TenantService {
                 }
             });
 
-            // ===== CALCULATE DEDUCTIONS =====
             let totalDeductions = 0;
 
             payroll.deductions.forEach(ded => {
@@ -1154,6 +1153,68 @@ class TenantService {
         });
     }
 
+    async findStaffWithPayrollByTenantAndDateRange(tenantId, startDate, endDate, paymentSchedule) {
+        const staffs = await this.staffRepository.findStaffWithPayrollByTenantAndDateRange(tenantId, startDate, endDate, paymentSchedule);
+
+        return staffs.map(staff => {
+            const payroll = staff.TenantStaffPayroll[0]; // assuming one payroll per staff
+
+            if (!payroll) {
+                return {
+                    staffName: staff.fullName,
+                    grossPay: 0,
+                    netPay: 0,
+                    paymentSchedule: null,
+                    id: staff.id
+                };
+            }
+
+            const ratePerHour = Number(payroll.ratePerHour || 0);
+
+            let grossPay = 0;
+
+            payroll.incomeItems.forEach(item => {
+                const rate = item.rate || {};
+
+                if (item.type === "Flat Rate") {
+                    grossPay += Number(rate.rate || 0);
+                }
+
+                else if (item.type === "Percentage based") {
+                    grossPay += ratePerHour * (Number(rate.unit || 0) / 100);
+                }
+
+                else if (item.type === "Time based") {
+                    const hours = Number(rate.unitMinutes || 0) / 60;
+                    grossPay += ratePerHour * hours * Number(rate.unit || 1);
+                }
+            });
+
+            let totalDeductions = 0;
+
+            payroll.deductions.forEach(ded => {
+                const rate = ded.rate || {};
+
+                if (ded.type === "Flat Rate") {
+                    totalDeductions += Number(rate.rate || 0);
+                }
+
+                else if (ded.type === "Percentage based") {
+                    totalDeductions += grossPay * (Number(rate.unit || 0) / 100);
+                }
+            });
+
+            const netPay = Math.max(0, grossPay - totalDeductions);
+
+            return {
+                staffName: staff.fullName,
+                grossPay,
+                netPay,
+                paymentSchedule: payroll.paymentSchedule,
+                id: staff.id
+            };
+        });
+    }
 }
 
 export default TenantService;

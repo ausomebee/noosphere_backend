@@ -590,6 +590,55 @@ class TenantRoutes {
 
         /**
          * @swagger
+         * /api/v1/tenant/getstaffwithpayrollbydate/{tenantId}:
+         *   get:
+         *     summary: Get staff with payroll by date range for a tenant
+         *     tags: [Tenant]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         description: The ID of the tenant
+         *       - in: query
+         *         name: startDate
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: date
+         *           example: 2025-01-01
+         *         description: The start date of the range (YYYY-MM-DD)
+         *       - in: query
+         *         name: endDate
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: date
+         *           example: 2025-01-31
+         *         description: The end date of the range (YYYY-MM-DD)
+         *       - in: query
+         *         name: paymentSchedule
+         *         required: true
+         *         schema:
+         *           type: string
+         *           enum: [Weekly, Monthly, Hourly]
+         *         description: The payment schedule of the staff to retrieve
+         *     responses:
+         *       200:
+         *         description: Staff with payroll retrieved successfully by date range
+         *       400:
+         *         description: Invalid tenant ID or date range provided
+         *       404:
+         *         description: Tenant not found
+         *       500:
+         *         description: Internal server error
+         */
+        this.router.get("/getstaffwithpayrollbydate/:tenantId", this.controller.findStaffWithPayrollByTenantAndDateRange);
+
+        /**
+         * @swagger
          * /api/v1/tenant/tenantadminchoices/{tenantId}:
          *   get:
          *     summary: Retrieve tenant admin choices
