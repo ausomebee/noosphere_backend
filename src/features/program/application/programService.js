@@ -4,19 +4,6 @@ class ProgramService {
     }
 
     async createProgram(data) {
-        console.log(this.programRepository)
-        const programExists = await this.programRepository.findFirst({
-            AND: [
-                { name: data.name },
-                { isDeleted: false },
-                { domainId: data.domainId }
-            ]
-        });
-
-        if (programExists) {
-            throw new Error("This Program already exists.");
-        }
-
         const newProgram = await this.programRepository.create(data);
 
         if (!newProgram) {
