@@ -283,6 +283,43 @@ class SessionRoutes {
 
         /**
          * @swagger
+         * /api/v1/sessions/target/{targetId}/{clientId}/{tenantId}:
+         *   get:
+         *     summary: Get sessions for a given targetId, clientId and tenantId
+         *     tags: [sessions]
+         *     parameters:
+         *       - in: path
+         *         name: targetId
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         required: true
+         *         description: Target ID
+         *       - in: path
+         *         name: clientId
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         required: true
+         *         description: Client ID
+         *       - in: path
+         *         name: tenantId
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         required: true
+         *         description: Tenant ID (foreign key)
+         *     responses:
+         *       200:
+         *         description: Session data fetched successfully
+         */
+        this.router.get(
+            "/target/:targetId/:clientId/:tenantId",
+            this.controller.getSessionsByTargetId
+        );
+
+        /**
+         * @swagger
          * /api/v1/sessions/tenant/overview/{tenantId}:
          *   get:
          *     summary: tenant sessions overview

@@ -256,6 +256,46 @@ class SessionService {
         return sessions;
     }
 
+    async getSessionsByTargetId(targetId, clientId, tenantId) {
+        const sessions = await this.sessionRepository.findAllAndPopulate({
+            appointment: { tenantId: tenantId, clientId: clientId },
+            sessionDatas: { some: { targetId: targetId } }
+        }, {
+            id: true,
+            appointment: {
+                select: {
+                    client: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                            preferredName: true
+
+                        }
+                    },
+                    session: { select: { name: true } },
+                    clinicians: {
+                        select: {
+                            fullName: true,
+                        },
+                    }
+                },
+            },
+            clientApprovalStatus: true,
+            supervisorApprovalStatus: true,
+            startTime: true,
+            approver: { select: { fullName: true } },
+            endTime: true,
+            createdAt: true,
+            authorizationsUsed: { select: { payerDetails: { select: { payerName: true } } } }
+        });
+
+        if (!sessions) {
+            throw new Error("Sessions not found");
+        }
+
+        return sessions;
+    }
+
     async getTargetPerformanceGraph(data) {
         const graph = await this.sessionRepository.getTargetPerformanceGraphData(data.targetId, data.clientId);
 
