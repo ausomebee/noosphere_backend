@@ -64,7 +64,7 @@ class ProgramService {
             id: id,
             isDeleted: false
         }, {
-            targets: true
+            target: true
         });
 
         if (!programs) {
