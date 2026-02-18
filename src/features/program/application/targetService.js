@@ -60,8 +60,9 @@ class TargetService {
         const targets = await this.targetRepository.findAll({
             program: {
                 isDeleted: false,
+                isCustom: false,
                 domain: {
-                    tenantId: tenantId,  
+                    tenantId: tenantId,
                     isDeleted: false
                 }
             },
@@ -78,7 +79,8 @@ class TargetService {
     async getAllProgramTargets(programId) {
         const targets = await this.targetRepository.findAll({
             programId,
-            isDeleted: false
+            isDeleted: false,
+            isCustom: false,
         });
 
         if (!targets) {
