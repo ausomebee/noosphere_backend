@@ -17,7 +17,6 @@ class TargetController {
     }
 
     createTarget = expressAsyncHandler(async (req, res) => {
-        console.log(req.body)
         const data = req.file ? {
             ...req.body,
             attachment: req.file.location

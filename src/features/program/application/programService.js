@@ -59,6 +59,21 @@ class ProgramService {
         return programs;
     }
 
+    async getProgram(id) {
+        const programs = await this.programRepository.findOneAndPopulate({
+            id: id,
+            isDeleted: false
+        }, {
+            targets: true
+        });
+
+        if (!programs) {
+            throw new Error("Programs not found")
+        }
+
+        return programs;
+    }
+
     async getAllTenantPrograms(tenantId) {
         const programs = await this.programRepository.findAll({
             isDeleted: false,

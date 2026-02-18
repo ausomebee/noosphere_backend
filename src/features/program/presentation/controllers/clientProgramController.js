@@ -5,6 +5,11 @@ import ClientProgramService from "../../application/clientProgramService.js";
 import ClientProgram from "../../domain/clientProgram.js";
 import TargetRepository from "../../infrastructure/targetRepository.js";
 import ClientTargetRepository from "../../infrastructure/clientTargetRepository.js";
+import ProgramService from "../../application/programService.js";
+import ProgramRepository from "../../infrastructure/programRepository.js";
+import Program from "../../domain/program.js";
+import TargetService from "../../application/targetService.js";
+import Target from "../../domain/target.js";
 
 class ClientProgramController {
     constructor() {
@@ -12,11 +17,36 @@ class ClientProgramController {
         this.clientProgramRepository = new ClientProgramRepository(this.prisma.clientProgram)
         this.targetRepository = new TargetRepository(this.prisma.target)
         this.clientTargetRepository = new ClientTargetRepository(this.prisma.clientTarget)
+        this.programRepository = new ProgramRepository(this.prisma.program)
+        this.programService = new ProgramService({ programRepository: this.programRepository });
+        this.targetService = new TargetService({ targetRepository: this.targetRepository });
         this.service = new ClientProgramService({ clientProgramRepository: this.clientProgramRepository, targetRepository: this.targetRepository, clientTargetRepository: this.clientTargetRepository });
     }
 
     createClientProgram = expressAsyncHandler(async (req, res) => {
-        const clientProgramData = new ClientProgram(req.body);
+        const program = await this.programService.getProgram(req.body.programId);
+
+        if (!program) {
+            return res.status(404).json({ message: "Program not found" });
+        }
+
+        const programData = new Program(program);
+        const newProgram = await this.service.createProgram(programData.createProgram);
+
+        if (!newProgram) {
+            res.status(500).json({ message: 'Failed to create program' });
+        }
+
+        for (const target of program.Targets) {
+            const targetData = new Target({ ...target, programId: newProgram.id });
+            const newTarget = await this.targetService.createTarget(targetData.createTarget);
+
+            if (!newTarget) {
+                res.status(500).json({ message: 'Failed to create target' });
+            }
+        }
+
+        const clientProgramData = new ClientProgram({...req.body, programId: newProgram.id});
         const clientProgram = await this.service.createClientProgram(clientProgramData.createClientProgram);
 
         if (!clientProgram) {
