@@ -32,7 +32,7 @@ class AdminRepository {
                 roles:{
                     select:{
                         name: true,
-                        access: true
+                        roleModuleAccesses: true
                     }
                 }
             }
