@@ -22,10 +22,9 @@ import { adminProtect } from "../../../../middleware/auth_handlers.js";
  *         dataAccessLevel:
  *           type: string
  *           description: Level of data access (e.g., READ, WRITE, ADMIN)
- *         systemModuleId:
+ *         systemModule:
  *           type: string
- *           format: uuid
- *           description: Optional system module ID linked to the role
+ *           description: Optional system module linked to the role
  *         createdByAdminId:
  *           type: string
  *           format: uuid
@@ -63,10 +62,9 @@ import { adminProtect } from "../../../../middleware/auth_handlers.js";
  *         dataAccessLevel:
  *           type: string
  *           description: Level of data access (e.g., READ, WRITE, ADMIN)
- *         systemModuleId:
+ *         systemModule:
  *           type: string
- *           format: uuid
- *           description: Optional system module ID linked to the role
+ *           description: Optional system module linked to the role
  *         createdByTenantId:
  *           type: string
  *           format: uuid

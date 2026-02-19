@@ -28,8 +28,7 @@ class RoleDto {
                 .messages({
                     "string.empty": "Data access level is required"
                 }),
-            systemModuleId: Joi.string()
-                .uuid()
+            systemModule: Joi.string()
                 .optional()
                 .allow(null, ''),
             createdByAdminId: Joi.string()

@@ -25,6 +25,16 @@ class Role {
         };
     }
 
+    get createRole() {
+        return {
+            name: this.name,
+            dataAccessLevel: this.dataAccessLevel,
+            systemModule: this.systemModule,
+            createdByAdminId: this.createdByAdminId,
+            createdByTenantId: this.createdByTenantId,
+        };
+    }
+
     get tenantCreateRole() {
         return {
             name: this.name,

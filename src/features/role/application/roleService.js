@@ -64,7 +64,15 @@ class RoleService {
         return newRole;
     }
 
-    
+    async createRole(data) {
+        const newRole = await this.repository.create(data);
+
+        if (!newRole) {
+            throw new Error("Failed to create role");
+        }
+
+        return newRole;
+    }
 }
 
 export default RoleService;

@@ -68,7 +68,7 @@ class RoleController {
             res.status(500).json({ message: 'Failed to create role' });
         }
 
-        for (const moduleAccess of roleData.createRole.moduleAccesses) {
+        for (const moduleAccess of req.body.moduleAccesses) {
             await this.roleModuleAccessService.createRoleModuleAccess({
                 roleId: role.id,
                 module: moduleAccess.module,
