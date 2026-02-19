@@ -10,7 +10,7 @@ import AuthRepository from '../../auth/infrastructure/authRepository.js';
 class AdminService {
     constructor() {
         this.repository = new AdminRepository()
-        this.token = new TokenService()
+        this.token = TokenService
         this.generateCode = new ReferralCodeGenerator(12)
         this.departmentRepository = new DepartmentRepository()
         this.roleRepository = new RoleRepository()

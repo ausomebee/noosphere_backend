@@ -2,26 +2,6 @@ import Joi from "joi";
 import Validator from "../../../../utilities/validate.js";
 
 class RoleDto {
-    static createRoleDto = (req, res, next) => {
-        const schema = Joi.object({
-            name: Joi.string()
-                .required()
-                .max(20)
-                .trim()
-                .messages({
-                    "string.empty": "Name is required",
-                    "string.max": "Name must not exceed 20 characters",
-                }),
-            description: Joi.string().trim().allow('').optional(),
-            departmentId: Joi.string().uuid().allow('').optional().messages({
-                "string.guid": "Department ID must be a valid UUID",
-            }),
-            access: Joi.object().required(),
-        });
-
-        Validator.validateRequest(req, next, schema);
-    };
-
     static departmentIdDto = (req, res, next) => {
         const schema = Joi.object({
             departmentId: Joi.string().uuid().required().messages({
@@ -31,6 +11,61 @@ class RoleDto {
         });
 
         Validator.validateRequest(req, next, schema, req.params);
+    };
+
+    static createRoleDto = (req, res, next) => {
+        const schema = Joi.object({
+            name: Joi.string()
+                .trim()
+                .max(20)
+                .required()
+                .messages({
+                    "string.empty": "Name is required",
+                    "string.max": "Name must not exceed 20 characters",
+                }),
+            dataAccessLevel: Joi.string()
+                .required()
+                .messages({
+                    "string.empty": "Data access level is required"
+                }),
+            systemModuleId: Joi.string()
+                .uuid()
+                .optional()
+                .allow(null, ''),
+            createdByAdminId: Joi.string()
+                .uuid()
+                .optional()
+                .allow(null, ''),
+            createdByTenantId: Joi.string()
+                .uuid()
+                .optional()
+                .allow(null, ''),
+            moduleAccesses: Joi.array()
+                .items(
+                    Joi.object({
+                        module: Joi.string()
+                            .required()
+                            .messages({
+                                "string.empty": "Module is required"
+                            }),
+
+                        permissions: Joi.array()
+                            .items(Joi.string().required())
+                            .min(1)
+                            .required()
+                            .messages({
+                                "array.min": "At least one permission is required"
+                            })
+                    })
+                )
+                .min(1)
+                .required()
+                .messages({
+                    "array.min": "At least one module access must be provided"
+                })
+        });
+
+        Validator.validateRequest(req, next, schema);
     };
 }
 

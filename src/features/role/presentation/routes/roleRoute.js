@@ -7,57 +7,87 @@ import { adminProtect } from "../../../../middleware/auth_handlers.js";
  * @swagger
  * components:
  *   schemas:
- *     AdminCreateRole:
+ *     CreateRole:
  *       type: object
  *       required:
  *         - name
+ *         - dataAccessLevel
  *         - createdByAdminId
- *         - access
- *         - module
+ *         - moduleAccesses
  *       properties:
  *         name:
  *           type: string
  *           maxLength: 20
  *           description: Name of the role (max 20 characters)
- *         description:
+ *         dataAccessLevel:
  *           type: string
- *           description: Optional description of the role
+ *           description: Level of data access (e.g., READ, WRITE, ADMIN)
+ *         systemModuleId:
+ *           type: string
+ *           format: uuid
+ *           description: Optional system module ID linked to the role
  *         createdByAdminId:
  *           type: string
  *           format: uuid
- *           description: UUID of the admin who created the role
- *         access:
- *           type: object
- *           description: Access permissions for the role
- *         module:
- *           type: string
- *           description: Module name related to the role
-
+ *           description: UUID of the admin creating the role
+ *         moduleAccesses:
+ *           type: array
+ *           description: List of module access configurations
+ *           items:
+ *             type: object
+ *             required:
+ *               - module
+ *               - permissions
+ *             properties:
+ *               module:
+ *                 type: string
+ *                 description: Feature module name
+ *               permissions:
+ *                 type: array
+ *                 description: List of permissions for the module
+ *                 items:
+ *                   type: string
+ *
  *     TenantCreateRole:
  *       type: object
  *       required:
  *         - name
+ *         - dataAccessLevel
  *         - createdByTenantId
- *         - access
- *         - module
+ *         - moduleAccesses
  *       properties:
  *         name:
  *           type: string
  *           maxLength: 20
  *           description: Name of the role (max 20 characters)
- *         description:
+ *         dataAccessLevel:
  *           type: string
- *           description: Optional description of the role
+ *           description: Level of data access (e.g., READ, WRITE, ADMIN)
+ *         systemModuleId:
+ *           type: string
+ *           format: uuid
+ *           description: Optional system module ID linked to the role
  *         createdByTenantId:
  *           type: string
  *           format: uuid
- *           description: UUID of the tenant who created the role
- *         access:
- *           type: object
- *           description: Access permissions for the role
- *         module:
- *           type: string
- *           description: Module name related to the role
+ *           description: UUID of the tenant creating the role
+ *         moduleAccesses:
+ *           type: array
+ *           description: List of module access configurations
+ *           items:
+ *             type: object
+ *             required:
+ *               - module
+ *               - permissions
+ *             properties:
+ *               module:
+ *                 type: string
+ *                 description: Feature module name
+ *               permissions:
+ *                 type: array
+ *                 description: List of permissions for the module
+ *                 items:
+ *                   type: string
  */
 
 class RoleRoutes {
@@ -90,6 +120,26 @@ class RoleRoutes {
 
         /**
          * @swagger
+         * /api/v1/role/:
+         *   post:
+         *     summary: create a new role
+         *     tags: [role]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/CreateRole'
+         *     responses:
+         *       201:
+         *         description: Role created successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/", RoleDto.createRoleDto, this.controller.createRole);
+
+        /**
+         * @swagger
          * /api/v1/role/tenantrole:
          *   post:
          *     summary: create a new role in the tenant module
@@ -107,26 +157,6 @@ class RoleRoutes {
          *         description: Validation error
          */
         this.router.post("/tenantrole", RoleDto.createRoleDto, this.controller.createTenantRole);
-
-        // /**
-        //  * @swagger
-        //  * /api/v1/role/clientrole:
-        //  *   post:
-        //  *     summary: create a new role in the client module
-        //  *     tags: [role]
-        //  *     requestBody:
-        //  *       required: true
-        //  *       content:
-        //  *         application/json:
-        //  *           schema:
-        //  *             $ref: '#/components/schemas/TenantCreateRole'
-        //  *     responses:
-        //  *       201:
-        //  *         description: Role created successfully
-        //  *       400:
-        //  *         description: Validation error
-        //  */
-        // this.router.post("/clientrole", RoleDto.createRoleDto, this.controller.createClientRole);
 
         /**
          * @swagger

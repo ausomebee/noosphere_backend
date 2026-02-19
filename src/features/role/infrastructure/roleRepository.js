@@ -13,6 +13,9 @@ class RoleRepository {
     async findOne(query) {
         return await this.model.findUnique({
             where: query,
+            include: {
+                roleModuleAccesses: true,
+            }
         });
     }
 
@@ -24,30 +27,24 @@ class RoleRepository {
         });
     }
 
-    async createTenantRole(departmentId, tx) {
+    async createTenantRole(dataAccessLevel, createdByTenantId, tx) {
         return await tx.role.create({
             data: {
                 name: "Admin",
-                departmentId: departmentId,
-                description: "This is the owner of this organization",
-                access: {
-                    canEdit: true,
-                    canDelete: false
-                }
+                dataAccessLevel: dataAccessLevel,
+                systemModule: "TENANT",
+                createdByTenantId: createdByTenantId,
             }
         });
     }
 
-    async createAdminRole(departmentId, tx) {
+    async createAdminRole(dataAccessLevel, createdByAdminId, tx) {
         return await tx.role.create({
             data: {
                 name: "Admin",
-                departmentId: departmentId,
-                description: "This is the superadmin",
-                access: {
-                    canEdit: true,
-                    canDelete: false
-                }
+                dataAccessLevel: dataAccessLevel,
+                systemModule: "ADMIN",
+                createdByAdminId: createdByAdminId
             }
         });
     }
@@ -55,6 +52,9 @@ class RoleRepository {
     async findAll(filter = {}) {
         return await this.model.findMany({
             where: filter,
+            include: {
+                roleModuleAccesses: true,
+            }
         });
     }
 

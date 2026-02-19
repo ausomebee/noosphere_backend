@@ -83,6 +83,20 @@ enum ClientFormStatus {
   FILLED
 }
 
+enum FeatureModule {
+  DASHBOARD
+  SCHEDULER
+  CLIENTS
+  MY_ORGANIZATION
+  BILLINGS_PAYMENTS
+  PAYROLL
+  PROGRAM_LIBRARY
+  CUSTOM_FORMS
+  REPORTS
+  HELP_SUPPORT
+  SETTINGS
+}
+
 model Admin {
   id                    String   @id @default(uuid())
   fullName              String
@@ -100,9 +114,8 @@ model Admin {
   authQuestion          String?
   auth2FADone           Boolean  @default(false)
 
-  roles          Role            @relation(fields: [roleId], references: [id])
+  roles          Role            @relation("RoleAdmins", fields: [roleId], references: [id])
   pipelines      Pipeline[]
-  departments    Department[]
   PipelineItem   PipelineItem[]
   Tenant         Tenant[]
   logs           Logs[]
@@ -111,6 +124,7 @@ model Admin {
   assignedIssues Issue[]         @relation("AssignedAdmin")
   loggedIssues   Issue[]         @relation("LoggedByAdmin")
   notifications  Notifications[]
+  rolesCreated   Role[]          @relation("RoleCreatedByAdmin")
 }
 
 model Auth {
@@ -122,34 +136,45 @@ model Auth {
   updatedAt DateTime @updatedAt
 }
 
-model Department {
-  id                String   @id @default(uuid())
-  name              String
-  module            Module
-  createdByAdminId  String?
-  createdByTenantId String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  description       String?
-  access            Json
+// model Department {
+//   id                String   @id @default(uuid())
+//   name              String
+//   module            Module
+//   createdByAdminId  String?
+//   createdByTenantId String?
+//   createdAt         DateTime @default(now())
+//   updatedAt         DateTime @updatedAt
+//   description       String?
+//   access            Json
 
-  roles           Role[]
-  createdByAdmin  Admin?  @relation(fields: [createdByAdminId], references: [id])
-  createdByTenant Tenant? @relation(fields: [createdByTenantId], references: [id])
-}
+//   roles           Role[]
+// }
 
 model Role {
-  id           String   @id @default(uuid())
-  name         String
-  description  String?
-  departmentId String
-  access       Json
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                String   @id @default(uuid())
+  name              String
+  dataAccessLevel   String?
+  systemModule      Module?
+  createdByAdminId  String?
+  createdByTenantId String?
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  admins      Admin[]
-  department  Department    @relation(fields: [departmentId], references: [id])
-  TenantStaff TenantStaff[]
+  createdByAdmin     Admin?             @relation("RoleCreatedByAdmin", fields: [createdByAdminId], references: [id])
+  createdByTenant    Tenant?            @relation(fields: [createdByTenantId], references: [id])
+  admins             Admin[]            @relation("RoleAdmins")
+  TenantStaff        TenantStaff[]
+  roleModuleAccesses RoleModuleAccess[]
+}
+
+model RoleModuleAccess {
+  id          String        @id @default(uuid())
+  roleId      String
+  module      FeatureModule
+  permissions Json[]
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
 }
 
 model RefreshTokens {
@@ -187,7 +212,7 @@ model Tenant {
   pipelineItems                     PipelineItem[]
   clientLinks                       ClientTenant[]
   pipelines                         Pipeline[]
-  departments                       Department[]
+  // departments                       Department[]
   TenantStaff                       TenantStaff[]
   BillingMetadata                   BillingMetadata?
   Subscription                      Subscription[]
@@ -220,6 +245,7 @@ model Tenant {
   clinicalReports                   ClinicalReport[]
   tenantGeneralSettings             TenantGeneralSettings[]
   tenantAdditionalSecurityQuestions TenantAdditionalSecurityQuestions[]
+  roles                             Role[]
 }
 
 model TenantStaff {

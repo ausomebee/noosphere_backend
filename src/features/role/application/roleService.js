@@ -64,26 +64,7 @@ class RoleService {
         return newRole;
     }
 
-    // async createClientRole(data) {
-    //     const roleExist = await this.repository.findFirst({
-    //         OR: [
-    //             { name: data.name },
-    //             { departmentId: data.departmentId }
-    //         ]
-    //     });
-
-    //     if (roleExist) {
-    //         throw new Error("This role already exists.");
-    //     }
-
-    //     const newRole = await this.repository.create(data);
-
-    //     if (!newRole) {
-    //         throw new Error("Failed to create role");
-    //     }
-
-    //     return newRole;
-    // }
+    
 }
 
 export default RoleService;
