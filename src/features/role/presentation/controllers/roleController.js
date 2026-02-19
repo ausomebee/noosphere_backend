@@ -3,9 +3,11 @@ import RoleService from "../../application/roleService.js";
 import Role from "../../domain/role.js";
 import RoleModuleAccessRepository from "../../infrastructure/roleModuleAccessRepository.js";
 import RoleModuleAccessService from "../../application/roleModuleAccessService.js";
+import prismaService from "../../../../config/prisma.js";
 
 class RoleController {
     constructor() {
+        this.prisma = prismaService.getClient();
         this.service = new RoleService();
         this.roleModuleAccessrepository = new RoleModuleAccessRepository(this.prisma.roleModuleAccess);
         this.roleModuleAccessService = new RoleModuleAccessService({

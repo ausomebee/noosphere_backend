@@ -153,8 +153,8 @@ model Auth {
 model Role {
   id                String   @id @default(uuid())
   name              String
-  dataAccessLevel   String?
-  systemModule      Module?
+  dataAccessLevel   String
+  systemModule      Module
   createdByAdminId  String?
   createdByTenantId String?
   isActive          Boolean  @default(true)
