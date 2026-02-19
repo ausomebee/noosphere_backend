@@ -243,7 +243,7 @@ class AdminService {
         const claims = {
             id: admin.id,
             role: admin.roles.name,
-            permissions: admin.roles.access
+            permissions: admin.roles
         }
 
         return { ...admin, accessToken: this.token.generateAccessToken(claims), refreshToken: this.token.generateRefreshToken() };
