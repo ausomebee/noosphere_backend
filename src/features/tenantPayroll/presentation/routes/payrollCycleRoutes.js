@@ -254,6 +254,24 @@ class PayrollCycleRoutes {
 
         /**
          * @swagger
+         * /api/v1/payroll-cycles/staff/{staffId}/stats:
+         *   get:
+         *     summary: Get payroll cycles stats for a staff
+         *     tags: [payroll-cycles]
+         *     parameters:
+         *       - in: path
+         *         name: staffId
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: List of payroll cycles retrieved successfully
+         */
+        this.router.get("/staff/:staffId/stats", this.controller.findPayrollCyclesByStaff);
+
+        /**
+         * @swagger
          * /api/v1/payroll-cycles/{id}:
          *   get:
          *     summary: Get a single payroll cycle by ID

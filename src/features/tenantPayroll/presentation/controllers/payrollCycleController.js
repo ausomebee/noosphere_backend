@@ -177,6 +177,20 @@ class PayrollCycleController {
             data: payrollCycles
         });
     });
+
+    findPayrollCyclesByStaff = expressAsyncHandler(async (req, res) => {
+        const payrollCycles = await this.service.findPayrollCyclesByStaff(req.params.staffId);
+
+        if (!payrollCycles) {
+            return res.status(404).json({ message: "No payroll cycles found" });
+        }
+
+        return res.status(200).json({
+            message: "Payroll cycles fetched successfully",
+            status: "ok",
+            data: payrollCycles
+        });
+    });
 }
 
 export default PayrollCycleController;

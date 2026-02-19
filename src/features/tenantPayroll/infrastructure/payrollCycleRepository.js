@@ -42,6 +42,45 @@ class PayrollCycleRepository extends BaseRepository {
             }
         });
     }
+
+    async findPayrollCyclesByStaff(staffId) {
+        return await this.model.findMany({
+            where: {
+                isDeleted: false,
+                isActive: true,
+                payrollCycleStaffs: {
+                    some: {
+                        staffId
+                    }
+                }
+            },
+            include: {
+                payrollCycleStaffs: {
+                    where: {
+                        staffId
+                    },
+                    include: {
+                        staff: {
+                            include: {
+                                TenantStaffPayroll: {
+                                    where: { isDeleted: false },
+                                    include: {
+                                        incomeItems: {
+                                            where: { isDeleted: false, isActive: true }
+                                        },
+                                        deductions: {
+                                            where: { isDeleted: false, isActive: true }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
 }
 
 export default PayrollCycleRepository;
