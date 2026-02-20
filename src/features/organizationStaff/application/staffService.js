@@ -143,7 +143,6 @@ class TenantStaffService {
             const update = await this.payrollRepository.update(data.payroll.id, {
                 paymentSchedule: data.payroll.paymentSchedule || payroll.paymentSchedule,
                 ratePerHour: data.payroll.ratePerHour || payroll.ratePerHour,
-                tenantStaffId: data.payroll.tenantStaffId || payroll.tenantStaffId,
                 minimumHours: data.payroll.minimumHours || payroll.minimumHours,
                 otherPays: data.payroll.otherPays || payroll.otherPays,
                 deductions: data.payroll.deductions || payroll.deductions,
