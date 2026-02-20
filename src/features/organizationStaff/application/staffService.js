@@ -145,8 +145,8 @@ class TenantStaffService {
                 ratePerHour: data.payroll.ratePerHour || payroll.ratePerHour,
                 minimumHours: data.payroll.minimumHours || payroll.minimumHours,
                 isDeleted: data.payroll.isDeleted ?? payroll.isDeleted,
-                incomeItems: data.payroll.incomeItems
-                    ? { set: data.payroll.incomeItems.map(item => ({ id: item.id })) }
+                incomeItems: data.payroll.otherPays
+                    ? { set: data.payroll.otherPays.map(item => ({ id: item.id })) }
                     : undefined,
                 deductions: data.payroll.deductions
                     ? { set: data.payroll.deductions.map(item => ({ id: item.id })) }
