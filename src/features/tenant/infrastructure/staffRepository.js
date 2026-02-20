@@ -15,9 +15,10 @@ class StaffRepository extends BaseRepository {
                 email
             },
             include: {
-                role: {
+                roles: {
                     select: {
-                        name: true
+                        name: true,
+                        roleModuleAccesses: true
                     }
                 }
             }

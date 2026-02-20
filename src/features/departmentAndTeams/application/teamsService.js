@@ -59,7 +59,27 @@ class TeamsService {
     }
 
     async getTeams(query = {}) {
-        return await this.teamsRepository.findAll(query);
+        return await this.teamsRepository.findAllAndPopulate(query, {
+            teamLead: {
+                select: {
+                    fullName: true,
+                }
+            },
+            teamMembers: {
+                select: {
+                    staff: {
+                        select: {
+                            fullName: true,
+                        }
+                    }
+                }
+            },
+            _count: {
+                select: {
+                    teamMembers: true
+                }
+            }
+        });
     }
 }
 
