@@ -110,6 +110,10 @@ class StaffRepository extends BaseRepository {
                     where: {
                         paymentSchedule,
                         isDeleted: false
+                    },
+                    include: {
+                        deductions: true,
+                        incomeItems: true
                     }
                 }
             }

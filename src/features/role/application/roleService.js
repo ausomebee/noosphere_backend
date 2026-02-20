@@ -73,6 +73,22 @@ class RoleService {
 
         return newRole;
     }
+
+    async getRolesByModule(systemModule, tenantId) {
+        const query = { systemModule };
+
+        if (tenantId) {
+            query.createdByTenantId = tenantId;
+        }
+        
+        const role = await this.repository.findAll(query);
+
+        if (!role) {
+            throw new Error("Failed to fetch roles");
+        }
+
+        return role;
+    }
 }
 
 export default RoleService;

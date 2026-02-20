@@ -44,6 +44,20 @@ class RoleController {
         });
     });
 
+    getRolesByModule = expressAsyncHandler(async (req, res) => {
+        const roles = await this.service.getRolesByModule(req.params.systemModule, req.params.tenantId);
+
+        if (!roles) {
+            res.status(500).json({ message: 'Failed to get roles by module' });
+        }
+
+        return res.status(201).json({
+            message: "Roles fetched successfully",
+            status: 'ok',
+            data: roles
+        });
+    });
+
     createTenantRole = expressAsyncHandler(async (req, res) => {
         console.log(req.body)
         const roleData = new Role(req.body);

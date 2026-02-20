@@ -158,6 +158,50 @@ class RoleRoutes {
 
         /**
          * @swagger
+         * /api/v1/role/module/{systemModule}:
+         *   get:
+         *     summary: fetch all roles in a system module
+         *     tags: [role]
+         *     parameters:
+         *       - in: path
+         *         name: systemModule
+         *         required: true
+         *         schema:
+         *           type: string
+         *           description: System module name (e.g., "TENANT", "ADMIN")
+         *     responses:
+         *       200:
+         *         description: Roles fetched successfully
+         */
+        this.router.get("/module/:systemModule", this.controller.getRolesByModule);
+        
+         /**
+         * @swagger
+         * /api/v1/role/module/{systemModule}/{tenantId}:
+         *   get:
+         *     summary: fetch all roles in a system module for a specific tenant
+         *     tags: [role]
+         *     parameters:
+         *       - in: path
+         *         name: systemModule
+         *         required: true
+         *         schema:
+         *           type: string
+         *           description: System module name (e.g., "TENANT", "ADMIN")
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           description: ID of the tenant
+         *     responses:
+         *       200:
+         *         description: Roles fetched successfully
+         */
+        this.router.get("/module/:systemModule/:tenantId", this.controller.getRolesByModule);
+        
+        /**
+         * @swagger
          * /api/v1/role/{departmentId}:
          *   get:
          *     summary: fetch all roles in a department

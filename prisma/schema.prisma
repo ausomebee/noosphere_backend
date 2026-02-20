@@ -97,6 +97,12 @@ enum FeatureModule {
   SETTINGS
 }
 
+enum PaymentSchedule {
+  MONTHLY
+  HOURLY
+  WEEKLY
+}
+
 model Admin {
   id                    String   @id @default(uuid())
   fullName              String
@@ -310,12 +316,12 @@ model TenantStaffLicenses {
 }
 
 model TenantStaffPayroll {
-  id              String  @id @default(uuid())
-  paymentSchedule String
+  id              String          @id @default(uuid())
+  paymentSchedule PaymentSchedule
   ratePerHour     String
   tenantStaffId   String
   minimumHours    String?
-  isDeleted       Boolean @default(false)
+  isDeleted       Boolean         @default(false)
 
   tenantStaff TenantStaff   @relation(fields: [tenantStaffId], references: [id])
   incomeItems IncomeItems[] @relation("PayrollIncomItems")
@@ -1106,39 +1112,52 @@ model Deductions {
 }
 
 model PayrollCycles {
-  id               String  @id @default(uuid())
+  id               String           @id @default(uuid())
   tenantId         String
   name             String?
-  compensationType String?
+  compensationType PaymentSchedule?
   interval         Int
   startDate        String
-  autoRun          Boolean @default(false)
-  isDeleted        Boolean @default(false)
-  isActive         Boolean @default(true)
+  autoRun          Boolean          @default(false)
+  isDeleted        Boolean          @default(false)
+  isActive         Boolean          @default(true)
 
   tenant             Tenant               @relation(fields: [tenantId], references: [id])
-  PayrollRecord      PayrollRecord[]
   payrollCycleStaffs PayrollCycleStaffs[]
 }
 
 model PayrollCycleStaffs {
-  id             String @id @default(uuid())
-  payrollCycleId String
-  staffId        String
+  id              String          @id @default(uuid())
+  payrollCycleId  String
+  staffId         String
+  paymentSchedule PaymentSchedule
+  ratePerHour     String
+  minimumHours    String?
 
-  payrollCycle PayrollCycles @relation(fields: [payrollCycleId], references: [id])
-  staff        TenantStaff   @relation(fields: [staffId], references: [id])
+  payrollCycle                 PayrollCycles                  @relation(fields: [payrollCycleId], references: [id])
+  staff                        TenantStaff                    @relation(fields: [staffId], references: [id])
+  payrollCycleStaffIncomeItems PayrollCycleStaffIncomeItems[]
+  payrollCycleStaffDeductions  PayrollCycleStaffDeductions[]
 }
 
-model PayrollRecord {
-  id             String @id @default(uuid())
-  payrollCycleId String
-  from           String
-  to             String
-  noOfStaff      Int
-  totalValue     Int
+model PayrollCycleStaffIncomeItems {
+  id                  String @id @default(uuid())
+  payrollCycleStaffId String
+  name                String
+  type                String
+  rate                Json
 
-  payrollCycle PayrollCycles @relation(fields: [payrollCycleId], references: [id])
+  PayrollCycleStaffs PayrollCycleStaffs @relation(fields: [payrollCycleStaffId], references: [id])
+}
+
+model PayrollCycleStaffDeductions {
+  id                  String @id @default(uuid())
+  payrollCycleStaffId String
+  name                String
+  type                String
+  rate                Json
+
+  PayrollCycleStaffs PayrollCycleStaffs @relation(fields: [payrollCycleStaffId], references: [id])
 }
 
 model Forms {

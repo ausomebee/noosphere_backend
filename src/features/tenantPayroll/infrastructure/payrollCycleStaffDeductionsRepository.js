@@ -1,6 +1,6 @@
 import BaseRepository from "./baseRepository.js";
 
-class PayrollRecordRepository extends BaseRepository {
+class PayrollCycleStaffDeductionsRepository extends BaseRepository {
     constructor(model) {
         super(model);
     }
@@ -11,6 +11,13 @@ class PayrollRecordRepository extends BaseRepository {
             include: populate
         });
     }
+
+    async insertMany(data) {
+        return await this.model.createMany({
+            data,
+            skipDuplicates: true 
+        });
+    }
 }
 
-export default PayrollRecordRepository;
+export default PayrollCycleStaffDeductionsRepository;

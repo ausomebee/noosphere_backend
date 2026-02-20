@@ -9,6 +9,12 @@ import StaffRepository from "../../../tenant/infrastructure/staffRepository.js";
 import TenantService from "../../../tenant/application/tenantService.js";
 import PayrollRepository from "../../../organizationStaff/infrastructure/payrollRepository.js";
 import PayrollService from "../../../organizationStaff/application/payrollService.js";
+import PayrollCycleStaffDeductionsRepository from "../../infrastructure/payrollCycleStaffDeductionsRepository.js";
+import PayrollCycleStaffDeductionsService from "../../application/payrollCycleStaffDeductionsService.js";
+import PayrollCycleStaffIncomeItemsRepository from "../../infrastructure/payrollCycleStaffIncomeItemsRepository.js";
+import PayrollCycleStaffIncomeItemsService from "../../application/payrollCycleStaffIncomeItemsService.js";
+import PayrollCycleStaffDeduction from "../../domain/payrollCycleStaffDeductions.js";
+import PayrollCycleStaffIncomeItem from "../../domain/payrollCycleStaffIncomeItems.js";
 
 class PayrollCycleController {
     constructor() {
@@ -20,9 +26,11 @@ class PayrollCycleController {
         this.staffRepository = new StaffRepository(this.prisma.tenantStaff);
         this.tenantService = new TenantService({ staffRepository: this.staffRepository });
         this.payrollRepository = new PayrollRepository(this.prisma.tenantStaffPayroll);
-        this.payrollService = new PayrollService({
-            payrollRepository: this.payrollRepository
-        });
+        this.payrollService = new PayrollService({ payrollRepository: this.payrollRepository });
+        this.payrollCycleStaffDeductionsRepository = new PayrollCycleStaffDeductionsRepository(this.prisma.payrollCycleStaffDeductions);
+        this.payrollCycleStaffDeductionsService = new PayrollCycleStaffDeductionsService({ payrollCycleStaffDeductionsRepository: this.payrollCycleStaffDeductionsRepository });
+        this.payrollCycleStaffIncomeItemsRepository = new PayrollCycleStaffIncomeItemsRepository(this.prisma.payrollCycleStaffIncomeItems);
+        this.payrollCycleStaffIncomeItemsService = new PayrollCycleStaffIncomeItemsService({ payrollCycleStaffIncomeItemsRepository: this.payrollCycleStaffIncomeItemsRepository });
     }
 
     createPayrollCycle = expressAsyncHandler(async (req, res) => {
@@ -35,12 +43,49 @@ class PayrollCycleController {
         }
 
         const staffs = await this.tenantService.getStaffByPaymentSchedule(payrollCycleData.tenantId, payrollCycleData.compensationType);
-
         for (const staff of staffs) {
-            await this.payrollCycleStaffService.createPayrollCycleStaff({
+            const payrollCycleStaff = await this.payrollCycleStaffService.createPayrollCycleStaff({
                 payrollCycleId: payrollCycle.id,
-                staffId: staff.id
+                staffId: staff.id,
+                paymentSchedule: staff.TenantStaffPayroll[0].paymentSchedule,
+                ratePerHour: staff.TenantStaffPayroll[0].ratePerHour,
+                minimumHours: staff.TenantStaffPayroll[0].minimumHours
             });
+
+            if (!payrollCycleStaff) {
+                console.error(`Failed to create payrollCycleStaff for staff ${staff.id}`);
+                continue;
+            }
+
+            const deductionDataArray = (staff.TenantStaffPayroll[0].deductions || []).map(template => {
+                const deductionInstance = new PayrollCycleStaffDeduction({
+                    payrollCycleStaffId: payrollCycleStaff.id,
+                    name: template.name,
+                    type: template.type,
+                    rate: template.rate,
+                });
+
+                return deductionInstance.createPayrollCycleStaffDeduction;
+            });
+
+            if (deductionDataArray.length > 0) {
+                await this.payrollCycleStaffDeductionsService.createManyPayrollCycleStaffDeductions(deductionDataArray);
+            }
+
+            const incomeItemsDataArray = (staff.TenantStaffPayroll[0].incomeItems || []).map(template => {
+                const incomeItemInstance = new PayrollCycleStaffIncomeItem({
+                    payrollCycleStaffId: payrollCycleStaff.id,
+                    name: template.name,
+                    type: template.type,
+                    rate: template.rate,
+                });
+
+                return incomeItemInstance.createPayrollCycleStaffIncomeItem;
+            });
+
+            if (incomeItemsDataArray.length > 0) {
+                await this.payrollCycleStaffIncomeItemsService.createManyPayrollCycleStaffIncomeItems(incomeItemsDataArray);
+            }
         }
 
         return res.status(201).json({
