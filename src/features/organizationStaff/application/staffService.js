@@ -144,7 +144,7 @@ class TenantStaffService {
                 paymentSchedule: data.payroll.paymentSchedule || payroll.paymentSchedule,
                 ratePerHour: data.payroll.ratePerHour || payroll.ratePerHour,
                 minimumHours: data.payroll.minimumHours || payroll.minimumHours,
-                otherPays: data.payroll.otherPays || payroll.otherPays,
+                incomeItems: data.payroll.otherPays || payroll.otherPays,
                 deductions: data.payroll.deductions || payroll.deductions,
                 isDeleted: data.payroll.isDeleted ?? payroll.isDeleted
             });

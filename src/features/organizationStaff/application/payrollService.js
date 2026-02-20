@@ -15,7 +15,7 @@ class PayrollService {
             ratePerHour: data.ratePerHour || payroll.ratePerHour,
             minimumHours: data.minimumHours || payroll.minimumHours,
             incomeItems: {
-                set: data.otherPays || payroll.incomeItems
+                set: data.incomeItems || payroll.incomeItems
             },
             deductions: {
                 set: data.deductions || payroll.deductions
