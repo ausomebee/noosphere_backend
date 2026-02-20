@@ -35,7 +35,6 @@ class StaffDto {
             payroll: Joi.object({
                 paymentSchedule: Joi.string().min(1).required(),
                 ratePerHour: Joi.string().min(1).required(),
-                tenantStaffId: Joi.string().uuid().optional(),
                 minimumHours: Joi.string().optional(),
                 otherPays: Joi.array().optional(),
                 deductions: Joi.array().optional()

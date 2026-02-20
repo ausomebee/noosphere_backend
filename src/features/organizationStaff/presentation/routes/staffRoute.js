@@ -245,10 +245,6 @@ import StaffDto from "../dto/staffDto.js";
  *             ratePerHour:
  *               type: string
  *               description: Hourly rate
- *             tenantStaffId:
- *               type: string
- *               format: uuid
- *               description: Unique identifier for the staff member
  *             minimumHours:
  *               type: string
  *               description: Minimum hours required
