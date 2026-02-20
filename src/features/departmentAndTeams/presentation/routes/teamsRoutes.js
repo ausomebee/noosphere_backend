@@ -174,7 +174,7 @@ class TeamsRoutes {
         /**
          * @swagger
          * /api/v1/organization/teams/{id}/active/{active}:
-         *   put:
+         *   patch:
          *     summary: Activate or deactivate a team
          *     tags: [organization]
          *     parameters:
@@ -195,7 +195,7 @@ class TeamsRoutes {
          *       200:
          *         description: Team activated or deactivated successfully
          */
-        this.router.put(
+        this.router.patch(
             "/:id/active/:active",
             this.controller.updateTeamActiveStatus
         );

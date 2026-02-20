@@ -153,7 +153,7 @@ class DepartmentsRoutes {
         /**
          * @swagger
          * /api/v1/organization/departments/{id}/active/{active}:
-         *   put:
+         *   patch:
          *     summary: Activate or deactivate a department
          *     tags: [organization]
          *     parameters:
@@ -174,7 +174,7 @@ class DepartmentsRoutes {
          *       200:
          *         description: Department activated or deactivated successfully
          */
-        this.router.put(
+        this.router.patch(
             "/:id/active/:active",
             this.controller.updateDepartmentActiveStatus
         );
