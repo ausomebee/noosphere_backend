@@ -12,7 +12,6 @@ import { adminProtect } from "../../../../middleware/auth_handlers.js";
  *       required:
  *         - name
  *         - dataAccessLevel
- *         - createdByAdminId
  *         - moduleAccesses
  *       properties:
  *         name:
@@ -29,6 +28,10 @@ import { adminProtect } from "../../../../middleware/auth_handlers.js";
  *           type: string
  *           format: uuid
  *           description: UUID of the admin creating the role
+ *         createdByTenantId:
+ *           type: string
+ *           format: uuid
+ *           description: UUID of the tenant creating the role
  *         moduleAccesses:
  *           type: array
  *           description: List of module access configurations
@@ -47,6 +50,47 @@ import { adminProtect } from "../../../../middleware/auth_handlers.js";
  *                 items:
  *                   type: string
  *
+ *     updateRole:
+ *       type: object
+ *       required:
+ *         - id
+ *         - name
+ *         - dataAccessLevel
+ *         - moduleAccesses
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           description: UUID of the role to update
+ *         name:
+ *           type: string
+ *           maxLength: 20
+ *           description: Name of the role (max 20 characters)
+ *         dataAccessLevel:
+ *           type: string
+ *           description: Level of data access (e.g., READ, WRITE, ADMIN)
+ *         moduleAccesses:
+ *           type: array
+ *           description: List of module access configurations
+ *           items:
+ *             type: object
+ *             required:
+ *               - module
+ *               - permissions
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 format: uuid
+ *                 description: UUID of the role module access (if updating existing access)
+ *               module:
+ *                 type: string
+ *                 description: Feature module name
+ *               permissions:
+ *                 type: array
+ *                 description: List of permissions for the module
+ *                 items:
+ *                   type: string
+ * 
  *     TenantCreateRole:
  *       type: object
  *       required:
@@ -75,7 +119,6 @@ import { adminProtect } from "../../../../middleware/auth_handlers.js";
  *           items:
  *             type: object
  *             required:
- *               - module
  *               - permissions
  *             properties:
  *               module:
@@ -138,6 +181,26 @@ class RoleRoutes {
 
         /**
          * @swagger
+         * /api/v1/role/:
+         *   patch:
+         *     summary: update an existing role
+         *     tags: [role]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/updateRole'
+         *     responses:
+         *       201:
+         *         description: Role updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/", RoleDto.updateRoleDto, this.controller.updateRole);
+
+        /**
+         * @swagger
          * /api/v1/role/tenantrole:
          *   post:
          *     summary: create a new role in the tenant module
@@ -175,6 +238,44 @@ class RoleRoutes {
          */
         this.router.get("/module/:systemModule", this.controller.getRolesByModule);
         
+        /**
+         * @swagger
+         * /api/v1/role/{id}:
+         *   get:
+         *     summary: fetch a role by ID
+         *     tags: [role]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *           description: ID of the role
+         *     responses:
+         *       200:
+         *         description: Role fetched successfully
+         */
+        this.router.get("/:id", this.controller.getRole);
+        
+        /**
+         * @swagger
+         * /api/v1/role/deactivate/{id}:
+         *   patch:
+         *     summary: deactivate a role by ID
+         *     tags: [role]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *           description: ID of the role
+         *     responses:
+         *       200:
+         *         description: Role deactivated successfully
+         */
+        this.router.patch("/deactivate/:id", this.controller.deactivateRole);
+
          /**
          * @swagger
          * /api/v1/role/module/{systemModule}/{tenantId}:

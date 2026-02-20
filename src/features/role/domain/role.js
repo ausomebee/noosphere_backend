@@ -47,6 +47,7 @@ class Role {
 
     get updateRole() {
         return {
+            id: this.id,
             name: this.name,
             dataAccessLevel: this.dataAccessLevel,
             systemModule: this.systemModule,
