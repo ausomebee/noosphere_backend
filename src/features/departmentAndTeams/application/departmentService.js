@@ -55,7 +55,30 @@ class DepartmentService {
     }
 
     async getDepartments(query = {}) {
-        const records = await this.departmentRepository.findAll(query);
+        const records = await this.departmentRepository.findAllAndPopulate(query,
+            {
+                teamLead: {
+                    select: {
+                        fullName: true,
+                    }
+                },
+                teamMembers: {
+                    select: {
+                        staff: {
+                            select: {
+                                id: true,
+                                fullName: true,
+                            }
+                        }
+                    }
+                },
+                _count: {
+                    select: {
+                        teamMembers: true
+                    }
+                }
+            }
+        );
 
         if (!records) {
             throw new Error("Departments not found");
@@ -63,6 +86,7 @@ class DepartmentService {
 
         return records;
     }
+
 }
 
 export default DepartmentService;
