@@ -12,6 +12,12 @@ class PayrollRepository extends BaseRepository {
         });
     }
     
+    async findOneAndPopulate(query, populate) {
+        return await this.model.findFirst({
+            where: query,
+            include: populate
+        });
+    }
 }
 
 export default PayrollRepository;
