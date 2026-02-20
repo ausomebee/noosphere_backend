@@ -211,7 +211,7 @@ class AdminRoutes {
         /**
         * @swagger
         * /api/v1/admin/getadminswithteamaccess:
-        *   post:
+        *   get:
         *     summary: get admins with team access
         *     tags: [admin]
         *     responses:
@@ -220,7 +220,7 @@ class AdminRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.post("/getadminswithteamaccess", this.controller.getAdminsWithTeamAccess);
+        this.router.get("/getadminswithteamaccess", this.controller.getAdminsWithTeamAccess);
 
         /**
         * @swagger
