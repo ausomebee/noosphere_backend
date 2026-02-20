@@ -152,9 +152,9 @@ class DepartmentsRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/departments/{id}:
-         *   delete:
-         *     summary: Deactivate a department
+         * /api/v1/organization/departments/{id}/active/{active}:
+         *   put:
+         *     summary: Activate or deactivate a department
          *     tags: [organization]
          *     parameters:
          *       - in: path
@@ -164,13 +164,19 @@ class DepartmentsRoutes {
          *           format: uuid
          *         required: true
          *         description: Department ID
+         *       - in: path
+         *         name: active
+         *         schema:
+         *           type: boolean
+         *         required: true
+         *         description: Whether to activate or deactivate the department
          *     responses:
          *       200:
-         *         description: Department deactivated successfully
+         *         description: Department activated or deactivated successfully
          */
-        this.router.delete(
-            "/:id",
-            this.controller.deactivateDepartment
+        this.router.put(
+            "/:id/active/:active",
+            this.controller.updateDepartmentActiveStatus
         );
 
         /**

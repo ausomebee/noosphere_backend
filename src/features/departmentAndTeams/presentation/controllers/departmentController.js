@@ -149,10 +149,10 @@ console.log("jjjjj",departmentMemberInstance.createDepartmentMember)
         });
     });
 
-    deactivateDepartment = expressAsyncHandler(async (req, res) => {
+    updateDepartmentActiveStatus = expressAsyncHandler(async (req, res) => {
         const department = await this.service.updateDepartment({
             id: req.params.id,
-            isActive: false
+            isActive: req.params.active === "true"
         });
 
         if (!department) {

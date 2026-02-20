@@ -173,9 +173,9 @@ class TeamsRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/teams/{id}/deactivate:
-         *   delete:
-         *     summary: Deactivate a team
+         * /api/v1/organization/teams/{id}/active/{active}:
+         *   put:
+         *     summary: Activate or deactivate a team
          *     tags: [organization]
          *     parameters:
          *       - in: path
@@ -185,13 +185,19 @@ class TeamsRoutes {
          *           format: uuid
          *         required: true
          *         description: Team ID
+         *       - in: path
+         *         name: active
+         *         schema:
+         *           type: boolean
+         *         required: true
+         *         description: Whether to activate or deactivate the team
          *     responses:
          *       200:
-         *         description: Team deactivated successfully
+         *         description: Team activated or deactivated successfully
          */
-        this.router.delete(
-            "/:id/deactivate",
-            this.controller.deactivateTeam
+        this.router.put(
+            "/:id/active/:active",
+            this.controller.updateTeamActiveStatus
         );
     }
 

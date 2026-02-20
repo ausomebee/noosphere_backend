@@ -150,10 +150,10 @@ class TeamsController {
         });
     });
 
-    deactivateTeam = expressAsyncHandler(async (req, res) => {
+    updateTeamActiveStatus = expressAsyncHandler(async (req, res) => {
         const team = await this.service.updateTeam({
             id: req.params.id,
-            isActive: false
+            isActive: req.params.active === "true"
         });
 
         if (!team) {
