@@ -748,6 +748,28 @@ class TenantRoutes {
 
         /**
          * @swagger
+         * /api/v1/tenant/staff/team/{tenantId}:
+         *   get:
+         *     summary: Get staffs with team access for a tenant
+         *     tags: [Tenant]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         description: The ID of the tenant
+         *     responses:
+         *       200:
+         *         description: staffs fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/staff/team/:tenantId", this.controller.getStaffsWithTeamAccess);
+
+        /**
+         * @swagger
          * /api/v1/tenant/{id}:
          *   get:
          *     summary: Get tenant by tenant id

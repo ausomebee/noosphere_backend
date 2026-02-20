@@ -98,9 +98,15 @@ enum FeatureModule {
 }
 
 enum PaymentSchedule {
-  MONTHLY
+  SALARIED
   HOURLY
-  WEEKLY
+  DAILY
+}
+
+enum DataAccessLevel {
+  GLOBAL
+  INDIVIDUAL
+  TEAM
 }
 
 model Admin {
@@ -120,17 +126,20 @@ model Admin {
   authQuestion          String?
   auth2FADone           Boolean  @default(false)
 
-  roles          Role            @relation("RoleAdmins", fields: [roleId], references: [id])
-  pipelines      Pipeline[]
-  PipelineItem   PipelineItem[]
-  Tenant         Tenant[]
-  logs           Logs[]
-  BillingPlan    BillingPlan[]
-  IssueComment   IssueComment[]
-  assignedIssues Issue[]         @relation("AssignedAdmin")
-  loggedIssues   Issue[]         @relation("LoggedByAdmin")
-  notifications  Notifications[]
-  rolesCreated   Role[]          @relation("RoleCreatedByAdmin")
+  roles             Role                @relation("RoleAdmins", fields: [roleId], references: [id])
+  pipelines         Pipeline[]
+  PipelineItem      PipelineItem[]
+  Tenant            Tenant[]
+  logs              Logs[]
+  BillingPlan       BillingPlan[]
+  IssueComment      IssueComment[]
+  assignedIssues    Issue[]             @relation("AssignedAdmin")
+  loggedIssues      Issue[]             @relation("LoggedByAdmin")
+  notifications     Notifications[]
+  rolesCreated      Role[]              @relation("RoleCreatedByAdmin")
+  departments       Department[]        @relation("DepartmentCreatedByAdmin")
+  departmentLead    Department[]        @relation("DepartmentTeamLead")
+  departmentMembers DepartmentMembers[]
 }
 
 model Auth {
@@ -142,24 +151,34 @@ model Auth {
   updatedAt DateTime @updatedAt
 }
 
-// model Department {
-//   id                String   @id @default(uuid())
-//   name              String
-//   module            Module
-//   createdByAdminId  String?
-//   createdByTenantId String?
-//   createdAt         DateTime @default(now())
-//   updatedAt         DateTime @updatedAt
-//   description       String?
-//   access            Json
+model Department {
+  id               String   @id @default(uuid())
+  name             String
+  createdByAdminId String?
+  teamLeadId       String
+  isDeleted        Boolean  @default(false)
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-//   roles           Role[]
-// }
+  createdByAdmin    Admin?              @relation("DepartmentCreatedByAdmin", fields: [createdByAdminId], references: [id])
+  teamLead          Admin               @relation("DepartmentTeamLead", fields: [teamLeadId], references: [id])
+  departmentMembers DepartmentMembers[]
+}
+
+model DepartmentMembers {
+  id           String @id @default(uuid())
+  departmentId String
+  adminId      String
+
+  department Department @relation(fields: [departmentId], references: [id])
+  admin      Admin      @relation(fields: [adminId], references: [id])
+}
 
 model Role {
   id                String   @id @default(uuid())
   name              String
-  dataAccessLevel   String
+  dataAccessLevel   DataAccessLevel
   systemModule      Module
   createdByAdminId  String?
   createdByTenantId String?
@@ -218,7 +237,6 @@ model Tenant {
   pipelineItems                     PipelineItem[]
   clientLinks                       ClientTenant[]
   pipelines                         Pipeline[]
-  // departments                       Department[]
   TenantStaff                       TenantStaff[]
   BillingMetadata                   BillingMetadata?
   Subscription                      Subscription[]
@@ -252,6 +270,7 @@ model Tenant {
   tenantGeneralSettings             TenantGeneralSettings[]
   tenantAdditionalSecurityQuestions TenantAdditionalSecurityQuestions[]
   roles                             Role[]
+  teams                             Teams[]                             @relation("tenantTeam")
 }
 
 model TenantStaff {
@@ -284,6 +303,7 @@ model TenantStaff {
   tenant                       Tenant                        @relation(fields: [tenantId], references: [id])
   PipelineItem                 PipelineItem[]
   ClientTenant                 ClientTenant[]                @relation("ClientClinicians")
+  teamLead                     Teams[]                       @relation("TeamLead")
   TenantStaffLicenses          TenantStaffLicenses[]
   TenantStaffPayroll           TenantStaffPayroll[]
   TenantStaffDocuments         TenantStaffDocuments[]
@@ -301,6 +321,31 @@ model TenantStaff {
   clinicalReportChangeRequests ClinicalReportChangeRequest[] @relation("ReportsRequestApprover")
   notifications                Notifications[]
   payrollCycleStaffs           PayrollCycleStaffs[]
+  teamMembers                  TeamMembers[]
+}
+
+model Teams {
+  id         String   @id @default(uuid())
+  name       String
+  tenantId   String
+  teamLeadId String
+  isDeleted  Boolean  @default(false)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  tenant      Tenant        @relation("tenantTeam", fields: [tenantId], references: [id])
+  teamLead    TenantStaff   @relation("TeamLead", fields: [teamLeadId], references: [id])
+  teamMembers TeamMembers[]
+}
+
+model TeamMembers {
+  id      String @id @default(uuid())
+  teamId  String
+  staffId String
+
+  team  Teams       @relation(fields: [teamId], references: [id])
+  staff TenantStaff @relation(fields: [staffId], references: [id])
 }
 
 model TenantStaffLicenses {

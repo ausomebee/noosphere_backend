@@ -9,7 +9,7 @@ import errorHandler from "./middleware/error-handler.js";
 import prismaService from "./config/prisma.js";
 import socketService from "./config/socket.js"
 import PassportUtil from "./config/passport.js";
-import department_route from "./features/department/presentation/routes/departmentRoute.js"
+import department_route from "./features/departmentAndTeams/presentation/routes/departmentRoutes.js"
 import admin_route from "./features/admin/presentation/routes/adminRoute.js"
 import role_route from "./features/role/presentation/routes/roleRoute.js"
 import pipeline_route from "./features/pipeline/presentation/routes/pipelineRoute.js"
@@ -77,6 +77,10 @@ import tenantGeneralSettingsRoute from "./features/tenant/presentation/routes/te
 import tenantAdditionalSecurityQuestionsRoute from "./features/tenant/presentation/routes/tenantAdditionalSecurityQuestionsRoutes.js";
 import clientNotificationSettingsRoute from "./features/client/presentation/routes/clientNotificationSettingsRoutes.js";
 import payrollCycleStaffRoute from "./features/tenantPayroll/presentation/routes/payrollCycleStaffRoutes.js";
+import teamRoute from "./features/departmentAndTeams/presentation/routes/teamsRoutes.js";
+import teamMembersRoute from "./features/departmentAndTeams/presentation/routes/teamMembersRoutes.js";
+import departmentRoute from "./features/departmentAndTeams/presentation/routes/departmentRoutes.js";
+import departmentMembersRoute from "./features/departmentAndTeams/presentation/routes/departmentMembersRoutes.js";
 
 class App {
     constructor() {
@@ -196,6 +200,10 @@ class App {
         this.app.use("/api/v1/tenant-general-settings", tenantGeneralSettingsRoute);
         this.app.use("/api/v1/notification-settings", clientNotificationSettingsRoute);
         this.app.use("/api/v1/payroll-cycle-staffs", payrollCycleStaffRoute);
+        this.app.use("/api/v1/organization/teams", teamRoute);
+        this.app.use("/api/v1/organization/team-members", teamMembersRoute);
+        this.app.use("/api/v1/organization/departments", departmentRoute);
+        this.app.use("/api/v1/organization/department-members", departmentMembersRoute);
     }
 
     initializeErrorHandler() {

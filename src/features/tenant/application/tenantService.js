@@ -944,6 +944,16 @@ class TenantService {
         });
     }
 
+    async getStaffsWithTeamAccess(tenantId) {
+        const staffs = await this.staffRepository.getStaffsWithTeamAccess(tenantId);
+
+        if (!staffs || staffs.length === 0) {
+            throw new Error("No staff found for the given tenant");
+        }
+
+        return staffs;
+    }
+
     async forgotPassword(email) {
         const staffExists = await this.staffRepository.staffExistsWithRole(email);
 

@@ -29,8 +29,8 @@ class AdminRepository {
         return await this.model.findUnique({
             where: query,
             include: {
-                roles:{
-                    select:{
+                roles: {
+                    select: {
                         name: true,
                         roleModuleAccesses: true
                     }
@@ -120,6 +120,25 @@ class AdminRepository {
     async delete(id) {
         return await this.model.delete({
             where: { id },
+        });
+    }
+
+    async getAdminsWithTeamAccess() {
+        return await this.prisma.admin.findMany({
+            where: {
+                isDeleted: false,
+                roles: {
+                    dataAccessLevel: 'TEAM',
+                },
+            },
+            include: {
+                roles: {
+                    select: {
+                        name: true,
+                        dataAccessLevel: true,
+                    },
+                },
+            },
         });
     }
 

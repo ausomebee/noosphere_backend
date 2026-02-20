@@ -79,6 +79,20 @@ class AdminController {
         });
     });
 
+    getAdminsWithTeamAccess = expressAsyncHandler(async (req, res) => {
+        const admin = await this.service.getAdminsWithTeamAccess(req.body);
+
+        if (!admin) {
+            res.status(500).json({ message: 'Failed to fetch admins with team access' });
+        }
+
+        return res.status(201).json({
+            message: "Admins with team access fetched successfully",
+            status: 'ok',
+            data: admin
+        });
+    });
+
     getAllAdmin = expressAsyncHandler(async (req, res) => {
         const admin = await this.service.getAllAdmin();
 

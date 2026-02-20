@@ -24,6 +24,26 @@ class StaffRepository extends BaseRepository {
         });
     }
 
+    async getStaffsWithTeamAccess(tenantId) {
+        return await this.model.findMany({
+            where: {
+                tenantId,
+                role: {
+                    dataAccessLevel: 'TEAM',
+                },
+                isDeleted: false,
+            },
+            include: {
+                role: {
+                    select: {
+                        name: true,
+                        dataAccessLevel: true,
+                    },
+                },
+            },
+        });
+    }
+
     async updateAll(tenantId, data) {
         return await this.model.updateMany({
             where: { tenantId },

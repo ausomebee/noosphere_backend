@@ -210,6 +210,20 @@ class AdminRoutes {
 
         /**
         * @swagger
+        * /api/v1/admin/getadminswithteamaccess:
+        *   post:
+        *     summary: get admins with team access
+        *     tags: [admin]
+        *     responses:
+        *       201:
+        *         description: Admins with team access fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.post("/getadminswithteamaccess", this.controller.getAdminsWithTeamAccess);
+
+        /**
+        * @swagger
         * /api/v1/admin/setpassword:
         *   patch:
         *     summary: set a new admin password

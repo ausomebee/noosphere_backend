@@ -2,7 +2,7 @@ import expressAsyncHandler from "express-async-handler";
 import TenantService from "../../application/tenantService.js";
 import prismaService from "../../../../config/prisma.js";
 import TenantRepository from "../../infrastructure/tenantRepository.js";
-import DepartmentRepository from "../../../department/infrastructure/departmentRepository.js";
+import DepartmentRepository from "../../../departmentAndTeams/infrastructure/departmentRepository.js";
 import RoleRepository from "../../../role/infrastructure/roleRepository.js";
 import StaffRepository from "../../infrastructure/staffRepository.js";
 import PipelineRepository from "../../../pipeline/infrastructure/pipelineRepository.js";
@@ -104,6 +104,22 @@ class TenantController {
         if (!staffs) {
             return res.status(500).json({
                 message: 'Failed to fetch staff by payment schedule.'
+            });
+        }
+
+        return res.status(200).json({
+            message: "Staff fetched successfully",
+            status: 'ok',
+            data: staffs
+        });
+    });
+
+    getStaffsWithTeamAccess = expressAsyncHandler(async (req, res) => {
+        const staffs = await this.service.getStaffsWithTeamAccess(req.params.tenantId);
+
+        if (!staffs) {
+            return res.status(500).json({
+                message: 'Failed to fetch staff with team access.'
             });
         }
 

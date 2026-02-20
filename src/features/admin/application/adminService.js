@@ -3,7 +3,7 @@ import AdminRepository from '../infrastructure/adminRepository.js';
 import argon2 from "argon2";
 import MailService from '../../../utilities/nodemailer.js';
 import ReferralCodeGenerator from '../../../utilities/generateCode.js';
-import DepartmentRepository from '../../department/infrastructure/departmentRepository.js';
+import DepartmentRepository from '../../departmentAndTeams/infrastructure/departmentRepository.js';
 import RoleRepository from '../../role/infrastructure/roleRepository.js';
 import AuthRepository from '../../auth/infrastructure/authRepository.js';
 
@@ -256,6 +256,16 @@ class AdminService {
 
         if (!admin) {
             throw new Error("Admin not found")
+        }
+
+        return admin;
+    }
+
+    async getAdminsWithTeamAccess(data) {
+        const admin = await this.repository.getAdminsWithTeamAccess();
+
+        if (!admin) {
+            throw new Error("Admins not found")
         }
 
         return admin;
