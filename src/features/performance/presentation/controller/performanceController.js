@@ -9,7 +9,10 @@ class PerformanceController {
     }
 
     getAllMetrics = expressAsyncHandler(async (req, res) => {
-        const metrics = await this.service.getAllMetrics(req.body);
+        const metrics = await this.service.getAllMetrics({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!metrics) {
             res.status(500).json({ message: 'Failed to fetch metrics' });
@@ -23,7 +26,10 @@ class PerformanceController {
     });
 
     getCPUUtilizationMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getCPUUtilizationMetric(req.body);
+        const data = await this.service.getCPUUtilizationMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch CPU utilization metric' });
@@ -37,7 +43,10 @@ class PerformanceController {
     });
 
     getDiskReadBytesMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getDiskReadBytesMetric(req.body);
+        const data = await this.service.getDiskReadBytesMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch disk read bytes' });
@@ -51,7 +60,10 @@ class PerformanceController {
     });
 
     getDiskWriteBytesMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getDiskWriteBytesMetric(req.body);
+        const data = await this.service.getDiskWriteBytesMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch disk write bytes' });
@@ -65,7 +77,10 @@ class PerformanceController {
     });
 
     getDiskReadOpsMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getDiskReadOpsMetric(req.body);
+        const data = await this.service.getDiskReadOpsMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch disk read ops' });
@@ -79,7 +94,10 @@ class PerformanceController {
     });
 
     getDiskWriteOpsMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getDiskWriteOpsMetric(req.body);
+        const data = await this.service.getDiskWriteOpsMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch disk write ops' });
@@ -93,7 +111,10 @@ class PerformanceController {
     });
 
     getNetworkInMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getNetworkInMetric(req.body);
+        const data = await this.service.getNetworkInMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch network in' });
@@ -107,7 +128,10 @@ class PerformanceController {
     });
 
     getNetworkOutMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getNetworkOutMetric(req.body);
+        const data = await this.service.getNetworkOutMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch network out' });
@@ -121,7 +145,10 @@ class PerformanceController {
     });
 
     getNetworkPacketsInMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getNetworkPacketsInMetric(req.body);
+        const data = await this.service.getNetworkPacketsInMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch network packets in' });
@@ -135,7 +162,10 @@ class PerformanceController {
     });
 
     getNetworkPacketsOutMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getNetworkPacketsOutMetric(req.body);
+        const data = await this.service.getNetworkPacketsOutMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch network packets out' });
@@ -149,7 +179,10 @@ class PerformanceController {
     });
 
     getStatusCheckFailedMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getStatusCheckFailedMetric(req.body);
+        const data = await this.service.getStatusCheckFailedMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch status check failed' });
@@ -163,7 +196,10 @@ class PerformanceController {
     });
 
     getStatusCheckFailedInstanceMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getStatusCheckFailedInstanceMetric(req.body);
+        const data = await this.service.getStatusCheckFailedInstanceMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch instance check failed' });
@@ -177,7 +213,10 @@ class PerformanceController {
     });
 
     getStatusCheckFailedSystemMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getStatusCheckFailedSystemMetric(req.body);
+        const data = await this.service.getStatusCheckFailedSystemMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch system check failed' });
@@ -191,7 +230,10 @@ class PerformanceController {
     });
 
     getRDSCPUUtilizationMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getRDSCPUUtilizationMetric(req.body);
+        const data = await this.service.getRDSCPUUtilizationMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch RDS CPU utilization' });
@@ -205,7 +247,10 @@ class PerformanceController {
     });
 
     getRDSDatabaseConnectionsMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getRDSDatabaseConnectionsMetric(req.body);
+        const data = await this.service.getRDSDatabaseConnectionsMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch RDS database connections' });
@@ -219,7 +264,10 @@ class PerformanceController {
     });
 
     getRDSFreeStorageSpaceMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getRDSFreeStorageSpaceMetric(req.body);
+        const data = await this.service.getRDSFreeStorageSpaceMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch RDS free storage space' });
@@ -233,7 +281,10 @@ class PerformanceController {
     });
 
     getRDSFreeableMemoryMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getRDSFreeableMemoryMetric(req.body);
+        const data = await this.service.getRDSFreeableMemoryMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch RDS freeable memory' });
@@ -247,7 +298,10 @@ class PerformanceController {
     });
 
     getRDSReadIOPSMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getRDSReadIOPSMetric(req.body);
+        const data = await this.service.getRDSReadIOPSMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch RDS read IOPS' });
@@ -261,7 +315,10 @@ class PerformanceController {
     });
 
     getRDSWriteIOPSMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getRDSWriteIOPSMetric(req.body);
+        const data = await this.service.getRDSWriteIOPSMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch RDS write IOPS' });
@@ -275,7 +332,10 @@ class PerformanceController {
     });
 
     getRDSReadLatencyMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getRDSReadLatencyMetric(req.body);
+        const data = await this.service.getRDSReadLatencyMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch RDS read latency' });
@@ -289,7 +349,10 @@ class PerformanceController {
     });
 
     getRDSWriteLatencyMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getRDSWriteLatencyMetric(req.body);
+        const data = await this.service.getRDSWriteLatencyMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch RDS write latency' });
@@ -303,7 +366,10 @@ class PerformanceController {
     });
 
     getRDSReadThroughputMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getRDSReadThroughputMetric(req.body);
+        const data = await this.service.getRDSReadThroughputMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch RDS read throughput' });
@@ -317,7 +383,10 @@ class PerformanceController {
     });
 
     getRDSWriteThroughputMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getRDSWriteThroughputMetric(req.body);
+        const data = await this.service.getRDSWriteThroughputMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch RDS write throughput' });
@@ -331,7 +400,10 @@ class PerformanceController {
     });
 
     getRDSReplicaLagMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getRDSReplicaLagMetric(req.body);
+        const data = await this.service.getRDSReplicaLagMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch RDS replica lag' });
@@ -345,7 +417,10 @@ class PerformanceController {
     });
 
     getRDSSwapUsageMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getRDSSwapUsageMetric(req.body);
+        const data = await this.service.getRDSSwapUsageMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch RDS swap usage' });
@@ -359,7 +434,10 @@ class PerformanceController {
     });
 
     getRDSDiskQueueDepthMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getRDSDiskQueueDepthMetric(req.body);
+        const data = await this.service.getRDSDiskQueueDepthMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch RDS disk queue depth' });
@@ -373,7 +451,10 @@ class PerformanceController {
     });
 
     getRDSNetworkReceiveThroughputMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getRDSNetworkReceiveThroughputMetric(req.body);
+        const data = await this.service.getRDSNetworkReceiveThroughputMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch RDS receive throughput' });
@@ -387,7 +468,10 @@ class PerformanceController {
     });
 
     getRDSNetworkTransmitThroughputMetric = expressAsyncHandler(async (req, res) => {
-        const data = await this.service.getRDSNetworkTransmitThroughputMetric(req.body);
+        const data = await this.service.getRDSNetworkTransmitThroughputMetric({
+            startTime: new Date(req.query.startTime),
+            endTime: new Date(req.query.endTime)
+        });
 
         if (!data) {
             return res.status(500).json({ message: 'Failed to fetch RDS transmit throughput' });

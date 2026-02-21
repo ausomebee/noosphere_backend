@@ -24,7 +24,7 @@ class PerformanceDto {
                 })
         });
 
-        Validator.validateRequest(req, next, schema);
+        Validator.validateRequest(req, next, schema, req.query);
     };
 
 }

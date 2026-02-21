@@ -29,7 +29,6 @@ class CloudWatchUtil {
         });
 
         try {
-            console.log("first")
             const data = await this.client.send(command);
             return data.MetricDataResults;
         } catch (err) {
