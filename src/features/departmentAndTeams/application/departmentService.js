@@ -62,7 +62,7 @@ class DepartmentService {
                         fullName: true,
                     }
                 },
-                teamMembers: {
+                departmentMembers: {
                     select: {
                         staff: {
                             select: {
@@ -74,7 +74,7 @@ class DepartmentService {
                 },
                 _count: {
                     select: {
-                        teamMembers: true
+                        departmentMembers: true
                     }
                 }
             }
