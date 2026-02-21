@@ -11,7 +11,46 @@ class CloudWatchUtil {
         });
     }
 
-    async getMetricData({ namespace, metricName, dimensions, startTime, endTime, stat = "Average", period = 300 }) {
+    static formatForChart(metricDataResults, { maxPoints = 50, label } = {}) {
+        const result = metricDataResults[0];
+        if (!result || !result.Timestamps?.length) {
+            return { label: label || result?.Label || "", data: [] };
+        }
+
+        let points = result.Timestamps
+            .map((ts, i) => ({
+                timestamp: new Date(ts).toISOString(),
+                value: result.Values[i]
+            }))
+            .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+        if (maxPoints && points.length > maxPoints) {
+            const bucketSize = Math.ceil(points.length / maxPoints);
+            const downsampled = [];
+            for (let i = 0; i < points.length; i += bucketSize) {
+                const bucket = points.slice(i, i + bucketSize);
+                const avgValue = bucket.reduce((sum, p) => sum + p.value, 0) / bucket.length;
+                downsampled.push({
+                    timestamp: bucket[Math.floor(bucket.length / 2)].timestamp,
+                    value: Math.round(avgValue * 100) / 100
+                });
+            }
+            points = downsampled;
+        }
+
+        return { label: label || result.Label || "", data: points };
+    }
+
+    async getMetricData({
+        namespace,
+        metricName,
+        dimensions,
+        startTime,
+        endTime,
+        stat = "Average",
+        period = 300,
+        maxPoints = 50
+    }) {
         const command = new GetMetricDataCommand({
             StartTime: startTime,
             EndTime: endTime,
@@ -19,7 +58,11 @@ class CloudWatchUtil {
                 {
                     Id: "m1",
                     MetricStat: {
-                        Metric: { Namespace: namespace, MetricName: metricName, Dimensions: dimensions },
+                        Metric: {
+                            Namespace: namespace,
+                            MetricName: metricName,
+                            Dimensions: dimensions
+                        },
                         Period: period,
                         Stat: stat,
                     },
@@ -30,15 +73,26 @@ class CloudWatchUtil {
 
         try {
             const data = await this.client.send(command);
-            return data.MetricDataResults;
+            return CloudWatchUtil.formatForChart(data.MetricDataResults, {
+                maxPoints,
+                label: metricName
+            });
         } catch (err) {
             console.error(`Error fetching ${metricName}:`, err);
             throw err;
         }
     }
 
+    async getMultipleMetrics(queries, startTime, endTime) {
+        const results = await Promise.all(
+            queries.map(q => this.getMetricData({ ...q, startTime, endTime }))
+        );
+        return { series: results };
+    }
 
-    async getEC2Metric(metricName, instanceId, startTime, endTime, stat = "Average", period = 300) {
+    // ── EC2 Metrics ──────────────────────────────────────────────
+
+    async getEC2Metric(metricName, instanceId, startTime, endTime, stat = "Average", period = 300, maxPoints = 50) {
         return this.getMetricData({
             namespace: "AWS/EC2",
             metricName,
@@ -46,7 +100,8 @@ class CloudWatchUtil {
             startTime,
             endTime,
             stat,
-            period
+            period,
+            maxPoints
         });
     }
 
@@ -63,8 +118,7 @@ class CloudWatchUtil {
     getStatusCheckFailedInstance = (...args) => this.getEC2Metric("StatusCheckFailed_Instance", ...args);
     getStatusCheckFailedSystem = (...args) => this.getEC2Metric("StatusCheckFailed_System", ...args);
 
-
-    async getRDSMetric(metricName, dbInstanceIdentifier, startTime, endTime, stat = "Average", period = 300) {
+    async getRDSMetric(metricName, dbInstanceIdentifier, startTime, endTime, stat = "Average", period = 300, maxPoints = 50) {
         return this.getMetricData({
             namespace: "AWS/RDS",
             metricName,
@@ -72,7 +126,8 @@ class CloudWatchUtil {
             startTime,
             endTime,
             stat,
-            period
+            period,
+            maxPoints
         });
     }
 
@@ -91,7 +146,6 @@ class CloudWatchUtil {
     getRDSDiskQueueDepth = (...args) => this.getRDSMetric("DiskQueueDepth", ...args);
     getRDSNetworkReceiveThroughput = (...args) => this.getRDSMetric("NetworkReceiveThroughput", ...args);
     getRDSNetworkTransmitThroughput = (...args) => this.getRDSMetric("NetworkTransmitThroughput", ...args);
-
 }
 
-export default CloudWatchUtil
+export default CloudWatchUtil;
