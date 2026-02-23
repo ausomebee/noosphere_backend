@@ -93,6 +93,45 @@ import multer from "multer";
  *           format: uuid
  *           example: "d6c6f7b4-b2f9-4d76-9f9c-9b292d3a1cfa"
  *
+ *     TenantActiveStatusDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - active
+ *         - deactivatedById
+ *         - password
+ *         - reason
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "439004a2-97cb-4eea-824e-e95d094c9be6"
+ *           description: Tenant ID to be activated or deactivated
+ *         active:
+ *           type: boolean
+ *           example: false
+ *           description: Set to false to deactivate tenant, true to reactivate
+ *         deactivatedById:
+ *           type: string
+ *           format: uuid
+ *           example: "b91c2e88-7f1b-4c1e-92d0-1a5d3f4e8a12"
+ *           description: Admin ID performing the action
+ *         password:
+ *           type: string
+ *           example: "AdminSecurePassword123!"
+ *           description: Admin password for verification
+ *         reason:
+ *           type: string
+ *           minLength: 3
+ *           maxLength: 200
+ *           example: "Violation of platform policy"
+ *           description: Reason for deactivation or reactivation
+ *         details:
+ *           type: string
+ *           maxLength: 500
+ *           example: "Tenant failed to comply with billing requirements despite multiple warnings."
+ *           description: Additional explanation for the action
+ * 
  *     TenantUpdate:
  *       type: object
  *       required:
@@ -290,7 +329,7 @@ class TenantRoutes {
          * /api/v1/tenant/candidate:
          *   post:
          *     summary: Create a new candidate
-         *     tags: [Candidate]
+         *     tags: [Tenant]
          *     requestBody:
          *       required: true
          *       content:
@@ -325,6 +364,60 @@ class TenantRoutes {
          *         description: Bad request
          */
         this.router.patch("/", TenantDto.updateTenantDto, this.controller.updateTenant);
+
+        /**
+         * @swagger
+         * /api/v1/tenant/active-status:
+         *   patch:
+         *     summary: Update tenant active status
+         *     description: Update the active status of a tenant.
+         *     tags: [Tenant]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/TenantActiveStatusDto'
+         *     responses:
+         *       201:
+         *         description: Tenant active status updated successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.patch("/active-status", this.controller.tenantActiveStatus);
+
+        /**
+         * @swagger
+         * /api/v1/tenant/account-officer/{tenantId}/{officerId}:
+         *   patch:
+         *     summary: Update tenant account officer
+         *     description: Assign or update the account officer for a specific tenant.
+         *     tags:
+         *       - Tenant
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         description: The UUID of the tenant
+         *       - in: path
+         *         name: officerId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         description: The UUID of the account officer to assign
+         *     responses:
+         *       200:
+         *         description: Tenant account officer updated successfully
+         *       400:
+         *         description: Invalid tenantId or officerId supplied
+         *       404:
+         *         description: Tenant or account officer not found
+         */
+        this.router.patch("/account-officer/:tenantId/:officerId", this.controller.updateAccountOfficer);
 
         /**
          * @swagger
@@ -767,6 +860,34 @@ class TenantRoutes {
          *         description: Validation error
          */
         this.router.get("/staff/team/:tenantId", this.controller.getStaffsWithTeamAccess);
+
+        /**
+         * @swagger
+         * /api/v1/tenant/active:
+         *   get:
+         *     summary: Get all active tenants
+         *     tags: [Tenant]
+         *     responses:
+         *       200:
+         *         description: Active tenants fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/active", this.controller.getAllActiveTenant);
+
+        /**
+         * @swagger
+         * /api/v1/tenant/management-overview:
+         *   get:
+         *     summary: Get management overview for  tenants
+         *     tags: [Tenant]
+         *     responses:
+         *       200:
+         *         description: management overview fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/management-overview", this.controller.tenantManagementOverview);
 
         /**
          * @swagger

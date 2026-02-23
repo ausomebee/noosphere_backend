@@ -98,6 +98,7 @@ class AdminService {
             fullName: data.fullName || admin.fullName,
             email: data.email || admin.email,
             phoneNumber: data.phoneNumber || admin.phoneNumber,
+            active: data.active ?? admin.active,
             roles: {
                 connect: {
                     id: data.roleId || admin.roleId
@@ -247,6 +248,22 @@ class AdminService {
         }
 
         return { ...admin, accessToken: this.token.generateAccessToken(claims), refreshToken: this.token.generateRefreshToken() };
+    }
+
+    async verifyPassword(data){
+        const admin = await this.repository.findAdmin({
+            id: data.id
+        });
+
+        if (!admin) {
+            throw new Error("admin not found")
+        }
+
+        if (!(await argon2.verify(admin.password, data.password))) {
+            throw new Error('Incorrect password')
+        }
+
+        return true;
     }
 
     async getSingleAdmin(data) {

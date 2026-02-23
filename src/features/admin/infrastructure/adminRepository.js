@@ -22,6 +22,13 @@ class AdminRepository {
     async findOne(query) {
         return await this.model.findUnique({
             where: query,
+            include: {
+                departmentMembers: {
+                    include: {
+                        department: true
+                    }
+                }
+            }
         });
     }
 

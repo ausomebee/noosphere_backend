@@ -6,6 +6,20 @@ class IssueService {
         this.issueCommentRepository = issueCommentRepository;
     }
 
+    async tenantManagementOverview(tenantId) {
+        const totalIssues = await this.issueRepository.totalCountDynamic({ tenantId });
+        const resolvedIssues = await this.issueRepository.totalCountDynamic({ tenantId, status: "Resolved" });
+        const activeIssues = await this.issueRepository.totalCountDynamic({ tenantId, status: { not: "Resolved" } });
+        const countByCategory = await this.issueRepository.countIssuesByCategory({ tenantId });
+
+        return {
+            totalIssues,
+            resolvedIssues,
+            activeIssues,
+            countByCategory
+        };
+    }
+
     async createIssue(data) {
         const issueData = new Issue(data)
 
@@ -211,6 +225,17 @@ class IssueService {
 
     async getIssueByStatus(status) {
         const query = status === "all" ? {} : { status }
+        const issue = await this.issueRepository.findAllAndPopulate(query);
+
+        if (!issue) {
+            throw new Error("Failed to fetch issue");
+        }
+
+        return issue;
+    }
+
+    async getTenantIssueByStatus(tenantId, status) {
+        const query = status === "all" ? { tenantId } : { tenantId, status }
         const issue = await this.issueRepository.findAllAndPopulate(query);
 
         if (!issue) {

@@ -22,6 +22,15 @@ class TenantRepository extends BaseRepository {
                         planType: true
                     }
                 },
+                Subscription: {
+                    include: { plan: true }
+                },
+                accountOfficer: {
+                    select: { firstName: true, lastName: true }
+                },
+                admin: {
+                    select: { firstName: true, lastName: true }
+                },
             }
         });
     }

@@ -11,12 +11,15 @@ import ReferralCodeGenerator from "../../../../utilities/generateCode.js";
 import ChoiceRepository from "../../infrastructure/choiceRepository.js";
 import AuthRepository from "../../../auth/infrastructure/authRepository.js";
 import TokenService from "../../../../utilities/generate_token.js";
+import ClientRepository from "../../../client/infrastructure/clientRepository.js";
+import ClientService from "../../../client/application/clientService.js";
+import TenantDeactivationRepository from "../../infrastructure/tenantDeactivationRepository.js";
+import AdminService from "../../../admin/application/adminService.js";
 
 class TenantController {
     constructor() {
         this.prisma = prismaService.getClient();
         this.tenantRepository = new TenantRepository(this.prisma.tenant);
-        this.departmentRepository = new DepartmentRepository(this.prisma.department);
         this.roleRepository = new RoleRepository(this.prisma.role);
         this.staffRepository = new StaffRepository(this.prisma.tenantStaff);
         this.pipelineRepository = new PipelineRepository(this.prisma.pipeline);
@@ -25,10 +28,11 @@ class TenantController {
         this.authRepository = new AuthRepository(this.prisma.auth);
         this.generateCode = new ReferralCodeGenerator(12);
         this.token = TokenService;
+        this.tenantDeactivationRepository = new TenantDeactivationRepository(this.prisma.tenantDeactivation);
         this.service = new TenantService({
+            tenantDeactivationRepository: this.tenantDeactivationRepository,
             tenantRepository: this.tenantRepository,
             prisma: this.prisma,
-            departmentRepository: this.departmentRepository,
             roleRepository: this.roleRepository,
             staffRepository: this.staffRepository,
             pipelineRepository: this.pipelineRepository,
@@ -38,6 +42,9 @@ class TenantController {
             authRepository: this.prisma.authenticator,
             tokenService: this.token
         });
+        this.clientRepository = new ClientRepository(this.prisma.client);
+        this.clientService = new ClientService({ clientRepository: this.clientRepository });
+        this.adminService = new AdminService();
     }
 
     createCandidate = expressAsyncHandler(async (req, res) => {
@@ -70,6 +77,23 @@ class TenantController {
 
     updateTenant = expressAsyncHandler(async (req, res) => {
         const tenant = await this.service.updateTenant(req.body);
+
+        if (!tenant) {
+            res.status(500).json({ message: 'Failed to update tenant.' });
+        }
+
+        return res.status(201).json({
+            message: "Candidate updated successfully",
+            status: 'ok',
+            data: tenant
+        });
+    });
+
+    updateAccountOfficer = expressAsyncHandler(async (req, res) => {
+        const tenant = await this.service.updateTenant({
+            id: req.params.tenantId,
+            assignToAdmin: req.params.officerId,
+        });
 
         if (!tenant) {
             res.status(500).json({ message: 'Failed to update tenant.' });
@@ -215,6 +239,63 @@ class TenantController {
             message: "Tenants counted successfully",
             status: 'ok',
             data: totalTenants
+        });
+    });
+
+    getAllActiveTenant = expressAsyncHandler(async (req, res) => {
+        const tenants = await this.service.getAllActiveTenant();
+
+        if (!tenants) {
+            res.status(500).json({ message: 'Failed to fetch tenants.' });
+        }
+
+        return res.status(201).json({
+            message: "Tenants fetched successfully",
+            status: 'ok',
+            data: tenants
+        });
+    });
+
+    tenantManagementOverview = expressAsyncHandler(async (req, res) => {
+        const totalTenants = await this.service.countAllTenant();
+        const totalStaffs = await this.service.countAllStaffs();
+        const totalClients = await this.clientService.countAllClients();
+
+        if (!totalTenants || !totalStaffs || !totalClients) {
+            res.status(500).json({ message: 'Failed to fetch tenants, staffs, or clients.' });
+        }
+
+        return res.status(201).json({
+            message: "Tenants and staffs counted successfully",
+            status: 'ok',
+            data: {
+                totalTenants,
+                totalStaffs,
+                totalClients
+            }
+        });
+    });
+
+    tenantActiveStatus = expressAsyncHandler(async (req, res) => {
+        const authorize = await this.adminService.verifyPassword({
+            id: req.body.deactivatedById,
+            password: req.body.password
+        });
+
+        if (!authorize) {
+            res.status(500).json({ message: 'Failed to authorize admin.' });
+        }
+
+        const tenant = await this.service.tenantActiveStatus(req.body);
+
+        if (!tenant) {
+            res.status(500).json({ message: 'Failed to deactivate tenant.' });
+        }
+
+        return res.status(201).json({
+            message: "Tenant deactivated successfully",
+            status: 'ok',
+            data: tenant
         });
     });
 

@@ -1,9 +1,11 @@
 class Admin {
-    constructor({ id, fullName, email, phoneNumber, roleId, superAdmin = false, password, authType }) {
+    constructor({ id, firstName, lastName, email, phoneNumber, departmentId, roleId, superAdmin = false, password, authType }) {
         this.id = id;
-        this.fullName = fullName;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.phoneNumber = phoneNumber;
+        this.departmentId = departmentId;
         this.roleId = roleId;
         this.superAdmin = superAdmin;
         this.password = password;
@@ -12,12 +14,17 @@ class Admin {
 
     get createAdmin() {
         return {
-            fullName: this.fullName,
+            firstName: this.firstName,
+            lastName: this.lastName,
             email: this.email,
             phoneNumber: this.phoneNumber,
             roleId: this.roleId,
             superAdmin: this.superAdmin,
-            authType: this.authType
+            departmentMembers: {
+                create: {
+                    departmentId: this.departmentId
+                }
+            }
         };
     }
 

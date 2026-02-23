@@ -148,6 +148,23 @@ class AdminController {
             data: mail
         });
     });
+
+    setAdminActiveStatus = expressAsyncHandler(async (req, res) => {
+        const admin = await this.service.updateAdmin({
+            id: req.params.id,
+            active: req.params.active === "true"
+        });
+
+        if (!admin) {
+            res.status(500).json({ message: 'Failed to update admin status' });
+        }
+
+        return res.status(201).json({
+            message: "Admin status updated successfully",
+            status: 'ok',
+            data: admin
+        });
+    });
 }
 
 export default AdminController;

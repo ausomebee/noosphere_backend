@@ -1,5 +1,6 @@
 import Joi from "joi";
 import Validator from "../../../../utilities/validate.js";
+import { id } from "date-fns/locale";
 
 const strongPasswordRegex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
 const stringPasswordError = "Password must be strong. At least one upper case letter, one lower case letter, one digit, one special character, and at least 8 characters long.";
@@ -7,7 +8,7 @@ const stringPasswordError = "Password must be strong. At least one upper case le
 class AdminDto {
     static createAdminDto = (req, res, next) => {
         const schema = Joi.object({
-            fullName: Joi.string()
+            firstName: Joi.string()
                 .required()
                 .min(3)
                 .max(20)
@@ -16,6 +17,16 @@ class AdminDto {
                     "string.empty": "First name is required",
                     "string.min": "First name must be at least 3 characters",
                     "string.max": "First name must not exceed 20 characters",
+                }),
+            lastName: Joi.string()
+                .required()
+                .min(3)
+                .max(20)
+                .trim()
+                .messages({
+                    "string.empty": "Last name is required",
+                    "string.min": "Last name must be at least 3 characters",
+                    "string.max": "Last name must not exceed 20 characters",
                 }),
             email: Joi.string()
                 .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
@@ -27,7 +38,6 @@ class AdminDto {
                     "string.empty": "Email is required",
                     "any.required": "Email is a required field",
                 }),
-            authType: Joi.string().trim().required(),
             phoneNumber: Joi.string()
                 .required()
                 .trim()
@@ -41,15 +51,23 @@ class AdminDto {
             roleId: Joi.string().uuid().required().messages({
                 "string.empty": "Role ID is required",
                 "string.guid": "Role ID must be a valid UUID",
-            })
+            }),
+            departmentId: Joi.string().uuid().required().messages({
+                "string.empty": "Department ID is required",
+                "string.guid": "Department ID must be a valid UUID",
+            }),
         });
 
         Validator.validateRequest(req, next, schema);
     };
 
-    static createSuperAdminDto = (req, res, next) => {
+    static updateAdminDto = (req, res, next) => {
         const schema = Joi.object({
-            fullName: Joi.string()
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID",
+            }),
+            firstName: Joi.string()
                 .required()
                 .min(3)
                 .max(20)
@@ -58,6 +76,71 @@ class AdminDto {
                     "string.empty": "First name is required",
                     "string.min": "First name must be at least 3 characters",
                     "string.max": "First name must not exceed 20 characters",
+                }),
+            lastName: Joi.string()
+                .required()
+                .min(3)
+                .max(20)
+                .trim()
+                .messages({
+                    "string.empty": "Last name is required",
+                    "string.min": "Last name must be at least 3 characters",
+                    "string.max": "Last name must not exceed 20 characters",
+                }),
+            email: Joi.string()
+                .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
+                .required()
+                .trim()
+                .lowercase()
+                .messages({
+                    "string.email": "Email must be a valid email",
+                    "string.empty": "Email is required",
+                    "any.required": "Email is a required field",
+                }),
+            phoneNumber: Joi.string()
+                .required()
+                .trim()
+                .min(10)
+                .max(15)
+                .messages({
+                    "string.empty": "Phone number is required",
+                    "string.min": "Phone number must be at least 10 characters long",
+                    "string.max": "Phone number must be at most 15 characters long"
+                }),
+            roleId: Joi.string().uuid().required().messages({
+                "string.empty": "Role ID is required",
+                "string.guid": "Role ID must be a valid UUID",
+            }),
+            departmentId: Joi.string().uuid().required().messages({
+                "string.empty": "Department ID is required",
+                "string.guid": "Department ID must be a valid UUID",
+            }),
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static createSuperAdminDto = (req, res, next) => {
+        const schema = Joi.object({
+            firstName: Joi.string()
+                .required()
+                .min(3)
+                .max(20)
+                .trim()
+                .messages({
+                    "string.empty": "First name is required",
+                    "string.min": "First name must be at least 3 characters",
+                    "string.max": "First name must not exceed 20 characters",
+                }),
+            lastName: Joi.string()
+                .required()
+                .min(3)
+                .max(20)
+                .trim()
+                .messages({
+                    "string.empty": "Last name is required",
+                    "string.min": "Last name must be at least 3 characters",
+                    "string.max": "Last name must not exceed 20 characters",
                 }),
             email: Joi.string()
                 .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })

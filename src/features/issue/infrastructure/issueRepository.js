@@ -48,7 +48,8 @@ class IssueRepository extends BaseRepository {
             include: {
                 assignedTo: {
                     select: {
-                        fullName: true
+                        firstName: true,
+                        lastName: true,
                     }
                 },
                 tenant: {
@@ -58,20 +59,27 @@ class IssueRepository extends BaseRepository {
                 },
                 loggedBy: {
                     select: {
-                        fullName: true
+                        firstName: true,
+                        lastName: true,
                     }
                 },
                 comments: {
                     include: {
                         commentBy: {
-                            select: { fullName: true }
+                            select: {
+                                firstName: true,
+                                lastName: true,
+                            }
                         }
                     }
                 },
                 Logs: {
                     include: {
                         admin: {
-                            select: { fullName: true }
+                            select: {
+                                firstName: true,
+                                lastName: true,
+                            }
                         }
                     }
                 },
@@ -85,6 +93,16 @@ class IssueRepository extends BaseRepository {
             _count: {
                 _all: true,
             },
+        });
+    }
+
+    async countIssuesByCategory(query = {}) {
+        return await this.model.groupBy({
+            by: ['category'],
+            where: query,
+            _count: {
+                category: true
+            }
         });
     }
 

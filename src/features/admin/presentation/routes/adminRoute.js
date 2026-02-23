@@ -9,17 +9,23 @@ import AdminDto from "../dto/adminDto.js";
  *     CreateAdmin:
  *       type: object
  *       required:
- *         - fullName
+ *         - firstName
+ *         - lastName
  *         - email
  *         - password
  *         - phoneNumber
  *         - roleId
  *       properties:
- *         fullName:
+ *         firstName:
  *           type: string
  *           minLength: 3
  *           maxLength: 20
- *           description: Full name of the admin (3-20 characters)
+ *           description: First name of the admin (3-20 characters)
+ *         lastName:
+ *           type: string
+ *           minLength: 3
+ *           maxLength: 20
+ *           description: Last name of the admin (3-20 characters)
  *         email:
  *           type: string
  *           format: email
@@ -33,24 +39,73 @@ import AdminDto from "../dto/adminDto.js";
  *           type: string
  *           format: uuid
  *           description: UUID of the assigned role
- *         authType:
+ *         departmentId:
  *           type: string
- *           format: text
- *           description: Authentication type
- *     CreateSuperAdmin:
+ *           format: uuid
+ *           description: UUID of the assigned department
+ * 
+ *     UpdateAdmin:
  *       type: object
  *       required:
- *         - fullName
+ *         - id
+ *         - firstName
+ *         - lastName
  *         - email
  *         - password
  *         - phoneNumber
  *         - roleId
  *       properties:
- *         fullName:
+ *         id:
+ *          type: string
+ *          format: uuid
+ *         firstName:
  *           type: string
  *           minLength: 3
  *           maxLength: 20
- *           description: Full name of the admin (3-20 characters)
+ *           description: First name of the admin (3-20 characters)
+ *         lastName:
+ *           type: string
+ *           minLength: 3
+ *           maxLength: 20
+ *           description: Last name of the admin (3-20 characters)
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: Valid email (must end with .com or .net)
+ *         phoneNumber:
+ *           type: string
+ *           minLength: 10
+ *           maxLength: 15
+ *           description: Phone number (10 to 15 digits)
+ *         roleId:
+ *           type: string
+ *           format: uuid
+ *           description: UUID of the assigned role
+ *         departmentId:
+ *           type: string
+ *           format: uuid
+ *           description: UUID of the assigned department
+ * 
+ *     CreateSuperAdmin:
+ *       type: object
+ *       required:
+ *         - firstName
+ *         - lastName
+ *         - email
+ *         - password
+ *         - phoneNumber
+ *         - roleId
+ *       properties:
+ *         firstName:
+ *           type: string
+ *           minLength: 3
+ *           maxLength: 20
+ *           description: First name of the admin (3-20 characters)
+ *         lastName:
+ *           type: string
+ *           minLength: 3
+ *           maxLength: 20
+ *           description: Last name of the admin (3-20 characters)
  *         email:
  *           type: string
  *           format: email
@@ -167,6 +222,26 @@ class AdminRoutes {
          *         description: Validation error
          */
         this.router.post("/createadmin", AdminDto.createAdminDto, this.controller.createAdmin);
+
+        /**
+         * @swagger
+         * /api/v1/admin/updateadmin:
+         *   patch:
+         *     summary: update an admin
+         *     tags: [admin]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateAdmin'
+         *     responses:
+         *       201:
+         *         description: Admin updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/updateadmin", AdminDto.updateAdminDto, this.controller.updateAdmin);
 
         /**
          * @swagger
@@ -363,6 +438,34 @@ class AdminRoutes {
          */
         this.router.get("/forgotpassword/:email", AdminDto.forgotPasswordDto, this.controller.forgotPassword);
 
+        /**
+         * @swagger
+         * /api/v1/admin/setactivestatus/{id}/active/{active}:
+         *   patch:
+         *     summary: Activate or deactivate an admin
+         *     tags: [admin]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         description: The ID of the admin
+         *       - in: path
+         *         name: active
+         *         required: true
+         *         schema:
+         *           type: string
+         *           enum: [true, false]
+         *         description: Whether to activate (true) or deactivate (false) the admin
+         *     responses:
+         *       200:
+         *         description: Admin status updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/setactivestatus/:id/active/:active", this.controller.setAdminActiveStatus);
     }
 
     getRouter() {

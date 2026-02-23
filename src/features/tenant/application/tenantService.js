@@ -1,13 +1,12 @@
-import { id } from 'date-fns/locale';
 import MailService from '../../../utilities/nodemailer.js';
 import Tenant from '../domain/tenant.js';
 import argon2 from "argon2";
 
 class TenantService {
-    constructor({ tenantRepository, prisma, tokenService, departmentRepository, roleRepository, staffRepository, pipelineRepository, itemRepository, generateCode, choiceRepository, authRepository }) {
+    constructor({ tenantDeactivationRepository, tenantRepository, prisma, tokenService, roleRepository, staffRepository, pipelineRepository, itemRepository, generateCode, choiceRepository, authRepository }) {
+        this.tenantDeactivationRepository = tenantDeactivationRepository;
         this.tenantRepository = tenantRepository;
         this.prisma = prisma;
-        this.departmentRepository = departmentRepository;
         this.roleRepository = roleRepository;
         this.staffRepository = staffRepository;
         this.pipelineRepository = pipelineRepository;
@@ -53,8 +52,7 @@ class TenantService {
                 pipelineStageId: data.pipelineStageId,
                 assignToAdmin: data.assignToAdmin
             }, tx)
-            const department = await this.departmentRepository.createTenantDepartment(tenant.id, tx);
-            const role = await this.roleRepository.createTenantRole(department.id, tx);
+            const role = await this.roleRepository.createTenantRole("GLOBAL", tenant.id, tx);
             const staff = await this.staffRepository.txCreate({ ...createData.createTenantStaff, tenantId: tenant.id, roleId: role.id }, tx);
 
             return { pipelineItem, staff };
@@ -390,8 +388,34 @@ class TenantService {
             leadSource: data.leadSource || tenant.leadSource,
             stage: data.stage || tenant.stage,
             website: data.website || tenant.website,
-            practiceNPI: data.practiceNPI || tenant.practiceNPI
+            practiceNPI: data.practiceNPI || tenant.practiceNPI,
+            assignToAdmin: data.assignToAdmin || tenant.assignToAdmin,
         });
+
+        if (!update) {
+            throw new Error("Failed to update tenant");
+        }
+
+        return update;
+    }
+
+    async tenantActiveStatus(data) {
+        const tenant = await this.tenantRepository.findOne({ id: data.id })
+
+        if (!tenant) {
+            throw new Error("tenant not found");
+        }
+
+        const update = await this.tenantRepository.update(data.id, {
+            active: data.active ?? tenant.active,
+        });
+
+        await this.tenantDeactivationRepository.create({
+            tenantId: data.id,
+            deactivatedBy: data.deactivatedBy,
+            reason: data.reason,
+            details: data.details
+        })
 
         if (!update) {
             throw new Error("Failed to update tenant");
@@ -402,6 +426,16 @@ class TenantService {
 
     async getAllTenant() {
         const tenants = await this.tenantRepository.findAllAndPopulate({});
+
+        if (!tenants) {
+            throw new Error("Tenants not found")
+        }
+
+        return tenants;
+    }
+
+    async getAllActiveTenant() {
+        const tenants = await this.tenantRepository.findAllAndPopulate({ active: true });
 
         if (!tenants) {
             throw new Error("Tenants not found")
@@ -455,6 +489,16 @@ class TenantService {
         }
 
         return totalTenants;
+    }
+
+    async countAllStaffs() {
+        const totalStaffs = await this.staffRepository.countAllStaffs();
+
+        if (!totalStaffs) {
+            throw new Error("Staffs not found")
+        }
+
+        return totalStaffs;
     }
 
     async contactTenantByEmail(data) {

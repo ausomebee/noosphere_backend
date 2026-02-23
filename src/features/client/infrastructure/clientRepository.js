@@ -9,7 +9,7 @@ class ClientRepository extends BaseRepository {
         return await tx.client.create({ data });
     }
 
-    async countAllClientss() {
+    async countAllClients() {
         return await this.model.count();
     }
 

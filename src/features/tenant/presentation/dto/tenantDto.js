@@ -66,83 +66,141 @@ class TenantDto {
 
     static updateTenantDto = (req, res, next) => {
         const schema = Joi.object({
-            id: Joi.string().uuid().required().messages({
-                "string.empty": "ID is required",
-                "string.guid": "ID must be a valid UUID",
-            }),
+            fullName: Joi.string()
+                .min(3)
+                .max(50)
+                .trim()
+                .messages({
+                    "string.min": "Full name must be at least 3 characters",
+                    "string.max": "Full name must not exceed 50 characters",
+                }),
+
             email: Joi.string()
-                .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
-                .required()
+                .email({ minDomainSegments: 2 })
                 .trim()
                 .lowercase()
                 .messages({
                     "string.email": "Email must be a valid email",
-                    "string.empty": "Email is required",
-                    "any.required": "Email is a required field",
                 }),
+
             phoneNumber: Joi.string()
-                .required()
                 .trim()
                 .min(10)
                 .max(15)
                 .messages({
-                    "string.empty": "Phone number is required",
                     "string.min": "Phone number must be at least 10 characters long",
                     "string.max": "Phone number must be at most 15 characters long"
                 }),
-            active: Joi.boolean()
-                .messages({
-                    "boolean.base": "Active status must be a boolean value",
-                }),
-            website: Joi.string().trim().optional(),
-            practiceNPI: Joi.string().trim().optional(),
-            isDeleted: Joi.boolean()
-                .messages({
-                    "boolean.base": "Deleted status must be a boolean value",
-                }),
-            companyName: Joi.string()
-                .required()
-                .trim()
-                .max(255)
-                .messages({
-                    "string.empty": "Company name is required",
-                    "string.max": "Company name must not exceed 255 characters",
-                }),
-            contactPerson: Joi.string()
-                .required()
-                .trim()
-                .max(255)
-                .messages({
-                    "string.empty": "Contact person is required",
-                    "string.max": "Contact person must not exceed 255 characters",
-                }),
-            companySize: Joi.string()
-                .trim()
-                .messages({
-                    "string.empty": "Company size is required",
-                }),
-            organizationType: Joi.string()
-                .trim()
-                .messages({
-                    "string.empty": "Organization type is required",
-                }),
+
+            stage: Joi.string().trim(),
+
+            companyName: Joi.string().trim(),
+
+            subdomain: Joi.string().trim(),
+
+            contactPerson: Joi.string().trim(),
+
+            companySize: Joi.string().trim(),
+
+            organizationType: Joi.string().trim(),
+
             location: Joi.object(),
-            leadSource: Joi.string()
-                .required()
-                .trim()
+
+            leadSource: Joi.string().trim(),
+
+            assignToAdmin: Joi.string()
+                .uuid()
                 .messages({
-                    "string.empty": "Lead source is required",
+                    "string.guid": "Assigned admin must be a valid UUID",
                 }),
-            stage: Joi.string()
-                .required()
-                .trim()
-                .messages({
-                    "string.empty": "Stage is required",
-                }),
-        });
+
+            website: Joi.string().trim(),
+
+            practiceNPI: Joi.string().trim(),
+        })
+            .min(1); // 🔥 prevents empty update requests
 
         Validator.validateRequest(req, next, schema);
     };
+    // static updateTenantDto = (req, res, next) => {
+    //     const schema = Joi.object({
+    //         id: Joi.string().uuid().required().messages({
+    //             "string.empty": "ID is required",
+    //             "string.guid": "ID must be a valid UUID",
+    //         }),
+    //         email: Joi.string()
+    //             .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
+    //             .required()
+    //             .trim()
+    //             .lowercase()
+    //             .messages({
+    //                 "string.email": "Email must be a valid email",
+    //                 "string.empty": "Email is required",
+    //                 "any.required": "Email is a required field",
+    //             }),
+    //         phoneNumber: Joi.string()
+    //             .required()
+    //             .trim()
+    //             .min(10)
+    //             .max(15)
+    //             .messages({
+    //                 "string.empty": "Phone number is required",
+    //                 "string.min": "Phone number must be at least 10 characters long",
+    //                 "string.max": "Phone number must be at most 15 characters long"
+    //             }),
+    //         active: Joi.boolean()
+    //             .messages({
+    //                 "boolean.base": "Active status must be a boolean value",
+    //             }),
+    //         website: Joi.string().trim().optional(),
+    //         practiceNPI: Joi.string().trim().optional(),
+    //         isDeleted: Joi.boolean()
+    //             .messages({
+    //                 "boolean.base": "Deleted status must be a boolean value",
+    //             }),
+    //         companyName: Joi.string()
+    //             .required()
+    //             .trim()
+    //             .max(255)
+    //             .messages({
+    //                 "string.empty": "Company name is required",
+    //                 "string.max": "Company name must not exceed 255 characters",
+    //             }),
+    //         contactPerson: Joi.string()
+    //             .required()
+    //             .trim()
+    //             .max(255)
+    //             .messages({
+    //                 "string.empty": "Contact person is required",
+    //                 "string.max": "Contact person must not exceed 255 characters",
+    //             }),
+    //         companySize: Joi.string()
+    //             .trim()
+    //             .messages({
+    //                 "string.empty": "Company size is required",
+    //             }),
+    //         organizationType: Joi.string()
+    //             .trim()
+    //             .messages({
+    //                 "string.empty": "Organization type is required",
+    //             }),
+    //         location: Joi.object(),
+    //         leadSource: Joi.string()
+    //             .required()
+    //             .trim()
+    //             .messages({
+    //                 "string.empty": "Lead source is required",
+    //             }),
+    //         stage: Joi.string()
+    //             .required()
+    //             .trim()
+    //             .messages({
+    //                 "string.empty": "Stage is required",
+    //             }),
+    //     });
+
+    //     Validator.validateRequest(req, next, schema);
+    // };
 
     static updateTenantDto = (req, res, next) => {
         const schema = Joi.object({

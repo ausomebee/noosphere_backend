@@ -111,7 +111,8 @@ enum DataAccessLevel {
 
 model Admin {
   id                    String   @id @default(uuid())
-  fullName              String
+  firstName             String   @default("jhc")
+  lastName              String   @default("hd")
   email                 String   @unique
   phoneNumber           String   @unique
   roleId                String
@@ -126,20 +127,22 @@ model Admin {
   authQuestion          String?
   auth2FADone           Boolean  @default(false)
 
-  roles             Role                @relation("RoleAdmins", fields: [roleId], references: [id])
-  pipelines         Pipeline[]
-  PipelineItem      PipelineItem[]
-  Tenant            Tenant[]
-  logs              Logs[]
-  BillingPlan       BillingPlan[]
-  IssueComment      IssueComment[]
-  assignedIssues    Issue[]             @relation("AssignedAdmin")
-  loggedIssues      Issue[]             @relation("LoggedByAdmin")
-  notifications     Notifications[]
-  rolesCreated      Role[]              @relation("RoleCreatedByAdmin")
-  departments       Department[]        @relation("DepartmentCreatedByAdmin")
-  departmentLead    Department[]        @relation("DepartmentTeamLead")
-  departmentMembers DepartmentMembers[]
+  roles               Role                 @relation("RoleAdmins", fields: [roleId], references: [id])
+  pipelines           Pipeline[]
+  PipelineItem        PipelineItem[]
+  TenantsAssigned     Tenant[]             @relation("AccountOfficer")
+  logs                Logs[]
+  BillingPlan         BillingPlan[]
+  IssueComment        IssueComment[]
+  assignedIssues      Issue[]              @relation("AssignedAdmin")
+  loggedIssues        Issue[]              @relation("LoggedByAdmin")
+  notifications       Notifications[]
+  rolesCreated        Role[]               @relation("RoleCreatedByAdmin")
+  departments         Department[]         @relation("DepartmentCreatedByAdmin")
+  departmentLead      Department[]         @relation("DepartmentTeamLead")
+  departmentMembers   DepartmentMembers[]
+  tenantDeactivations TenantDeactivation[]
+  tenants             Tenant[]
 }
 
 model Auth {
@@ -176,15 +179,15 @@ model DepartmentMembers {
 }
 
 model Role {
-  id                String   @id @default(uuid())
+  id                String          @id @default(uuid())
   name              String
   dataAccessLevel   DataAccessLevel
   systemModule      Module
   createdByAdminId  String?
   createdByTenantId String?
-  isActive          Boolean  @default(true)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  isActive          Boolean         @default(true)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 
   createdByAdmin     Admin?             @relation("RoleCreatedByAdmin", fields: [createdByAdminId], references: [id])
   createdByTenant    Tenant?            @relation(fields: [createdByTenantId], references: [id])
@@ -229,6 +232,7 @@ model Tenant {
   leadSource       String
   stage            String   @default("UNVERIFIED")
   website          String?
+  assignToAdmin    String?
   practiceNPI      String?
   createdBy        String
   createdAt        DateTime @default(now())
@@ -241,6 +245,7 @@ model Tenant {
   BillingMetadata                   BillingMetadata?
   Subscription                      Subscription[]
   admin                             Admin                               @relation(fields: [createdBy], references: [id])
+  accountOfficer                    Admin?                              @relation("AccountOfficer", fields: [assignToAdmin], references: [id])
   Payment                           Payment[]
   logs                              Logs[]
   BillingPlan                       BillingPlan[]
@@ -271,6 +276,20 @@ model Tenant {
   tenantAdditionalSecurityQuestions TenantAdditionalSecurityQuestions[]
   roles                             Role[]
   teams                             Teams[]                             @relation("tenantTeam")
+  tenantDeactivation                TenantDeactivation?
+}
+
+model TenantDeactivation {
+  id               String    @id @default(uuid())
+  tenantId         String    @unique
+  reason           String
+  details          String
+  deactivatedById  String
+  deactivatedAt    DateTime  @default(now())
+  reactivationDate DateTime?
+
+  tenant        Tenant @relation(fields: [tenantId], references: [id])
+  deactivatedBy Admin  @relation(fields: [deactivatedById], references: [id])
 }
 
 model TenantStaff {
