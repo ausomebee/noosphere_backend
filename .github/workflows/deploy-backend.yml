@@ -36,6 +36,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST_BACKEND }} << EOF
             set -e
 
+            mkdir -p ${{ secrets.DEPLOY_PATH }}
             cd ${{ secrets.DEPLOY_PATH }}
 
             echo "Deploying branch: $BRANCH"
