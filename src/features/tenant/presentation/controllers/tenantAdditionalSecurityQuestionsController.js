@@ -2,7 +2,7 @@ import expressAsyncHandler from "express-async-handler";
 import prismaService from "../../../../config/prisma.js";
 import TenantAdditionalSecurityQuestionsService from "../../application/tenantAdditionalSecurityQuestionsService.js";
 import TenantAdditionalSecurityQuestions from "../../domain/tenantAdditionalSecurityQuestions.js";
-import TenantAdditionalSecurityQuestionsRepository from "../../infrastructure/TenantadditionalSecurityQuestionsRepository.js";
+import TenantAdditionalSecurityQuestionsRepository from "../../infrastructure/tenantAdditionalSecurityQuestionsRepository.js";
 
 class TenantAdditionalSecurityQuestionsController {
     constructor() {
