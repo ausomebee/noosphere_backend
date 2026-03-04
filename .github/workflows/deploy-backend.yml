@@ -44,7 +44,7 @@ jobs:
             # First-time setup (clone if missing)
             if [ ! -d '.git' ]; then
               echo '📦 Cloning repository...'
-              git clone git@github.com:<YOUR_USERNAME>/<YOUR_REPO>.git .
+              git clone git@github.com:ausomebee/noosphere_backend.git .
             fi
 
             echo '🔄 Fetching latest code...'
