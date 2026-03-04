@@ -20,32 +20,52 @@ jobs:
           mkdir -p ~/.ssh
           printf "%s" "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-
-          # Avoid failure if host is not reachable immediately
           ssh-keyscan -H ${{ secrets.EC2_HOST_BACKEND }} >> ~/.ssh/known_hosts || true
 
       - name: Test SSH connection
         run: |
           ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 \
-          ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST_BACKEND }} "echo Connected successfully"
+          ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST_BACKEND }} "echo ✅ Connected to EC2"
 
-      - name: Deploy to EC2
+      - name: Deploy to EC2 (Production Grade)
         run: |
           BRANCH=${GITHUB_REF##*/}
 
-          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST_BACKEND }} << EOF
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST_BACKEND }} "
             set -e
 
+            echo '🚀 Starting deployment...'
+            echo 'Branch: $BRANCH'
+
+            # Ensure directory exists
+            mkdir -p ${{ secrets.DEPLOY_PATH }}
             cd ${{ secrets.DEPLOY_PATH }}
 
-            echo "Deploying branch: $BRANCH"
+            # First-time setup (clone if missing)
+            if [ ! -d '.git' ]; then
+              echo '📦 Cloning repository...'
+              git clone git@github.com:<YOUR_USERNAME>/<YOUR_REPO>.git .
+            fi
 
+            echo '🔄 Fetching latest code...'
             git fetch origin
+
+            echo '⚡ Resetting to latest version...'
             git reset --hard origin/$BRANCH
 
-            npm install --production
+            echo '📦 Installing dependencies...'
+            npm ci --production
 
-            pm2 stop noosphere-backend || true
-            pm2 start src/server.js --name noosphere-backend
+            echo '🧠 Checking PM2...'
+            if ! command -v pm2 &> /dev/null; then
+              echo 'Installing PM2...'
+              npm install -g pm2
+            fi
+
+            echo '🔁 Restarting application (zero downtime)...'
+            pm2 reload noosphere-backend || pm2 start src/server.js --name noosphere-backend
+
             pm2 save
-          EOF
+
+            echo '✅ Deployment completed successfully'
+          "
