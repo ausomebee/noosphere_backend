@@ -35,6 +35,24 @@ class TenantRepository extends BaseRepository {
         });
     }
 
+    async getTenantRelationsCount(tenantId) {
+        const tenant = await this.model.findUnique({
+            where: { id: tenantId },
+            select: {
+                _count: {
+                    select: {
+                        clientLinks: true,
+                        serverRequests: true,
+                    }
+                },
+            },
+        });
+
+        return {
+            tenantClientsCount: tenant._count.clientLinks,
+            serverRequestsCount: tenant._count.serverRequests,
+        };
+    }
 }
 
 export default TenantRepository;

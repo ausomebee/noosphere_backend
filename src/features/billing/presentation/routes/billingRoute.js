@@ -423,6 +423,60 @@ class BillingRoutes {
 
         /**
          * @swagger
+         * /api/v1/billing/tenants/{tenantId}/payments/status/{status}:
+         *   get:
+         *     summary: Retrieve tenant payments by status
+         *     tags: [billing]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The tenant ID
+         *       - in: path
+         *         name: status
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: Payment status (e.g., SUCCESS, FAILED, PENDING)
+         *     responses:
+         *       200:
+         *         description: Tenant payments by status retrieved successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get(
+            "/tenants/:tenantId/payments/status/:status",
+            this.controller.getTenantPaymentsByStatus
+        );
+
+        /**
+         * @swagger
+         * /api/v1/billing/tenants/{tenantId}/payments:
+         *   get:
+         *     summary: Retrieve all payments for a tenant
+         *     tags: [billing]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The tenant ID
+         *     responses:
+         *       200:
+         *         description: Tenant payments retrieved successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get(
+            "/tenants/:tenantId/payments",
+            this.controller.getTenantPayments
+        );
+
+        /**
+         * @swagger
          * /api/v1/billing/allbillingmetadata:
          *   get:
          *     summary: Retrieve all billing metadata
@@ -623,18 +677,18 @@ class BillingRoutes {
          */
         this.router.post("/paymentaccess", BillingDto.createPaymentAceesDto, this.controller.createPaymentAccess);
 
-         /**
-         * @swagger
-         * /api/v1/billing/paymentaccess:
-         *   get:
-         *     summary: Retrieve payment access
-         *     tags: [billing]
-         *     responses:
-         *       200:
-         *         description: all payment retrieved successfully
-         *       400:
-         *         description: Bad request
-         */
+        /**
+        * @swagger
+        * /api/v1/billing/paymentaccess:
+        *   get:
+        *     summary: Retrieve payment access
+        *     tags: [billing]
+        *     responses:
+        *       200:
+        *         description: all payment retrieved successfully
+        *       400:
+        *         description: Bad request
+        */
         this.router.get("/paymentaccess", this.controller.getPaymentAccess);
 
         /**

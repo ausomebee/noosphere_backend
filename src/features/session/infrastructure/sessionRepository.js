@@ -106,6 +106,29 @@ class SessionRepository extends BaseRepository {
         return this.prisma.$queryRawUnsafe(query, clientId);
     }
 
+    async getTenantSessionCounts({ tenantId, groupBy = "month" }) {
+        if (!["month", "year"].includes(groupBy)) throw new Error("Invalid groupBy value");
+
+        const interval = groupBy === "year" ? "6 years" : "6 months";
+
+        const periodFormat = groupBy === "year" ? "YYYY" : "Mon YYYY";
+
+        const query = `
+            SELECT
+            TO_CHAR(s."startTime", '${periodFormat}') AS period,
+            COUNT(*)::int AS session_count
+            FROM "Session" s
+            JOIN "Appointment" a
+            ON a.id = s."appointmentId"
+            WHERE a."tenantId" = $1
+            AND s."startTime" >= NOW() - INTERVAL '${interval}'
+            GROUP BY period
+            ORDER BY MIN(s."startTime") ASC;
+        `;
+
+        return this.prisma.$queryRawUnsafe(query, tenantId);
+    }
+
     async getClientSessions(clientId) {
         return await this.model.findMany({
             where: { appointment: { clientId } },

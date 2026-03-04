@@ -56,6 +56,33 @@ class InvoiceController {
         });
     });
 
+    getTenantInvoices = expressAsyncHandler(async (req, res) => {
+        const tenantId = req.params.tenantId;
+
+        const invoices = await this.service.getTenantInvoices(tenantId);
+
+        return res.status(200).json({
+            message: "Tenant invoices fetched successfully",
+            status: "ok",
+            data: invoices,
+        });
+    });
+
+    getTenantInvoicesByStatus = expressAsyncHandler(async (req, res) => {
+        const { status, tenantId } = req.params;
+
+        const invoices = await this.service.getTenantInvoicesByStatus(
+            tenantId,
+            status
+        );
+
+        return res.status(200).json({
+            message: `Invoices with status ${status} fetched successfully`,
+            status: "ok",
+            data: invoices,
+        });
+    });
+
     getTotalBilled = expressAsyncHandler(async (req, res) => {
         const params = req.params.from === "all" ? null : req.params
         const invoice = await this.service.getTotalBilled(params);

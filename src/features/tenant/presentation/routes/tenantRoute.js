@@ -683,6 +683,199 @@ class TenantRoutes {
 
         /**
          * @swagger
+         * /api/v1/tenant/change-admin-password/{tenantId}:
+         *   patch:
+         *     summary: Reset the admin password for a tenant
+         *     description: Generates and updates a new admin password for the specified tenant. The password is not supplied in the request body.
+         *     tags:
+         *       - Tenant
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         description: The unique identifier of the tenant
+         *     responses:
+         *       200:
+         *         description: Admin password reset successfully
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 status:
+         *                   type: string
+         *                   example: ok
+         *                 message:
+         *                   type: string
+         *                   example: Tenant admin password reset successfully
+         *       400:
+         *         description: Invalid tenant ID supplied
+         *       404:
+         *         description: Tenant not found
+         *       500:
+         *         description: Internal server error
+         */
+        this.router.patch(
+            "/change-admin-password/:tenantId",
+            this.controller.changeAdminPassword
+        );
+
+        /**
+         * @swagger
+         * /api/v1/tenant/change-email/{tenantId}:
+         *   patch:
+         *     summary: Update tenant email address
+         *     description: Updates the email address associated with a tenant.
+         *     tags:
+         *       - Tenant
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         description: The unique identifier of the tenant
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             required:
+         *               - email
+         *             properties:
+         *               email:
+         *                 type: string
+         *                 format: email
+         *                 example: tenant@example.com
+         *     responses:
+         *       200:
+         *         description: Tenant email updated successfully
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 status:
+         *                   type: string
+         *                   example: ok
+         *                 message:
+         *                   type: string
+         *                   example: Tenant email updated successfully
+         *       400:
+         *         description: Invalid email or bad request
+         *       404:
+         *         description: Tenant not found
+         *       500:
+         *         description: Internal server error
+         */
+        this.router.patch(
+            "/change-email/:tenantId",
+            this.controller.changeEmail
+        );
+
+        /**
+         * @swagger
+         * /api/v1/tenant/change-phone-number/{tenantId}:
+         *   patch:
+         *     summary: Update tenant phone number
+         *     description: Updates the phone number associated with a tenant.
+         *     tags:
+         *       - Tenant
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         description: The unique identifier of the tenant
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             required:
+         *               - phoneNumber
+         *             properties:
+         *               phoneNumber:
+         *                 type: string
+         *                 example: "+2348012345678"
+         *     responses:
+         *       200:
+         *         description: Tenant phone number updated successfully
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 status:
+         *                   type: string
+         *                   example: ok
+         *                 message:
+         *                   type: string
+         *                   example: Tenant phone number updated successfully
+         *       400:
+         *         description: Invalid phone number or bad request
+         *       404:
+         *         description: Tenant not found
+         *       500:
+         *         description: Internal server error
+         */
+        this.router.patch(
+            "/change-phone-number/:tenantId",
+            this.controller.changePhoneNumber
+        );
+
+        /**
+         * @swagger
+         * /api/v1/tenant/usage-statistics-overview/{tenantId}:
+         *   get:
+         *     summary: Get usage statistics overview for a tenant
+         *     description: Retrieves usage statistics overview for a specific tenant.
+         *     tags:
+         *       - Tenant
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         description: The unique identifier of the tenant
+         *     responses:
+         *       200:
+         *         description: Usage statistics overview retrieved successfully
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 status:
+         *                   type: string
+         *                   example: ok
+         *                 message:
+         *                   type: string
+         *                   example: Usage statistics overview retrieved successfully
+         *       400:
+         *         description: Invalid tenant ID or bad request
+         *       404:
+         *         description: Tenant not found
+         *       500:
+         *         description: Internal server error
+         */
+        this.router.get(
+            "/usage-statistics-overview/:tenantId",
+            this.controller.getTenantRelationsCount
+        );
+
+        /**
+         * @swagger
          * /api/v1/tenant/getstaffwithpayrollbydate/{tenantId}:
          *   get:
          *     summary: Get staff with payroll by date range for a tenant

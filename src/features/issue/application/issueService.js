@@ -11,12 +11,24 @@ class IssueService {
         const resolvedIssues = await this.issueRepository.totalCountDynamic({ tenantId, status: "Resolved" });
         const activeIssues = await this.issueRepository.totalCountDynamic({ tenantId, status: { not: "Resolved" } });
         const countByCategory = await this.issueRepository.countIssuesByCategory({ tenantId });
+        const issues = await this.issueRepository.tenantAverageResolutionTime(tenantId)
+
+        const durationsInHours = issues.map(issue => {
+            const created = new Date(issue.createdAt);
+            const updated = new Date(issue.updatedAt);
+            const diffMs = updated.getTime() - created.getTime();
+            return diffMs / (1000 * 60 * 60);
+        });
+
+        const total = durationsInHours.reduce((acc, val) => acc + val, 0);
+        const average = durationsInHours.length ? total / durationsInHours.length : 0;
 
         return {
             totalIssues,
             resolvedIssues,
             activeIssues,
-            countByCategory
+            countByCategory,
+            averageResolutionTime: average.toFixed(2)
         };
     }
 
@@ -235,7 +247,7 @@ class IssueService {
     }
 
     async getTenantIssueByStatus(tenantId, status) {
-        const query = status === "all" ? { tenantId } : { tenantId, status }
+        const query = status === "all" ? { tenantId } : status === "pending" ? { tenantId, status: { not: "Resolved" } } : { tenantId, status }
         const issue = await this.issueRepository.findAllAndPopulate(query);
 
         if (!issue) {

@@ -116,6 +116,16 @@ class IssueRepository extends BaseRepository {
         });
     }
 
+    async tenantAverageResolutionTime(tenantId) {
+        return await this.model.findMany({
+            where: { status: "Resolved", tenantId: tenantId },
+            select: {
+                createdAt: true,
+                updatedAt: true,
+            },
+        });
+    }
+
     async totalCount() {
         return await this.model.count();
     }

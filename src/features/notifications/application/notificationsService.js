@@ -1,100 +1,70 @@
-class NotificationsService {
-    constructor({ notificationsRepository }) {
-        this.notificationsRepository = notificationsRepository;
+class NotificationService {
+    constructor({ notificationRepository }) {
+        this.notificationRepository = notificationRepository;
     }
 
     async createNotification(data) {
-        const newRecord = await this.notificationsRepository.create(data);
+        const newNotification = await this.notificationRepository.create(data);
 
-        if (!newRecord) {
-            throw new Error("Failed to create Notification.");
+        if (!newNotification) {
+            throw new Error("Failed to create notification.");
         }
 
-        return newRecord;
+        return newNotification;
     }
 
-    async markAsRead(id) {
-        const record = await this.notificationsRepository.findOne({ id });
+    async updateNotification(data) {
+        const record = await this.notificationRepository.findOne({ id: data.id });
 
         if (!record) {
-            throw new Error("Notification not found");
+            throw new Error("Notification not found.");
         }
 
-        const updated = await this.notificationsRepository.update(id, {
-            isRead: true,
-            readAt: new Date()
+        const updated = await this.notificationRepository.update(data.id, {
+            title: data.title || record.title,
+            content: data.content || record.content,
+            isRead: data.isRead ?? record.isRead
         });
 
         if (!updated) {
-            throw new Error("Failed to mark notification as read");
+            throw new Error("Failed to update notification.");
         }
 
         return updated;
     }
 
     async getSingleNotification(id) {
-        const record = await this.notificationsRepository.findOne({ id });
+        const record = await this.notificationRepository.findOne({ id });
 
         if (!record) {
-            throw new Error("Notification not found");
+            throw new Error("Notification not found.");
         }
 
         return record;
     }
 
-    async getNotificationsByRecipient({ tenantStaffId, tenantClientId, adminId }) {
-        const where = {
-            ...(tenantStaffId && { tenantStaffId }),
-            ...(tenantClientId && { tenantClientId }),
-            ...(adminId && { adminId })
-        };
-
-        const records = await this.notificationsRepository.findAllAndPopulate(
-            where,
-            {
-                tenantStaff: true,
-                tenantClient: true,
-                admin: true
-            }
+    async getNotificationsByUser(userId, userType) {
+        const records = await this.notificationRepository.findAllAndPopulate(
+            { userId, userType },
+            {}
         );
 
         if (!records) {
-            throw new Error("Notifications not found");
+            throw new Error("No notifications found for this user.");
         }
 
         return records;
     }
 
-    async getUnreadCount({ tenantStaffId, tenantClientId, adminId }) {
-        const where = {
-            isRead: false,
-            ...(tenantStaffId && { tenantStaffId }),
-            ...(tenantClientId && { tenantClientId }),
-            ...(adminId && { adminId })
-        };
+    async markAsRead(notificationId) {
+        const record = await this.notificationRepository.findOne({ id: notificationId });
 
-        return await this.notificationsRepository.count(where);
-    }
-
-    async markAllAsRead({ tenantStaffId, tenantClientId, adminId }) {
-        const where = {
-            isRead: false,
-            ...(tenantStaffId && { tenantStaffId }),
-            ...(tenantClientId && { tenantClientId }),
-            ...(adminId && { adminId })
-        };
-
-        const updated = await this.notificationsRepository.updateMany(where, {
-            isRead: true,
-            readAt: new Date()
-        });
-
-        if (!updated) {
-            throw new Error("Failed to mark notifications as read");
+        if (!record) {
+            throw new Error("Notification not found.");
         }
 
-        return updated;
+        return await this.notificationRepository.update(notificationId, { isRead: true });
     }
 }
 
-export default NotificationsService;
+export default NotificationService;

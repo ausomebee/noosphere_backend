@@ -36,6 +36,33 @@ class SubscriptionRepository extends BaseRepository {
         });
     }
 
+    async getTenantSubscriptionsWithDetails(tenantId) {
+        const subscriptions = await this.model.findMany({
+            where: { tenantId },
+            include: {
+                plan: {
+                    include: {
+                        features: true,
+                        extraFeatures: true,
+                    },
+                },
+                tenant: {
+                    select: {
+                        _count: {
+                            select: { clientLinks: true },
+                        },
+                    },
+                },
+            },
+        });
+
+        const formatted = subscriptions.map((sub) => ({
+            ...sub,
+            clientCount: sub.tenant._count.clientLinks,
+        }));
+
+        return formatted;
+    }
 }
 
 export default SubscriptionRepository;

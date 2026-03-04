@@ -105,6 +105,15 @@ class SubscriptionService {
         return subscriptions;
     }
 
+    async getTenantSubscriptions(tenantId) {
+        const subscriptions = await this.subscriptionRepository.getTenantSubscriptionsWithDetails(tenantId);
+
+        if (!subscriptions) {
+            throw new Error("Subscriptions not found for this tenant")
+        }
+
+        return subscriptions;
+    }
 }
 
 export default SubscriptionService;

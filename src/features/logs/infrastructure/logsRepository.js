@@ -32,6 +32,48 @@ class LogsRepository {
         });
     }
 
+    async getTenantLogs({ tenantId, featureNames = [], page = 1, limit = 20 }) {
+        const skip = (page - 1) * limit;
+
+        const where = {
+            tenantId,
+            ...(featureNames.length > 0 && {
+                feature: {
+                    name: {
+                        in: featureNames,
+                    },
+                },
+            }),
+        };
+
+        const [logs, total] = await Promise.all([
+            this.model.findMany({
+                where,
+                include: {
+                    feature: true,
+                    admin: true,
+                    client: true,
+                },
+                orderBy: {
+                    createdAt: "desc",
+                },
+                skip,
+                take: limit,
+            }),
+            this.model.count({ where }),
+        ]);
+
+        return {
+            data: logs,
+            meta: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit),
+            },
+        };
+    }
+
     async delete(id) {
         return await this.model.delete({
             where: { id },

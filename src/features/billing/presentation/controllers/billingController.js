@@ -39,6 +39,33 @@ class BillingController {
         });
     });
 
+    getTenantPayments = expressAsyncHandler(async (req, res) => {
+        const tenantId = req.params.tenantId;
+
+        const payments = await this.service.getTenantPayments(tenantId);
+
+        return res.status(200).json({
+            message: "Tenant payments fetched successfully",
+            status: "ok",
+            data: payments,
+        });
+    });
+
+    getTenantPaymentsByStatus = expressAsyncHandler(async (req, res) => {
+        const { status, tenantId } = req.params;
+
+        const payments = await this.service.getTenantPaymentsByStatus(
+            tenantId,
+            status
+        );
+
+        return res.status(200).json({
+            message: `Payments with status ${status} fetched successfully`,
+            status: "ok",
+            data: payments,
+        });
+    });
+
     updateBillingMetadata = expressAsyncHandler(async (req, res) => {
         const billing = await this.service.updateBillingMetadata(req.body);
 

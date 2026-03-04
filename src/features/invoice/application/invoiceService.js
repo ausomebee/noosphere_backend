@@ -59,6 +59,33 @@ class InvoiceService {
         return invoice;
     }
 
+    async getTenantInvoices(tenantId, filter = {}) {
+        const invoices = await this.invoiceRepository.getTenantInvoices(
+            tenantId,
+            filter
+        );
+
+        if (!invoices || invoices.length === 0) {
+            throw new Error("No invoices found for this tenant");
+        }
+
+        return invoices;
+    }
+
+    async getTenantInvoicesByStatus(tenantId, status) {
+        const invoices =
+            await this.invoiceRepository.getTenantInvoicesByStatus(
+                tenantId,
+                status
+            );
+
+        if (!invoices || invoices.length === 0) {
+            throw new Error(`No invoices found with status ${status}`);
+        }
+
+        return invoices;
+    }
+
     async getTotalBilled(data) {
         const now = new Date();
 

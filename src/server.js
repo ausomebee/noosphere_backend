@@ -9,6 +9,7 @@ import errorHandler from "./middleware/error-handler.js";
 import prismaService from "./config/prisma.js";
 import socketService from "./config/socket.js"
 import PassportUtil from "./config/passport.js";
+import healthRoute from "./health.route.js";
 import department_route from "./features/departmentAndTeams/presentation/routes/departmentRoutes.js"
 import admin_route from "./features/admin/presentation/routes/adminRoute.js"
 import role_route from "./features/role/presentation/routes/roleRoute.js"
@@ -22,6 +23,7 @@ import plan_route from "./features/planAndFeature/presentation/routes/planRoute.
 import subscription_route from "./features/planAndFeature/presentation/routes/subscriptionRoute.js"
 import invoice_route from "./features/invoice/presentation/routes/invoiceRoute.js"
 import log_route from "./features/logs/presentation/routes/logRoute.js"
+import server_request_route from "./features/logs/presentation/routes/serverRequestRoutes.js"
 import performance_route from "./features/performance/presentation/routes/performanceRoute.js"
 import issue_route from "./features/issue/presentation/routes/issueRoute.js"
 import program_route from "./features/program/presentation/routes/programRoute.js"
@@ -88,7 +90,7 @@ class App {
         this.server = http.createServer(this.app);
 
         this.prisma = prismaService;
-        this.port = process.env.PORT || 5001;
+        this.port = process.env.PORT || 5000;
         this.allowedOrigins = {
             origin(origin, callback) {
                 if (!origin) return callback(null, true);
@@ -110,6 +112,7 @@ class App {
         };
         this.initializeDatabase();
         this.initializeMiddlewares();
+        this.initializeRequestTracking();
         this.initializeSwagger();
         this.initializeRoutes();
         this.initializeErrorHandler();
@@ -131,7 +134,74 @@ class App {
         this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
     }
 
+    initializeRequestTracking() {
+        const prisma = this.prisma.getClient();
+
+        this.app.use((req, res, next) => {
+            if (
+                req.originalUrl.startsWith("/api-docs") ||
+                req.originalUrl.startsWith("/health")
+            ) {
+                return next();
+            }
+
+            const start = process.hrtime.bigint();
+
+            res.on("finish", async () => {
+                try {
+                    const durationMs =
+                        Number(process.hrtime.bigint() - start) / 1_000_000;
+
+                    const logData = {
+                        tenantId: null,
+                        adminId: null,
+                        tenantStaffId: null,
+                        tenantClientId: null,
+                        method: req.method,
+                        endpoint: req.originalUrl,
+                        statusCode: res.statusCode,
+                        durationMs: Math.round(durationMs),
+                        ipAddress: req.ip,
+                        userAgent: req.headers["user-agent"],
+                        errorMessage:
+                            res.statusCode >= 500
+                                ? res.statusMessage || "Server Error"
+                                : null,
+                    };
+
+                    if (req.user) {
+                        logData.tenantId = req.user.tenantId ?? null;
+
+                        switch (req.user.type) {
+                            case "ADMIN":
+                                logData.adminId = req.user.id;
+                                break;
+                            case "STAFF":
+                                logData.tenantStaffId = req.user.id;
+                                break;
+                            case "CLIENT":
+                                logData.tenantClientId = req.user.id;
+                                break;
+                        }
+                    }
+
+                    if (!prisma?.serverRequest) {
+                        console.error("Prisma ServerRequest model not available");
+                        return;
+                    }
+
+                    await prisma.serverRequest.create({ data: logData });
+                } catch (err) {
+                    console.error("Request tracking failed:", err);
+                }
+            });
+
+            next();
+        });
+    }
+
     initializeRoutes() {
+        this.app.use("/health", healthRoute);
         this.app.use("/api/v1/department", department_route);
         this.app.use("/api/v1/role", role_route);
         this.app.use("/api/v1/admin", admin_route);
@@ -144,7 +214,8 @@ class App {
         this.app.use("/api/v1/plan", plan_route);
         this.app.use("/api/v1/subscription", subscription_route);
         this.app.use("/api/v1/invoice", invoice_route);
-        this.app.use("/api/v1/log", log_route);
+        this.app.use("/api/v1/logs", log_route);
+        this.app.use("/api/v1/server-requests", server_request_route);
         this.app.use("/api/v1/performance", performance_route);
         this.app.use("/api/v1/issue", issue_route);
         this.app.use("/api/v1/programs", program_route);

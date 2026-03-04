@@ -26,6 +26,20 @@ class LogsService {
         return log;
     }
 
+    async getTenantLogs(data) {
+        const logs = await this.logsRepository.getTenantLogs({
+            tenantId: data.tenantId,
+            featureNames: data.featureNames || [],
+            page: parseInt(data.page) || 1,
+            limit: parseInt(data.limit) || 20,
+        });
+
+        if (!logs || logs.data.length === 0) {
+            throw new Error("No logs found for this tenant.");
+        }
+
+        return logs;
+    }
 }
 
 export default LogsService;

@@ -1,141 +1,938 @@
-<!DOCTYPE html
-    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Reset your password</title>
-    <style type="text/css">
-        body,
-        table,
-        td,
-        a {
-            -webkit-text-size-adjust: 100%;
-            -ms-text-size-adjust: 100%;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Socket.IO Test Console</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;800&display=swap');
 
-        table,
-        td {
-            mso-table-lspace: 0pt;
-            mso-table-rspace: 0pt;
-        }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        img {
-            -ms-interpolation-mode: bicubic;
-            border: 0;
-            height: auto;
-            line-height: 100%;
-            outline: none;
-            text-decoration: none;
-        }
+  :root {
+    --bg: #0a0a0b;
+    --surface: #111114;
+    --surface2: #18181d;
+    --border: #2a2a35;
+    --accent: #e8ff47;
+    --accent2: #47b4ff;
+    --danger: #ff4757;
+    --success: #2ecc71;
+    --warn: #f39c12;
+    --text: #e8e8f0;
+    --muted: #666680;
+    --radius: 4px;
+  }
 
-        body {
-            height: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 100% !important;
-        }
+  body {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
+    height: 100vh;
+  }
 
-        * {
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-    </style>
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 28px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(232,255,71,0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(232,255,71,0); }
+  }
+
+  .logo-icon svg { width: 16px; height: 16px; }
+
+  .logo h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .logo span { color: var(--accent); }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--danger);
+    transition: background 0.3s;
+  }
+
+  .status-dot.connected { background: var(--success); }
+
+  #status-text { font-size: 11px; letter-spacing: 0.05em; }
+
+  .main {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    height: calc(100vh - 65px);
+    overflow: hidden;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .section {
+    border-bottom: 1px solid var(--border);
+    padding: 20px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  label {
+    display: block;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  input, select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 8px 12px;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 10px;
+  }
+
+  input:focus, select:focus { border-color: var(--accent); }
+  select option { background: var(--surface2); }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 8px 12px;
+    outline: none;
+    resize: vertical;
+    min-height: 80px;
+    margin-bottom: 10px;
+    transition: border-color 0.2s;
+    line-height: 1.5;
+  }
+
+  textarea:focus { border-color: var(--accent); }
+
+  button {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    padding: 9px 16px;
+    transition: all 0.15s;
+    width: 100%;
+    text-transform: uppercase;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0a0a0b;
+  }
+
+  .btn-primary:hover { background: #d4eb2f; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .btn-danger {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--border);
+  }
+
+  .btn-danger:hover { border-color: var(--danger); background: rgba(255,71,87,0.08); }
+
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  /* CONSOLE AREA */
+  .console-area {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  .console-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .filter-tabs {
+    display: flex;
+    gap: 4px;
+  }
+
+  .filter-tab {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    width: auto;
+    transition: all 0.15s;
+  }
+
+  .filter-tab.active {
+    background: var(--surface2);
+    border-color: var(--border);
+    color: var(--text);
+  }
+
+  .filter-tab:hover:not(.active) { color: var(--text); }
+
+  .event-count {
+    font-size: 10px;
+    color: var(--muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+
+  .btn-clear {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: var(--radius);
+    cursor: pointer;
+    width: auto;
+    transition: all 0.15s;
+  }
+
+  .btn-clear:hover { border-color: var(--danger); color: var(--danger); }
+
+  .log-stream {
+    overflow-y: auto;
+    padding: 12px 0;
+    font-size: 11px;
+    line-height: 1.6;
+  }
+
+  .log-stream::-webkit-scrollbar { width: 4px; }
+  .log-stream::-webkit-scrollbar-track { background: transparent; }
+  .log-stream::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .log-entry {
+    display: grid;
+    grid-template-columns: 68px 80px 1fr;
+    gap: 0;
+    padding: 5px 20px;
+    border-left: 2px solid transparent;
+    transition: background 0.1s;
+    animation: slideIn 0.2s ease-out;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-6px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .log-entry:hover { background: rgba(255,255,255,0.03); }
+
+  .log-entry.type-sent { border-color: var(--accent2); }
+  .log-entry.type-received { border-color: var(--success); }
+  .log-entry.type-system { border-color: var(--muted); }
+  .log-entry.type-error { border-color: var(--danger); }
+  .log-entry.type-callback { border-color: var(--warn); }
+
+  .log-time { color: var(--muted); font-size: 10px; padding-top: 1px; }
+
+  .log-badge {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 3px;
+    height: fit-content;
+    width: fit-content;
+  }
+
+  .badge-sent { background: rgba(71,180,255,0.15); color: var(--accent2); }
+  .badge-received { background: rgba(46,204,113,0.15); color: var(--success); }
+  .badge-system { background: rgba(102,102,128,0.2); color: var(--muted); }
+  .badge-error { background: rgba(255,71,87,0.15); color: var(--danger); }
+  .badge-callback { background: rgba(243,156,18,0.15); color: var(--warn); }
+
+  .log-content { color: var(--text); word-break: break-all; }
+  .log-content .event-name { color: var(--accent); font-weight: 500; }
+  .log-content .json-key { color: var(--accent2); }
+  .log-content .json-str { color: #a8ff78; }
+  .log-content .json-num { color: #f8b500; }
+  .log-content .json-bool { color: var(--accent2); }
+
+  .log-detail {
+    grid-column: 3;
+    margin-top: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 10px;
+    font-size: 10px;
+    color: var(--muted);
+    white-space: pre-wrap;
+    display: none;
+    cursor: default;
+  }
+
+  .log-entry.expanded .log-detail { display: block; }
+  .log-content { cursor: pointer; }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--muted);
+    gap: 12px;
+  }
+
+  .empty-state svg { opacity: 0.3; }
+  .empty-state p { font-size: 12px; letter-spacing: 0.05em; }
+
+  /* QUICK SEND */
+  .quick-send {
+    display: flex;
+    gap: 8px;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    align-items: center;
+  }
+
+  .quick-send input {
+    flex: 1;
+    margin: 0;
+    font-size: 11px;
+    padding: 7px 12px;
+  }
+
+  .quick-send select { width: 140px; margin: 0; font-size: 11px; padding: 7px 10px; }
+
+  .quick-btn {
+    width: auto;
+    padding: 7px 14px;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  /* TAG */
+  .tag {
+    display: inline-block;
+    background: rgba(232,255,71,0.08);
+    border: 1px solid rgba(232,255,71,0.2);
+    color: var(--accent);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+  }
+
+  .field-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+
+  .schema-hint {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 4px 8px;
+    margin-bottom: 12px;
+    word-break: break-all;
+    line-height: 1.6;
+  }
+
+  .schema-hint::before {
+    content: 'schema: ';
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* Blinking cursor effect in empty console */
+  .cursor-blink {
+    display: inline-block;
+    width: 8px;
+    height: 14px;
+    background: var(--accent);
+    animation: blink 1s step-end infinite;
+    vertical-align: middle;
+    border-radius: 1px;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .connection-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: var(--radius);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    font-size: 10px;
+    color: var(--muted);
+    transition: all 0.3s;
+  }
+
+  .connection-indicator.connected-state {
+    border-color: rgba(46,204,113,0.3);
+    color: var(--success);
+    background: rgba(46,204,113,0.08);
+  }
+</style>
 </head>
+<body>
 
-<body style="margin: 0; padding: 0; background-color: #f5f5f5;">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f5;">
-        <tr>
-            <td align="center" style="padding: 0;">
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="8" cy="8" r="3" fill="#0a0a0b"/>
+        <circle cx="8" cy="8" r="6" stroke="#0a0a0b" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <h1>Socket<span>.IO</span> Tester</h1>
+  </div>
+  <div class="status-bar">
+    <div class="status-dot" id="status-dot"></div>
+    <span id="status-text">DISCONNECTED</span>
+    <span id="socket-id" style="color: var(--muted); font-size: 10px;"></span>
+  </div>
+</header>
 
-                <table border="0" cellpadding="0" cellspacing="0" width="600"
-                    style="max-width: 600px; background-color: #ffffff;">
+<div class="main">
 
-                    <tr>
-                        <td align="center"
-                            style="padding: 0; height: 90px; background: linear-gradient(90deg, #8B5CF6 0%, #EC4899 35%, #F97316 65%, #3B82F6 100%);">
-                            <div style="height: 90px;"></div>
-                        </td>
-                    </tr>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
 
-                    <tr>
-                        <td align="center" style="padding: 60px 40px 40px 40px;">
+    <!-- CONNECTION -->
+    <div class="section">
+      <div class="section-title">Connection</div>
+      <label>Server URL</label>
+      <input type="text" id="server-url" value="http://localhost:3000" placeholder="http://localhost:3000">
+      <div class="btn-row">
+        <button class="btn-primary" onclick="connect()">Connect</button>
+        <button class="btn-danger" onclick="disconnect()">Disconnect</button>
+      </div>
+    </div>
 
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                                <tr>
-                                    <td align="center" style="padding: 40px 40px 30px 40px;">
-                                        <table border="0" cellpadding="0" cellspacing="0">
-                                            <tr>
-                                                <td align="center">
-                                                    <img src="/Logowrap.png" alt="NooSphere" width="180" height="40"
-                                                        style="display: block; font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; color: #000000;" />
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
+    <!-- REGISTER -->
+    <div class="section">
+      <div class="section-title">Register<span class="tag">socket.on("register")</span></div>
+      <div class="row">
+        <div>
+          <label>User ID</label>
+          <input type="text" id="reg-userId" placeholder="e.g. 123">
+        </div>
+        <div>
+          <label>User Type</label>
+          <select id="reg-userType">
+            <option value="USER">USER</option>
+            <option value="ADMIN">ADMIN</option>
+            <option value="DRIVER">DRIVER</option>
+            <option value="VENDOR">VENDOR</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-secondary" onclick="registerUser()">Emit register</button>
+    </div>
 
-                                <tr>
-                                    <td align="center" style="padding: 0 0 30px 0;">
-                                        <h1
-                                            style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 32px; font-weight: 700; color: #000000; line-height: 1.3;">
-                                            Reset your password</h1>
-                                    </td>
-                                </tr>
+    <!-- CHAT MESSAGE -->
+    <div class="section">
+      <div class="section-title">Chat Message<span class="tag">chatMessage</span></div>
+      <div class="schema-hint">Message · senderId · senderType · receiverId · receiverType · content</div>
+      <div class="row">
+        <div>
+          <label>Sender ID</label>
+          <input type="text" id="msg-senderId" placeholder="uuid / user id">
+        </div>
+        <div>
+          <label>Sender Type</label>
+          <select id="msg-senderType">
+            <option value="USER">USER</option>
+            <option value="ADMIN">ADMIN</option>
+            <option value="DRIVER">DRIVER</option>
+            <option value="VENDOR">VENDOR</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Receiver ID</label>
+          <input type="text" id="msg-receiverId" placeholder="uuid / user id">
+        </div>
+        <div>
+          <label>Receiver Type</label>
+          <select id="msg-receiverType">
+            <option value="USER">USER</option>
+            <option value="ADMIN">ADMIN</option>
+            <option value="DRIVER">DRIVER</option>
+            <option value="VENDOR">VENDOR</option>
+          </select>
+        </div>
+      </div>
+      <label>Content <span style="color:var(--danger)">*</span></label>
+      <textarea id="msg-content" placeholder="Message text..."></textarea>
+      <div class="field-row">
+        <label style="margin-bottom:0; display:flex; align-items:center; gap:6px; cursor:pointer;">
+          <input type="checkbox" id="msg-isRead" style="width:auto; margin:0; accent-color:var(--accent);">
+          <span>isRead</span>
+          <span style="color:var(--muted); font-size:9px;">(default: false)</span>
+        </label>
+      </div>
+      <button class="btn-primary" style="margin-top:10px;" onclick="sendChatMessage()">Emit chatMessage</button>
+    </div>
 
-                                <tr>
-                                    <td align="center" style="padding: 0 0 10px 0;">
-                                        <p
-                                            style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; color: #6B7280; line-height: 1.6;">
-                                            We received a request to reset our password.</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td align="center" style="padding: 0 0 30px 0;">
-                                        <p
-                                            style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; color: #6B7280; line-height: 1.6;">
-                                            Follow the link to create a new password.</p>
-                                    </td>
-                                </tr>
+    <!-- SEND NOTIFICATION -->
+    <div class="section">
+      <div class="section-title">Notification<span class="tag">sendNotification</span></div>
+      <div class="schema-hint">Notification · userId · userType · type · title · content</div>
+      <div class="row">
+        <div>
+          <label>User ID</label>
+          <input type="text" id="notif-userId" placeholder="uuid / user id">
+        </div>
+        <div>
+          <label>User Type</label>
+          <select id="notif-userType">
+            <option value="USER">USER</option>
+            <option value="ADMIN">ADMIN</option>
+            <option value="DRIVER">DRIVER</option>
+            <option value="VENDOR">VENDOR</option>
+          </select>
+        </div>
+      </div>
+      <label>Type <span style="color:var(--danger)">*</span></label>
+      <input type="text" id="notif-type" placeholder="e.g. ORDER, PROMO, ALERT, SYSTEM">
+      <label>Title <span style="color:var(--danger)">*</span></label>
+      <input type="text" id="notif-title" placeholder="Order confirmed">
+      <label>Content <span style="color:var(--danger)">*</span></label>
+      <textarea id="notif-content" placeholder="Your order #XYZ has been confirmed." style="min-height:56px;"></textarea>
+      <div class="field-row">
+        <label style="margin-bottom:0; display:flex; align-items:center; gap:6px; cursor:pointer;">
+          <input type="checkbox" id="notif-isRead" style="width:auto; margin:0; accent-color:var(--accent);">
+          <span>isRead</span>
+          <span style="color:var(--muted); font-size:9px;">(default: false)</span>
+        </label>
+      </div>
+      <button class="btn-primary" style="margin-top:10px;" onclick="sendNotification()">Emit sendNotification</button>
+    </div>
 
-                                <tr>
-                                    <td align="center" style="padding: 0 0 40px 0;">
-                                        <p
-                                            style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; color: #6B7280; line-height: 1.6;">
-                                            If this was not you, kindly ignore this email.</p>
-                                    </td>
-                                </tr>
+    <!-- CUSTOM EVENT -->
+    <div class="section">
+      <div class="section-title">Custom Emit</div>
+      <label>Event Name</label>
+      <input type="text" id="custom-event" placeholder="myEvent">
+      <label>Payload (JSON)</label>
+      <textarea id="custom-payload" placeholder='{"key": "value"}'></textarea>
+      <button class="btn-secondary" onclick="sendCustom()">Emit Custom Event</button>
+    </div>
 
-                                <tr>
-                                    <td align="center" style="padding: 0;">
-                                        <table border="0" cellpadding="0" cellspacing="0">
-                                            <tr>
-                                                <td align="center"
-                                                    style="border-radius: 100px; background-color: #0066FF;">
-                                                    <a href="#" target="_blank"
-                                                        style="display: inline-block; padding: 18px 0; width: 500px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 100px;">Reset
-                                                        password</a>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
+  </div>
 
-                            </table>
+  <!-- CONSOLE -->
+  <div class="console-area">
 
-                        </td>
-                    </tr>
+    <div class="console-toolbar">
+      <div class="toolbar-left">
+        <div class="filter-tabs">
+          <button class="filter-tab active" onclick="setFilter('all', this)">All</button>
+          <button class="filter-tab" onclick="setFilter('sent', this)">Sent</button>
+          <button class="filter-tab" onclick="setFilter('received', this)">Received</button>
+          <button class="filter-tab" onclick="setFilter('system', this)">System</button>
+          <button class="filter-tab" onclick="setFilter('error', this)">Errors</button>
+        </div>
+        <div class="event-count" id="event-count">0 events</div>
+      </div>
+      <button class="btn-clear" onclick="clearLogs()">Clear</button>
+    </div>
 
-                    <tr>
-                        <td style="height: 80px;"></td>
-                    </tr>
+    <div class="log-stream" id="log-stream">
+      <div class="empty-state" id="empty-state">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="18" stroke="#666680" stroke-width="1.5"/>
+          <circle cx="20" cy="20" r="10" stroke="#666680" stroke-width="1.5"/>
+          <circle cx="20" cy="20" r="3" fill="#666680"/>
+        </svg>
+        <p>Connect to a server to begin <span class="cursor-blink"></span></p>
+      </div>
+    </div>
 
-                </table>
+    <div class="quick-send">
+      <select id="listen-event" style="width:160px; margin:0; font-size:11px; padding:7px 10px;">
+        <option value="chatMessage">chatMessage</option>
+        <option value="newNotification">newNotification</option>
+        <option value="custom">custom</option>
+      </select>
+      <input type="text" id="listen-custom-event" placeholder="Custom event name..." style="width:150px; display:none;">
+      <span style="font-size:10px; color:var(--muted); white-space:nowrap;">← Listening on:</span>
+      <div id="active-listeners" style="flex:1; display:flex; flex-wrap:wrap; gap:6px;"></div>
+    </div>
 
-            </td>
-        </tr>
-    </table>
+  </div>
+</div>
+
+<script>
+let socket = null;
+let logs = [];
+let filter = 'all';
+let activeListeners = {};
+
+const listenEventSel = document.getElementById('listen-event');
+const listenCustom = document.getElementById('listen-custom-event');
+
+listenEventSel.addEventListener('change', () => {
+  listenCustom.style.display = listenEventSel.value === 'custom' ? 'block' : 'none';
+});
+
+function getTime() {
+  return new Date().toTimeString().slice(0,8);
+}
+
+function syntaxHighlight(json) {
+  if (typeof json !== 'string') json = JSON.stringify(json, null, 2);
+  return json
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, (match) => {
+      if (/^"/.test(match)) {
+        return /:$/.test(match)
+          ? `<span class="json-key">${match}</span>`
+          : `<span class="json-str">${match}</span>`;
+      }
+      if (/true|false/.test(match)) return `<span class="json-bool">${match}</span>`;
+      return `<span class="json-num">${match}</span>`;
+    });
+}
+
+function addLog(type, label, summary, detail = null) {
+  const entry = { id: Date.now() + Math.random(), type, label, summary, detail, time: getTime() };
+  logs.push(entry);
+
+  document.getElementById('empty-state')?.remove();
+  updateEventCount();
+  if (filter !== 'all' && filter !== type) return;
+  renderEntry(entry);
+}
+
+function renderEntry(entry) {
+  const stream = document.getElementById('log-stream');
+  const div = document.createElement('div');
+  div.className = `log-entry type-${entry.type}`;
+  div.dataset.id = entry.id;
+  div.dataset.type = entry.type;
+
+  div.innerHTML = `
+    <span class="log-time">${entry.time}</span>
+    <span><span class="log-badge badge-${entry.type}">${entry.label}</span></span>
+    <span class="log-content" onclick="toggleDetail(this.closest('.log-entry'))">${entry.summary}${entry.detail ? ' <span style="color:var(--muted);font-size:9px;">▶ click</span>' : ''}</span>
+    ${entry.detail ? `<pre class="log-detail">${typeof entry.detail === 'object' ? syntaxHighlight(entry.detail) : entry.detail}</pre>` : ''}
+  `;
+
+  stream.appendChild(div);
+  stream.scrollTop = stream.scrollHeight;
+}
+
+function toggleDetail(el) {
+  el.classList.toggle('expanded');
+}
+
+function rerenderLogs() {
+  const stream = document.getElementById('log-stream');
+  stream.innerHTML = '';
+  const filtered = filter === 'all' ? logs : logs.filter(l => l.type === filter);
+  if (filtered.length === 0) {
+    stream.innerHTML = '<div class="empty-state"><p>No events match this filter</p></div>';
+    return;
+  }
+  filtered.forEach(renderEntry);
+  stream.scrollTop = stream.scrollHeight;
+}
+
+function setFilter(f, btn) {
+  filter = f;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  rerenderLogs();
+}
+
+function updateEventCount() {
+  document.getElementById('event-count').textContent = `${logs.length} event${logs.length !== 1 ? 's' : ''}`;
+}
+
+function clearLogs() {
+  logs = [];
+  document.getElementById('log-stream').innerHTML = '<div class="empty-state" id="empty-state"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#666680" stroke-width="1.5"/><circle cx="20" cy="20" r="10" stroke="#666680" stroke-width="1.5"/><circle cx="20" cy="20" r="3" fill="#666680"/></svg><p>Logs cleared</p></div>';
+  updateEventCount();
+}
+
+function setStatus(connected, id = '') {
+  const dot = document.getElementById('status-dot');
+  const text = document.getElementById('status-text');
+  const sockId = document.getElementById('socket-id');
+  dot.className = 'status-dot' + (connected ? ' connected' : '');
+  text.textContent = connected ? 'CONNECTED' : 'DISCONNECTED';
+  text.style.color = connected ? 'var(--success)' : 'var(--muted)';
+  sockId.textContent = id ? `· ${id}` : '';
+}
+
+function connect() {
+  const url = document.getElementById('server-url').value.trim();
+  if (socket) { socket.disconnect(); }
+
+  addLog('system', 'SYS', `Connecting to <span class="event-name">${url}</span>...`);
+
+  socket = io(url, { transports: ['websocket'], reconnection: false });
+
+  socket.on('connect', () => {
+    setStatus(true, socket.id);
+    addLog('system', 'SYS', `Connected · socket id: <span class="event-name">${socket.id}</span>`);
+    setupDefaultListeners();
+  });
+
+  socket.on('disconnect', (reason) => {
+    setStatus(false);
+    addLog('system', 'SYS', `Disconnected · reason: ${reason}`);
+  });
+
+  socket.on('connect_error', (err) => {
+    setStatus(false);
+    addLog('error', 'ERR', `Connection failed: ${err.message}`);
+  });
+}
+
+function setupDefaultListeners() {
+  const events = ['chatMessage', 'newNotification'];
+  events.forEach(ev => {
+    if (activeListeners[ev]) return;
+    socket.on(ev, (data) => {
+      addLog('received', 'IN', `<span class="event-name">${ev}</span>`, data);
+    });
+    activeListeners[ev] = true;
+  });
+  renderListenerTags();
+}
+
+function renderListenerTags() {
+  const container = document.getElementById('active-listeners');
+  container.innerHTML = '';
+  Object.keys(activeListeners).forEach(ev => {
+    const span = document.createElement('span');
+    span.className = 'tag';
+    span.textContent = ev;
+    container.appendChild(span);
+  });
+}
+
+function disconnect() {
+  if (socket) { socket.disconnect(); socket = null; activeListeners = {}; renderListenerTags(); }
+}
+
+function requireSocket() {
+  if (!socket || !socket.connected) { addLog('error', 'ERR', 'Not connected to a server.'); return false; }
+  return true;
+}
+
+function registerUser() {
+  if (!requireSocket()) return;
+  const userId = document.getElementById('reg-userId').value.trim();
+  const userType = document.getElementById('reg-userType').value;
+  if (!userId) { addLog('error', 'ERR', 'User ID is required'); return; }
+  const data = { userId, userType };
+  socket.emit('register', data);
+  addLog('sent', 'OUT', `<span class="event-name">register</span> → room: ${userType}_${userId}`, data);
+}
+
+function sendChatMessage() {
+  if (!requireSocket()) return;
+  const content = document.getElementById('msg-content').value.trim();
+  if (!content) { addLog('error','ERR','Content is required'); return; }
+  const receiverId = document.getElementById('msg-receiverId').value.trim();
+  if (!receiverId) { addLog('error','ERR','Receiver ID is required'); return; }
+  const data = {
+    senderId: document.getElementById('msg-senderId').value.trim(),
+    senderType: document.getElementById('msg-senderType').value,
+    receiverId,
+    receiverType: document.getElementById('msg-receiverType').value,
+    content,
+    isRead: document.getElementById('msg-isRead').checked,
+  };
+
+  socket.emit('chatMessage', data, (ack) => {
+    if (ack) addLog('callback', 'ACK', `chatMessage callback: ${ack.success ? '✓ success' : '✗ failed'}`, ack);
+  });
+  addLog('sent', 'OUT', `<span class="event-name">chatMessage</span> → ${data.receiverType}_${data.receiverId}`, data);
+}
+
+function sendNotification() {
+  if (!requireSocket()) return;
+  const userId = document.getElementById('notif-userId').value.trim();
+  const title = document.getElementById('notif-title').value.trim();
+  const type = document.getElementById('notif-type').value.trim();
+  const content = document.getElementById('notif-content').value.trim();
+  if (!userId) { addLog('error','ERR','User ID is required'); return; }
+  if (!type) { addLog('error','ERR','Type is required'); return; }
+  if (!title) { addLog('error','ERR','Title is required'); return; }
+  if (!content) { addLog('error','ERR','Content is required'); return; }
+
+  const data = {
+    userId,
+    userType: document.getElementById('notif-userType').value,
+    type,
+    title,
+    content,
+    isRead: document.getElementById('notif-isRead').checked,
+  };
+
+  socket.emit('sendNotification', data, (ack) => {
+    if (ack) addLog('callback', 'ACK', `sendNotification callback: ${ack.success ? '✓ success' : '✗ failed'}`, ack);
+  });
+  addLog('sent', 'OUT', `<span class="event-name">sendNotification</span> → ${data.userType}_${data.userId}`, data);
+}
+
+function sendCustom() {
+  if (!requireSocket()) return;
+  const event = document.getElementById('custom-event').value.trim();
+  let payload = {};
+  try { payload = JSON.parse(document.getElementById('custom-payload').value || '{}'); } catch(e) { addLog('error','ERR','Invalid JSON payload'); return; }
+  if (!event) { addLog('error','ERR','Event name required'); return; }
+  socket.emit(event, payload, (ack) => {
+    if (ack) addLog('callback', 'ACK', `${event} ack`, ack);
+  });
+  addLog('sent', 'OUT', `<span class="event-name">${event}</span>`, payload);
+}
+
+// Add custom listener
+document.querySelector('.quick-send').insertAdjacentHTML('beforeend', `
+  <button class="btn-secondary quick-btn" onclick="addCustomListener()" style="margin-left:4px;">+ Listen</button>
+`);
+
+function addCustomListener() {
+  if (!requireSocket()) return;
+  const sel = document.getElementById('listen-event');
+  const ev = sel.value === 'custom' ? document.getElementById('listen-custom-event').value.trim() : sel.value;
+  if (!ev) { addLog('error','ERR','Event name required'); return; }
+  if (activeListeners[ev]) { addLog('system','SYS',`Already listening on <span class="event-name">${ev}</span>`); return; }
+  socket.on(ev, (data) => { addLog('received','IN',`<span class="event-name">${ev}</span>`, data); });
+  activeListeners[ev] = true;
+  renderListenerTags();
+  addLog('system','SYS',`Now listening on <span class="event-name">${ev}</span>`);
+}
+</script>
 </body>
-
 </html>

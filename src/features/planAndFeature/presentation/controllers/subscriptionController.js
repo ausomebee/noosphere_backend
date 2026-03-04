@@ -81,7 +81,7 @@ class SubscriptionController {
     });
 
     getSubscriptionByPlan = expressAsyncHandler(async (req, res) => {
-        const subscriptions = await this.service.getSubscriptionByPlan(req.params,planId);
+        const subscriptions = await this.service.getSubscriptionByPlan(req.params, planId);
 
         if (!subscriptions) {
             res.status(500).json({ message: 'Failed to fetch subscriptions' });
@@ -122,6 +122,19 @@ class SubscriptionController {
         });
     });
 
+    getTenantSubscriptions = expressAsyncHandler(async (req, res) => {
+        const subscriptions = await this.service.getTenantSubscriptions(req.params.tenantId);
+
+        if (!subscriptions) {
+            res.status(500).json({ message: 'Failed to fetch subscriptions for this tenant' });
+        }
+
+        return res.status(201).json({
+            message: "subscriptions for this tenant fetched successfully",
+            status: 'ok',
+            data: subscriptions
+        });
+    });
 }
 
 export default SubscriptionController;

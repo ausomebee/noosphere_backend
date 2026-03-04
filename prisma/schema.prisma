@@ -109,6 +109,12 @@ enum DataAccessLevel {
   TEAM
 }
 
+enum UserType {
+  ADMIN
+  TENANT_STAFF
+  CLIENT
+}
+
 model Admin {
   id                    String   @id @default(uuid())
   firstName             String   @default("jhc")
@@ -136,13 +142,13 @@ model Admin {
   IssueComment        IssueComment[]
   assignedIssues      Issue[]              @relation("AssignedAdmin")
   loggedIssues        Issue[]              @relation("LoggedByAdmin")
-  notifications       Notifications[]
   rolesCreated        Role[]               @relation("RoleCreatedByAdmin")
   departments         Department[]         @relation("DepartmentCreatedByAdmin")
   departmentLead      Department[]         @relation("DepartmentTeamLead")
   departmentMembers   DepartmentMembers[]
   tenantDeactivations TenantDeactivation[]
   tenants             Tenant[]
+  serverRequests      ServerRequest[]
 }
 
 model Auth {
@@ -277,6 +283,7 @@ model Tenant {
   roles                             Role[]
   teams                             Teams[]                             @relation("tenantTeam")
   tenantDeactivation                TenantDeactivation?
+  serverRequests                    ServerRequest[]
 }
 
 model TenantDeactivation {
@@ -338,9 +345,9 @@ model TenantStaff {
   clinicalReportsApprover      ClinicalReport[]              @relation("ReportsApprover")
   clinicalReportHistories      ClinicalReportHistory[]
   clinicalReportChangeRequests ClinicalReportChangeRequest[] @relation("ReportsRequestApprover")
-  notifications                Notifications[]
   payrollCycleStaffs           PayrollCycleStaffs[]
   teamMembers                  TeamMembers[]
+  serverRequests               ServerRequest[]
 }
 
 model Teams {
@@ -472,7 +479,7 @@ model ClientTenant {
   clinicalReportChangeRequests ClinicalReportChangeRequest[]
   clientFiles                  ClientFiles[]
   clientNotificationSettings   clientNotificationSettings[]
-  notifications                Notifications[]
+  serverRequests               ServerRequest[]
 
   @@unique([clientId, tenantId])
 }
@@ -1561,18 +1568,45 @@ model TenantAdditionalSecurityQuestions {
   tenant Tenant @relation(fields: [tenantId], references: [id])
 }
 
-model Notifications {
-  id              String   @id @default(uuid())
-  tenantStaffId   String?
-  teanantClientId String?
-  adminId         String?
-  message         String
-  subject         String
-  isRead          Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+model Message {
+  id           String   @id @default(uuid())
+  senderId     String
+  senderType   UserType
+  receiverId   String
+  receiverType UserType
+  content      String
+  isRead       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+}
 
-  tenant TenantStaff?  @relation(fields: [tenantStaffId], references: [id])
-  client ClientTenant? @relation(fields: [teanantClientId], references: [id])
-  admin  Admin?        @relation(fields: [adminId], references: [id])
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  userType  UserType
+  type      String
+  title     String
+  content   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model ServerRequest {
+  id             String   @id @default(uuid())
+  tenantId       String?
+  adminId        String?
+  tenantStaffId  String?
+  tenantClientId String?
+  method         String
+  endpoint       String
+  statusCode     Int
+  durationMs     Int
+  ipAddress      String?
+  userAgent      String?
+  errorMessage   String?
+  createdAt      DateTime @default(now())
+
+  tenant      Tenant?       @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  admin       Admin?        @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  tenantStaff TenantStaff?  @relation(fields: [tenantStaffId], references: [id], onDelete: SetNull)
+  client      ClientTenant? @relation(fields: [tenantClientId], references: [id], onDelete: SetNull)
 }

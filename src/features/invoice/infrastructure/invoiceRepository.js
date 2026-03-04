@@ -26,6 +26,30 @@ class InvoiceRepository {
         });
     }
 
+    async getTenantInvoices(tenantId, filter = {}) {
+        return await this.model.findMany({
+            where: {
+                tenantId,
+                ...filter,
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+        });
+    }
+
+    async getTenantInvoicesByStatus(tenantId, status) {
+        return await this.model.findMany({
+            where: {
+                tenantId,
+                status,
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+        });
+    }
+    
     async findOne(query) {
         return await this.model.findUnique({
             where: query,

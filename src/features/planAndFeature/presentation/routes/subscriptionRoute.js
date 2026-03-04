@@ -392,6 +392,27 @@ class SubscriptionRoutes {
         this.router.get("/status/:status", SubscriptionDto.checkStatusDto, this.controller.getSubscriptionByStatus);
 
         /**
+        * @swagger
+        * /api/v1/subscription/tenant/{tenantId}:
+        *   get:
+        *     summary: gets subscription by tenantId
+        *     tags: [subscription]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The ID of the tenant
+        *     responses:
+        *       200:
+        *         description: subscription fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant/:tenantId", this.controller.getTenantSubscriptions);
+
+        /**
          * @swagger
          * /api/v1/subscription/cancelnow:
          *   patch:

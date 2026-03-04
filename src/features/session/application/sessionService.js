@@ -209,6 +209,19 @@ class SessionService {
         return session;
     }
 
+    async tenantOverviewGraph(id, groupBy) {
+        const session = await this.sessionRepository.getTenantSessionCounts({
+            tenantId: id,
+            groupBy,
+        });
+
+        if (!session) {
+            throw new Error("Sessions not found");
+        }
+
+        return session;
+    }
+
     async getClientSessions(clientId) {
         const session = await this.sessionRepository.getClientSessions(clientId);
 

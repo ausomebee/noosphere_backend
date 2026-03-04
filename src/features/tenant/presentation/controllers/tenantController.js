@@ -15,6 +15,8 @@ import ClientRepository from "../../../client/infrastructure/clientRepository.js
 import ClientService from "../../../client/application/clientService.js";
 import TenantDeactivationRepository from "../../infrastructure/tenantDeactivationRepository.js";
 import AdminService from "../../../admin/application/adminService.js";
+import SessionRepository from "../../../session/infrastructure/sessionRepository.js";
+import SessionService from "../../../session/application/sessionService.js";
 
 class TenantController {
     constructor() {
@@ -45,6 +47,8 @@ class TenantController {
         this.clientRepository = new ClientRepository(this.prisma.client);
         this.clientService = new ClientService({ clientRepository: this.clientRepository });
         this.adminService = new AdminService();
+        this.sessionRepository = new SessionRepository(this.prisma);
+        this.sessionService = new SessionService({ sessionRepository: this.sessionRepository });
     }
 
     createCandidate = expressAsyncHandler(async (req, res) => {
@@ -103,6 +107,103 @@ class TenantController {
             message: "Candidate updated successfully",
             status: 'ok',
             data: tenant
+        });
+    });
+
+    changeEmail = expressAsyncHandler(async (req, res) => {
+        const { tenantId } = req.params;
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ message: "Email is required" });
+        }
+
+        const tenant = await this.service.changeEmail({
+            id: tenantId,
+            email,
+        });
+
+        if (!tenant) {
+            return res.status(500).json({ message: "Failed to update tenant email." });
+        }
+
+        return res.status(200).json({
+            message: "Tenant email updated successfully",
+            status: "ok",
+            data: tenant,
+        });
+    });
+
+    changePhoneNumber = expressAsyncHandler(async (req, res) => {
+        const { tenantId } = req.params;
+        const { phoneNumber } = req.body;
+
+        if (!phoneNumber) {
+            return res.status(400).json({ message: "Phone number is required" });
+        }
+
+        const tenant = await this.service.changePhoneNumber({
+            id: tenantId,
+            phoneNumber,
+        });
+
+        if (!tenant) {
+            return res.status(500).json({ message: "Failed to update tenant phone number." });
+        }
+
+        return res.status(200).json({
+            message: "Tenant phone number updated successfully",
+            status: "ok",
+            data: tenant,
+        });
+    });
+
+    changeAdminPassword = expressAsyncHandler(async (req, res) => {
+        const { tenantId } = req.params;
+
+        const tenant = await this.service.changeAdminPassword({
+            id: tenantId,
+        });
+
+        if (!tenant) {
+            return res.status(500).json({
+                message: "Failed to reset tenant admin password.",
+            });
+        }
+
+        return res.status(200).json({
+            message: "Tenant admin password reset successfully",
+            status: "ok",
+        });
+    });
+
+    getTenantRelationsCount = expressAsyncHandler(async (req, res) => {
+        const tenantRelationsCount = await this.service.getTenantRelationsCount(req.params.tenantId);
+
+        if (!tenantRelationsCount) {
+            return res.status(500).json({ message: 'Failed to fetch tenant relations count.' });
+        }
+
+        const tenantSessionCount = await this.sessionService.countTenantSessions(req.params.tenantId);
+
+        if (!tenantSessionCount) {
+            return res.status(500).json({ message: 'Failed to fetch tenant session count.' });
+        }
+
+        const tenantSessionGraph = await this.sessionService.tenantOverviewGraph(req.params.tenantId, "month");
+
+        if (!tenantSessionGraph) {
+            return res.status(500).json({ message: 'Failed to fetch tenant session graph.' });
+        }
+
+        return res.status(200).json({
+            message: "Tenant relations and session counts fetched successfully",
+            status: 'ok',
+            data: {
+                ...tenantRelationsCount,
+                tenantSessionCount,
+                tenantSessionGraph
+            }
         });
     });
 

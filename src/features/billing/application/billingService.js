@@ -28,6 +28,33 @@ class BillingService {
         return newBillingMetadata;
     }
 
+    async getTenantPayments(tenantId, filter = {}) {
+        const payments = await this.paymentRepository.getTenantPayments(
+            tenantId,
+            filter
+        );
+
+        if (!payments || payments.length === 0) {
+            throw new Error("No payments found for this tenant");
+        }
+
+        return payments;
+    }
+
+    async getTenantPaymentsByStatus(tenantId, status) {
+        const payments =
+            await this.paymentRepository.getTenantPaymentsByStatus(
+                tenantId,
+                status
+            );
+
+        if (!payments || payments.length === 0) {
+            throw new Error(`No payments found with status ${status}`);
+        }
+
+        return payments;
+    }
+
     async updateBillingMetadata(data) {
         const billingMetadata = await this.billingRepository.findOne({ id: data.id })
 

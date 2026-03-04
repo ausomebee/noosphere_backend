@@ -316,6 +316,60 @@ class InvoiceRoutes {
 
         /**
          * @swagger
+         * /api/v1/invoice/tenants/{tenantId}/invoices:
+         *   get:
+         *     summary: Retrieve all invoices for a tenant
+         *     tags: [Invoice]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The tenant ID
+         *     responses:
+         *       200:
+         *         description: Tenant invoices retrieved successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get(
+            "/tenants/:tenantId/invoices",
+            this.controller.getTenantInvoices
+        );
+
+        /**
+         * @swagger
+         * /api/v1/invoice/tenants/{tenantId}/invoices/status/{status}:
+         *   get:
+         *     summary: Retrieve tenant invoices by status
+         *     tags: [Invoice]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The tenant ID
+         *       - in: path
+         *         name: status
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: Invoice status (e.g., PAID, PENDING, OVERDUE)
+         *     responses:
+         *       200:
+         *         description: Tenant invoices by status retrieved successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get(
+            "/tenants/:tenantId/invoices/status/:status",
+            this.controller.getTenantInvoicesByStatus
+        );
+
+        /**
+         * @swagger
          * /api/v1/invoice/billed/total/{from}/{to}:
          *   get:
          *     summary: Retrieve total billed

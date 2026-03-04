@@ -1,35 +1,23 @@
 class Notification {
-    constructor({
-        id,
-        subject,
-        message,
-        tenantStaffId,
-        tenantClientId,
-        adminId,
-        isRead,
-        readAt,
-        createdAt,
-        updatedAt
-    }) {
+    constructor({ id, userId, userType, type, title, content, isRead, createdAt }) {
         this.id = id;
-        this.subject = subject;
-        this.message = message;
-        this.tenantStaffId = tenantStaffId;
-        this.tenantClientId = tenantClientId;
-        this.adminId = adminId;
-        this.isRead = isRead;
-        this.readAt = readAt;
+        this.userId = userId;
+        this.userType = userType;
+        this.type = type;
+        this.title = title;
+        this.content = content;
+        this.isRead = isRead ?? false;
         this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     get createNotification() {
         return {
-            subject: this.subject,
-            message: this.message,
-            tenantStaffId: this.tenantStaffId,
-            tenantClientId: this.tenantClientId,
-            adminId: this.adminId
+            userId: this.userId,
+            userType: this.userType,
+            type: this.type,
+            title: this.title,
+            content: this.content,
+            isRead: this.isRead
         };
     }
 }
