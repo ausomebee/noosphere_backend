@@ -54,7 +54,7 @@ jobs:
             git reset --hard origin/$BRANCH
 
             echo '📦 Installing dependencies...'
-            npm ci --production
+            npm install --production
 
             echo '🧠 Checking PM2...'
             if ! command -v pm2 &> /dev/null; then
