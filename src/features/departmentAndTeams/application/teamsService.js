@@ -62,7 +62,8 @@ class TeamsService {
         return await this.teamsRepository.findAllAndPopulate(query, {
             teamLead: {
                 select: {
-                    fullName: true,
+                    firstName: true,
+                    lastName: true,
                 }
             },
             teamMembers: {

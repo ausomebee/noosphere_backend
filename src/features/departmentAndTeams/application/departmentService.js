@@ -59,7 +59,8 @@ class DepartmentService {
             {
                 teamLead: {
                     select: {
-                        fullName: true,
+                        firstName: true,
+                        lastName: true,
                     }
                 },
                 departmentMembers: {
