@@ -14,11 +14,11 @@ class NotificationProcessor {
 
   async process(data) {
     const { type, userId, userType } = data;
-
+    
     const config = notificationConfig[type];
-
+    
     if (!config) {
-      throw new Error(`Notification type ${type} not defined`);
+        throw new Error(`Notification type ${type} not defined`);
     }
 
     if (config.conditions?.userType &&
@@ -30,7 +30,6 @@ class NotificationProcessor {
 
     if (config.channels.includes("in_app")) {
       savedNotification = await this.notificationService.createNotification(data);
-
       const room = `${userType}_${userId}`;
       this.io.to(room).emit("newNotification", {
         notification: savedNotification

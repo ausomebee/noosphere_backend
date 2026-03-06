@@ -5,8 +5,8 @@ import MessageService from "../features/messaging/application/messageService.js"
 import NotificationsRepository from "../features/notifications/infrastructure/notificationsRepository.js";
 import NotificationService from "../features/notifications/application/notificationsService.js";
 import Message from "../features/messaging/domain/message.js";
-import Notification from "../features/notifications/domain/notification.js";
 import NotificationProcessor from "../utilities/notificationProcessor.js";
+import emailService from "../utilities/ses.js";
 
 class SocketService {
     constructor() {
@@ -85,7 +85,12 @@ class SocketService {
 
             socket.on("sendNotification", async (data, callback) => {
                 try {
-                    await NotificationProcessor.process(data);
+                    const notificationProcessor = new NotificationProcessor({
+                        notificationService: this.notificationService,
+                        emailService: emailService,
+                        io: this.io
+                    });
+                    await notificationProcessor.process(data);
 
                     callback?.({ success: true });
                 } catch (error) {

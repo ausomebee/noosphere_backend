@@ -9,7 +9,7 @@
   "NEW_INVOICE": {
     "channels": ["in_app"],
     "conditions": {
-      "userType": "TENANT"
+      "userType": "ADMIN"
     }
   },
   "PAYMENT_SUCCESS": {
