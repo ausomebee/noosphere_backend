@@ -1,8 +1,8 @@
 import expressAsyncHandler from "express-async-handler";
 import prismaService from "../../../../config/prisma.js";
-import MessageRepository from "../../infrastucture/messageRepository.js";
 import MessageService from "../../application/messageService.js";
 import Message from "../../domain/message.js";
+import MessageRepository from "../../infrastructure/messageRepository.js";
 
 class MessageController {
     constructor() {

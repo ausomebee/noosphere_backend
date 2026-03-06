@@ -83,6 +83,8 @@ import teamRoute from "./features/departmentAndTeams/presentation/routes/teamsRo
 import teamMembersRoute from "./features/departmentAndTeams/presentation/routes/teamMembersRoutes.js";
 import departmentRoute from "./features/departmentAndTeams/presentation/routes/departmentRoutes.js";
 import departmentMembersRoute from "./features/departmentAndTeams/presentation/routes/departmentMembersRoutes.js";
+import notificationsRoute from "./features/notifications/presentation/routes/notificationRoutes.js";
+import messagesRoute from "./features/messaging/presentation/routes/messageRoutes.js";
 
 class App {
     constructor() {
@@ -275,6 +277,8 @@ class App {
         this.app.use("/api/v1/organization/team-members", teamMembersRoute);
         this.app.use("/api/v1/organization/departments", departmentRoute);
         this.app.use("/api/v1/organization/department-members", departmentMembersRoute);
+        this.app.use("/api/v1/notifications", notificationsRoute);
+        this.app.use("/api/v1/messages", messagesRoute);
     }
 
     initializeErrorHandler() {

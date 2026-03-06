@@ -1,13 +1,13 @@
 import expressAsyncHandler from "express-async-handler";
 import prismaService from "../../../../config/prisma.js";
-import NotificationRepository from "../../infrastucture/notificationRepository.js";
-import NotificationService from "../../application/notificationService.js";
 import Notification from "../../domain/notification.js";
+import NotificationsRepository from "../../infrastructure/notificationsRepository.js";
+import NotificationService from "../../application/notificationsService.js";
 
 class NotificationController {
     constructor() {
         this.prisma = prismaService.getClient();
-        this.notificationRepository = new NotificationRepository(this.prisma.notification);
+        this.notificationRepository = new NotificationsRepository(this.prisma.notification);
         this.service = new NotificationService({
             notificationRepository: this.notificationRepository
         });
