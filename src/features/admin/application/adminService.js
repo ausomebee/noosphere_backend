@@ -289,7 +289,15 @@ class AdminService {
     }
 
     async getAllAdmin() {
-        const admins = await this.repository.findAll({});
+        const admins = await this.repository.findAll({
+            include:{
+                roles: {
+                    select: {
+                        name: true,
+                    }
+                }
+            }
+        });
 
         if (!admins) {
             throw new Error("Failed to fetch admins")
