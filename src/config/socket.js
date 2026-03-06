@@ -6,6 +6,7 @@ import NotificationsRepository from "../features/notifications/infrastructure/no
 import NotificationService from "../features/notifications/application/notificationsService.js";
 import Message from "../features/messaging/domain/message.js";
 import Notification from "../features/notifications/domain/notification.js";
+import NotificationProcessor from "../utilities/notificationProcessor.js";
 
 class SocketService {
     constructor() {
@@ -58,26 +59,40 @@ class SocketService {
                 }
             });
 
+            // socket.on("sendNotification", async (data, callback) => {
+            //     try {
+            //         const { userId, userType } = data;
+
+            //         const notificationData = new Notification(data);
+            //         const newRecord = await this.notificationService.createNotification(notificationData.createNotification);
+
+            //         if (!newRecord) {
+            //             return res.status(500).json({ message: "Failed to create notification" });
+            //         }
+
+            //         const userRoom = `${userType}_${userId}`;
+            //         this.io.to(userRoom).emit("newNotification", { notification: newRecord });
+
+            //         callback?.({ success: true });
+            //     } catch (error) {
+            //         console.error("Notification error:", error);
+            //         callback?.({
+            //             success: false,
+            //             error: "Internal server error",
+            //         });
+            //     }
+            // });
+
             socket.on("sendNotification", async (data, callback) => {
                 try {
-                    const { userId, userType } = data;
-
-                    const notificationData = new Notification(data);
-                    const newRecord = await this.notificationService.createNotification(notificationData.createNotification);
-
-                    if (!newRecord) {
-                        return res.status(500).json({ message: "Failed to create notification" });
-                    }
-
-                    const userRoom = `${userType}_${userId}`;
-                    this.io.to(userRoom).emit("newNotification", { notification: newRecord });
+                    await NotificationProcessor.process(data);
 
                     callback?.({ success: true });
                 } catch (error) {
                     console.error("Notification error:", error);
                     callback?.({
                         success: false,
-                        error: "Internal server error",
+                        error: "Internal server error"
                     });
                 }
             });

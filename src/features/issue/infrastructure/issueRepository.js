@@ -11,7 +11,7 @@ class IssueRepository extends BaseRepository {
             include: {
                 assignedTo: {
                     select: {
-                        fullName: true
+                        select: { firstName: true, lastName: true }
                     }
                 },
                 tenant: {
@@ -21,20 +21,20 @@ class IssueRepository extends BaseRepository {
                 },
                 loggedBy: {
                     select: {
-                        fullName: true
+                        select: { firstName: true, lastName: true }
                     }
                 },
                 comments: {
                     include: {
                         commentBy: {
-                            select: { fullName: true }
+                            select: { firstName: true, lastName: true }
                         }
                     }
                 },
                 Logs: {
                     include: {
                         admin: {
-                            select: { fullName: true }
+                            select: { firstName: true, lastName: true }
                         }
                     }
                 },

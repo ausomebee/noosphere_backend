@@ -1,0 +1,20 @@
+{
+  "WELCOME_TENANT": {
+    "channels": ["in_app", "email"],
+    "emailTemplate": "welcomeTenant",
+    "conditions": {
+      "userType": "TENANT"
+    }
+  },
+  "NEW_INVOICE": {
+    "channels": ["in_app"],
+    "conditions": {
+      "userType": "TENANT"
+    }
+  },
+  "PAYMENT_SUCCESS": {
+    "channels": ["in_app", "email"],
+    "emailTemplate": "paymentSuccess",
+    "conditions": {}
+  }
+}
