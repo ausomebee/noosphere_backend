@@ -39,9 +39,7 @@ class LogsRepository {
             tenantId,
             ...(featureNames.length > 0 && {
                 feature: {
-                    name: {
-                        in: featureNames,
-                    },
+                    in: featureNames,
                 },
             }),
         };
@@ -50,9 +48,11 @@ class LogsRepository {
             this.model.findMany({
                 where,
                 include: {
-                    feature: true,
                     admin: true,
                     client: true,
+                    tenant: true,
+                    issue: true,
+                    subscription: true,
                 },
                 orderBy: {
                     createdAt: "desc",

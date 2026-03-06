@@ -664,7 +664,6 @@ model Feature {
   plans        BillingPlan[] @relation("PlanFeatures")
   extraPlans   BillingPlan[] @relation("ExtraFeatures")
   featureGroup FeatureGroup? @relation(fields: [featureGroupId], references: [id])
-  logs         Logs[]
 }
 
 model FeatureGroup {
@@ -719,7 +718,7 @@ model Logs {
   tenantId       String?
   clientId       String?
   adminId        String?
-  featureId      String?
+  feature        String?
   module         Module?
   action         String
   reason         String
@@ -733,7 +732,6 @@ model Logs {
   tenant       Tenant?       @relation(fields: [tenantId], references: [id])
   client       Client?       @relation(fields: [clientId], references: [id])
   admin        Admin?        @relation(fields: [adminId], references: [id])
-  feature      Feature?      @relation(fields: [featureId], references: [id])
   issue        Issue?        @relation(fields: [issueId], references: [id])
   subscription Subscription? @relation(fields: [subscriptionId], references: [id])
 }
