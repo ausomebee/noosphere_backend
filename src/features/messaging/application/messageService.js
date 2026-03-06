@@ -43,16 +43,41 @@ class MessageService {
     }
 
     async getMessagesByUser(userId, userType) {
-        const records = await this.messageRepository.findAllAndPopulate(
-            { receiverId: userId, receiverType: userType },
+        const messages = await this.messageRepository.findAllAndPopulate(
+            {
+                OR: [
+                    {
+                        senderId: userId,
+                        senderType: userType,
+                    },
+                    {
+                        receiverId: userId,
+                        receiverType: userType,
+                    },
+                ],
+            },
             {}
         );
 
-        if (!records) {
+        const chats = {};
+
+        messages.forEach((msg) => {
+            const participants = [msg.senderId, msg.receiverId].sort().join("_");
+
+            if (!chats[participants]) {
+                chats[participants] = [];
+            }
+
+            chats[participants].push(msg);
+        });
+
+        const groupedChats = Object.values(chats);
+
+        if (!groupedChats) {
             throw new Error("No messages found for this user.");
         }
 
-        return records;
+        return groupedChats;
     }
 
     async markAsRead(messageId) {
