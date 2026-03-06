@@ -239,7 +239,7 @@ class IssueController {
             res.status(500).json({ message: 'Failed to update issue' });
         }
 
-        const issueData = new Issue({ issueId: issue.id, adminId: req.body.updatedBy, action: "updated an issue", reason: "to improve traching", details: "updated an issue" });
+        const issueData = new Issue({ issueId: issue.id, adminId: req.body.updatedBy, action: "updated an issue", reason: "to improve traching", details: "updated an issue", module: "issue management" });
 
         const log = await this.logService.createLog(issueData.createLog);
 
@@ -261,7 +261,7 @@ class IssueController {
             res.status(500).json({ message: 'Failed to create issue comment' });
         }
 
-        const issueData = new Issue({ issueId: comment.issueId, adminId: comment.adminId, action: "added a comment", reason: "to improve tracking", details: "commented on an issue" });
+        const issueData = new Issue({ issueId: comment.issueId, adminId: comment.adminId, action: "added a comment", reason: "to improve tracking", details: "commented on an issue", module: "issue management" });
 
         const log = await this.logService.createLog(issueData.createLog);
 
