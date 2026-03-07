@@ -239,7 +239,45 @@ class InvoiceService {
     async getInvoiceManagement() {
         const invoice = await this.invoiceManagementRepository.findFirst({});
         if (!invoice) {
-            throw new Error("Invoice not found")
+            const invoiceData = new Invoice(
+                {
+                    "onPlanPurchase": true,
+                    "daysBeforeDueDate": 5,
+                    "upcomingInvoiceHeader": "Upcoming Invoice Reminder",
+                    "upcomingInvoiceBody": "Hello, this is a reminder that your invoice is coming up soon.",
+                    "onDueDate": true,
+                    "dueInvoiceHeader": "Invoice Due Today",
+                    "dueInvoiceBody": "Your invoice is due today. Please make payment to avoid penalties.",
+                    "markOverDue": 7,
+                    "unpaidReminderTimesBefore": 3,
+                    "attachInvoiceToReminder": true,
+                    "reminderEmail": [
+                        {
+                            "sendOn": 1,
+                            "header": "First Overdue Reminder",
+                            "body": "Your invoice is 1 day overdue. Please pay as soon as possible."
+                        },
+                        {
+                            "sendOn": 3,
+                            "header": "Second Overdue Reminder",
+                            "body": "Your invoice is 3 days overdue. Kindly settle your payment."
+                        },
+                        {
+                            "sendOn": 7,
+                            "header": "Final Overdue Reminder",
+                            "body": "Your invoice is 7 days overdue. Further action may be taken."
+                        }
+                    ]
+                }
+            )
+
+            const newInvoice = await this.invoiceManagementRepository.create(invoiceData.createInvoiceManagement);
+
+            if (!newInvoice) {
+                throw new Error("Failed to create invoice");
+            }
+
+            return newInvoice;
         }
 
         return invoice;

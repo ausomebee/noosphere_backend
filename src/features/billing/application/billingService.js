@@ -256,7 +256,35 @@ class BillingService {
         const payment = await this.paymentAccessRepository.findFirst({});
 
         if (!payment) {
-            throw new Error("Payment access not found")
+            const paymentAccessData = new Billing(
+                {
+                    "chargeOnDueDate": true,
+                    "chargeLastUsedFirst": false,
+                    "chargeAlternative": true,
+                    "retryBefore": 2,
+                    "retryAfter": 3,
+                    "notifyTenant": true,
+                    "notificationEmailHeader": "Payment Failed Notification",
+                    "notificationEmailBody": "Your recent payment attempt failed. Please update your payment method to continue uninterrupted service.",
+                    "cancelAfter": 5,
+                    "manualCancel": false,
+                    "suspensionAction": "SUSPEND_SERVICE",
+                    "errorMessage": "Payment could not be processed due to invalid card details.",
+                    "emailAfterAttempts": 3,
+                    "warningMailHeader": "Warning: Payment Issue Detected",
+                    "warningMailBody": "We attempted to charge your account but were unsuccessful. Please update your payment info.",
+                    "sendOnSubscriptionCancel": true,
+                    "cancelMailHeader": "Subscription Cancelled",
+                    "cancelMailBody": "Your subscription has been cancelled due to failed payments. Contact support to reactivate."
+                }
+            )
+            const newPaymentAccess = await this.paymentAccessRepository.create(paymentAccessData.createPaymentAccess);
+
+            if (!newPaymentAccess) {
+                throw new Error("Failed to create payment");
+            }
+
+            return newPaymentAccess;
         }
 
         return payment;
