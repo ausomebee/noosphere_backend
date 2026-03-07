@@ -35,6 +35,28 @@ class TenantRepository extends BaseRepository {
         });
     }
 
+    async findOneAndPopulate(filter = {}) {
+        return await this.model.findUnique({
+            where: filter,
+            include: {
+                BillingPlan: {
+                    select: {
+                        planType: true
+                    }
+                },
+                Subscription: {
+                    include: { plan: true }
+                },
+                accountOfficer: {
+                    select: { firstName: true, lastName: true }
+                },
+                admin: {
+                    select: { firstName: true, lastName: true }
+                },
+            }
+        });
+    }
+
     async getTenantRelationsCount(tenantId) {
         const tenant = await this.model.findUnique({
             where: { id: tenantId },

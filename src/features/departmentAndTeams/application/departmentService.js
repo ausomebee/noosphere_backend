@@ -65,10 +65,11 @@ class DepartmentService {
                 },
                 departmentMembers: {
                     select: {
-                        staff: {
+                        admin: {
                             select: {
                                 id: true,
-                                fullName: true,
+                                firstName: true,
+                                lastName: true,
                             }
                         }
                     }

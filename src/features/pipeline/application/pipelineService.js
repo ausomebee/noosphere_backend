@@ -177,13 +177,15 @@ class PipelineService {
                     createdAt: true,
                     admin: {
                         select: {
-                            fullName: true
+                            firstName: true,
+                            lastName: true,
                         }
                     }
                 }
             }, admin: {
                 select: {
-                    fullName: true
+                    firstName: true,
+                    lastName: true,
                 }
             }
         });

@@ -833,7 +833,7 @@ class TenantService {
     }
 
     async getTenant(id) {
-        const tenants = await this.tenantRepository.findFirst({ id });
+        const tenants = await this.tenantRepository.findOneAndPopulate({ id });
 
         if (!tenants) {
             throw new Error("Tenant not found")

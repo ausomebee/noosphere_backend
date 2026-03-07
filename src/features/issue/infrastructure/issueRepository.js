@@ -146,7 +146,8 @@ class IssueRepository extends BaseRepository {
                 assignedTo: {
                     select: {
                         id: true,
-                        fullName: true,
+                        firstName: true,
+                        lastName: true,
                     },
                 },
             },
