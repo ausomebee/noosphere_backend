@@ -257,6 +257,33 @@ class AppointmentRoutes {
 
         /**
         * @swagger
+        * /api/v1/appointments/clinician/{clientId}/{tenantId}:
+        *   get:
+        *     summary: gets clinicians by client id
+        *     tags: [Clients]
+        *     parameters:
+        *       - in: path
+        *         name: clientId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the client
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the tenant
+        *     responses:
+        *       200:
+        *         description: clinicians fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/clinician/:clientId/:tenantId", this.controller.getCliniciansByClientId);
+
+        /**
+        * @swagger
         * /api/v1/appointments/staff/{staffId}:
         *   get:
         *     summary: get staff appointments

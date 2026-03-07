@@ -733,6 +733,15 @@ class AppointmentService {
     //         });
     // }
 
+    async getCliniciansByClientId(clientId, tenantId) {
+        const clients = await this.appointmentRepository.getCliniciansByClientId(clientId, tenantId);
+        if (!clients) {
+            throw new Error("clients not found")
+        }
+
+        return clients;
+    }
+
     async getClientPastAppointments(clientId) {
         const now = new Date();
 

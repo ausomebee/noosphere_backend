@@ -55,6 +55,20 @@ class AppointmentController {
         });
     });
 
+    getCliniciansByClientId = expressAsyncHandler(async (req, res) => {
+        const clients = await this.service.getCliniciansByClientId(req.params.clientId, req.params.tenantId);
+
+        if (!clients) {
+            res.status(500).json({ message: 'Failed to fetch clinicians' });
+        }
+
+        return res.status(201).json({
+            message: "clinicians fetched successfully",
+            status: 'ok',
+            data: clients
+        });
+    });
+
     getTenantAppointments = expressAsyncHandler(async (req, res) => {
         const appointments = await this.service.getTenantAppointments(req.params.tenantId);
 

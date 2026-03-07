@@ -257,6 +257,29 @@ class AppointmentRepository {
         return expandedAppointments.slice(0, limit);
     }
 
+    async getCliniciansByClientId(clientId, tenantId) {
+        const appointments = await this.model.findMany({
+            where: {
+                clientId,
+                tenantId,
+                isCanceled: false
+            },
+            select: {
+                clinicians: true
+            }
+        });
+
+        const cliniciansMap = new Map();
+
+        appointments.forEach(appt => {
+            appt.clinicians.forEach(clinician => {
+                cliniciansMap.set(clinician.id, clinician);
+            });
+        });
+
+        return Array.from(cliniciansMap.values());
+    }
+
     async getPastAppointments(query, toDate = new Date(), limit = 100) {
         // Get all appointments for the client that could have past instances
         const appointments = await this.model.findMany({
