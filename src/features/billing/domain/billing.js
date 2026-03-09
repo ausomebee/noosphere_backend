@@ -19,7 +19,6 @@ class Billing {
         cancelMailHeader,
         cancelMailBody,
         transactionRef,
-        transactionId,
         holderName,
         gatewayToken, lastFourDigits, cardType, subscription, createdAt, tenant, invoice, amount, paymentMethod, paymentMethodId, billingAddress, billingMetadataId, planId, status, startDate, endDate, name, description, price, billingCycle, transactionId, invoiceId }) {
         this.id = id;
@@ -65,7 +64,6 @@ class Billing {
         this.cancelMailHeader = cancelMailHeader;
         this.cancelMailBody = cancelMailBody;
         this.transactionRef = transactionRef;
-        this.transactionId = transactionId;
         this.holderName = holderName;
     }
 
