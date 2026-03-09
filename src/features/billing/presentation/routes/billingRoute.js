@@ -36,6 +36,9 @@ import BillingDto from "../dto/billingDto.js";
  *         - cardType
  *         - lastFourDigits
  *         - gatewayToken
+ *         - holderName
+ *         - transactionRef
+ *         - paymentStatus
  *       properties:
  *         tenantId:
  *           type: string
@@ -79,6 +82,18 @@ import BillingDto from "../dto/billingDto.js";
  *           type: string
  *           example: "tok_visa_123456"
  *           description: Token returned by the payment gateway.
+ *         holderName:
+ *           type: string
+ *           example: "John Doe"
+ *           description: Name of the cardholder.
+ *         transactionRef:
+ *           type: string
+ *           example: "ref_abc123xyz789"
+ *           description: Transaction reference number.
+ *         paymentStatus:
+ *           type: string
+ *           example: "SUCCESS"
+ *           description: Status of the payment (SUCCESS, FAILED, PENDING).
  *     CreateTransactionDto:
  *       type: object
  *       required:

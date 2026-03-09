@@ -336,7 +336,6 @@ class BillingController {
         }
 
         const subscriptionData = new Subscription({ ...req.body, status: "ACTIVE", startDate: payment.createdAt, paymentId: payment.id });
-        console.log(subscriptionData)
         const subscription = await this.subscriptionService.createSubscription(subscriptionData.createSubscription);
         if (!subscription) {
             res.status(500).json({ message: 'Failed to create subscription' });
