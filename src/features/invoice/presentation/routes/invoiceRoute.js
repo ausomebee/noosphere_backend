@@ -355,9 +355,53 @@ class InvoiceRoutes {
          *         schema:
          *           type: string
          *         description: The tenant ID
+         *       - in: query
+         *         name: page
+         *         required: false
+         *         schema:
+         *           type: integer
+         *           default: 1
+         *         description: Page number for pagination
+         *       - in: query
+         *         name: pageSize
+         *         required: false
+         *         schema:
+         *           type: integer
+         *           default: 10
+         *         description: Number of invoices per page
          *     responses:
          *       200:
          *         description: Tenant invoices retrieved successfully
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 message:
+         *                   type: string
+         *                   example: Tenant invoices fetched successfully
+         *                 status:
+         *                   type: string
+         *                   example: ok
+         *                 data:
+         *                   type: array
+         *                   items:
+         *                     type: object
+         *                 pagination:
+         *                   type: object
+         *                   properties:
+         *                     total:
+         *                       type: integer
+         *                       example: 50
+         *                     page:
+         *                       type: integer
+         *                       example: 1
+         *                     pageSize:
+         *                       type: integer
+         *                       example: 10
+         *                     totalPages:
+         *                       type: integer
+         *                       example: 5
          *       400:
          *         description: Bad request
          */

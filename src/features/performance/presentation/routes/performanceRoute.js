@@ -1,6 +1,7 @@
 import express from "express";
 import PerformanceController from "../controller/performanceController.js";
 import PerformanceDto from "../dto/performanceDto.js";
+import CloudWatchUtil from "../../../../utilities/cloudWatch.js";
 
 /**
  * @swagger
@@ -29,6 +30,8 @@ class PerformanceRoutes {
         this.controller = new PerformanceController();
         this.router = express.Router();
         this.initializeRoutes();
+                this.cloudWatchUtil = new CloudWatchUtil({ secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY, accessKeyId: process.env.AWS_ACCESS_KEY_ID, region: process.env.AWS_REGION });
+
     }
 
     initializeRoutes() {
@@ -900,49 +903,105 @@ class PerformanceRoutes {
          */
         this.router.get("/rds-network-transmit-throughput", PerformanceDto.checkTimeDto, this.controller.getRDSNetworkTransmitThroughputMetric);
 
-        // // GET /api/performance/general
-        // router.get("/general", async (req, res) => {
-        //     const result = await cloudwatch.getGeneralMetrics({
-        //         instanceId: process.env.EC2_INSTANCE_ID,
-        //         dbInstanceIdentifier: process.env.RDS_INSTANCE_ID,
-        //         apiName: process.env.API_GATEWAY_NAME
-        //     });
-        //     res.json(result);
-        // });
+        /**
+         * @swagger
+         * /api/v1/performance/general:
+         *   get:
+         *     summary: Get general performance metrics
+         *     tags: [Performance]
+         *     responses:
+         *       200:
+         *         description: General metrics fetched successfully
+         *       500:
+         *         description: Server error
+         */
+        this.router.get("/general", async (req, res) => {
+            const result = await this.cloudWatchUtil.getGeneralMetrics({
+                instanceId: process.env.EC2_INSTANCE_ID,
+                dbInstanceIdentifier: process.env.RDS_INSTANCE_ID
+            });
+            res.json(result);
+        });
 
-        // // GET /api/performance/general/timeseries
-        // router.get("/general/timeseries", async (req, res) => {
-        //     const result = await cloudwatch.getGeneralTimeseries({
-        //         instanceId: process.env.EC2_INSTANCE_ID,
-        //         dbInstanceIdentifier: process.env.RDS_INSTANCE_ID,
-        //         apiName: process.env.API_GATEWAY_NAME
-        //     });
-        //     res.json(result);
-        // });
 
-        // // GET /api/performance/api-error-rate
-        // router.get("/api-error-rate", async (req, res) => {
-        //     const result = await cloudwatch.getApiErrorRate({
-        //         apiName: process.env.API_GATEWAY_NAME
-        //     });
-        //     res.json(result);
-        // });
+        /**
+         * @swagger
+         * /api/v1/performance/general/timeseries:
+         *   get:
+         *     summary: Get general performance metrics timeseries
+         *     tags: [Performance]
+         *     responses:
+         *       200:
+         *         description: General timeseries metrics fetched successfully
+         *       500:
+         *         description: Server error
+         */
+        this.router.get("/general/timeseries", async (req, res) => {
+            const result = await this.cloudWatchUtil.getGeneralTimeseries({
+                instanceId: process.env.EC2_INSTANCE_ID,
+                dbInstanceIdentifier: process.env.RDS_INSTANCE_ID
+            });
+            res.json(result);
+        });
 
-        // // GET /api/performance/resources
-        // router.get("/resources", async (req, res) => {
-        //     const result = await cloudwatch.getResourceMetrics({
-        //         instanceId: process.env.EC2_INSTANCE_ID
-        //     });
-        //     res.json(result);
-        // });
+        /**
+         * @swagger
+         * /api/v1/performance/api-error-rate:
+         *   get:
+         *     summary: Get API error rate
+         *     tags: [Performance]
+         *     responses:
+         *       200:
+         *         description: API error rate fetched successfully
+         *       500:
+         *         description: Server error
+         */
+        this.router.get("/api-error-rate", async (req, res) => {
+            const result = await this.cloudWatchUtil.getApiErrorRate({
+                instanceId: process.env.EC2_INSTANCE_ID
+            });
+            res.json(result);
+        });
 
-        // // GET /api/performance/resources/timeseries
-        // router.get("/resources/timeseries", async (req, res) => {
-        //     const result = await cloudwatch.getResourceTimeseries({
-        //         instanceId: process.env.EC2_INSTANCE_ID
-        //     });
-        //     res.json(result);
-        // });
+        /**
+         * @swagger
+         * /api/v1/performance/resources:
+         *   get:
+         *     summary: Get resource metrics
+         *     tags: [Performance]
+         *     responses:
+         *       200:
+         *         description: Resource metrics fetched successfully
+         *       500:
+         *         description: Server error
+         */
+        this.router.get("/resources", async (req, res) => {
+            const result = await this.cloudWatchUtil.getResourceMetrics({
+                instanceId: process.env.EC2_INSTANCE_ID,
+                dbInstanceIdentifier: process.env.RDS_INSTANCE_ID
+            });
+            res.json(result);
+        });
+
+        /**
+         * @swagger
+         * /api/v1/performance/resources/timeseries:
+         *   get:
+         *     summary: Get resource metrics timeseries
+         *     tags: [Performance]
+         *     responses:
+         *       200:
+         *         description: Resource timeseries metrics fetched successfully
+         *       500:
+         *         description: Server error
+         */
+        this.router.get("/resources/timeseries", async (req, res) => {
+            const result = await this.cloudWatchUtil.getResourceTimeseries({
+                instanceId: process.env.EC2_INSTANCE_ID,
+                dbInstanceIdentifier: process.env.RDS_INSTANCE_ID
+            });
+            res.json(result);
+        });
 
     }
 

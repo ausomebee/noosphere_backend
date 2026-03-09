@@ -26,16 +26,38 @@ class InvoiceRepository {
         });
     }
 
-    async getTenantInvoices(tenantId, filter = {}) {
-        return await this.model.findMany({
-            where: {
-                tenantId,
-                ...filter,
+    async getTenantInvoices(tenantId, filter = {}, page = 1, pageSize = 10) {
+        const skip = (page - 1) * pageSize;
+
+        const [invoices, total] = await Promise.all([
+            this.model.findMany({
+                where: {
+                    tenantId,
+                    ...filter,
+                },
+                orderBy: {
+                    createdAt: "desc",
+                },
+                skip,
+                take: pageSize,
+            }),
+            this.model.count({
+                where: {
+                    tenantId,
+                    ...filter,
+                },
+            }),
+        ]);
+
+        return {
+            data: invoices,
+            pagination: {
+                total,
+                page,
+                pageSize,
+                totalPages: Math.ceil(total / pageSize),
             },
-            orderBy: {
-                createdAt: "desc",
-            },
-        });
+        };
     }
 
     async getTenantInvoicesByStatus(tenantId, status) {

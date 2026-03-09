@@ -119,13 +119,20 @@ class InvoiceController {
 
     getTenantInvoices = expressAsyncHandler(async (req, res) => {
         const tenantId = req.params.tenantId;
+        const { page = 1, pageSize = 10 } = req.query;
 
-        const invoices = await this.service.getTenantInvoices(tenantId);
+        const invoices = await this.service.getTenantInvoices(
+            tenantId,
+            {},
+            Number(page),
+            Number(pageSize)
+        );
 
         return res.status(200).json({
             message: "Tenant invoices fetched successfully",
             status: "ok",
-            data: invoices,
+            data: invoices.data,
+            pagination: invoices.pagination,
         });
     });
 

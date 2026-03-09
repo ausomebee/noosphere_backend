@@ -247,13 +247,15 @@ class InvoiceService {
         return history;
     }
 
-    async getTenantInvoices(tenantId, filter = {}) {
+    async getTenantInvoices(tenantId, filter = {}, page = 1, pageSize = 10) {
         const invoices = await this.invoiceRepository.getTenantInvoices(
             tenantId,
-            filter
+            filter,
+            page,
+            pageSize
         );
 
-        if (!invoices || invoices.length === 0) {
+        if (!invoices || invoices.data.length === 0) {
             throw new Error("No invoices found for this tenant");
         }
 

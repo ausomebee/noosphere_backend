@@ -49,9 +49,6 @@ class CloudWatchUtil {
         const month = now.getMonth();
         const day = now.getDate();
 
-        const firstDayOfWeek = new Date(now);
-        firstDayOfWeek.setDate(now.getDate() - 7);
-
         return {
             year: {
                 startTime: new Date(year, 0, 1),
@@ -64,7 +61,7 @@ class CloudWatchUtil {
                 period: 3600    // 1 point per hour
             },
             week: {
-                startTime: firstDayOfWeek,
+                startTime: new Date(now - 7 * 24 * 60 * 60 * 1000),
                 endTime: now,
                 period: 3600    // 1 point per hour
             },
@@ -211,12 +208,12 @@ class CloudWatchUtil {
     // ── Performance Page Endpoints ───────────────────────────────
 
     // GET /api/performance/general
-    async getGeneralMetrics({ instanceId, dbInstanceIdentifier, apiName }) {
+    async getGeneralMetrics({ instanceId, dbInstanceIdentifier }) {
         const { day: { startTime, endTime } } = CloudWatchUtil.getPeriodRanges();
         const dimsEc2 = [{ Name: "InstanceId", Value: instanceId }];
-        const dimsApi = [{ Name: "ApiName", Value: apiName }];
+        const dimsRds = [{ Name: "DBInstanceIdentifier", Value: dbInstanceIdentifier }];
 
-        const [networkOut, rdsLatency, statusCheck, apiLatency] = await Promise.all([
+        const [networkOut, readLatency, statusCheck, writeLatency] = await Promise.all([
             this.getMetricData({
                 namespace: "AWS/EC2",
                 metricName: "NetworkOut",
@@ -227,7 +224,7 @@ class CloudWatchUtil {
             this.getMetricData({
                 namespace: "AWS/RDS",
                 metricName: "ReadLatency",
-                dimensions: [{ Name: "DBInstanceIdentifier", Value: dbInstanceIdentifier }],
+                dimensions: dimsRds,
                 startTime, endTime,
                 stat: "Average", period: 300, maxPoints: 288
             }),
@@ -239,9 +236,9 @@ class CloudWatchUtil {
                 stat: "Sum", period: 3600, maxPoints: 24
             }),
             this.getMetricData({
-                namespace: "AWS/ApiGateway",
-                metricName: "IntegrationLatency",
-                dimensions: dimsApi,
+                namespace: "AWS/RDS",
+                metricName: "WriteLatency",
+                dimensions: dimsRds,
                 startTime, endTime,
                 stat: "Average", period: 300, maxPoints: 288
             })
@@ -249,35 +246,34 @@ class CloudWatchUtil {
 
         const latest = (d) => d.data[d.data.length - 1]?.y ?? 0;
 
-        // Uptime: percentage of hours with 0 failed status checks
+        // Uptime: % of hourly checks with 0 failures in the last 24h
         const uptimePercent = statusCheck.data.length
             ? Math.round((statusCheck.data.filter(p => p.y === 0).length / statusCheck.data.length) * 100)
             : 100;
 
-        // NetworkOut bytes/s → normalise to ms-scale (0–1000)
-        const speedRaw = latest(networkOut);
-        const speedNorm = Math.min(Math.round(speedRaw / 1000), 1000);
+        // NetworkOut bytes → normalise to 0–1000 range
+        const speedNorm = Math.min(Math.round(latest(networkOut) / 1000), 1000);
 
-        // RDS ReadLatency is in seconds → convert to ms
-        const latencyMs = Math.round(latest(rdsLatency) * 1000);
+        // RDS latency is in seconds → convert to ms, cap at 1000
+        const readLatencyMs = Math.min(Math.round(latest(readLatency) * 1000), 1000);
+        const writeLatencyMs = Math.min(Math.round(latest(writeLatency) * 1000), 1000);
 
         return {
             data: {
-                systemSpeed:     { value: speedNorm, maxValue: 1000, unit: "ms" },
-                latency:         { value: Math.min(latencyMs, 1000), maxValue: 1000, unit: "ms" },
-                uptime:          { value: uptimePercent, maxValue: 100, unit: "percent" },
-                apiResponseTime: { value: Math.min(Math.round(latest(apiLatency)), 1000), maxValue: 1000, unit: "ms" }
+                systemSpeed: { value: speedNorm, maxValue: 1000, unit: "ms" },
+                latency: { value: readLatencyMs, maxValue: 1000, unit: "ms" },
+                uptime: { value: uptimePercent, maxValue: 100, unit: "percent" },
+                apiResponseTime: { value: writeLatencyMs, maxValue: 1000, unit: "ms" }
             }
         };
     }
 
     // GET /api/performance/general/timeseries
-    async getGeneralTimeseries({ instanceId, dbInstanceIdentifier, apiName }) {
+    async getGeneralTimeseries({ instanceId, dbInstanceIdentifier }) {
         const dimsEc2 = [{ Name: "InstanceId", Value: instanceId }];
         const dimsRds = [{ Name: "DBInstanceIdentifier", Value: dbInstanceIdentifier }];
-        const dimsApi = [{ Name: "ApiName", Value: apiName }];
 
-        const [systemSpeed, latency, uptime, apiResponseTime] = await Promise.all([
+        const [systemSpeed, readLatency, uptime, writeLatency] = await Promise.all([
             this.getMetricByAllPeriods({
                 namespace: "AWS/EC2",
                 metricName: "NetworkOut",
@@ -297,15 +293,15 @@ class CloudWatchUtil {
                 stat: "Sum"
             }),
             this.getMetricByAllPeriods({
-                namespace: "AWS/ApiGateway",
-                metricName: "IntegrationLatency",
-                dimensions: dimsApi,
+                namespace: "AWS/RDS",
+                metricName: "WriteLatency",
+                dimensions: dimsRds,
                 stat: "Average"
             })
         ]);
 
-        // Convert RDS latency from seconds → ms for all period data points
-        const convertLatency = (periodMap) =>
+        // Convert RDS latency seconds → ms for all periods
+        const toMs = (periodMap) =>
             Object.fromEntries(
                 Object.entries(periodMap).map(([k, points]) => [
                     k,
@@ -316,53 +312,42 @@ class CloudWatchUtil {
         return {
             data: {
                 systemSpeed,
-                latency: convertLatency(latency),
+                latency: toMs(readLatency),
                 uptime,
-                apiResponseTime
+                apiResponseTime: toMs(writeLatency)
             }
         };
     }
 
     // GET /api/performance/api-error-rate
-    async getApiErrorRate({ apiName }) {
+    // Uses StatusCheckFailed per month — failed hours vs total hours = Error vs Success %
+    async getApiErrorRate({ instanceId }) {
         const year = new Date().getFullYear();
         const startTime = new Date(year, 0, 1);
         const endTime = new Date(year, 11, 31, 23, 59, 59);
-        const period = 2592000; // ~30 days
 
-        const dimsApi = [{ Name: "ApiName", Value: apiName }];
-
-        const [errors, total] = await Promise.all([
-            this.getMetricData({
-                namespace: "AWS/ApiGateway",
-                metricName: "5XXError",
-                dimensions: dimsApi,
-                startTime, endTime,
-                stat: "Sum", period, maxPoints: 12
-            }),
-            this.getMetricData({
-                namespace: "AWS/ApiGateway",
-                metricName: "Count",
-                dimensions: dimsApi,
-                startTime, endTime,
-                stat: "Sum", period, maxPoints: 12
-            })
-        ]);
+        const statusCheck = await this.getMetricData({
+            namespace: "AWS/EC2",
+            metricName: "StatusCheckFailed",
+            dimensions: [{ Name: "InstanceId", Value: instanceId }],
+            startTime, endTime,
+            stat: "Sum",
+            period: 2592000, // ~30 days per bucket
+            maxPoints: 12
+        });
 
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-        // Pad to 12 months if CloudWatch returns fewer buckets
-        const pad = (arr, fill = 0) => {
-            const padded = [...arr.map(p => p.y)];
-            while (padded.length < 12) padded.push(fill);
-            return padded;
-        };
+        // Each bucket period = ~30 days = ~720 hours
+        // error% = (failed checks / total checks in period) * 100
+        const hoursPerBucket = 720;
+        const raw = statusCheck.data.map(p => p.y);
 
-        const errorCounts = pad(errors.data);
-        const totalCounts = pad(total.data, 1);
+        // Pad to 12 months
+        while (raw.length < 12) raw.push(0);
 
-        const errorPct = errorCounts.map((e, i) =>
-            Math.round((e / (totalCounts[i] || 1)) * 100)
+        const errorPct = raw.map(failures =>
+            Math.min(Math.round((failures / hoursPerBucket) * 100), 100)
         );
         const successPct = errorPct.map(v => 100 - v);
 
@@ -378,76 +363,103 @@ class CloudWatchUtil {
     }
 
     // GET /api/performance/resources
-    async getResourceMetrics({ instanceId }) {
+    // memory uses RDS FreeableMemory — set RDS_TOTAL_MEMORY_GB in env (check your RDS instance class)
+    // storage uses RDS FreeStorageSpace — set RDS_TOTAL_STORAGE_GB in env (your allocated storage)
+    async getResourceMetrics({ instanceId, dbInstanceIdentifier }) {
         const { day: { startTime, endTime } } = CloudWatchUtil.getPeriodRanges();
-        const dimsAgent = [{ Name: "InstanceId", Value: instanceId }];
+        const dimsEc2 = [{ Name: "InstanceId", Value: instanceId }];
+        const dimsRds = [{ Name: "DBInstanceIdentifier", Value: dbInstanceIdentifier }];
 
-        const [cpu, memory, storage] = await Promise.all([
+        const totalMemoryBytes = (parseFloat(process.env.RDS_TOTAL_MEMORY_GB) || 16) * 1024 * 1024 * 1024;
+        const totalStorageBytes = (parseFloat(process.env.RDS_TOTAL_STORAGE_GB) || 100) * 1024 * 1024 * 1024;
+
+        const [cpu, freeMemory, freeStorage] = await Promise.all([
             this.getMetricData({
                 namespace: "AWS/EC2",
                 metricName: "CPUUtilization",
-                dimensions: [{ Name: "InstanceId", Value: instanceId }],
+                dimensions: dimsEc2,
                 startTime, endTime,
                 stat: "Average", period: 300, maxPoints: 288
             }),
-            // Requires CloudWatch Agent installed on EC2
             this.getMetricData({
-                namespace: "CWAgent",
-                metricName: "mem_used_percent",
-                dimensions: dimsAgent,
+                namespace: "AWS/RDS",
+                metricName: "FreeableMemory",  // bytes
+                dimensions: dimsRds,
                 startTime, endTime,
                 stat: "Average", period: 300, maxPoints: 288
             }),
-            // Requires CloudWatch Agent installed on EC2
             this.getMetricData({
-                namespace: "CWAgent",
-                metricName: "disk_used_percent",
-                dimensions: dimsAgent,
+                namespace: "AWS/RDS",
+                metricName: "FreeStorageSpace", // bytes
+                dimensions: dimsRds,
                 startTime, endTime,
                 stat: "Average", period: 300, maxPoints: 288
             })
         ]);
 
-        const latest = (d) => Math.round(d.data[d.data.length - 1]?.y ?? 0);
+        const latest = (d) => d.data[d.data.length - 1]?.y ?? 0;
+
+        // Free → Used %
+        const memoryUsedPct = Math.round(((totalMemoryBytes - latest(freeMemory)) / totalMemoryBytes) * 100);
+        const storageUsedPct = Math.round(((totalStorageBytes - latest(freeStorage)) / totalStorageBytes) * 100);
 
         return {
             data: {
-                cpu:     { value: latest(cpu),     maxValue: 100, unit: "percent" },
-                memory:  { value: latest(memory),  maxValue: 100, unit: "percent" },
-                storage: { value: latest(storage), maxValue: 100, unit: "percent" }
+                cpu: { value: Math.round(latest(cpu)), maxValue: 100, unit: "percent" },
+                memory: { value: Math.max(memoryUsedPct, 0), maxValue: 100, unit: "percent" },
+                storage: { value: Math.max(storageUsedPct, 0), maxValue: 100, unit: "percent" }
             }
         };
     }
 
     // GET /api/performance/resources/timeseries
-    async getResourceTimeseries({ instanceId }) {
-        const dimsEc2   = [{ Name: "InstanceId", Value: instanceId }];
-        const dimsAgent = [{ Name: "InstanceId", Value: instanceId }];
+    async getResourceTimeseries({ instanceId, dbInstanceIdentifier }) {
+        const dimsEc2 = [{ Name: "InstanceId", Value: instanceId }];
+        const dimsRds = [{ Name: "DBInstanceIdentifier", Value: dbInstanceIdentifier }];
 
-        const [cpu, memory, storage] = await Promise.all([
+        const totalMemoryBytes = (parseFloat(process.env.RDS_TOTAL_MEMORY_GB) || 16) * 1024 * 1024 * 1024;
+        const totalStorageBytes = (parseFloat(process.env.RDS_TOTAL_STORAGE_GB) || 100) * 1024 * 1024 * 1024;
+
+        const [cpu, freeMemory, freeStorage] = await Promise.all([
             this.getMetricByAllPeriods({
                 namespace: "AWS/EC2",
                 metricName: "CPUUtilization",
                 dimensions: dimsEc2,
                 stat: "Average"
             }),
-            // Requires CloudWatch Agent
             this.getMetricByAllPeriods({
-                namespace: "CWAgent",
-                metricName: "mem_used_percent",
-                dimensions: dimsAgent,
+                namespace: "AWS/RDS",
+                metricName: "FreeableMemory",
+                dimensions: dimsRds,
                 stat: "Average"
             }),
-            // Requires CloudWatch Agent
             this.getMetricByAllPeriods({
-                namespace: "CWAgent",
-                metricName: "disk_used_percent",
-                dimensions: dimsAgent,
+                namespace: "AWS/RDS",
+                metricName: "FreeStorageSpace",
+                dimensions: dimsRds,
                 stat: "Average"
             })
         ]);
 
-        return { data: { cpu, memory, storage } };
+        // Convert free bytes → used %
+        const toUsedPct = (periodMap, totalBytes) =>
+            Object.fromEntries(
+                Object.entries(periodMap).map(([k, points]) => [
+                    k,
+                    points.map(p => ({
+                        x: p.x,
+                        y: Math.max(Math.round(((totalBytes - p.y) / totalBytes) * 100), 0)
+                    }))
+                ])
+            );
+
+        return {
+            data: {
+                cpu,
+                memory: toUsedPct(freeMemory, totalMemoryBytes),
+                storage: toUsedPct(freeStorage, totalStorageBytes)
+            }
+        };
     }
 }
 
