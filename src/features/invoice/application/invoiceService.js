@@ -1,10 +1,14 @@
+import e from "express";
+import TokenService from "../../../utilities/generate_token.js";
 import Invoice from "../domain/invoice.js";
 
 class InvoiceService {
-    constructor({ invoiceRepository, planRepository, invoiceManagementRepository }) {
+    constructor({ invoiceRepository, planRepository, invoiceManagementRepository, invoiceTokenRepository }) {
         this.invoiceRepository = invoiceRepository;
         this.planRepository = planRepository;
         this.invoiceManagementRepository = invoiceManagementRepository;
+        this.invoiceTokenRepository = invoiceTokenRepository;
+        this.token = TokenService;
     }
 
     async createInvoice(data) {
@@ -57,6 +61,109 @@ class InvoiceService {
         }
 
         return invoice;
+    }
+
+    async generatePaymentLink(data) {
+        const plan = await this.planRepository.findOne({ id: data.planId });
+
+        if (!plan) {
+            throw new Error("Plan not found")
+        }
+
+        const now = new Date();
+        let dueDate = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+        const rate = data.billingFrequency === "Monthly" ? plan.pricePerMonth.price : plan.pricePerYear.price
+        const total = data.quantity * rate
+        const invoiceData = new Invoice({ ...data, total, dueDate })
+
+        const newInvoice = await this.invoiceRepository.create(invoiceData.createInvoice);
+
+        if (!newInvoice) {
+            throw new Error("Failed to create invoice");
+        }
+
+        const tok = this.token.generatePaymentToken({
+            invoiceId: newInvoice.id,
+        });
+
+        const tokenData = {
+            invoiceId: newInvoice.id,
+            tokenHash: tok,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+        }
+
+        const token = await this.invoiceTokenRepository.create(tokenData);
+
+        if (!token) {
+            throw new Error("Failed to create payment link");
+        }
+
+        return `https://noospherehub.com/pay/${tok}`;
+
+    }
+
+    async validatePaymentToken(token) {
+        const decoded = this.token.validatePaymentToken(token);
+
+        const tokenRecord = await this.invoiceTokenRepository.findFirst({ invoiceId: decoded.invoiceId, tokenHash: token });
+
+        if (!tokenRecord) {
+            throw new Error("Invalid token");
+        }
+
+        if (tokenRecord.expiresAt < new Date()) {
+            throw new Error("Token expired");
+        }
+
+        const invoice = await this.invoiceRepository.findOneAndPopulate({ id: decoded.invoiceId }, { tenant: true, plan: true });
+        if (!invoice) {
+            throw new Error("Invoice not found")
+        }
+
+        return invoice;
+    }
+
+    async regeneratePaymentLink(invoiceId) {
+        const invoice = await this.invoiceRepository.findOne({ id: invoiceId });
+
+        if (!invoice) {
+            throw new Error("Invoice not found")
+        }
+
+        const tok = this.token.generatePaymentToken({
+            invoiceId: invoice.id,
+        });
+
+        const tokenData = {
+            invoiceId: invoice.id,
+            tokenHash: tok,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+        }
+
+        const token = await this.invoiceTokenRepository.create(tokenData);
+
+        if (!token) {
+            throw new Error("Failed to create payment link");
+        }
+
+        return `https://noospherehub.com/pay/${tok}`;
+    };
+
+    async getInvoiceTokenHistory(tenantId) {
+        const invoice = await this.invoiceRepository.findFirst({ tenantId: tenantId });
+
+        if (!invoice) {
+            throw new Error("Invoice not found")
+        }
+
+        const history = await this.invoiceRepository.getInvoiceTokenHistory(invoice.id);
+
+        if (!history) {
+            throw new Error("Failed to fetch invoice token history");
+        }
+
+        return history;
     }
 
     async getTenantInvoices(tenantId, filter = {}) {

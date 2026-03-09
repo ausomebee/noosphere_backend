@@ -49,7 +49,70 @@ class InvoiceRepository {
             },
         });
     }
-    
+
+    async getInvoiceTokenHistory(invoiceId) {
+        const invoice = await this.model.findFirst({
+            where: { id: invoiceId },
+            include: {
+                invoiceTokens: true,
+                Payment: true,
+            },
+        });
+
+        if (!invoice) {
+            throw new Error("Invoice not found");
+        }
+
+        const history = [];
+
+        for (const token of invoice.invoiceTokens) {
+
+            history.push({
+                event: "PAYMENT_LINK_GENERATED",
+                time: token.createdAt,
+                tokenId: token.id,
+            });
+
+            if (new Date() > token.expiresAt && !token.used) {
+                history.push({
+                    event: "PAYMENT_LINK_EXPIRED",
+                    time: token.expiresAt,
+                    tokenId: token.id,
+                });
+            }
+
+            if (token.used) {
+                const payment = invoice.payments.find(
+                    (p) => p.invoiceId === invoiceId
+                );
+
+                if (payment) {
+                    history.push({
+                        event: "PAYMENT_LINK_PAID",
+                        time: payment.createdAt,
+                        tokenId: token.id,
+                    });
+                }
+            }
+        }
+
+        if (invoice.invoiceTokens.length > 1) {
+            const sortedTokens = invoice.invoiceTokens.sort(
+                (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+            );
+
+            for (let i = 1; i < sortedTokens.length; i++) {
+                history.push({
+                    event: "PAYMENT_LINK_REGENERATED",
+                    time: sortedTokens[i].createdAt,
+                    tokenId: sortedTokens[i].id,
+                });
+            }
+        }
+
+        return history.sort((a, b) => new Date(a.time) - new Date(b.time));
+    }
+
     async findOne(query) {
         return await this.model.findUnique({
             where: query,

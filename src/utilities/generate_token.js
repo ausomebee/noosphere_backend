@@ -13,6 +13,16 @@ class TokenService {
         });
     }
 
+    static generatePaymentToken(claims) {
+        return jwt.sign(claims, process.env.ACCESS_TOKEN_SECRET || "secret", {
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRE || "1d",
+        });
+    }
+
+    static validatePaymentToken(token) {
+        return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET || "secret");
+    }
+
     static async generateClinicalReportToken(id, prisma) {
         const report = await prisma.clinicalReport.update({
             where: { id },

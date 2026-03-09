@@ -4,14 +4,16 @@ import InvoiceRepository from "../../infrastructure/invoiceRepository.js";
 import InvoiceService from "../../application/invoiceService.js";
 import PlanRepository from "../../../planAndFeature/infrastructure/planRepositiory.js";
 import InvoiceManagementRepository from "../../infrastructure/invoiceManagementRepository.js";
+import InvoiceTokenRepository from "../../infrastructure/invoiceTokenRepository.js";
 
 class InvoiceController {
     constructor() {
         this.prisma = prismaService.getClient()
         this.invoiceRepository = new InvoiceRepository(this.prisma.invoice);
         this.invoiceManagementRepository = new InvoiceManagementRepository(this.prisma.invoiceManagement);
+        this.invoiceTokenRepository = new InvoiceTokenRepository(this.prisma.invoiceToken);
         this.planRepository = new PlanRepository(this.prisma.billingPlan)
-        this.service = new InvoiceService({ invoiceRepository: this.invoiceRepository, planRepository: this.planRepository, invoiceManagementRepository: this.invoiceManagementRepository });
+        this.service = new InvoiceService({ invoiceRepository: this.invoiceRepository, planRepository: this.planRepository, invoiceManagementRepository: this.invoiceManagementRepository, invoiceTokenRepository: this.invoiceTokenRepository });
     }
 
     createInvoice = expressAsyncHandler(async (req, res) => {
@@ -42,6 +44,21 @@ class InvoiceController {
         });
     });
 
+    validatePaymentToken = expressAsyncHandler(async (req, res) => {
+        const token = req.params.token;
+
+        const invoice = await this.service.validatePaymentToken(token);
+        if (!invoice) {
+            res.status(500).json({ message: 'Failed to validate payment token' });
+        }
+
+        return res.status(201).json({
+            message: "Payment token validated successfully",
+            status: 'ok',
+            data: invoice
+        });
+    });
+
     getAllInvoice = expressAsyncHandler(async (req, res) => {
         const invoice = await this.service.getAllInvoice();
 
@@ -53,6 +70,50 @@ class InvoiceController {
             message: "Invoices fetched successfully",
             status: 'ok',
             data: invoice
+        });
+    });
+
+    generatePaymentLink = expressAsyncHandler(async (req, res) => {
+        const paymentLink = await this.service.generatePaymentLink(req.body);
+
+        if (!paymentLink) {
+            res.status(500).json({ message: 'Failed to generate payment link' });
+        }
+
+        return res.status(201).json({
+            message: "Payment link generated successfully",
+            status: 'ok',
+            data: paymentLink
+        });
+    });
+
+    regeneratePaymentLink = expressAsyncHandler(async (req, res) => {
+        const { invoiceId } = req.params;
+        const paymentLink = await this.service.regeneratePaymentLink(parseInt(invoiceId));
+
+        if (!paymentLink) {
+            res.status(500).json({ message: 'Failed to regenerate payment link' });
+        }
+
+        return res.status(201).json({
+            message: "Payment link regenerated successfully",
+            status: 'ok',
+            data: paymentLink
+        });
+    });
+
+    getInvoiceTokenHistory = expressAsyncHandler(async (req, res) => {
+        const { tenantId } = req.params;
+        const history = await this.service.getInvoiceTokenHistory(tenantId);
+
+        if (!history) {
+            res.status(500).json({ message: 'Failed to fetch invoice token history' });
+        }
+
+        return res.status(201).json({
+            message: "Invoice token history fetched successfully",
+            status: 'ok',
+            data: history
         });
     });
 

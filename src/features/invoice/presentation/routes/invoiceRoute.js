@@ -38,6 +38,34 @@ import InvoiceDto from "../dto/invoiceDto.js";
  *           type: number
  *           example: 1
  *           description: The quantity of the plan
+ * 
+ *     GeneratePaymentLinkDto:
+ *       type: object
+ *       required:
+ *         - tenantId
+ *         - planId
+ *         - dueDate
+ *       properties:
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *           example: "550e8400-e29b-41d4-a716-446655440000"
+ *           description: The UUID of the tenant
+ *         planId:
+ *           type: string
+ *           format: uuid
+ *           example: "a1b2c3d4-e5f6-7890-1234-56789abcdef0"
+ *           description: The UUID of the billing plan
+ *         billingFrequency:
+ *           type: string
+ *           enum: [Monthly, Yearly]
+ *           example: "Monthly"
+ *           description: The billing frequency of the invoice
+ *         quantity:
+ *           type: number
+ *           example: 1
+ *           description: The quantity of the plan
+ * 
  *     CreateInvoiceManagementDto:
  *       type: object
  *       required:
@@ -490,6 +518,86 @@ class InvoiceRoutes {
         *         description: Validation error
         */
         this.router.get("/invoice/management", this.controller.getInvoiceManagement);
+
+        /**
+        * @swagger
+        * /api/v1/invoice/payment-link:
+        *   post:
+        *     summary: Generate payment link
+        *     tags: [Invoice]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/GeneratePaymentLinkDto'
+        *     responses:
+        *       200:
+        *         description: Payment link generated successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.post("/payment-link", this.controller.generatePaymentLink);
+
+        /**
+        * @swagger
+        * /api/v1/invoice/validate-payment-token/{token}:
+        *  get:
+        *   summary: Validate payment token
+        *   tags: [Invoice]
+        *   parameters:
+        *     - name: token
+        *       in: path
+        *       required: true
+        *       schema:
+        *         type: string
+        *   responses:
+        *     200:
+        *       description: Payment token validated successfully
+        *     400:
+        *       description: Validation error
+        */
+        this.router.get("/validate-payment-token/:token", this.controller.validatePaymentToken);
+
+        /**
+         * @swagger
+         * /api/v1/invoice/regenerate/{invoiceId}:
+         *   patch:
+         *     summary: Regenerate payment link
+         *     tags: [Invoice]
+         *     parameters:
+         *       - name: invoiceId
+         *         in: path
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: Payment link regenerated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/regenerate/:invoiceId", this.controller.regeneratePaymentLink);
+
+        /**
+         * @swagger
+         * /api/v1/invoice/history/{tenantId}:
+         *   get:
+         *     summary: Get invoice payment history
+         *     tags: [Invoice]
+         *     parameters:
+         *       - name: tenantId
+         *         in: path
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: Invoice payment history fetched successfully 
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/history/:tenantId", this.controller.getInvoiceTokenHistory);
 
         /**
          * @swagger

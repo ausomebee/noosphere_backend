@@ -748,9 +748,21 @@ model Invoice {
   total            Int
   billingFrequency incoiceBillingFrequency
 
-  tenant  Tenant?      @relation(fields: [tenantId], references: [id])
-  plan    BillingPlan? @relation(fields: [planId], references: [id])
-  Payment Payment[]
+  tenant        Tenant?        @relation(fields: [tenantId], references: [id])
+  plan          BillingPlan?   @relation(fields: [planId], references: [id])
+  Payment       Payment[]
+  invoiceTokens InvoiceToken[]
+}
+
+model InvoiceToken {
+  id        String   @id @default(uuid())
+  invoiceId Int
+  tokenHash String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  used      Boolean  @default(false)
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 }
 
 model PaymentMethod {

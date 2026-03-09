@@ -39,7 +39,7 @@ class Invoice {
         return {
             tenantId: this.tenantId,
             dueDate: this.dueDate,
-            status: this.status,
+            status: this.status || "Upcoming",
             planId: this.planId,
             total: this.total,
             quantity: this.quantity,
