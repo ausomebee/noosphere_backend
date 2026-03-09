@@ -28,17 +28,19 @@ class BillingService {
         return newBillingMetadata;
     }
 
-    async getTenantPayments(tenantId, filter = {}) {
-        const payments = await this.paymentRepository.getTenantPayments(
+    async getTenantPayments(tenantId, filter = {}, page = 1, pageSize = 10) {
+        const result = await this.paymentRepository.getTenantPayments(
             tenantId,
-            filter
+            filter,
+            page,
+            pageSize
         );
 
-        if (!payments || payments.length === 0) {
+        if (!result.data || result.data.length === 0) {
             throw new Error("No payments found for this tenant");
         }
 
-        return payments;
+        return result;
     }
 
     async getTenantPaymentsByStatus(tenantId, status) {

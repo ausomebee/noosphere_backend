@@ -52,13 +52,20 @@ class BillingController {
 
     getTenantPayments = expressAsyncHandler(async (req, res) => {
         const tenantId = req.params.tenantId;
+        const { page = 1, pageSize = 10 } = req.query;
 
-        const payments = await this.service.getTenantPayments(tenantId);
+        const payments = await this.service.getTenantPayments(
+            tenantId,
+            {},
+            Number(page),
+            Number(pageSize)
+        );
 
         return res.status(200).json({
             message: "Tenant payments fetched successfully",
             status: "ok",
-            data: payments,
+            data: payments.data,
+            pagination: payments.pagination,
         });
     });
 

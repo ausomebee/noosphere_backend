@@ -18,16 +18,38 @@ class PaymentRepository extends BaseRepository {
         });
     }
 
-    async getTenantPayments(tenantId, filter = {}) {
-        return await this.model.findMany({
-            where: {
-                tenantId,
-                ...filter,
+    async getTenantPayments(tenantId, filter = {}, page = 1, pageSize = 10) {
+        const skip = (page - 1) * pageSize;
+
+        const [payments, total] = await Promise.all([
+            this.model.findMany({
+                where: {
+                    tenantId,
+                    ...filter,
+                },
+                orderBy: {
+                    createdAt: "desc",
+                },
+                skip,
+                take: pageSize,
+            }),
+            this.model.count({
+                where: {
+                    tenantId,
+                    ...filter,
+                },
+            }),
+        ]);
+
+        return {
+            data: payments,
+            pagination: {
+                total,
+                page,
+                pageSize,
+                totalPages: Math.ceil(total / pageSize),
             },
-            orderBy: {
-                createdAt: "desc",
-            },
-        });
+        };
     }
 
     async getTenantPaymentsByStatus(tenantId, status) {
