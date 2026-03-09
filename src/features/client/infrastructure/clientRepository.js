@@ -17,26 +17,32 @@ class ClientRepository extends BaseRepository {
         return await this.model.findMany({
             where: {
                 isDeleted: false,
-                tenantLinks: {
-                    some: {
-                        tenantId,
-                        active: true,
-                        clinicians: {
+                OR: [
+                    {
+                        tenantLinks: {
                             some: {
-                                id: staffId
+                                tenantId: tenantId,
+                                active: true,
+                                clinicians: {
+                                    some: {
+                                        id: staffId
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        Appointment: {
+                            some: {
+                                clinicians: {
+                                    some: {
+                                        id: staffId
+                                    }
+                                }
                             }
                         }
                     }
-                },
-                Appointment: {
-                    some: {
-                        clinicians: {
-                            some: {
-                                id: staffId
-                            }
-                        }
-                    }
-                }
+                ]
             }
         });
     }

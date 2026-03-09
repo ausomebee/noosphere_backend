@@ -6,6 +6,11 @@ import TransactionRepository from "../../infrastructure/transactionsRepository.j
 import BillingRepository from "../../infrastructure/billingRepository.js";
 import PaymentRepository from "../../infrastructure/paymentRepository.js";
 import PaymentMethodRepository from "../../infrastructure/paymentMethodRepository.js";
+import InvoiceRepository from "../../../invoice/infrastructure/invoiceRepository.js";
+import InvoiceService from "../../../invoice/application/invoiceService.js";
+import SubscriptionRepository from "../../../planAndFeature/infrastructure/subscriptionRepository.js";
+import SubscriptionService from "../../../planAndFeature/application/subscriptionService.js";
+import Subscription from "../../../planAndFeature/domain/subscription.js";
 
 class BillingController {
     constructor() {
@@ -22,6 +27,12 @@ class BillingController {
             paymentMethodRepository: this.paymentMethodRepository,
             paymentAccessRepository: this.paymentAccessRepository
         });
+
+        this.invoiceRepository = new InvoiceRepository(this.prisma.invoice);
+        this.invoiceService = new InvoiceService({ invoiceRepository: this.invoiceRepository });
+
+        this.subscriptionRepository = new SubscriptionRepository(this.prisma.subscription);
+        this.subscriptionService = new SubscriptionService({ subscriptionRepository: this.subscriptionRepository });
     }
 
     createBillingMetadata = expressAsyncHandler(async (req, res) => {
@@ -307,21 +318,37 @@ class BillingController {
         });
     });
 
-    // payPaymentLink = expressAsyncHandler(async (req, res) => {
-    //     const paymentData = new Billing(req.body);
-    //     const payment = await this.service.createPayment(paymentData.createPayment);
+    payPaymentLink = expressAsyncHandler(async (req, res) => {
+        const paymentData = new Billing({...req.body, status: "paid"});
 
-    //     if (!payment) {
-    //         res.status(500).json({ message: 'Failed to create payment' });
-    //     }
+        const paymentMethod = await this.service.createPaymentMethod(paymentData.createPaymentMethod);
+        if (!paymentMethod) {
+            res.status(500).json({ message: 'Failed to create payment method' });
+        }
 
-    //     const paymentData = new Billing(req.body);
-    //     const payment = await this.service.createPaymentMethod(paymentData.createPaymentMethod);
+        const payment = await this.service.createPayment({...paymentData.createPayment, paymentMethodId: paymentMethod.id});
+        if (!payment) {
+            res.status(500).json({ message: 'Failed to create payment' });
+        }
 
-    //     if (!payment) {
-    //         res.status(500).json({ message: 'Failed to create payment method' });
-    //     }
-    // }); 
+        const subscriptionData = new Subscription({...req.body, status: "ACTIVE", startDate: payment.createdAt, paymentId: payment.id});
+        console.log(subscriptionData)
+        const subscription = await this.subscriptionService.createSubscription(subscriptionData.createSubscription);
+        if (!subscription) {
+            res.status(500).json({ message: 'Failed to create subscription' });
+        }
+
+        const invoice = await this.invoiceService.updateInvoice({ id: req.body.invoiceId, status: "Paid" });
+        if (!invoice) {
+            res.status(500).json({ message: 'Failed to update invoice' });
+        }
+
+        return res.status(201).json({
+            message: "payment recorded successfully",
+            status: 'ok',
+            data: invoice
+        });
+    });
 }
 
 export default BillingController;

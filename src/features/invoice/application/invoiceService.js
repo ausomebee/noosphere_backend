@@ -15,7 +15,7 @@ class InvoiceService {
         const plan = await this.planRepository.findOne({ id: data.planId });
 
         if (!plan) {
-            throw new Error("Plan not found")
+            throw new Error("Plan not found");
         }
 
         const now = new Date();
@@ -29,17 +29,68 @@ class InvoiceService {
             dueDate.setFullYear(dueDate.getFullYear() + data.quantity);
         }
 
-        const rate = data.billingFrequency === "Monthly" ? plan.pricePerMonth.price : plan.pricePerYear.price
-        const total = data.quantity * rate
-        const invoiceData = new Invoice({ ...data, total, dueDate })
+        const rate =
+            data.billingFrequency === "Monthly"
+                ? plan.pricePerMonth.price
+                : plan.pricePerYear.price;
 
-        const newInvoice = await this.invoiceRepository.create(invoiceData.createInvoice);
+        let total = data.quantity * rate;
+
+        if (
+            plan.extraFeaturesEnabled &&
+            plan.extraFeaturesWithPrice &&
+            data.extraFeatures?.length
+        ) {
+            const extraFeatures = plan.extraFeaturesWithPrice;
+
+            const extraTotal = data.extraFeatures.reduce((sum, featureId) => {
+                const feature = extraFeatures.find((f) => f.id === featureId);
+
+                if (!feature) return sum;
+
+                const price =
+                    data.billingFrequency === "Monthly"
+                        ? feature.pricePerMonth.price
+                        : feature.pricePerYear.price;
+
+                return sum + price * data.quantity;
+            }, 0);
+
+            total += extraTotal;
+        }
+
+        const invoiceData = new Invoice({
+            ...data,
+            total,
+            dueDate
+        });
+
+        const newInvoice = await this.invoiceRepository.create(
+            invoiceData.createInvoice
+        );
 
         if (!newInvoice) {
             throw new Error("Failed to create invoice");
         }
 
         return newInvoice;
+    }
+
+    async updateInvoice(data) {
+        const invoice = await this.invoiceRepository.findOne({ id: data.id })
+        if (!invoice) {
+            throw new Error("Invoice not found");
+        }
+
+        const update = await this.invoiceRepository.update(data.id, {
+            status: data.status || invoice.status,
+        });
+
+        if (!update) {
+            throw new Error("Failed to update Invoice");
+        }
+
+        return update;
     }
 
     async getSingleInvoice(id) {
@@ -67,31 +118,67 @@ class InvoiceService {
         const plan = await this.planRepository.findOne({ id: data.planId });
 
         if (!plan) {
-            throw new Error("Plan not found")
+            throw new Error("Plan not found");
         }
 
         const now = new Date();
-        let dueDate = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+        const ONE_DAY = 24 * 60 * 60 * 1000;
 
-        const rate = data.billingFrequency === "Monthly" ? plan.pricePerMonth.price : plan.pricePerYear.price
-        const total = data.quantity * rate
-        const invoiceData = new Invoice({ ...data, total, dueDate })
+        const dueDate = new Date(now.getTime() + ONE_DAY);
 
-        const newInvoice = await this.invoiceRepository.create(invoiceData.createInvoice);
+        const rate =
+            data.billingFrequency === "Monthly"
+                ? plan.pricePerMonth.price
+                : plan.pricePerYear.price;
+
+        let total = data.quantity * rate;
+
+        if (
+            plan.extraFeaturesEnabled &&
+            plan.extraFeaturesWithPrice &&
+            data.extraFeatures?.length
+        ) {
+            const extraFeatures = plan.extraFeaturesWithPrice;
+
+            const extraTotal = data.extraFeatures.reduce((sum, featureId) => {
+                const feature = extraFeatures.find(f => f.id === featureId);
+
+                if (!feature) return sum;
+
+                const price =
+                    data.billingFrequency === "Monthly"
+                        ? feature.pricePerMonth.price
+                        : feature.pricePerYear.price;
+
+                return sum + price * data.quantity;
+            }, 0);
+
+            total += extraTotal;
+        }
+
+        const invoiceData = new Invoice({
+            ...data,
+            total,
+            dueDate
+        });
+
+        const newInvoice = await this.invoiceRepository.create(
+            invoiceData.createInvoice
+        );
 
         if (!newInvoice) {
             throw new Error("Failed to create invoice");
         }
 
         const tok = this.token.generatePaymentToken({
-            invoiceId: newInvoice.id,
+            invoiceId: newInvoice.id
         });
 
         const tokenData = {
             invoiceId: newInvoice.id,
             tokenHash: tok,
-            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
-        }
+            expiresAt: new Date(Date.now() + ONE_DAY)
+        };
 
         const token = await this.invoiceTokenRepository.create(tokenData);
 
@@ -99,8 +186,7 @@ class InvoiceService {
             throw new Error("Failed to create payment link");
         }
 
-        return `https://noospherehub.com/pay/${tok}`;
-
+        return `https://noospherehub.com/control/payment/${tok}`;
     }
 
     async validatePaymentToken(token) {
@@ -116,7 +202,18 @@ class InvoiceService {
             throw new Error("Token expired");
         }
 
-        const invoice = await this.invoiceRepository.findOneAndPopulate({ id: decoded.invoiceId }, { tenant: true, plan: true });
+        const invoice = await this.invoiceRepository.findOneAndPopulate(
+            { id: decoded.invoiceId },
+            {
+                tenant: true,
+                plan: {
+                    include: {
+                        features: true
+                    }
+                }
+            }
+        );
+        
         if (!invoice) {
             throw new Error("Invoice not found")
         }
@@ -147,7 +244,7 @@ class InvoiceService {
             throw new Error("Failed to create payment link");
         }
 
-        return `https://noospherehub.com/pay/${tok}`;
+        return `https://noospherehub.com/control/payment/${tok}`;
     };
 
     async getInvoiceTokenHistory(tenantId) {

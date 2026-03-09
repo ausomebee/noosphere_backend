@@ -611,15 +611,15 @@ model Subscription {
   autoRenew        Boolean?           @default(true)
   mailNotification Boolean?
   endDate          DateTime
-  transactionId    String             @unique
+  transactionId    String?            @unique
   paymentId        Int                @unique
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
 
-  tenant      Tenant       @relation(fields: [tenantId], references: [id])
-  transaction Transactions @relation(fields: [transactionId], references: [id])
-  payment     Payment      @relation(fields: [paymentId], references: [id])
-  plan        BillingPlan  @relation(fields: [planId], references: [id])
+  tenant      Tenant        @relation(fields: [tenantId], references: [id])
+  transaction Transactions? @relation(fields: [transactionId], references: [id])
+  payment     Payment       @relation(fields: [paymentId], references: [id])
+  plan        BillingPlan   @relation(fields: [planId], references: [id])
   Logs        Logs[]
 }
 

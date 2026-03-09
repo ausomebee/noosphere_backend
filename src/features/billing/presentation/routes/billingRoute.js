@@ -23,7 +23,62 @@ import BillingDto from "../dto/billingDto.js";
  *           type: string
  *           format: uuid
  *           example: "c0a8017e-7b68-11e9-8f9e-2a86e4085a59"
- *
+ *     PayPaymentLinkDto:
+ *       type: object
+ *       required:
+ *         - tenantId
+ *         - invoiceId
+ *         - planId
+ *         - billingCycle
+ *         - endDate
+ *         - transactionId
+ *         - amount
+ *         - cardType
+ *         - lastFourDigits
+ *         - gatewayToken
+ *       properties:
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *           example: "439004a2-97cb-4eea-824e-e95d094c9be6"
+ *           description: UUID of the tenant making the payment.
+ *         invoiceId:
+ *           type: integer
+ *           example: 12
+ *           description: Invoice being paid.
+ *         planId:
+ *           type: string
+ *           example: "plan_basic_monthly"
+ *           description: Billing plan associated with the subscription.
+ *         billingCycle:
+ *           type: string
+ *           example: "MONTHLY"
+ *           description: Billing cycle for the subscription.
+ *         endDate:
+ *           type: string
+ *           format: date-time
+ *           example: "2026-04-09T10:00:00.000Z"
+ *           description: Subscription end date.
+ *         transactionId:
+ *           type: string
+ *           example: "txn_1b7d72c4-6b6f-4e3a-8e2d-1e2f8c7c9a22"
+ *           description: Transaction reference for the payment.
+ *         amount:
+ *           type: number
+ *           example: 5000
+ *           description: Amount paid for the invoice.
+ *         cardType:
+ *           type: string
+ *           example: "Visa"
+ *           description: Type of card used for payment.
+ *         lastFourDigits:
+ *           type: string
+ *           example: "4242"
+ *           description: Last 4 digits of the payment card.
+ *         gatewayToken:
+ *           type: string
+ *           example: "tok_visa_123456"
+ *           description: Token returned by the payment gateway.
  *     CreateTransactionDto:
  *       type: object
  *       required:
@@ -172,7 +227,6 @@ import BillingDto from "../dto/billingDto.js";
  *         chargeOnDueDate:
  *           type: boolean
  *           example: true
-
  *     UpdateChargeLastUsedFirstDto:
  *       type: object
  *       required:
@@ -186,7 +240,6 @@ import BillingDto from "../dto/billingDto.js";
  *         chargeLastUsedFirst:
  *           type: boolean
  *           example: false
-
  *     UpdateChargeAlternativeDto:
  *       type: object
  *       required:
@@ -200,7 +253,6 @@ import BillingDto from "../dto/billingDto.js";
  *         chargeAlternative:
  *           type: boolean
  *           example: true
-
  *     UpdateRetryBeforeDto:
  *       type: object
  *       required:
@@ -214,7 +266,6 @@ import BillingDto from "../dto/billingDto.js";
  *         retryBefore:
  *           type: integer
  *           example: 6
-
  *     UpdateRetryAfterDto:
  *       type: object
  *       required:
@@ -228,7 +279,6 @@ import BillingDto from "../dto/billingDto.js";
  *         retryAfter:
  *           type: integer
  *           example: 5
-
  *     UpdateNotifyTenantDto:
  *       type: object
  *       required:
@@ -242,7 +292,6 @@ import BillingDto from "../dto/billingDto.js";
  *         notifyTenant:
  *           type: boolean
  *           example: true
-
  *     UpdateNotificationEmailDto:
  *       type: object
  *       required:
@@ -260,7 +309,6 @@ import BillingDto from "../dto/billingDto.js";
  *         notificationEmailBody:
  *           type: string
  *           example: "Your payment attempt failed. Please update your billing info."
-
  *     UpdateCancelAfterDto:
  *       type: object
  *       required:
@@ -274,7 +322,6 @@ import BillingDto from "../dto/billingDto.js";
  *         cancelAfter:
  *           type: integer
  *           example: 5
-
  *     UpdateManualCancelDto:
  *       type: object
  *       required:
@@ -288,7 +335,6 @@ import BillingDto from "../dto/billingDto.js";
  *         manualCancel:
  *           type: boolean
  *           example: false
-
  *     UpdateSuspensionActionDto:
  *       type: object
  *       required:
@@ -306,7 +352,6 @@ import BillingDto from "../dto/billingDto.js";
  *         errorMessage:
  *           type: string
  *           example: "Payment processing error"
-
  *     UpdateEmailAfterAttemptsDto:
  *       type: object
  *       required:
@@ -320,7 +365,6 @@ import BillingDto from "../dto/billingDto.js";
  *         emailAfterAttempts:
  *           type: integer
  *           example: 3
-
  *     UpdateWarningMailDto:
  *       type: object
  *       required:
@@ -338,7 +382,6 @@ import BillingDto from "../dto/billingDto.js";
  *         warningMailBody:
  *           type: string
  *           example: "You have one more chance to update your payment method."
-
  *     UpdateSendOnSubscriptionCancelDto:
  *       type: object
  *       required:
@@ -352,7 +395,6 @@ import BillingDto from "../dto/billingDto.js";
  *         sendOnSubscriptionCancel:
  *           type: boolean
  *           example: true
-
  *     UpdateCancelMailDto:
  *       type: object
  *       required:
@@ -399,6 +441,26 @@ class BillingRoutes {
          *         description: Validation error
          */
         this.router.post("/billingmetadata", BillingDto.createBillingMetadataDto, this.controller.createBillingMetadata);
+
+        /**
+         * @swagger
+         * /api/v1/billing/pay-payment-link:
+         *   post:
+         *     summary: Pay payment link
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/PayPaymentLinkDto'
+         *     responses:
+         *       201:
+         *         description: payment recorded successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/pay-payment-link", this.controller.payPaymentLink);
 
         /**
         * @swagger
