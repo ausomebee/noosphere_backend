@@ -18,6 +18,9 @@ class Billing {
         sendOnSubscriptionCancel,
         cancelMailHeader,
         cancelMailBody,
+        transactionRef,
+        transactionId,
+        holderName,
         gatewayToken, lastFourDigits, cardType, subscription, createdAt, tenant, invoice, amount, paymentMethod, paymentMethodId, billingAddress, billingMetadataId, planId, status, startDate, endDate, name, description, price, billingCycle, transactionId, invoiceId }) {
         this.id = id;
         this.tenantId = tenantId;
@@ -61,6 +64,9 @@ class Billing {
         this.sendOnSubscriptionCancel = sendOnSubscriptionCancel;
         this.cancelMailHeader = cancelMailHeader;
         this.cancelMailBody = cancelMailBody;
+        this.transactionRef = transactionRef;
+        this.transactionId = transactionId;
+        this.holderName = holderName;
     }
 
     get createBillingMetadata() {
@@ -84,7 +90,9 @@ class Billing {
             tenantId: this.tenantId,
             amount: this.amount,
             invoiceId: this.invoiceId,
-            paymentMethodId: this.paymentMethodId
+            paymentMethodId: this.paymentMethodId,
+            transactionId: this.transactionId,
+            transactionRef: this.transactionRef
         };
     }
 
@@ -110,6 +118,7 @@ class Billing {
             tenantId: this.tenantId,
             lastFourDigits: this.lastFourDigits,
             gatewayToken: this.gatewayToken,
+            holderName: this.holderName
         };
     }
 

@@ -701,6 +701,8 @@ model Payment {
   id              Int      @id @default(autoincrement())
   tenantId        String
   status          String
+  transactionId String?
+  transactionRef String?
   amount          Int
   invoiceId       Int
   createdAt       DateTime @default(now())
@@ -769,6 +771,7 @@ model PaymentMethod {
   id             String   @id @default(uuid())
   cardType       String
   lastFourDigits String
+  holderName String?
   tenantId       String
   gatewayToken   String
   createdAt      DateTime @default(now())

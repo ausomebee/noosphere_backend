@@ -319,19 +319,23 @@ class BillingController {
     });
 
     payPaymentLink = expressAsyncHandler(async (req, res) => {
-        const paymentData = new Billing({...req.body, status: "paid"});
+        const paymentData = new Billing({ ...req.body, status: req.body.paymentStatus });
 
         const paymentMethod = await this.service.createPaymentMethod(paymentData.createPaymentMethod);
         if (!paymentMethod) {
             res.status(500).json({ message: 'Failed to create payment method' });
         }
 
-        const payment = await this.service.createPayment({...paymentData.createPayment, paymentMethodId: paymentMethod.id});
+        const payment = await this.service.createPayment({ ...paymentData.createPayment, paymentMethodId: paymentMethod.id });
         if (!payment) {
             res.status(500).json({ message: 'Failed to create payment' });
         }
 
-        const subscriptionData = new Subscription({...req.body, status: "ACTIVE", startDate: payment.createdAt, paymentId: payment.id});
+        if (payment.status === "Failed") {
+            return res.status(400).json({ message: "Payment failed, please try again." });
+        }
+
+        const subscriptionData = new Subscription({ ...req.body, status: "ACTIVE", startDate: payment.createdAt, paymentId: payment.id });
         console.log(subscriptionData)
         const subscription = await this.subscriptionService.createSubscription(subscriptionData.createSubscription);
         if (!subscription) {
