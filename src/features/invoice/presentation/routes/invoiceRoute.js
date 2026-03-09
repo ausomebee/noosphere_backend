@@ -561,12 +561,12 @@ class InvoiceRoutes {
 
         /**
          * @swagger
-         * /api/v1/invoice/regenerate/{invoiceId}:
+         * /api/v1/invoice/regenerate/{tenantId}:
          *   patch:
          *     summary: Regenerate payment link
          *     tags: [Invoice]
          *     parameters:
-         *       - name: invoiceId
+         *       - name: tenantId
          *         in: path
          *         required: true
          *         schema:
@@ -577,7 +577,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/regenerate/:invoiceId", this.controller.regeneratePaymentLink);
+        this.router.patch("/regenerate/:tenantId", this.controller.regeneratePaymentLink);
 
         /**
          * @swagger

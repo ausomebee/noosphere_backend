@@ -124,8 +124,8 @@ class InvoiceService {
         return invoice;
     }
 
-    async regeneratePaymentLink(invoiceId) {
-        const invoice = await this.invoiceRepository.findOne({ id: invoiceId });
+    async regeneratePaymentLink(tenantId) {
+        const invoice = await this.invoiceRepository.findFirst({ tenantId: tenantId });
 
         if (!invoice) {
             throw new Error("Invoice not found")

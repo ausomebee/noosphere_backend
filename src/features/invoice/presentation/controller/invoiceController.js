@@ -88,8 +88,8 @@ class InvoiceController {
     });
 
     regeneratePaymentLink = expressAsyncHandler(async (req, res) => {
-        const { invoiceId } = req.params;
-        const paymentLink = await this.service.regeneratePaymentLink(parseInt(invoiceId));
+        const { tenantId } = req.params;
+        const paymentLink = await this.service.regeneratePaymentLink(parseInt(tenantId));
 
         if (!paymentLink) {
             res.status(500).json({ message: 'Failed to regenerate payment link' });

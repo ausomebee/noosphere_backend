@@ -306,6 +306,22 @@ class BillingController {
             data: paymentAccess
         });
     });
+
+    // payPaymentLink = expressAsyncHandler(async (req, res) => {
+    //     const paymentData = new Billing(req.body);
+    //     const payment = await this.service.createPayment(paymentData.createPayment);
+
+    //     if (!payment) {
+    //         res.status(500).json({ message: 'Failed to create payment' });
+    //     }
+
+    //     const paymentData = new Billing(req.body);
+    //     const payment = await this.service.createPaymentMethod(paymentData.createPaymentMethod);
+
+    //     if (!payment) {
+    //         res.status(500).json({ message: 'Failed to create payment method' });
+    //     }
+    // }); 
 }
 
 export default BillingController;
