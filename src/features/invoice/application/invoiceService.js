@@ -38,8 +38,7 @@ class InvoiceService {
 
         if (
             plan.extraFeaturesEnabled &&
-            plan.extraFeaturesWithPrice &&
-            data.extraFeatures?.length
+            plan.extraFeaturesWithPrice 
         ) {
             const extraFeatures = plan.extraFeaturesWithPrice;
 
@@ -135,8 +134,7 @@ class InvoiceService {
 
         if (
             plan.extraFeaturesEnabled &&
-            plan.extraFeaturesWithPrice &&
-            data.extraFeatures?.length
+            plan.extraFeaturesWithPrice 
         ) {
             const extraFeatures = plan.extraFeaturesWithPrice;
 
@@ -213,7 +211,7 @@ class InvoiceService {
                 }
             }
         );
-        
+
         if (!invoice) {
             throw new Error("Invoice not found")
         }

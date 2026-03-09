@@ -1,5 +1,3 @@
-import { is } from "date-fns/locale";
-
 class TeamsService {
     constructor({ teamsRepository }) {
         this.teamsRepository = teamsRepository;
