@@ -900,6 +900,50 @@ class PerformanceRoutes {
          */
         this.router.get("/rds-network-transmit-throughput", PerformanceDto.checkTimeDto, this.controller.getRDSNetworkTransmitThroughputMetric);
 
+        // GET /api/performance/general
+        router.get("/general", async (req, res) => {
+            const result = await cloudwatch.getGeneralMetrics({
+                instanceId: process.env.EC2_INSTANCE_ID,
+                dbInstanceIdentifier: process.env.RDS_INSTANCE_ID,
+                apiName: process.env.API_GATEWAY_NAME
+            });
+            res.json(result);
+        });
+
+        // GET /api/performance/general/timeseries
+        router.get("/general/timeseries", async (req, res) => {
+            const result = await cloudwatch.getGeneralTimeseries({
+                instanceId: process.env.EC2_INSTANCE_ID,
+                dbInstanceIdentifier: process.env.RDS_INSTANCE_ID,
+                apiName: process.env.API_GATEWAY_NAME
+            });
+            res.json(result);
+        });
+
+        // GET /api/performance/api-error-rate
+        router.get("/api-error-rate", async (req, res) => {
+            const result = await cloudwatch.getApiErrorRate({
+                apiName: process.env.API_GATEWAY_NAME
+            });
+            res.json(result);
+        });
+
+        // GET /api/performance/resources
+        router.get("/resources", async (req, res) => {
+            const result = await cloudwatch.getResourceMetrics({
+                instanceId: process.env.EC2_INSTANCE_ID
+            });
+            res.json(result);
+        });
+
+        // GET /api/performance/resources/timeseries
+        router.get("/resources/timeseries", async (req, res) => {
+            const result = await cloudwatch.getResourceTimeseries({
+                instanceId: process.env.EC2_INSTANCE_ID
+            });
+            res.json(result);
+        });
+
     }
 
     getRouter() {

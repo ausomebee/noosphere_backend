@@ -66,6 +66,7 @@ class Invoice {
             items: [
                 {
                     id: this.plan.id,
+                    extraFeaturesWithPrice: this.plan.extraFeaturesWithPrice,
                     description: this.plan.description,
                     rate: this.billingFrequency === "Monthly" ? this.plan.pricePerMonth : this.plan.pricePerYear,
                     quantity: this.quantity,
