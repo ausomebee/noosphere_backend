@@ -36,17 +36,10 @@ class InvoiceService {
 
         let total = data.quantity * rate;
 
-        if (
-            plan.extraFeaturesEnabled &&
-            plan.extraFeaturesWithPrice 
-        ) {
+        if (plan.extraFeaturesEnabled && plan.extraFeaturesWithPrice) {
             const extraFeatures = plan.extraFeaturesWithPrice;
 
-            const extraTotal = data.extraFeatures.reduce((sum, featureId) => {
-                const feature = extraFeatures.find((f) => f.id === featureId);
-
-                if (!feature) return sum;
-
+            const extraTotal = extraFeatures.reduce((sum, feature) => {
                 const price =
                     data.billingFrequency === "Monthly"
                         ? feature.pricePerMonth.price
@@ -132,17 +125,10 @@ class InvoiceService {
 
         let total = data.quantity * rate;
 
-        if (
-            plan.extraFeaturesEnabled &&
-            plan.extraFeaturesWithPrice 
-        ) {
+        if (plan.extraFeaturesEnabled && plan.extraFeaturesWithPrice) {
             const extraFeatures = plan.extraFeaturesWithPrice;
 
-            const extraTotal = data.extraFeatures.reduce((sum, featureId) => {
-                const feature = extraFeatures.find(f => f.id === featureId);
-
-                if (!feature) return sum;
-
+            const extraTotal = extraFeatures.reduce((sum, feature) => {
                 const price =
                     data.billingFrequency === "Monthly"
                         ? feature.pricePerMonth.price
