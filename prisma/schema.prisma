@@ -594,7 +594,6 @@ model Transactions {
   status            String
 
   BillingMetadata BillingMetadata? @relation(fields: [billingMetadataId], references: [id])
-  subscription    Subscription?
 }
 
 model Subscription {
@@ -611,16 +610,14 @@ model Subscription {
   autoRenew        Boolean?           @default(true)
   mailNotification Boolean?
   endDate          DateTime
-  transactionId    String?            @unique
   paymentId        Int                @unique
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
 
-  tenant      Tenant        @relation(fields: [tenantId], references: [id])
-  transaction Transactions? @relation(fields: [transactionId], references: [id])
-  payment     Payment       @relation(fields: [paymentId], references: [id])
-  plan        BillingPlan   @relation(fields: [planId], references: [id])
-  Logs        Logs[]
+  tenant  Tenant      @relation(fields: [tenantId], references: [id])
+  payment Payment     @relation(fields: [paymentId], references: [id])
+  plan    BillingPlan @relation(fields: [planId], references: [id])
+  Logs    Logs[]
 }
 
 model BillingPlan {
@@ -701,8 +698,9 @@ model Payment {
   id              Int      @id @default(autoincrement())
   tenantId        String
   status          String
-  transactionId String?
-  transactionRef String?
+  transactionId   String?
+  transactionRef  String?
+  gateway         String
   amount          Int
   invoiceId       Int
   createdAt       DateTime @default(now())
@@ -771,7 +769,7 @@ model PaymentMethod {
   id             String   @id @default(uuid())
   cardType       String
   lastFourDigits String
-  holderName String?
+  holderName     String?
   tenantId       String
   gatewayToken   String
   createdAt      DateTime @default(now())

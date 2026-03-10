@@ -39,6 +39,7 @@ import BillingDto from "../dto/billingDto.js";
  *         - holderName
  *         - transactionRef
  *         - paymentStatus
+ *         - gateway
  *       properties:
  *         tenantId:
  *           type: string
@@ -74,6 +75,10 @@ import BillingDto from "../dto/billingDto.js";
  *           type: string
  *           example: "Visa"
  *           description: Type of card used for payment.
+ *         gateway:
+ *           type: string
+ *           example: "paypal"
+ *           description: Type of gateway used for payment.
  *         lastFourDigits:
  *           type: string
  *           example: "4242"
