@@ -800,7 +800,7 @@ class TenantService {
 
         await this.tenantDeactivationRepository.create({
             tenantId: data.id,
-            deactivatedBy: data.deactivatedBy,
+            deactivatedById: data.deactivatedById,
             reason: data.reason,
             details: data.details
         })
