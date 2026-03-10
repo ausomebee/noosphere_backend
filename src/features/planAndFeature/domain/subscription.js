@@ -1,12 +1,11 @@
 class Subscription {
-    constructor({ id, tenantId, reason, comment, planId, status, startDate, endDate, transactionId, billingCycle, paymentId }) {
+    constructor({ id, tenantId, reason, comment, planId, status, startDate, endDate, billingCycle, paymentId }) {
         this.id = id;
         this.tenantId = tenantId;
         this.planId = planId;
         this.status = status;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.transactionId = transactionId;
         this.billingCycle = billingCycle;
         this.paymentId = paymentId;
         this.reason = reason;
@@ -20,7 +19,6 @@ class Subscription {
             status: this.status,
             startDate: this.startDate,
             endDate: this.endDate,
-            transactionId: this.transactionId,
             billingCycle: this.billingCycle,
             paymentId: this.paymentId
         };
