@@ -206,6 +206,7 @@ class InvoiceService {
     }
 
     async regeneratePaymentLink(tenantId) {
+        console.log(tenantId)
         const invoice = await this.invoiceRepository.findFirst({ tenantId: tenantId });
 
         if (!invoice) {
