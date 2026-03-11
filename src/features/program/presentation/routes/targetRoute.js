@@ -402,6 +402,27 @@ class TargetRoutes {
 
         /**
         * @swagger
+        * /api/v1/targets/baseline/{targetId}:
+        *   get:
+        *     summary: gets tenant
+        *     tags: [program]
+        *     parameters:
+        *       - in: path
+        *         name: targetId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The target ID of the target
+        *     responses:
+        *       200:
+        *         description: Target fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/baseline/:targetId", this.controller.findTargetWithFirstSessionData);
+
+        /**
+        * @swagger
         * /api/v1/targets/tenant/{tenantId}:
         *   get:
         *     summary: gets tenant targets

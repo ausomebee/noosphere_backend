@@ -247,6 +247,16 @@ class InvoiceService {
         return history;
     }
 
+    async markLatestTokenAsUsed(invoiceId) {
+        const invoice = await this.invoiceTokenRepository.markLatestTokenAsUsed(invoiceId);
+
+        if (!invoice) {
+            throw new Error("failed to update invoice token");
+        }
+
+        return invoice;
+    }
+
     async getTenantInvoices(tenantId, filter = {}, page = 1, pageSize = 10) {
         const invoices = await this.invoiceRepository.getTenantInvoices(
             tenantId,

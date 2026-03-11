@@ -36,7 +36,7 @@ class TenantNotificationSettingsController {
     });
 
     saveNotificationSettings = expressAsyncHandler(async (req, res) => {
-        const { userId } = req.params;
+        const { userId } = req.body;
         const { settings } = req.body;
 
         if (!settings || typeof settings !== "object") {
@@ -47,16 +47,16 @@ class TenantNotificationSettingsController {
             });
         }
 
-        const savedSettings = await this.service.saveNotificationSettings(userId, settings);
+        const { record, isNew } = await this.service.saveNotificationSettings(userId, settings);
 
-        const message = savedSettings.createdAt
+        const message = isNew
             ? "Notification settings created successfully"
             : "Notification settings updated successfully";
 
         return res.status(201).json({
             message,
             status: "ok",
-            data: savedSettings
+            data: record
         });
     });
 }

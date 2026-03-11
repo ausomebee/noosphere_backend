@@ -11,6 +11,7 @@ import InvoiceService from "../../../invoice/application/invoiceService.js";
 import SubscriptionRepository from "../../../planAndFeature/infrastructure/subscriptionRepository.js";
 import SubscriptionService from "../../../planAndFeature/application/subscriptionService.js";
 import Subscription from "../../../planAndFeature/domain/subscription.js";
+import InvoiceTokenRepository from "../../../invoice/infrastructure/invoiceTokenRepository.js";
 
 class BillingController {
     constructor() {
@@ -28,8 +29,9 @@ class BillingController {
             paymentAccessRepository: this.paymentAccessRepository
         });
 
+        this.invoiceTokenRepository = new InvoiceTokenRepository(this.prisma.invoiceToken);
         this.invoiceRepository = new InvoiceRepository(this.prisma.invoice);
-        this.invoiceService = new InvoiceService({ invoiceRepository: this.invoiceRepository });
+        this.invoiceService = new InvoiceService({ invoiceRepository: this.invoiceRepository, invoiceTokenRepository: this.invoiceTokenRepository });
 
         this.subscriptionRepository = new SubscriptionRepository(this.prisma.subscription);
         this.subscriptionService = new SubscriptionService({ subscriptionRepository: this.subscriptionRepository });
@@ -365,7 +367,8 @@ class BillingController {
         }
 
         const invoice = await this.invoiceService.updateInvoice({ id: req.body.invoiceId, status: "Paid" });
-        if (!invoice) {
+        const invoiceToken = await this.invoiceService.markLatestTokenAsUsed(req.body.invoiceId);
+        if (!invoice || !invoiceToken) {
             res.status(500).json({ message: 'Failed to update invoice' });
         }
 

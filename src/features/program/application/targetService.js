@@ -100,6 +100,20 @@ class TargetService {
         return target;
     }
 
+    async findTargetWithFirstSessionData(targetId) {
+        const target = await this.targetRepository.findTargetWithFirstSessionData( targetId );
+
+        if (!target) {
+            throw new Error("Target not found")
+        }
+
+        if (!target.baselineDataRequired) {
+            throw new Error("Target baseline data not required")
+        }
+
+        return target;
+    }
+
     async duplicateTarget(id) {
         const target = await this.targetRepository.findOne({ id });
 

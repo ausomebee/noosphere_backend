@@ -14,6 +14,8 @@ class TenantNotificationSettingsService {
     }
 
     async saveNotificationSettings(userId, settings) {
+        const existing = await this.tenantNotificationSettingsRepository.findByUserId(userId);
+
         const record = await this.tenantNotificationSettingsRepository.upsert({
             userId,
             settings
@@ -23,7 +25,10 @@ class TenantNotificationSettingsService {
             throw new Error("Failed to save notification settings");
         }
 
-        return record;
+        return {
+            record,
+            isNew: !existing
+        };
     }
 }
 

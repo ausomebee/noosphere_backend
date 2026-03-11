@@ -39,6 +39,30 @@ class InvoiceTokenRepository {
         });
     }
 
+    async markLatestTokenAsUsed(invoiceId) {
+        const latestToken = await this.model.findFirst({
+            where: {
+                invoiceId,
+            },
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
+
+        if (!latestToken) {
+            return null;
+        }
+
+        return await this.model.update({
+            where: {
+                id: latestToken.id
+            },
+            data: {
+                used: true
+            }
+        });
+    }
+
     async update(id, data) {
         return await this.model.update({
             where: { id },

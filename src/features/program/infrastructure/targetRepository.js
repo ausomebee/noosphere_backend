@@ -11,6 +11,22 @@ class TargetRepository extends BaseRepository {
             include: populate
         });
     }
+
+    async findTargetWithFirstSessionData(targetId) {
+        return await this.model.findFirst({
+            where: {
+                id: targetId
+            },
+            include: {
+                sessionDatas: {
+                    take: 1,
+                    orderBy: {
+                        createdAt: "asc"
+                    }
+                }
+            }
+        });
+    }
 }
 
 export default TargetRepository;

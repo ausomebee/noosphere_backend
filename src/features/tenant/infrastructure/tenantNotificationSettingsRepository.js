@@ -18,6 +18,21 @@ class TenantNotificationSettingsRepository extends BaseRepository {
             include: populate
         });
     }
+
+    async upsert({ userId, settings }) {
+        return await this.model.upsert({
+            where: {
+                userId
+            },
+            update: {
+                settings
+            },
+            create: {
+                userId,
+                settings
+            }
+        });
+    }
 }
 
 export default TenantNotificationSettingsRepository;

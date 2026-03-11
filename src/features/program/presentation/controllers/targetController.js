@@ -135,6 +135,20 @@ class TargetController {
         });
     });
 
+    findTargetWithFirstSessionData = expressAsyncHandler(async (req, res) => {
+        const target = await this.service.findTargetWithFirstSessionData(req.params.targetId);
+
+        if (!target) {
+            res.status(500).json({ message: 'Failed to fetch target' });
+        }
+
+        return res.status(201).json({
+            message: "target fetched successfully",
+            status: 'ok',
+            data: target
+        });
+    });
+
     duplicateTarget = expressAsyncHandler(async (req, res) => {
         const target = await this.service.duplicateTarget(req.params.id);
 
