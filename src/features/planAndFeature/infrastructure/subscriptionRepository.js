@@ -5,12 +5,12 @@ class SubscriptionRepository extends BaseRepository {
         super(model)
     }
 
-    async findAllAndPopulate(query, populate) {
-        return await this.model.findMany({
-            where: query,
-            include: populate
-        });
-    }
+    // async findAllAndPopulate(query, populate) {
+    //     return await this.model.findMany({
+    //         where: query,
+    //         include: populate
+    //     });
+    // }
 
     async totalCount(query) {
         return await this.model.aggregate({
@@ -25,7 +25,16 @@ class SubscriptionRepository extends BaseRepository {
         return await this.model.findMany({
             where: filter,
             include: {
-                tenant: true,
+                tenant: {
+                    include: {
+                        pipelineItems: {
+                            select: {
+                                id: true,
+                                pipelineStageId: true
+                            }
+                        }
+                    }
+                },
                 plan: {
                     select: {
                         name: true
