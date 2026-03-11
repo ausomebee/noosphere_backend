@@ -190,11 +190,6 @@ class TenantController {
         
         const tenantSessionCount = await this.sessionService.countTenantSessions(req.params.tenantId);
         
-        console.log("object")
-        if (!tenantSessionCount) {
-            return res.status(500).json({ message: 'Failed to fetch tenant session count.' });
-        }
-
         const tenantSessionGraph = await this.sessionService.tenantOverviewGraph(req.params.tenantId, "month");
 
         if (!tenantSessionGraph) {

@@ -82,13 +82,8 @@ class SessionService {
     }
 
     async countTenantSessions(id) {
-        const session = await this.sessionRepository.countTenantSessions(id);
-
-        if (!session) {
-            throw new Error("Session not found");
-        }
-
-        return session;
+        const sessionCount = await this.sessionRepository.countTenantSessions(id);
+        return sessionCount;
     }
 
     async getSessions(tenantId) {
