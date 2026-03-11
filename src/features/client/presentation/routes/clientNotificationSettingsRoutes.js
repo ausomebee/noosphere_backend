@@ -156,7 +156,7 @@ class ClientNotificationSettingsRoutes {
 
         /**
          * @swagger
-         * /api/v1/client/notification-settings/client/{tenantClientId}:
+         * /api/v1/client/notification-settings/{tenantClientId}:
          *   get:
          *     summary: Get notification settings for a client
          *     tags: [client-notification-settings]
@@ -172,7 +172,7 @@ class ClientNotificationSettingsRoutes {
          *         description: Notification settings fetched successfully
          */
         this.router.get(
-            "/client/:tenantClientId",
+            "/:tenantClientId",
             this.controller.getNotificationSettingsByClient
         );
     }
