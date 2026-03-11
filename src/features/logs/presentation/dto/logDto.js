@@ -16,7 +16,7 @@ class LogsDto {
                 "string.empty": "Tenant ID is required",
                 "string.guid": "Tenant ID must be a valid UUID",
             }),
-            featureId: Joi.string().uuid().optional().messages({
+            feature: Joi.string().uuid().optional().messages({
                 "string.empty": "Feature ID is required",
                 "string.guid": "Feature ID must be a valid UUID",
             }),

@@ -24,7 +24,7 @@ import LogsController from "../controllers/logController.js";
  *           format: uuid
  *           description: Optional Tenant ID
  *           example: "550e8400-e29b-41d4-a716-446655440002"
- *         featureId:
+ *         feature:
  *           type: string
  *           format: uuid
  *           description: Optional Feature ID

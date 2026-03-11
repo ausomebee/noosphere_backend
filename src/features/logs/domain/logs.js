@@ -1,10 +1,10 @@
 class Logs {
-    constructor({ logId, tenantId, issueId, reason, clientId, adminId, featureId, module, action, details, ipAddress }) {
+    constructor({ logId, tenantId, issueId, reason, clientId, adminId, feature, module, action, details, ipAddress }) {
         this.logId = logId;
         this.tenantId = tenantId;
         this.clientId = clientId;
         this.adminId = adminId;
-        this.featureId = featureId;
+        this.feature = feature;
         this.module = module;
         this.action = action;
         this.details = details;
@@ -18,7 +18,7 @@ class Logs {
             tenantId: this.tenantId,
             clientId: this.clientId,
             adminId: this.adminId,
-            featureId: this.featureId,
+            feature: this.feature,
             module: this.module,
             action: this.action,
             details: this.details,

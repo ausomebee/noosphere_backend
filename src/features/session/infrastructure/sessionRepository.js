@@ -59,6 +59,42 @@ class SessionRepository extends BaseRepository {
         });
     }
 
+    async getSessionsBySessionType(tenantId, sessionTypeId) {
+        return await this.model.findMany({
+            where: {
+                appointment: {
+                    tenantId: tenantId,
+                    sessionId: sessionTypeId,
+                },
+            },
+            include: {
+                appointment: true,
+            },
+        });
+    }
+
+    async getSessionsByServiceCode(tenantId, serviceCodeId) {
+        return await this.model.findMany({
+            where: {
+                appointment: {
+                    tenantId: tenantId,
+                    appointmentServices: {
+                        some: {
+                            serviceCodeId: serviceCodeId,
+                        },
+                    },
+                },
+            },
+            include: {
+                appointment: {
+                    include: {
+                        appointmentServices: true,
+                    },
+                },
+            },
+        });
+    }
+
     async countClientAwaitingApproval(id) {
         return await this.model.count({
             where: {

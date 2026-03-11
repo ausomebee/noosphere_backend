@@ -157,6 +157,70 @@ class SessionRoutes {
 
         /**
          * @swagger
+         * /api/v1/sessions/service/{tenantId}/{serviceCodeId}:
+         *   get:
+         *     summary: Get sessions for a tenant filtered by service code
+         *     tags: [sessions]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: Tenant ID
+         *       - in: path
+         *         name: serviceCodeId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: Service code ID
+         *     responses:
+         *       200:
+         *         description: Sessions fetched successfully
+         *       404:
+         *         description: No sessions found
+         *       500:
+         *         description: Server error
+         */
+        this.router.get(
+            "/service/:tenantId/:serviceCodeId",
+            this.controller.getSessionsByServiceCode
+        );
+
+        /**
+        * @swagger
+        * /api/v1/sessions/session-type/{tenantId}/{sessionTypeId}:
+        *   get:
+        *     summary: Get sessions for a tenant filtered by session type
+        *     tags: [sessions]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: Tenant ID
+        *       - in: path
+        *         name: sessionTypeId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: Session type ID
+        *     responses:
+        *       200:
+        *         description: Sessions fetched successfully
+        *       404:
+        *         description: No sessions found
+        *       500:
+        *         description: Server error
+        */
+        this.router.get(
+            "/session-type/:tenantId/:sessionTypeId",
+            this.controller.getSessionsBySessionType
+        );
+
+        /**
+         * @swagger
          * /api/v1/sessions/{id}:
          *   get:
          *     summary: Get a single session

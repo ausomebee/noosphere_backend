@@ -17,6 +17,8 @@ import TenantDeactivationRepository from "../../infrastructure/tenantDeactivatio
 import AdminService from "../../../admin/application/adminService.js";
 import SessionRepository from "../../../session/infrastructure/sessionRepository.js";
 import SessionService from "../../../session/application/sessionService.js";
+import LogsRepository from "../../../logs/infrastructure/logsRepository.js";
+import LogsService from "../../../logs/application/logsService.js";
 
 class TenantController {
     constructor() {
@@ -49,6 +51,8 @@ class TenantController {
         this.adminService = new AdminService();
         this.sessionRepository = new SessionRepository(this.prisma);
         this.sessionService = new SessionService({ sessionRepository: this.sessionRepository });
+        this.logsRepository = new LogsRepository(this.prisma.logs);
+        this.logService = new LogsService({ logsRepository: this.logsRepository });
     }
 
     createCandidate = expressAsyncHandler(async (req, res) => {
@@ -465,6 +469,18 @@ class TenantController {
 
         if (!staff) {
             return res.status(500).json({ message: 'Failed to login tenant staff.' });
+        }
+
+        const log = await this.logService.createLog({
+            tenantId: staff.tenantId,
+            action: `${staff.fullName} logged in`,
+            reason: "User login",
+            details: `Staff ${staff.fullName} logged in at ${new Date().toISOString()}`,
+            feature: "login"
+        });
+
+        if (!log) {
+            res.status(500).json({ message: 'Failed to log login' });
         }
 
         return res.status(200).json({

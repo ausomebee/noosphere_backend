@@ -271,6 +271,52 @@ class SessionController {
         });
     });
 
+    getSessionsByServiceCode = expressAsyncHandler(async (req, res) => {
+        const { tenantId, serviceCodeId } = req.params;
+
+        try {
+            const sessions = await this.sessionService.getSessionsByServiceCode(tenantId, serviceCodeId);
+
+            if (!sessions || sessions.length === 0) {
+                return res.status(404).json({ message: "No sessions found for this service code" });
+            }
+
+            return res.status(200).json({
+                message: "Sessions fetched successfully",
+                status: "ok",
+                data: sessions,
+            });
+        } catch (error) {
+            return res.status(500).json({
+                message: error.message || "Failed to fetch sessions",
+                status: "error",
+            });
+        }
+    });
+
+    getSessionsBySessionType = expressAsyncHandler(async (req, res) => {
+        const { tenantId, sessionTypeId } = req.params;
+
+        try {
+            const sessions = await this.sessionService.getSessionsBySessionType(tenantId, sessionTypeId);
+
+            if (!sessions || sessions.length === 0) {
+                return res.status(404).json({ message: "No sessions found for this session type" });
+            }
+
+            return res.status(200).json({
+                message: "Sessions fetched successfully",
+                status: "ok",
+                data: sessions,
+            });
+        } catch (error) {
+            return res.status(500).json({
+                message: error.message || "Failed to fetch sessions",
+                status: "error",
+            });
+        }
+    });
+
     getSessions = expressAsyncHandler(async (req, res) => {
         const sessions = await this.sessionService.getSessions(req.params.tenantId);
 

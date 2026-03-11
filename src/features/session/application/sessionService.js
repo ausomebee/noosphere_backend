@@ -51,6 +51,26 @@ class SessionService {
         return update;
     }
 
+    async getSessionsBySessionType(tenantId, sessionTypeId) {
+        const session = await this.sessionRepository.getSessionsBySessionType(tenantId, sessionTypeId);
+
+        if (!session) {
+            throw new Error("Session not found");
+        }
+
+        return session;
+    }
+
+    async getSessionsByServiceCode(tenantId, serviceCodeId) {
+        const session = await this.sessionRepository.getSessionsByServiceCode(tenantId, serviceCodeId);
+
+        if (!session) {
+            throw new Error("Session not found");
+        }
+
+        return session;
+    }
+
     async getSingleSession(id) {
         const session = await this.sessionRepository.findOneAndPopulate(id);
 
