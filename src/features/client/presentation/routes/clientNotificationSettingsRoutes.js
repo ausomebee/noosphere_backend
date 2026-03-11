@@ -128,7 +128,6 @@ class ClientNotificationSettingsRoutes {
          */
         this.router.put(
             "/:id",
-            ClientNotificationSettingsDto.updateNotificationSettingsDto,
             this.controller.updateNotificationSettings
         );
 
