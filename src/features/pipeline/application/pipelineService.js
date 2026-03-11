@@ -285,7 +285,15 @@ class PipelineService {
 
     async getItemById(id) {
         const item = await this.itemRepository.findOneAndPopulate({ id: id }, {
-            tenant: true, admin: true
+            tenant: {
+                include: {
+                    Subscription: {
+                        include: {
+                            payment: true
+                        }
+                    }
+                }
+            }, admin: true,
         });
 
         if (!item) {
