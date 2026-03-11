@@ -26,6 +26,14 @@ class PaymentRepository extends BaseRepository {
                 orderBy: {
                     createdAt: "desc",
                 },
+                include: {
+                    tenant: {
+                        select: {
+                            id: true,
+                            companyName: true
+                        }
+                    }
+                },
                 skip,
                 take: pageSize,
             }),
