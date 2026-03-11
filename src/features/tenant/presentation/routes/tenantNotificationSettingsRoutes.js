@@ -30,7 +30,11 @@ import TenantNotificationSettingsDto from "../dto/tenantNotificationSettingsDto.
  *       type: object
  *       required:
  *         - settings
+ *         - userId
  *       properties:
+ *         userId:
+ *           type: string
+ *           format: uuid
  *         settings:
  *           type: object
  *           description: Notification categories with nested booleans
@@ -72,13 +76,7 @@ class TenantNotificationSettingsRoutes {
          *   put:
          *     summary: Update tenant notification settings for a user
          *     tags: [tenant-notification-settings]
-         *     parameters:
-         *       - in: path
-         *         name: userId
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: TenantStaff user ID
+         *     
          *     requestBody:
          *       required: true
          *       content:

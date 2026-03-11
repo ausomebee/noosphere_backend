@@ -15,6 +15,9 @@ class TenantNotificationSettingsDto {
 
     static updateNotificationSettingsDto = (req, res, next) => {
         const schema = Joi.object({
+            userId: Joi.string()
+                .uuid()
+                .required(),
             settings: Joi.array()
         });
 
