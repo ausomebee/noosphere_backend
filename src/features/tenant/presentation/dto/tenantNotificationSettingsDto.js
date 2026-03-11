@@ -7,15 +7,7 @@ class TenantNotificationSettingsDto {
             userId: Joi.string()
                 .uuid()
                 .required(),
-            settings: Joi.object()
-                .required()
-                .pattern(
-                    Joi.string(),
-                    Joi.object().pattern(
-                        Joi.string(),
-                        Joi.boolean()
-                    )
-                )
+            settings: Joi.array().required()
         });
 
         Validator.validateRequest(req, next, schema);
@@ -23,15 +15,7 @@ class TenantNotificationSettingsDto {
 
     static updateNotificationSettingsDto = (req, res, next) => {
         const schema = Joi.object({
-            settings: Joi.object()
-                .required()
-                .pattern(
-                    Joi.string(),
-                    Joi.object().pattern(
-                        Joi.string(),
-                        Joi.boolean()
-                    )
-                )
+            settings: Joi.array()
         });
 
         Validator.validateRequest(req, next, schema);
