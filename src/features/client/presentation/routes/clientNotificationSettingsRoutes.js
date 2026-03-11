@@ -10,43 +10,65 @@ import ClientNotificationSettingsDto from "../dto/clientNotificationSettingsDto.
  *       type: object
  *       required:
  *         - tenantClientId
- *         - reschedule
- *         - starts
- *         - completed
- *         - awaitingReview
- *         - approvedReschedule
  *       properties:
  *         tenantClientId:
  *           type: string
  *           format: uuid
- *         reschedule:
+ *         appointmentScheduled:
  *           type: boolean
- *         starts:
+ *         appointmentRescheduled:
  *           type: boolean
- *         completed:
+ *         appointmentAboutToStart:
  *           type: boolean
- *         awaitingReview:
+ *         appointmentStarted:
  *           type: boolean
- *         approvedReschedule:
+ *         appointmentCancelled:
+ *           type: boolean
+ *         appointmentCompletedAwaitingFeedback:
+ *           type: boolean
+ *         documentRequested:
+ *           type: boolean
+ *         formShared:
+ *           type: boolean
+ *         authorizationAboutToExpire:
+ *           type: boolean
+ *         authorizationExpired:
+ *           type: boolean
+ *         authorizationUnitsAlmostExhausted:
+ *           type: boolean
+ *         authorizationUnitsExhausted:
+ *           type: boolean
+ *         signatureRequested:
  *           type: boolean
  *
  *     NotificationSettingsUpdateDto:
  *       type: object
- *       required:
- *         - id
  *       properties:
- *         id:
- *           type: string
- *           format: uuid
- *         reschedule:
+ *         appointmentScheduled:
  *           type: boolean
- *         starts:
+ *         appointmentRescheduled:
  *           type: boolean
- *         completed:
+ *         appointmentAboutToStart:
  *           type: boolean
- *         awaitingReview:
+ *         appointmentStarted:
  *           type: boolean
- *         approvedReschedule:
+ *         appointmentCancelled:
+ *           type: boolean
+ *         appointmentCompletedAwaitingFeedback:
+ *           type: boolean
+ *         documentRequested:
+ *           type: boolean
+ *         formShared:
+ *           type: boolean
+ *         authorizationAboutToExpire:
+ *           type: boolean
+ *         authorizationExpired:
+ *           type: boolean
+ *         authorizationUnitsAlmostExhausted:
+ *           type: boolean
+ *         authorizationUnitsExhausted:
+ *           type: boolean
+ *         signatureRequested:
  *           type: boolean
  */
 
@@ -58,9 +80,10 @@ class ClientNotificationSettingsRoutes {
     }
 
     initializeRoutes() {
+
         /**
          * @swagger
-         * /api/v1/notification-settings:
+         * /api/v1/client/notification-settings:
          *   post:
          *     summary: Create notification settings for a client
          *     tags: [client-notification-settings]
@@ -82,10 +105,17 @@ class ClientNotificationSettingsRoutes {
 
         /**
          * @swagger
-         * /api/v1/notification-settings:
+         * /api/v1/client/notification-settings/{id}:
          *   put:
-         *     summary: Update notification settings for a client
+         *     summary: Update notification settings
          *     tags: [client-notification-settings]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: Notification settings ID
          *     requestBody:
          *       required: true
          *       content:
@@ -93,20 +123,20 @@ class ClientNotificationSettingsRoutes {
          *           schema:
          *             $ref: '#/components/schemas/NotificationSettingsUpdateDto'
          *     responses:
-         *       201:
+         *       200:
          *         description: Notification settings updated successfully
          */
         this.router.put(
-            "/",
+            "/:id",
             ClientNotificationSettingsDto.updateNotificationSettingsDto,
             this.controller.updateNotificationSettings
         );
 
         /**
          * @swagger
-         * /api/v1/notification-settings/{id}:
+         * /api/v1/client/notification-settings/{id}:
          *   get:
-         *     summary: Get a single notification settings record
+         *     summary: Get notification settings by ID
          *     tags: [client-notification-settings]
          *     parameters:
          *       - in: path
@@ -120,29 +150,29 @@ class ClientNotificationSettingsRoutes {
          *         description: Notification settings fetched successfully
          */
         this.router.get(
-            "/:id",
+            "/single/:id",
             this.controller.getSingleNotificationSettings
         );
 
         /**
          * @swagger
-         * /api/v1/notification-settings/tenant/{clientTenantId}:
+         * /api/v1/client/notification-settings/{tenantClientId}:
          *   get:
-         *     summary: Get notification settings for a specific clientTenantId
+         *     summary: Get notification settings for a client
          *     tags: [client-notification-settings]
          *     parameters:
          *       - in: path
-         *         name: clientTenantId
+         *         name: tenantClientId
          *         schema:
          *           type: string
          *         required: true
-         *         description: The client tenant ID
+         *         description: Client tenant ID
          *     responses:
          *       200:
          *         description: Notification settings fetched successfully
          */
         this.router.get(
-            "/tenant/:clientTenantId",
+            "/:tenantClientId",
             this.controller.getNotificationSettingsByClient
         );
     }

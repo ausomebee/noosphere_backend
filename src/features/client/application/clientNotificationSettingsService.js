@@ -29,13 +29,10 @@ class ClientNotificationSettingsService {
             throw new Error("Notification settings not found");
         }
 
-        const updated = await this.clientNotificationSettingsRepository.update(data.id, {
-            reschedule: data.reschedule ?? record.reschedule,
-            starts: data.starts ?? record.starts,
-            completed: data.completed ?? record.completed,
-            awaitingReview: data.awaitingReview ?? record.awaitingReview,
-            approvedReschedule: data.approvedReschedule ?? record.approvedReschedule,
-        });
+        // Remove id so it doesn't attempt to update it
+        const { id, ...updateData } = data;
+
+        const updated = await this.clientNotificationSettingsRepository.update(id, updateData);
 
         if (!updated) {
             throw new Error("Failed to update notification settings");
@@ -54,17 +51,29 @@ class ClientNotificationSettingsService {
         return record;
     }
 
-    async getNotificationSettingsByClient(clientTenantId) {
-        const record = await this.clientNotificationSettingsRepository.findByClientId(clientTenantId);
+    async getNotificationSettingsByClient(tenantClientId) {
+        const record = await this.clientNotificationSettingsRepository.findByClientId(tenantClientId);
 
         if (!record) {
             const newRecord = await this.clientNotificationSettingsRepository.create({
-                tenantClientId: clientTenantId,
-                reschedule: false,
-                starts: false,
-                completed: false,
-                awaitingReview: false,
-                approvedReschedule: false
+                tenantClientId,
+
+                appointmentScheduled: true,
+                appointmentRescheduled: true,
+                appointmentAboutToStart: true,
+                appointmentStarted: true,
+                appointmentCancelled: true,
+                appointmentCompletedAwaitingFeedback: true,
+
+                documentRequested: true,
+                formShared: true,
+
+                authorizationAboutToExpire: true,
+                authorizationExpired: true,
+                authorizationUnitsAlmostExhausted: true,
+                authorizationUnitsExhausted: true,
+
+                signatureRequested: true
             });
 
             if (!newRecord) {

@@ -7,23 +7,24 @@ import ClientNotificationSettings from "../../domain/clientNotificationSettings.
 class ClientNotificationSettingsController {
     constructor() {
         this.prisma = prismaService.getClient();
-        this.clientNotificationSettingsRepository = new ClientNotificationSettingsRepository(
-            this.prisma.clientNotificationSettings
-        );
+
+        this.clientNotificationSettingsRepository =
+            new ClientNotificationSettingsRepository(
+                this.prisma.clientNotificationSettings
+            );
+
         this.service = new ClientNotificationSettingsService({
-            clientNotificationSettingsRepository: this.clientNotificationSettingsRepository
+            clientNotificationSettingsRepository:
+                this.clientNotificationSettingsRepository
         });
     }
 
     createNotificationSettings = expressAsyncHandler(async (req, res) => {
         const data = new ClientNotificationSettings(req.body);
+
         const newRecord = await this.service.createNotificationSettings(
             data.createNotificationSettings
         );
-
-        if (!newRecord) {
-            return res.status(500).json({ message: "Failed to create notification settings" });
-        }
 
         return res.status(201).json({
             message: "Notification settings created successfully",
@@ -33,13 +34,12 @@ class ClientNotificationSettingsController {
     });
 
     updateNotificationSettings = expressAsyncHandler(async (req, res) => {
-        const updated = await this.service.updateNotificationSettings(req.body);
+        const updated = await this.service.updateNotificationSettings({
+            id: req.params.id,
+            ...req.body
+        });
 
-        if (!updated) {
-            return res.status(500).json({ message: "Failed to update notification settings" });
-        }
-
-        return res.status(201).json({
+        return res.status(200).json({
             message: "Notification settings updated successfully",
             status: "ok",
             data: updated
@@ -47,11 +47,9 @@ class ClientNotificationSettingsController {
     });
 
     getSingleNotificationSettings = expressAsyncHandler(async (req, res) => {
-        const record = await this.service.getSingleNotificationSettings(req.params.id);
-
-        if (!record) {
-            return res.status(500).json({ message: "Failed to fetch notification settings" });
-        }
+        const record = await this.service.getSingleNotificationSettings(
+            req.params.id
+        );
 
         return res.status(200).json({
             message: "Notification settings fetched successfully",
@@ -61,11 +59,9 @@ class ClientNotificationSettingsController {
     });
 
     getNotificationSettingsByClient = expressAsyncHandler(async (req, res) => {
-        const record = await this.service.getNotificationSettingsByClient(req.params.clientTenantId);
-
-        if (!record) {
-            return res.status(500).json({ message: "Failed to fetch notification settings for client" });
-        }
+        const record = await this.service.getNotificationSettingsByClient(
+            req.params.tenantClientId
+        );
 
         return res.status(200).json({
             message: "Notification settings fetched successfully",

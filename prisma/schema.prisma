@@ -478,7 +478,7 @@ model ClientTenant {
   clinicalReports              ClinicalReport[]
   clinicalReportChangeRequests ClinicalReportChangeRequest[]
   clientFiles                  ClientFiles[]
-  clientNotificationSettings   clientNotificationSettings[]
+  clientNotificationSettings   ClientNotificationSettings[]
   serverRequests               ServerRequest[]
 
   @@unique([clientId, tenantId])
@@ -516,14 +516,24 @@ model ClientRequestedDocuments {
   clientDocuments ClientDocuments[]
 }
 
-model clientNotificationSettings {
-  id                 String  @id @default(uuid())
-  tenantClientId     String
-  reschedule         Boolean
-  starts             Boolean
-  completed          Boolean
-  awaitingReview     Boolean
-  approvedReschedule Boolean
+model ClientNotificationSettings {
+  id                                   String   @id @default(uuid())
+  tenantClientId                       String   @unique
+  appointmentScheduled                 Boolean  @default(true)
+  appointmentRescheduled               Boolean  @default(true)
+  appointmentAboutToStart              Boolean  @default(true)
+  appointmentStarted                   Boolean  @default(true)
+  appointmentCancelled                 Boolean  @default(true)
+  appointmentCompletedAwaitingFeedback Boolean  @default(true)
+  documentRequested                    Boolean  @default(true)
+  formShared                           Boolean  @default(true)
+  authorizationAboutToExpire           Boolean  @default(true)
+  authorizationExpired                 Boolean  @default(true)
+  authorizationUnitsAlmostExhausted    Boolean  @default(true)
+  authorizationUnitsExhausted          Boolean  @default(true)
+  signatureRequested                   Boolean  @default(true)
+  createdAt                            DateTime @default(now())
+  updatedAt                            DateTime @updatedAt
 
   tenantClient ClientTenant @relation(fields: [tenantClientId], references: [id])
 }
