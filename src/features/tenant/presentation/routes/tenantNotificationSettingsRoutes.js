@@ -72,7 +72,7 @@ class TenantNotificationSettingsRoutes {
 
         /**
          * @swagger
-         * /api/v1/tenant/notification-settings/{userId}:
+         * /api/v1/tenant/notification-settings/:
          *   put:
          *     summary: Update tenant notification settings for a user
          *     tags: [tenant-notification-settings]
@@ -88,7 +88,7 @@ class TenantNotificationSettingsRoutes {
          *         description: Tenant notification settings updated successfully
          */
         this.router.put(
-            "/:userId",
+            "/",
             TenantNotificationSettingsDto.updateNotificationSettingsDto,
             this.controller.saveNotificationSettings
         );
