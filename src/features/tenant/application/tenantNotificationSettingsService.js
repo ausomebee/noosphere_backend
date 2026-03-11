@@ -4,10 +4,24 @@ class TenantNotificationSettingsService {
     }
 
     async getNotificationSettings(userId) {
-        const record = await this.tenantNotificationSettingsRepository.findByUserId(userId);
+        let record = await this.tenantNotificationSettingsRepository.findByUserId(userId);
 
         if (!record) {
-            return null;
+            const defaultSettings = {
+                CALENDAR_APPOINTMENTS: {
+                    enabled: false,
+                    upcoming_appointments: false,
+                    canceled_appointments: false
+                },
+                CLIENT_MANAGEMENT: {
+                    enabled: false
+                }
+            };
+
+            record = await this.tenantNotificationSettingsRepository.upsert({
+                userId,
+                settings: defaultSettings
+            });
         }
 
         return record.settings;
