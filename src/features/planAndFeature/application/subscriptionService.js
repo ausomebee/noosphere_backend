@@ -71,7 +71,18 @@ class SubscriptionService {
     }
 
     async getSubscriptionByPlan(planId) {
-        const subscription = await this.subscriptionRepository.findAllAndPopulate({ planId }, { tenant: true });
+        const subscription = await this.subscriptionRepository.findAllAndPopulate({ planId }, {
+            tenant: {
+                include: {
+                    pipelineItems: {
+                        select: {
+                            id: true,
+                            pipelineStageId: true
+                        }
+                    }
+                }
+            }
+        });
 
         if (!subscription) {
             throw new Error("Subscriptions not found")

@@ -18,6 +18,10 @@ import ClientAuthorizationServiceService from "../../../client/application/clien
 import TimesheetHistoryRepository from "../../infrastructure/timesheetHistoryRepository.js";
 import TimesheetHistoryService from "../../application/timesheetHistoryService.js";
 import TimesheetHistory from "../../domain/timesheetHistory.js";
+import Message from "../../../messaging/domain/message.js";
+import MessageRepository from "../../../messaging/infrastructure/messageRepository.js";
+import MessageService from "../../../messaging/application/messageService.js";
+import socketService from "../../../../config/socket.js"
 
 class SessionController {
     constructor() {
@@ -44,6 +48,11 @@ class SessionController {
 
         this.historyRepository = new TimesheetHistoryRepository(this.prisma.timesheetHistory);
         this.historyService = new TimesheetHistoryService({ timesheetHistoryRepository: this.historyRepository });
+
+        this.messageRepository = new MessageRepository(this.prisma.message);
+        this.messageService = new MessageService({
+            messageRepository: this.messageRepository
+        });
     }
 
     createSession = expressAsyncHandler(async (req, res) => {
@@ -308,6 +317,40 @@ class SessionController {
                 message: "Sessions fetched successfully",
                 status: "ok",
                 data: sessions,
+            });
+        } catch (error) {
+            return res.status(500).json({
+                message: error.message || "Failed to fetch sessions",
+                status: "error",
+            });
+        }
+    });
+
+    nudgeClient = expressAsyncHandler(async (req, res) => {
+        const { clientId, senderId } = req.params;
+
+        try {
+            const messageData = new Message({
+                senderId: senderId,
+                senderType: "TENANT_STAFF",
+                receiverId: clientId,
+                receiverType: "CLIENT",
+                content: "Check yout timesheet",
+            });
+            const newRecord = await this.messageService.createMessage(messageData.createMessage);
+
+            if (!newRecord) {
+                return callback?.({
+                    success: false,
+                    error: "Failed to create message",
+                });
+            }
+
+            socketService.emitToUser(clientId, "CLIENT", "timesheet nudge", newRecord);
+
+            return res.status(200).json({
+                message: "client nudged successfully",
+                status: "ok",
             });
         } catch (error) {
             return res.status(500).json({

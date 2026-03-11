@@ -188,6 +188,38 @@ class SessionRoutes {
         );
 
         /**
+         * @swagger
+         * /api/v1/sessions/nudge-client/{clientId}/{senderId}:
+         *   post:
+         *     summary: nudge client
+         *     tags: [sessions]
+         *     parameters:
+         *       - in: path
+         *         name: clientId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: client ID
+         *       - in: path
+         *         name: senderId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: staff ID
+         *     responses:
+         *       200:
+         *         description: client nudged successfully
+         *       404:
+         *         description: No sessions found
+         *       500:
+         *         description: Server error
+         */
+        this.router.post(
+            "/nudge-client/:clientId/:senderId",
+            this.controller.nudgeClient
+        );
+
+        /**
         * @swagger
         * /api/v1/sessions/session-type/{tenantId}/{sessionTypeId}:
         *   get:
