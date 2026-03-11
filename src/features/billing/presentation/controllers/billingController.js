@@ -12,6 +12,8 @@ import SubscriptionRepository from "../../../planAndFeature/infrastructure/subsc
 import SubscriptionService from "../../../planAndFeature/application/subscriptionService.js";
 import Subscription from "../../../planAndFeature/domain/subscription.js";
 import InvoiceTokenRepository from "../../../invoice/infrastructure/invoiceTokenRepository.js";
+import TenantRepository from "../../../tenant/infrastructure/tenantRepository.js";
+import TenantService from "../../../tenant/application/tenantService.js";
 
 class BillingController {
     constructor() {
@@ -35,6 +37,11 @@ class BillingController {
 
         this.subscriptionRepository = new SubscriptionRepository(this.prisma.subscription);
         this.subscriptionService = new SubscriptionService({ subscriptionRepository: this.subscriptionRepository });
+
+        this.tenantRepository = new TenantRepository(this.prisma.tenant);
+        this.tenantService = new TenantService({
+            tenantRepository: this.tenantRepository,
+        });
     }
 
     createBillingMetadata = expressAsyncHandler(async (req, res) => {
@@ -158,20 +165,6 @@ class BillingController {
             data: transaction
         });
     });
-
-    // updateTransaction = expressAsyncHandler(async (req, res) => {
-    //     const transaction = await this.service.updateTransaction(req.body);
-
-    //     if (!transaction) {
-    //         res.status(500).json({ message: 'Failed to update transaction' });
-    //     }
-
-    //     return res.status(201).json({
-    //         message: "Transaction updated successfully",
-    //         status: 'ok',
-    //         data: transaction
-    //     });
-    // });
 
     getSingleTransaction = expressAsyncHandler(async (req, res) => {
         const transaction = await this.service.getSingleTransaction(req.params);
@@ -370,6 +363,15 @@ class BillingController {
         const invoiceToken = await this.invoiceService.markLatestTokenAsUsed(req.body.invoiceId);
         if (!invoice || !invoiceToken) {
             res.status(500).json({ message: 'Failed to update invoice' });
+        }
+
+        const tenant = await this.tenantService.updateTenant({
+            id: req.body.tenantId,
+            active: true
+        });
+
+        if (!tenant) {
+            res.status(500).json({ message: 'Failed to update tenant.' });
         }
 
         return res.status(201).json({

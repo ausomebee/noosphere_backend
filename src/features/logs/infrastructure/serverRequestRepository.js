@@ -1,6 +1,7 @@
 class ServerRequestRepository {
-    constructor(model) {
+    constructor(model, prisma) {
         this.model = model;
+        this.prisma = prisma
     }
 
     async create(data) {
@@ -30,6 +31,26 @@ class ServerRequestRepository {
             where: { id },
             data,
         });
+    }
+
+    async getTenantServerRequestGraphLastYear(tenantId) {
+        const data = await this.prisma.$queryRaw`
+        SELECT 
+            DATE_TRUNC('month', "createdAt") AS month,
+            COUNT(*)::int AS total_requests
+        FROM "ServerRequest"
+        WHERE "tenantId" = ${tenantId}
+        AND "createdAt" >= NOW() - INTERVAL '1 year'
+        GROUP BY month
+        ORDER BY month ASC
+    `;
+
+        return {
+            labels: data.map(d =>
+                new Date(d.month).toLocaleString("default", { month: "short", year: "numeric" })
+            ),
+            values: data.map(d => d.total_requests)
+        };
     }
 
     async getTenantLogs({ tenantId, page = 1, limit = 20, statusCodes = [] }) {

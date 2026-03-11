@@ -19,6 +19,8 @@ import SessionRepository from "../../../session/infrastructure/sessionRepository
 import SessionService from "../../../session/application/sessionService.js";
 import LogsRepository from "../../../logs/infrastructure/logsRepository.js";
 import LogsService from "../../../logs/application/logsService.js";
+import ServerRequestRepository from "../../../logs/infrastructure/serverRequestRepository.js";
+import ServerRequestService from "../../../logs/application/serverRequestService.js";
 
 class TenantController {
     constructor() {
@@ -53,6 +55,8 @@ class TenantController {
         this.sessionService = new SessionService({ sessionRepository: this.sessionRepository });
         this.logsRepository = new LogsRepository(this.prisma.logs);
         this.logService = new LogsService({ logsRepository: this.logsRepository });
+        this.serverRequestRepository = new ServerRequestRepository(this.prisma.serverRequest, this.prisma);
+        this.serverRequestService = new ServerRequestService({ serverRequestRepository: this.serverRequestRepository });
     }
 
     createCandidate = expressAsyncHandler(async (req, res) => {
@@ -183,17 +187,23 @@ class TenantController {
 
     getTenantRelationsCount = expressAsyncHandler(async (req, res) => {
         const tenantRelationsCount = await this.service.getTenantRelationsCount(req.params.tenantId);
-        
+
         if (!tenantRelationsCount) {
             return res.status(500).json({ message: 'Failed to fetch tenant relations count.' });
         }
-        
+
         const tenantSessionCount = await this.sessionService.countTenantSessions(req.params.tenantId);
-        
+
         const tenantSessionGraph = await this.sessionService.tenantOverviewGraph(req.params.tenantId, "month");
 
         if (!tenantSessionGraph) {
             return res.status(500).json({ message: 'Failed to fetch tenant session graph.' });
+        }
+
+        const getTenantServerRequestGraphLastYear = await this.serverRequestService.getTenantServerRequestGraphLastYear(req.params.tenantId);
+
+        if (!getTenantServerRequestGraphLastYear) {
+            return res.status(500).json({ message: 'Failed to fetch tenant server request.' });
         }
 
         return res.status(200).json({
@@ -202,7 +212,8 @@ class TenantController {
             data: {
                 ...tenantRelationsCount,
                 tenantSessionCount,
-                tenantSessionGraph
+                tenantSessionGraph,
+                getTenantServerRequestGraphLastYear
             }
         });
     });

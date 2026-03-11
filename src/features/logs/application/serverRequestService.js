@@ -13,6 +13,16 @@ class ServerRequestService {
         return newRequest;
     }
 
+    async getTenantServerRequestGraphLastYear(tenantId) {
+        const request = await this.serverRequestRepository.getTenantServerRequestGraphLastYear(tenantId);
+
+        if (!request) {
+            throw new Error("Server request log not found.");
+        }
+
+        return request;
+    }
+
     async getSingleRequest(data) {
         const request = await this.serverRequestRepository.findOne({ id: data.id });
 
