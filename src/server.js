@@ -272,7 +272,7 @@ class App {
         this.app.use("/api/v1/clinical-report-change-requests", clinicalReportRequestsRoute);
         this.app.use("/api/v1/tenant-security-questions", tenantAdditionalSecurityQuestionsRoute);
         this.app.use("/api/v1/tenant-general-settings", tenantGeneralSettingsRoute);
-        this.app.use("/api/v1/notification-settings", clientNotificationSettingsRoute);
+        this.app.use("/api/v1/client/notification-settings", clientNotificationSettingsRoute);
         this.app.use("/api/v1/payroll-cycle-staffs", payrollCycleStaffRoute);
         this.app.use("/api/v1/organization/teams", teamRoute);
         this.app.use("/api/v1/organization/team-members", teamMembersRoute);
