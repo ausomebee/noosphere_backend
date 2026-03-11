@@ -69,6 +69,22 @@ class BillingController {
         });
     });
 
+    getAllPayments = expressAsyncHandler(async (req, res) => {
+        const { page = 1, pageSize = 10 } = req.query;
+
+        const payments = await this.service.getAllPayments(
+            Number(page),
+            Number(pageSize)
+        );
+
+        return res.status(200).json({
+            message: "payments fetched successfully",
+            status: "ok",
+            data: payments.data,
+            pagination: payments.pagination,
+        });
+    });
+
     getTenantPaymentsByStatus = expressAsyncHandler(async (req, res) => {
         const { status, tenantId } = req.params;
 

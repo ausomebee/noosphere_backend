@@ -301,6 +301,34 @@ class TenantController {
         });
     });
 
+    getDeactivationLogs = expressAsyncHandler(async (req, res) => {
+        const logs = await this.service.getDeactivationLogs(req.query);
+
+        if (!logs) {
+            return res.status(500).json({ message: 'Failed to fetch deactivation logs.' });
+        }
+
+        return res.status(200).json({
+            message: "Deactivation logs fetched successfully",
+            status: 'ok',
+            data: logs
+        });
+    });
+
+    getActivationLogs = expressAsyncHandler(async (req, res) => {
+        const logs = await this.service.getActivationLogs(req.query);
+
+        if (!logs) {
+            return res.status(500).json({ message: 'Failed to fetch activation logs.' });
+        }
+
+        return res.status(200).json({
+            message: "Activation logs fetched successfully",
+            status: 'ok',
+            data: logs
+        });
+    });
+
     availaibleStaffs = expressAsyncHandler(async (req, res) => {
         const count = await this.service.availaibleStaffs(req.params.tenantId);
 

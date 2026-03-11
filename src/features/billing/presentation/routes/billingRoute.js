@@ -713,17 +713,32 @@ class BillingRoutes {
 
         /**
          * @swagger
-         * /api/v1/billing/allpayment:
+         * /api/v1/billing/allpayment/:
          *   get:
-         *     summary: Retrieve all payment
+         *     summary: Retrieve all payments
          *     tags: [billing]
+         *     parameters:
+         *       - in: query
+         *         name: page
+         *         required: false
+         *         schema:
+         *           type: integer
+         *           default: 1
+         *         description: Page number for pagination
+         *       - in: query
+         *         name: pageSize
+         *         required: false
+         *         schema:
+         *           type: integer
+         *           default: 10
+         *         description: Number of records per page
          *     responses:
          *       200:
-         *         description: all payment retrieved successfully
+         *         description: payments retrieved successfully
          *       400:
          *         description: Bad request
          */
-        this.router.get("/allpayment", this.controller.getAllPayment);
+        this.router.get("/allpayment", this.controller.getAllPayments);
 
         /**
         * @swagger

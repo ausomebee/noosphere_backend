@@ -18,6 +18,31 @@ class PaymentRepository extends BaseRepository {
         });
     }
 
+    async getAllPayments(page = 1, pageSize = 10) {
+        const skip = (page - 1) * pageSize;
+
+        const [payments, total] = await Promise.all([
+            this.model.findMany({
+                orderBy: {
+                    createdAt: "desc",
+                },
+                skip,
+                take: pageSize,
+            }),
+            this.model.count({}),
+        ]);
+
+        return {
+            data: payments,
+            pagination: {
+                total,
+                page,
+                pageSize,
+                totalPages: Math.ceil(total / pageSize),
+            },
+        };
+    }
+
     async getTenantPayments(tenantId, filter = {}, page = 1, pageSize = 10) {
         const skip = (page - 1) * pageSize;
 

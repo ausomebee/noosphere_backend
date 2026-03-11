@@ -788,28 +788,59 @@ class TenantService {
     }
 
     async tenantActiveStatus(data) {
-        const tenant = await this.tenantRepository.findOne({ id: data.id })
+        const tenant = await this.tenantRepository.findOne({ id: data.id });
 
         if (!tenant) {
-            throw new Error("tenant not found");
+            throw new Error("Tenant not found");
         }
 
-        const update = await this.tenantRepository.update(data.id, {
+        const updatedTenant = await this.tenantRepository.update(data.id, {
             active: data.active ?? tenant.active,
         });
 
-        await this.tenantDeactivationRepository.create({
-            tenantId: data.id,
-            deactivatedById: data.deactivatedById,
-            reason: data.reason,
-            details: data.details
-        })
-
-        if (!update) {
+        if (!updatedTenant) {
             throw new Error("Failed to update tenant");
         }
 
-        return update;
+        if (data.active === false) {
+            await this.tenantDeactivationRepository.create({
+                tenantId: data.id,
+                deactivatedById: data.deactivatedById,
+                reason: data.reason,
+                details: data.details
+            });
+        }
+
+        if (data.active === true) {
+            const lastDeactivation =
+                await this.tenantDeactivationRepository.findLatestByTenantId(data.id);
+
+            if (lastDeactivation && !lastDeactivation.reactivationDate) {
+                await this.tenantDeactivationRepository.update(lastDeactivation.id, {
+                    reactivationDate: new Date()
+                });
+            }
+        }
+
+        return updatedTenant;
+    }
+
+    async getDeactivationLogs(query) {
+        const page = Number(query.page) || 1;
+        const limit = Number(query.limit) || 10;
+
+        const logs = await this.tenantDeactivationRepository.getDeactivationLogs(page, limit);
+
+        return logs;
+    }
+
+    async getActivationLogs(query) {
+        const page = Number(query.page) || 1;
+        const limit = Number(query.limit) || 10;
+
+        const logs = await this.tenantDeactivationRepository.getReactivationLogs(page, limit);
+
+        return logs;
     }
 
     async getAllTenant() {

@@ -60,6 +60,39 @@ class InvoiceRepository {
         };
     }
 
+    async getAllInvoices(page = 1, pageSize = 10) {
+        const skip = (page - 1) * pageSize;
+
+        const [invoices, total] = await Promise.all([
+            this.model.findMany({
+                orderBy: {
+                    createdAt: "desc",
+                },
+                include: {
+                    tenant: {
+                        select: {
+                            id: true,
+                            companyName: true
+                        }
+                    }
+                },
+                skip,
+                take: pageSize,
+            }),
+            this.model.count({}),
+        ]);
+
+        return {
+            data: invoices,
+            pagination: {
+                total,
+                page,
+                pageSize,
+                totalPages: Math.ceil(total / pageSize),
+            },
+        };
+    }
+
     async getTenantInvoicesByStatus(tenantId, status) {
         return await this.model.findMany({
             where: {

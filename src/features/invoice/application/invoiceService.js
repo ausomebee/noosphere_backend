@@ -206,7 +206,6 @@ class InvoiceService {
     }
 
     async regeneratePaymentLink(tenantId) {
-        console.log(tenantId)
         const invoice = await this.invoiceRepository.findFirst({ tenantId: tenantId });
 
         if (!invoice) {
@@ -258,6 +257,19 @@ class InvoiceService {
 
         if (!invoices || invoices.data.length === 0) {
             throw new Error("No invoices found for this tenant");
+        }
+
+        return invoices;
+    }
+
+    async getAllInvoices(page = 1, pageSize = 10) {
+        const invoices = await this.invoiceRepository.getAllInvoices(
+            page,
+            pageSize
+        );
+
+        if (!invoices || invoices.data.length === 0) {
+            throw new Error("No invoices found");
         }
 
         return invoices;

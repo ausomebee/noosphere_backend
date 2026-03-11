@@ -477,6 +477,60 @@ class TenantRoutes {
 
         /**
          * @swagger
+         * /api/v1/tenant/deactivation-logs:
+         *   get:
+         *     summary: Retrieve all tenant deactivation logs
+         *     tags: [Tenant]
+         *     parameters:
+         *       - in: query
+         *         name: page
+         *         schema:
+         *           type: integer
+         *         required: false
+         *         description: Page number for pagination
+         *       - in: query
+         *         name: limit
+         *         schema:
+         *           type: integer
+         *         required: false
+         *         description: Number of records per page
+         *     responses:
+         *       200:
+         *         description: Deactivation logs retrieved successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get("/deactivation-logs", this.controller.getDeactivationLogs);
+
+        /**
+         * @swagger
+         * /api/v1/tenant/activation-logs:
+         *   get:
+         *     summary: Retrieve all tenant activation logs
+         *     tags: [Tenant]
+         *     parameters:
+         *       - in: query
+         *         name: page
+         *         schema:
+         *           type: integer
+         *         required: false
+         *         description: Page number for pagination
+         *       - in: query
+         *         name: limit
+         *         schema:
+         *           type: integer
+         *         required: false
+         *         description: Number of records per page
+         *     responses:
+         *       200:
+         *         description: Activation logs retrieved successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get("/activation-logs", this.controller.getActivationLogs);
+
+        /**
+         * @swagger
          * /api/v1/tenant/count:
          *   get:
          *     summary: Count all tenants

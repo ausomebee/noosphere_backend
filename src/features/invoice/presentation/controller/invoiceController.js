@@ -136,6 +136,22 @@ class InvoiceController {
         });
     });
 
+     getAllInvoices = expressAsyncHandler(async (req, res) => {
+        const { page = 1, pageSize = 10 } = req.query;
+
+        const invoices = await this.service.getAllInvoices(
+            Number(page),
+            Number(pageSize)
+        );
+
+        return res.status(200).json({
+            message: "Invoices fetched successfully",
+            status: "ok",
+            data: invoices.data,
+            pagination: invoices.pagination,
+        });
+    });
+
     getTenantInvoicesByStatus = expressAsyncHandler(async (req, res) => {
         const { status, tenantId } = req.params;
 

@@ -330,17 +330,32 @@ class InvoiceRoutes {
 
         /**
          * @swagger
-         * /api/v1/invoice:
+         * /api/v1/invoice/:
          *   get:
          *     summary: Retrieve all invoices
          *     tags: [Invoice]
+         *     parameters:
+         *       - in: query
+         *         name: page
+         *         required: false
+         *         schema:
+         *           type: integer
+         *           default: 1
+         *         description: Page number for pagination
+         *       - in: query
+         *         name: pageSize
+         *         required: false
+         *         schema:
+         *           type: integer
+         *           default: 10
+         *         description: Number of invoices per page
          *     responses:
          *       200:
-         *         description: all invoices retrieved successfully
+         *         description: invoices retrieved successfully
          *       400:
          *         description: Bad request
          */
-        this.router.get("/", this.controller.getAllInvoice);
+        this.router.get("/", this.controller.getAllInvoices);
 
         /**
          * @swagger
