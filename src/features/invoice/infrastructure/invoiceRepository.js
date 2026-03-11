@@ -137,7 +137,7 @@ class InvoiceRepository {
             }
 
             if (token.used) {
-                const payment = invoice.payments.find(
+                const payment = invoice.Payment.find(
                     (p) => p.invoiceId === invoiceId
                 );
 
