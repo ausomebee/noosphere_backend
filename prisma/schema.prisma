@@ -348,6 +348,17 @@ model TenantStaff {
   payrollCycleStaffs           PayrollCycleStaffs[]
   teamMembers                  TeamMembers[]
   serverRequests               ServerRequest[]
+  tenantNotificationSettings   TenantNotificationSettings?
+}
+
+model TenantNotificationSettings {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  settings  Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user TenantStaff @relation(fields: [userId], references: [id])
 }
 
 model Teams {
