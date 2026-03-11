@@ -53,6 +53,26 @@ class TenantRepository extends BaseRepository {
                 admin: {
                     select: { firstName: true, lastName: true }
                 },
+                pipelineItems: {
+                    select: {
+                        id: true,
+                        pipelineStageId: true
+                    }
+                },
+                _count: {
+                    select: {
+                        clientLinks: true
+                    }
+                },
+                Invoice: {
+                    orderBy: {
+                        createdAt: "desc"
+                    },
+                    take: 1,
+                    select: {
+                        id: true
+                    }
+                }
             }
         });
     }
