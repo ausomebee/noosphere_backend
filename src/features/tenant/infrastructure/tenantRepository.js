@@ -86,9 +86,16 @@ class TenantRepository extends BaseRepository {
                         clientLinks: true,
                         serverRequests: true,
                     }
-                },
-            },
+                }
+            }
         });
+
+        if (!tenant) {
+            return {
+                tenantClientsCount: 0,
+                serverRequestsCount: 0
+            };
+        }
 
         return {
             tenantClientsCount: tenant._count.clientLinks,

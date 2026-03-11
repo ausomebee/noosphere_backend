@@ -60,6 +60,12 @@ class SubscriptionRepository extends BaseRepository {
                         _count: {
                             select: { clientLinks: true },
                         },
+                        pipelineItems: {
+                            select: {
+                                id: true,
+                                pipelineStageId: true
+                            }
+                        },
                     },
                 },
             },

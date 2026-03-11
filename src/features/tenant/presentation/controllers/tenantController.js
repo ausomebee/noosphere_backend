@@ -183,13 +183,14 @@ class TenantController {
 
     getTenantRelationsCount = expressAsyncHandler(async (req, res) => {
         const tenantRelationsCount = await this.service.getTenantRelationsCount(req.params.tenantId);
-
+        
         if (!tenantRelationsCount) {
             return res.status(500).json({ message: 'Failed to fetch tenant relations count.' });
         }
-
+        
         const tenantSessionCount = await this.sessionService.countTenantSessions(req.params.tenantId);
-
+        
+        console.log("object")
         if (!tenantSessionCount) {
             return res.status(500).json({ message: 'Failed to fetch tenant session count.' });
         }
