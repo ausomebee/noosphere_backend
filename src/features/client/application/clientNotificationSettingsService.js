@@ -54,7 +54,7 @@ class ClientNotificationSettingsService {
     async getNotificationSettingsByClient(tenantClientId) {
         const record = await this.clientNotificationSettingsRepository.findByClientId(tenantClientId);
 
-        if (!record) {
+        if (record.length === 0) {
             const newRecord = await this.clientNotificationSettingsRepository.create({
                 tenantClientId,
 

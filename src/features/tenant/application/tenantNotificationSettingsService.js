@@ -6,7 +6,7 @@ class TenantNotificationSettingsService {
     async getNotificationSettings(userId) {
         let record = await this.tenantNotificationSettingsRepository.findByUserId(userId);
 
-        if (!record) {
+        if (record.length === 0) {
             const defaultSettings = [
                 {
                     key: "CALENDAR_APPOINTMENTS",
