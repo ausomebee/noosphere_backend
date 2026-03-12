@@ -143,6 +143,49 @@ class LogsRoutes {
         */
         this.router.get("/tenant/activity", this.controller.getTenantLogs);
 
+        /**
+        * @swagger
+        * /api/v1/logs/tenant/feature/activity:
+        *   get:
+        *     summary: gets tenant logs
+        *     tags: [log]
+        *     parameters:
+        *       - in: query
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The ID of the tenant
+        *       - in: query
+        *         name: featureNames
+        *         required: false
+        *         schema:
+        *           type: array
+        *           items:
+        *             type: string
+        *         description: Optional list of feature names to filter logs
+        *       - in: query
+        *         name: page
+        *         required: false
+        *         schema:
+        *           type: integer
+        *           default: 1
+        *         description: Page number for pagination
+        *       - in: query
+        *         name: limit
+        *         required: false
+        *         schema:
+        *           type: integer
+        *           default: 20
+        *         description: Number of logs per page for pagination
+        *     responses:
+        *       200:
+        *         description: Logs fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant/feature/activity", this.controller.getTenantLogsGroupedByFeature);
+
     }
 
     getRouter() {

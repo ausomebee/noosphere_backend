@@ -51,6 +51,20 @@ class LogsController {
             data: logs
         });
     });
+
+    getTenantLogsGroupedByFeature = expressAsyncHandler(async (req, res) => {
+        const logs = await this.service.getTenantLogsGroupedByFeature(req.query);
+
+        if (!logs) {
+            res.status(500).json({ message: 'Failed to fetch logs' });
+        }
+
+        return res.status(201).json({
+            message: "Logs fetched successfully",
+            status: 'ok',
+            data: logs
+        });
+    });
 }
 
 export default LogsController;
