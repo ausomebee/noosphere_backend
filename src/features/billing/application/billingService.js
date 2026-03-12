@@ -43,6 +43,16 @@ class BillingService {
         return result;
     }
 
+    async getTenantPaymentMethods(tenantId) {
+        const result = await this.paymentMethodRepository.findAll({ tenantId });
+
+        if (!result || result.length === 0) {
+            throw new Error("No payments found for this tenant");
+        }
+
+        return result;
+    }
+
     async getAllPayments(page = 1, pageSize = 10) {
         const result = await this.paymentRepository.getAllPayments(
             page,

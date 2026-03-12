@@ -504,6 +504,27 @@ class BillingRoutes {
         this.router.get("/getbillingmetadata/:id", BillingDto.checkIdDto, this.controller.getSingleBillingMetadata);
 
         /**
+        * @swagger
+        * /api/v1/billing/payment-methods/tenant/{tenantId}:
+        *   get:
+        *     summary: gets tenant payment methods
+        *     tags: [billing]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The ID of the tenant
+        *     responses:
+        *       200:
+        *         description: tenant payment methods fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/payment-methods/tenant/:tenantId", this.controller.getTenantPaymentMethods);
+
+        /**
          * @swagger
          * /api/v1/billing/tenants/{tenantId}/payments/status/{status}:
          *   get:

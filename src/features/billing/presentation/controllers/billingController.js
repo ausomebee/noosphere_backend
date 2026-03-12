@@ -251,6 +251,20 @@ class BillingController {
         });
     });
 
+    getTenantPaymentMethods = expressAsyncHandler(async (req, res) => {
+        const paymentMethods = await this.service.getTenantPaymentMethods(req.params.tenantId);
+
+        if (!paymentMethods) {
+            res.status(500).json({ message: 'Failed to fetch payment methods' });
+        }
+
+        return res.status(201).json({
+            message: "Payment methods fetched successfully",
+            status: 'ok',
+            data: paymentMethods
+        });
+    });
+
     getPaymentByStatus = expressAsyncHandler(async (req, res) => {
         const payment = await this.service.getPaymentByStatus(req.params.status);
 
