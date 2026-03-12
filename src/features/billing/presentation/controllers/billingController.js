@@ -363,7 +363,7 @@ class BillingController {
             res.status(500).json({ message: 'Failed to create payment' });
         }
 
-        if (payment.status === "Failed") {
+        if (payment.status === "FAILED") {
             return res.status(400).json({ message: "Payment failed, please try again." });
         }
 
