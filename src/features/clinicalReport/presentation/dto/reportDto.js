@@ -16,7 +16,8 @@ class ClinicalReportDto {
                 .items(
                     Joi.object({
                         section: Joi.string().min(2).max(150).required(),
-                        content: Joi.object().required()
+                        content: Joi.object().required(),
+                        order: Joi.number()
                     })
                 )
                 .min(1)
@@ -42,7 +43,8 @@ class ClinicalReportDto {
                     Joi.object({
                         id: Joi.string().uuid().optional(),
                         section: Joi.string().min(2).max(150).optional(),
-                        content: Joi.object().optional()
+                        content: Joi.object().optional(),
+                        order: Joi.number()
                     })
                 )
                 .optional()

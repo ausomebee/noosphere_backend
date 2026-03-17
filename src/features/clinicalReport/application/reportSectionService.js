@@ -4,6 +4,7 @@ class ClinicalReportSectionService {
     }
 
     async createSection(data) {
+        console.log(data)
         const newRecord = await this.repository.create(data);
         if (!newRecord) throw new Error("Failed to create Clinical Report Section");
         return newRecord;
