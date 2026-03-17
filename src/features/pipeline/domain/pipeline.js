@@ -1,5 +1,5 @@
 class Pipeline {
-    constructor({ id, module, name, description, createdByAdminId, createdByTenantId, isActive, pipelineId, tasks, order, tenantId, clientId, pipelineStageId, doneTasks, documents, colourCode, assignToAdmin, assignToTenantStaff }) {
+    constructor({ id, module, name, requiredTasks, requiredDocuments, description, createdByAdminId, createdByTenantId, isActive, pipelineId, tasks, order, tenantId, clientId, pipelineStageId, doneTasks, documents, colourCode, assignToAdmin, assignToTenantStaff }) {
         this.id = id;
         this.module = module;
         this.name = name;
@@ -18,6 +18,8 @@ class Pipeline {
         this.doneTasks = doneTasks;
         this.assignToAdmin = assignToAdmin;
         this.assignToTenantStaff = assignToTenantStaff;
+        this.requiredTasks = requiredTasks;
+        this.requiredDocuments = requiredDocuments;
     }
 
     get createPipeline() {
@@ -36,7 +38,9 @@ class Pipeline {
             name: this.name,
             colourCode: this.colourCode,
             order: this.order,
-            description: this.description
+            description: this.description,
+            requiredTasks: this.requiredTasks,
+            requiredDocuments: this.requiredDocuments
         };
     }
 
