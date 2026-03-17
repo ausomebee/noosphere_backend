@@ -43,7 +43,7 @@ class FormResponseService {
     }
 
     async getFormResponses(formId) {
-        const responses = await this.formResponseRepository.findAllAndPopulate({ formId }, { fields: true });
+        const responses = await this.formResponseRepository.findAllAndPopulate({ formId }, { fields: true, form: true });
 
         if (!responses || responses.length === 0) {
             throw new Error("No Form Responses found");
