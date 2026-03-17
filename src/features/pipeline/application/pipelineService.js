@@ -136,8 +136,8 @@ class PipelineService {
             name: data.name || stage.name,
             description: data.description || stage.description,
             isActive: data.isActive ?? stage.isActive,
-            tasks: data.tasks || stage.tasks,
-            documents: data.documents || stage.documents,
+            requiredTasks: data.requiredTasks || stage.requiredTasks,
+            requiredDocuments: data.requiredDocuments || stage.requiredDocuments,
             colourCode: data.colourCode || stage.colourCode,
             order: data.order || stage.order
         });
