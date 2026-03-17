@@ -233,7 +233,31 @@ class PipelineDto {
                     "string.max": "Name must not exceed 20 characters",
                 }),
             description: Joi.string().trim().optional(),
-            colourCode: Joi.string().trim().required()
+            colourCode: Joi.string().trim().required(),
+            requiredTasks: Joi.array().items(
+                Joi.object({
+                    name: Joi.string().trim().required().messages({
+                        'string.base': 'Task name must be a string',
+                        'string.empty': 'Task name is required'
+                    }),
+                    required: Joi.boolean().required().messages({
+                        'boolean.base': 'Required must be a boolean',
+                        'any.required': 'Required field is required'
+                    })
+                })
+            ),
+            requiredDocuments: Joi.array().items(
+                Joi.object({
+                    name: Joi.string().trim().required().messages({
+                        'string.base': 'Document name must be a string',
+                        'string.empty': 'Document name is required'
+                    }),
+                    required: Joi.boolean().required().messages({
+                        'boolean.base': 'Required must be a boolean',
+                        'any.required': 'Required field is required'
+                    })
+                })
+            )
         });
 
         Validator.validateRequest(req, next, schema);
@@ -245,7 +269,7 @@ class PipelineDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID",
             }),
-            tasks: Joi.array().items(
+            requiredTasks: Joi.array().items(
                 Joi.object({
                     name: Joi.string().trim().required().messages({
                         'string.base': 'Task name must be a string',
@@ -268,7 +292,7 @@ class PipelineDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID",
             }),
-            documents: Joi.array().items(
+            requiredDocuments: Joi.array().items(
                 Joi.object({
                     name: Joi.string().trim().required().messages({
                         'string.base': 'Document name must be a string',

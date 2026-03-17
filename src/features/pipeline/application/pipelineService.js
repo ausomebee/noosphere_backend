@@ -1,11 +1,13 @@
 import Pipeline from "../domain/pipeline.js";
 
 class PipelineService {
-    constructor({ pipelineRepository, stageRepository, itemRepository, tenantRepository }) {
+    constructor({ pipelineRepository, stageRepository, itemRepository, tenantRepository, pipelineDoneTaskRepository, pipelineSubmittedDocumentRepository }) {
         this.pipelineRepository = pipelineRepository;
         this.stageRepository = stageRepository;
         this.itemRepository = itemRepository;
         this.tenantRepository = tenantRepository;
+        this.pipelineDoneTaskRepository = pipelineDoneTaskRepository;
+        this.pipelineSubmittedDocumentRepository = pipelineSubmittedDocumentRepository;
     }
 
     async createPipeline(data) {

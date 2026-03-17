@@ -8,6 +8,8 @@ import TenantRepository from "../../../tenant/infrastructure/tenantRepository.js
 import ClientRepository from "../../../client/infrastructure/clientRepository.js";
 import ClientService from "../../../client/application/clientService.js";
 import ClientTenantRepository from "../../../client/infrastructure/clientTenantRepository.js";
+import PipelineDoneTaskRepository from "../../infrastructure/pipelineDoneTaskRepository.js";
+import PipelineSubmittedDocumentRepository from "../../infrastructure/pipelineSubmittedDocumentRepository.js";
 
 class PipelineController {
     constructor() {
@@ -16,7 +18,9 @@ class PipelineController {
         this.tenantRepository = new TenantRepository(this.prisma.tenant)
         this.stageRepository = new StageRepository(this.prisma.pipelineStage)
         this.itemRepository = new ItemRepository(this.prisma.pipelineItem)
-        this.service = new PipelineService({ pipelineRepository: this.pipelineRepository, stageRepository: this.stageRepository, itemRepository: this.itemRepository, tenantRepository: this.tenantRepository });
+        this.pipelineDoneTaskRepository = new PipelineDoneTaskRepository(this.prisma.pipelineDoneTask)
+        this.pipelineSubmittedDocumentRepository = new PipelineSubmittedDocumentRepository(this.prisma.pipelineSubmittedDocument)
+        this.service = new PipelineService({ pipelineRepository: this.pipelineRepository, stageRepository: this.stageRepository, itemRepository: this.itemRepository, tenantRepository: this.tenantRepository, pipelineSubmittedDocumentRepository: this.pipelineSubmittedDocumentRepository, pipelineDoneTaskRepository: this.pipelineDoneTaskRepository });
         this.clientRepository = new ClientRepository(this.prisma.client);
         this.clientService = new ClientService({ clientRepository: this.clientRepository });
         this.clientTenantRepository = new ClientTenantRepository(this.prisma.clientTenant);
