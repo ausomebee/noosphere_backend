@@ -102,6 +102,30 @@ import S3Service from "../../../../utilities/s3.js";
  *           format: uuid
  *         colourCode:
  *           type: string
+ *         requiredTasks:
+ *           type: array
+ *           items:
+ *             type: object
+ *             required:
+ *               - name
+ *               - required
+ *             properties:
+ *               name:
+ *                 type: string
+ *               required:
+ *                 type: boolean
+ *         requiredDocuments:
+ *           type: array
+ *           items:
+ *             type: object
+ *             required:
+ *               - name
+ *               - required
+ *             properties:
+ *               name:
+ *                 type: string
+ *               required:
+ *                 type: boolean
  *
  *     GetStagesByPipelineIdParams:
  *       type: object

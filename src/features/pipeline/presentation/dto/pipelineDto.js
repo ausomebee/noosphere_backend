@@ -91,30 +91,30 @@ class PipelineDto {
                 "string.guid": "Pipeline ID must be a valid UUID",
             }),
             colourCode: Joi.string().trim().required(),
-            // tasks: Joi.array().items(
-            //     Joi.object({
-            //         name: Joi.string().trim().required().messages({
-            //             'string.base': 'Task name must be a string',
-            //             'string.empty': 'Task name is required'
-            //         }),
-            //         required: Joi.boolean().required().messages({
-            //             'boolean.base': 'Required must be a boolean',
-            //             'any.required': 'Required field is required'
-            //         })
-            //     })
-            // ),
-            // documents: Joi.array().items(
-            //     Joi.object({
-            //         name: Joi.string().trim().required().messages({
-            //             'string.base': 'Document name must be a string',
-            //             'string.empty': 'Document name is required'
-            //         }),
-            //         required: Joi.boolean().required().messages({
-            //             'boolean.base': 'Required must be a boolean',
-            //             'any.required': 'Required field is required'
-            //         })
-            //     })
-            // )
+            requiredTasks: Joi.array().items(
+                Joi.object({
+                    name: Joi.string().trim().required().messages({
+                        'string.base': 'Task name must be a string',
+                        'string.empty': 'Task name is required'
+                    }),
+                    required: Joi.boolean().required().messages({
+                        'boolean.base': 'Required must be a boolean',
+                        'any.required': 'Required field is required'
+                    })
+                })
+            ),
+            requiredDocuments: Joi.array().items(
+                Joi.object({
+                    name: Joi.string().trim().required().messages({
+                        'string.base': 'Document name must be a string',
+                        'string.empty': 'Document name is required'
+                    }),
+                    required: Joi.boolean().required().messages({
+                        'boolean.base': 'Required must be a boolean',
+                        'any.required': 'Required field is required'
+                    })
+                })
+            )
         });
 
         Validator.validateRequest(req, next, schema);

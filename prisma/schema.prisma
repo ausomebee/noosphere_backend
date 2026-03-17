@@ -566,15 +566,17 @@ model Pipeline {
 }
 
 model PipelineStage {
-  id          String   @id @default(uuid())
-  pipelineId  String
-  name        String
-  colourCode  String
-  order       Int
-  description String?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                String   @id @default(uuid())
+  pipelineId        String
+  name              String
+  colourCode        String
+  order             Int
+  description       String?
+  isActive          Boolean  @default(true)
+  requiredTasks     Json?
+  requiredDocuments Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   pipelineItem PipelineItem[]
   pipeline     Pipeline       @relation(fields: [pipelineId], references: [id])
@@ -593,11 +595,35 @@ model PipelineItem {
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
-  client        Client?        @relation(fields: [clientId], references: [id])
-  tenant        Tenant?        @relation(fields: [tenantId], references: [id])
-  pipelineStage PipelineStage? @relation(fields: [pipelineStageId], references: [id])
-  tenantStaff   TenantStaff?   @relation(fields: [assignToTenantStaff], references: [id])
-  admin         Admin?         @relation(fields: [assignToAdmin], references: [id])
+  client                     Client?                     @relation(fields: [clientId], references: [id])
+  tenant                     Tenant?                     @relation(fields: [tenantId], references: [id])
+  pipelineStage              PipelineStage?              @relation(fields: [pipelineStageId], references: [id])
+  tenantStaff                TenantStaff?                @relation(fields: [assignToTenantStaff], references: [id])
+  admin                      Admin?                      @relation(fields: [assignToAdmin], references: [id])
+  pipelineDoneTasks          PipelineDoneTask[]
+  pipelineSubmittedDocuments PipelineSubmittedDocument[]
+}
+
+model PipelineDoneTask {
+  id             String    @id @default(uuid())
+  pipelineItemId String
+  taskName       String
+  isCompleted    Boolean   @default(false)
+  completedAt    DateTime?
+  createdAt      DateTime  @default(now())
+
+  pipelineItem PipelineItem @relation(fields: [pipelineItemId], references: [id], onDelete: Cascade)
+}
+
+model PipelineSubmittedDocument {
+  id             String   @id @default(uuid())
+  pipelineItemId String
+  documentName   String
+  fileUrl        String
+  isVerified     Boolean  @default(false)
+  uploadedAt     DateTime @default(now())
+
+  pipelineItem PipelineItem @relation(fields: [pipelineItemId], references: [id], onDelete: Cascade)
 }
 
 model BillingMetadata {
