@@ -121,7 +121,10 @@ class FormResponseController {
         return res.status(200).json({
             message: "Form responses fetched successfully",
             status: "ok",
-            data: {...responses, originalFields: formFields}
+            data: {
+                responses,
+                originalFields: formFields
+            }
         });
     });
 
