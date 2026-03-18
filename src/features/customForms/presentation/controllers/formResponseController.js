@@ -8,6 +8,8 @@ import FormResponseField from "../../domain/formResponseField.js";
 import FormResponseService from "../../application/FormResponseService.js";
 import ClientFormRepository from "../../infrastructure/clientFormRepository.js";
 import ClientFormService from "../../application/clientFormService.js";
+import FormFieldsRepository from "../../infrastructure/formFieldsRepository.js";
+import FormFieldService from "../../application/formFieldService.js";
 
 class FormResponseController {
     constructor() {
@@ -21,6 +23,9 @@ class FormResponseController {
 
         this.formResponseService = new FormResponseService({ formResponseRepository });
         this.formResponseFieldService = new FormResponseFieldService({ formResponseFieldRepository });
+
+        const formFieldRepository = new FormFieldsRepository(this.prisma.formFields);
+        this.formFieldService = new FormFieldService({ formFieldRepository });
     }
 
     createFormResponse = expressAsyncHandler(async (req, res) => {
@@ -107,10 +112,16 @@ class FormResponseController {
             return res.status(404).json({ message: "No form responses found" });
         }
 
+        const formFields = await this.formFieldService.getFormFields(req.params.formId);
+
+        if (!formFields) {
+            return res.status(404).json({ message: "No form responses found" });
+        }
+
         return res.status(200).json({
             message: "Form responses fetched successfully",
             status: "ok",
-            data: responses
+            data: {...responses, originalFields: formFields}
         });
     });
 
