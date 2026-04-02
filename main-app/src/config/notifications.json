@@ -1,0 +1,528 @@
+{
+  "TENANT_MODULE": {
+ 
+    "UPCOMING_APPOINTMENT": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "upcomingAppointment",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Appointment & Reminders"
+      }
+    },
+ 
+    "NEW_RESCHEDULE_REQUEST": {
+      "channels": ["in_app"],
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Appointment & Reminders"
+      }
+    },
+
+    "NUDGE_CLIENT_TIMESHEET": {
+      "channels": ["in_app"],
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN", "CLIENT"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Appointment & Reminders"
+      }
+    },
+ 
+    "RESCHEDULED_APPOINTMENT": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "rescheduledAppointment",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Appointment & Reminders"
+      }
+    },
+ 
+    "APPOINTMENT_START_REMINDER": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "appointmentStartReminder",
+      "triggerType": "time_based",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Appointment & Reminders"
+      }
+    },
+ 
+    "APPOINTMENT_STARTED": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "appointmentStarted",
+      "triggerType": "time_based",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Appointment & Reminders"
+      }
+    },
+ 
+    "CANCELLED_APPOINTMENT": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "cancelledAppointment",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Appointment & Reminders"
+      }
+    },
+ 
+    "COMPLETED_APPOINTMENT": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "completedAppointment",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Appointment & Reminders"
+      }
+    },
+ 
+    "CLIENT_PROFILE_CREATION": {
+      "channels": ["email"],
+      "emailTemplate": "clientProfileCreation",
+      "conditions": {
+        "userType": "CLIENT",
+        "configurable": false
+      }
+    },
+ 
+    "DOCUMENT_REQUEST_CREATED": {
+      "channels": ["email"],
+      "emailTemplate": "documentRequestCreated",
+      "conditions": {
+        "userType": "CLIENT",
+        "configurable": false
+      }
+    },
+ 
+    "DOCUMENT_REQUEST_COMPLETED": {
+      "channels": ["in_app"],
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Clients"
+      }
+    },
+ 
+    "DOCUMENT_REQUEST_NUDGE": {
+      "channels": ["email"],
+      "emailTemplate": "documentRequestNudge",
+      "conditions": {
+        "userType": "CLIENT",
+        "configurable": false
+      }
+    },
+ 
+    "FORM_CREATED": {
+      "channels": ["email"],
+      "emailTemplate": "formCreated",
+      "conditions": {
+        "userType": "CLIENT",
+        "configurable": false
+      }
+    },
+ 
+    "FORM_FILLED": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "formFilled",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Clients"
+      }
+    },
+ 
+    "AUTHORIZATION_CREATION": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "authorizationCreation",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Clients"
+      }
+    },
+ 
+    "AUTHORIZATION_EXPIRY_1_MONTH": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "authorizationExpiry",
+      "triggerType": "time_based",
+      "triggerOffset": "1_month",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Clients"
+      }
+    },
+ 
+    "AUTHORIZATION_EXPIRY_1_WEEK": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "authorizationExpiry",
+      "triggerType": "time_based",
+      "triggerOffset": "1_week",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Clients"
+      }
+    },
+ 
+    "AUTHORIZATION_UTILIZATION_80_PERCENT": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "authorizationUtilization",
+      "triggerType": "quantity_based",
+      "triggerThreshold": "80%",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Clients"
+      }
+    },
+ 
+    "AUTHORIZATION_UTILIZATION_ZERO": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "authorizationUtilizationZero",
+      "triggerType": "quantity_based",
+      "triggerThreshold": "0",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Clients"
+      }
+    },
+ 
+    "REPORT_APPROVAL_REQUEST_TO_SUPERVISOR": {
+      "channels": ["in_app"],
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Clients"
+      }
+    },
+ 
+    "REPORT_APPROVED_BY_SUPERVISOR": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "reportApprovedBySupervisor",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Clients"
+      }
+    },
+ 
+    "CLIENT_REPORT_SIGNED": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "clientReportSigned",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Clients"
+      }
+    },
+ 
+    "CLIENT_REPORT_CHANGE_REQUEST": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "clientReportChangeRequest",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Clients"
+      }
+    },
+ 
+    "ORGANIZATION_LICENSE_EXPIRY_SOON": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "orgLicenseExpirySoon",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / My Organization"
+      }
+    },
+ 
+    "ORGANIZATION_LICENSE_EXPIRED": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "orgLicenseExpired",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / My Organization"
+      }
+    },
+ 
+    "ORGANIZATION_LICENSE_EXPIRY_1_MONTH": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "orgLicenseExpiry",
+      "triggerType": "time_based",
+      "triggerOffset": "1_month",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / My Organization"
+      }
+    },
+ 
+    "TIMESHEET_CREATED": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "timesheetCreated",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Billing & Payments"
+      }
+    },
+ 
+    "TIMESHEET_CHANGE_REQUESTED": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "timesheetChangeRequested",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Billing & Payments"
+      }
+    },
+ 
+    "TIMESHEET_APPROVED": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "timesheetApproved",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Billing & Payments"
+      }
+    },
+ 
+    "TIMESHEET_REJECTED": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "timesheetRejected",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Billing & Payments"
+      }
+    },
+ 
+    "PAYER_AUTHORIZATION_EXPIRY_SOON": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "payerAuthorizationExpirySoon",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Billing & Payments"
+      }
+    },
+ 
+    "PAYER_AUTHORIZATION_EXPIRY_1_MONTH": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "payerAuthorizationExpiry",
+      "triggerType": "time_based",
+      "triggerOffset": "1_month",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Billing & Payments"
+      }
+    },
+ 
+    "UPCOMING_PAYROLL": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "upcomingPayroll",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Payroll"
+      }
+    },
+ 
+    "NEW_PAYROLL_RUN": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "newPayrollRun",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Payroll"
+      }
+    },
+ 
+    "TICKET_SUBMITTED": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "ticketSubmitted",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Help & Support"
+      }
+    },
+ 
+    "TICKET_STATUS_IN_PROGRESS": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "ticketStatusInProgress",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Help & Support"
+      }
+    },
+ 
+    "TICKET_STATUS_RESOLVED": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "ticketStatusResolved",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Help & Support"
+      }
+    },
+ 
+    "TICKET_WITHDRAWN": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "ticketWithdrawn",
+      "conditions": {
+        "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Help & Support"
+      }
+    }
+ 
+  },
+ 
+  "CONTROL_MODULE": {
+ 
+    "PAYMENT_MADE_FOR_PLAN": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "paymentConfirmation",
+      "conditions": {
+        "userType": "CONTROL_MODULE_SUPER_ADMIN",
+        "emailRecipient": "TENANT"
+      }
+    },
+ 
+    "TENANT_CREATED": {
+      "channels": ["in_app"],
+      "conditions": {
+        "userType": "CONTROL_MODULE_SUPER_ADMIN"
+      }
+    },
+ 
+    "TENANT_DEACTIVATED": {
+      "channels": ["in_app"],
+      "conditions": {
+        "userType": "CONTROL_MODULE_SUPER_ADMIN"
+      }
+    },
+ 
+    "PLAN_CREATED": {
+      "channels": ["in_app"],
+      "conditions": {
+        "userType": "CONTROL_MODULE_SUPER_ADMIN"
+      }
+    },
+ 
+    "PLAN_DEACTIVATED": {
+      "channels": ["in_app"],
+      "conditions": {
+        "userType": "CONTROL_MODULE_SUPER_ADMIN"
+      }
+    },
+ 
+    "PLAN_DELETED": {
+      "channels": ["in_app"],
+      "conditions": {
+        "userType": "CONTROL_MODULE_SUPER_ADMIN"
+      }
+    },
+ 
+    "SUBSCRIPTION_PAUSED": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "subscriptionPaused",
+      "conditions": {
+        "userType": "CONTROL_MODULE_SUPER_ADMIN",
+        "emailRecipient": "TENANT"
+      }
+    },
+ 
+    "SUBSCRIPTION_CANCELLED": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "subscriptionCancelled",
+      "conditions": {
+        "userType": "CONTROL_MODULE_SUPER_ADMIN",
+        "emailRecipient": "TENANT"
+      }
+    },
+ 
+    "SUBSCRIPTION_AUTO_RENEWED": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "subscriptionAutoRenewed",
+      "conditions": {
+        "userType": "CONTROL_MODULE_SUPER_ADMIN",
+        "emailRecipient": "TENANT"
+      }
+    },
+ 
+    "ISSUE_SUBMITTED": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "issueSubmitted",
+      "conditions": {
+        "userType": ["CONTROL_MODULE_SUPER_ADMIN", "ADMIN_WITH_RBAC"],
+        "emailRecipient": "TENANT"
+      }
+    },
+ 
+    "ISSUE_ASSIGNED_TO_ADMIN": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "issueAssigned",
+      "conditions": {
+        "userType": "CONTROL_MODULE_SUPER_ADMIN",
+        "emailRecipient": "TENANT"
+      }
+    },
+ 
+    "ISSUE_ASSIGNED_TO_SELF": {
+      "channels": ["in_app"],
+      "conditions": {
+        "userType": "ASSIGNED_ADMIN"
+      }
+    },
+ 
+    "ISSUE_IN_PROGRESS": {
+      "channels": ["in_app"],
+      "conditions": {
+        "userType": "ASSIGNED_ADMIN"
+      }
+    },
+ 
+    "ISSUE_REASSIGNED": {
+      "channels": ["in_app"],
+      "conditions": {
+        "userType": ["CONTROL_MODULE_SUPER_ADMIN", "ASSIGNED_ADMIN"]
+      }
+    },
+ 
+    "ISSUE_PRIORITY_CHANGED": {
+      "channels": ["in_app"],
+      "conditions": {
+        "userType": ["CONTROL_MODULE_SUPER_ADMIN", "ASSIGNED_ADMIN"]
+      }
+    },
+ 
+    "ISSUE_CATEGORY_CHANGED": {
+      "channels": ["in_app"],
+      "conditions": {
+        "userType": ["CONTROL_MODULE_SUPER_ADMIN", "ASSIGNED_ADMIN"]
+      }
+    },
+ 
+    "ISSUE_RESOLVED": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "issueResolved",
+      "conditions": {
+        "userType": ["CONTROL_MODULE_SUPER_ADMIN", "ASSIGNED_ADMIN"],
+        "emailRecipient": "TENANT"
+      }
+    }
+ 
+  }
+}

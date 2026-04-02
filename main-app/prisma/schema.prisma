@@ -1,0 +1,1670 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Module {
+  ADMIN
+  TENANT
+  CLIENT
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAUSED
+  PENDING
+  CANCELLED
+}
+
+enum PlanType {
+  ENTERPRISE
+  STANDARD
+}
+
+enum InvoiceStatus {
+  Paid
+  Upcoming
+  Due
+  Overdue
+}
+
+enum incoiceBillingFrequency {
+  Monthly
+  Yearly
+}
+
+enum DomainType {
+  SKILL_ACQUISITION
+  BEHAVIOR_REDUCTION
+}
+
+enum DocumentRequestStatus {
+  UPLOADED
+  PENDING
+  CANCELLED
+}
+
+enum WeekDay {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ClinicalReportStatus {
+  DRAFT
+  SUBMITTED
+  SIGNED
+  APPROVED
+  AWAITING_SIGNATURE
+  CHANGES_REQUESTED
+}
+
+enum TokenOwnerType {
+  ADMIN
+  STAFF
+  CLIENT
+}
+
+enum ClientFormStatus {
+  PENDING
+  FILLED
+}
+
+enum FeatureModule {
+  DASHBOARD
+  SCHEDULER
+  CLIENTS
+  MY_ORGANIZATION
+  BILLINGS_PAYMENTS
+  PAYROLL
+  PROGRAM_LIBRARY
+  CUSTOM_FORMS
+  REPORTS
+  HELP_SUPPORT
+  SETTINGS
+}
+
+enum PaymentSchedule {
+  SALARIED
+  HOURLY
+  DAILY
+}
+
+enum DataAccessLevel {
+  GLOBAL
+  INDIVIDUAL
+  TEAM
+}
+
+enum UserType {
+  ADMIN
+  TENANT_STAFF
+  CLIENT
+}
+
+model Admin {
+  id                    String   @id @default(uuid())
+  firstName             String   @default("jhc")
+  lastName              String   @default("hd")
+  email                 String   @unique
+  phoneNumber           String   @unique
+  roleId                String
+  superAdmin            Boolean  @default(false)
+  active                Boolean  @default(true)
+  isDeleted             Boolean  @default(false)
+  password              String?
+  administratorPassword String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  authType              String?
+  authQuestion          String?
+  auth2FADone           Boolean  @default(false)
+
+  roles               Role                 @relation("RoleAdmins", fields: [roleId], references: [id])
+  pipelines           Pipeline[]
+  PipelineItem        PipelineItem[]
+  TenantsAssigned     Tenant[]             @relation("AccountOfficer")
+  logs                Logs[]
+  BillingPlan         BillingPlan[]
+  IssueComment        IssueComment[]
+  assignedIssues      Issue[]              @relation("AssignedAdmin")
+  loggedIssues        Issue[]              @relation("LoggedByAdmin")
+  rolesCreated        Role[]               @relation("RoleCreatedByAdmin")
+  departments         Department[]         @relation("DepartmentCreatedByAdmin")
+  departmentLead      Department[]         @relation("DepartmentTeamLead")
+  departmentMembers   DepartmentMembers[]
+  tenantDeactivations TenantDeactivation[]
+  tenants             Tenant[]
+  serverRequests      ServerRequest[]
+}
+
+model Auth {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  module    Module
+  secret    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Department {
+  id               String   @id @default(uuid())
+  name             String
+  createdByAdminId String?
+  teamLeadId       String
+  isDeleted        Boolean  @default(false)
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  createdByAdmin    Admin?              @relation("DepartmentCreatedByAdmin", fields: [createdByAdminId], references: [id])
+  teamLead          Admin               @relation("DepartmentTeamLead", fields: [teamLeadId], references: [id])
+  departmentMembers DepartmentMembers[]
+}
+
+model DepartmentMembers {
+  id           String @id @default(uuid())
+  departmentId String
+  adminId      String
+
+  department Department @relation(fields: [departmentId], references: [id])
+  admin      Admin      @relation(fields: [adminId], references: [id])
+}
+
+model Role {
+  id                String          @id @default(uuid())
+  name              String
+  dataAccessLevel   DataAccessLevel
+  systemModule      Module
+  createdByAdminId  String?
+  createdByTenantId String?
+  isActive          Boolean         @default(true)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  createdByAdmin     Admin?             @relation("RoleCreatedByAdmin", fields: [createdByAdminId], references: [id])
+  createdByTenant    Tenant?            @relation(fields: [createdByTenantId], references: [id])
+  admins             Admin[]            @relation("RoleAdmins")
+  TenantStaff        TenantStaff[]
+  roleModuleAccesses RoleModuleAccess[]
+}
+
+model RoleModuleAccess {
+  id          String        @id @default(uuid())
+  roleId      String
+  module      FeatureModule
+  permissions Json[]
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+}
+
+model RefreshTokens {
+  id        String         @id @default(uuid())
+  ownerId   String
+  ownerType TokenOwnerType
+
+  tokenHash   String
+  fingerprint String
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  used        Boolean  @default(false)
+}
+
+model Tenant {
+  id               String   @id @default(uuid())
+  email            String   @unique
+  phoneNumber      String   @unique
+  active           Boolean  @default(true)
+  isDeleted        Boolean  @default(false)
+  subdomain        String   @unique
+  companyName      String
+  contactPerson    String
+  companySize      String
+  organizationType String
+  location         Json
+  leadSource       String
+  stage            String   @default("UNVERIFIED")
+  website          String?
+  assignToAdmin    String?
+  practiceNPI      String?
+  createdBy        String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  pipelineItems                     PipelineItem[]
+  clientLinks                       ClientTenant[]
+  pipelines                         Pipeline[]
+  TenantStaff                       TenantStaff[]
+  BillingMetadata                   BillingMetadata?
+  Subscription                      Subscription[]
+  admin                             Admin                               @relation(fields: [createdBy], references: [id])
+  accountOfficer                    Admin?                              @relation("AccountOfficer", fields: [assignToAdmin], references: [id])
+  Payment                           Payment[]
+  logs                              Logs[]
+  BillingPlan                       BillingPlan[]
+  Invoice                           Invoice[]
+  PaymentMethod                     PaymentMethod[]
+  issues                            Issue[]
+  tenantAdminChoices                TenantAdminChoices?
+  domain                            Domain[]
+  OrganizationInformation           OrganizationInformation?
+  OrganizationDocuments             OrganizationDocuments[]
+  OrganizationDiagnosisCodes        OrganizationDiagnosisCodes[]
+  OrganizationSessionTypes          OrganizationSessionTypes[]
+  OrganizationLicenses              OrganizationLicenses[]
+  Appointment                       Appointment[]
+  ServiceCodes                      ServiceCodes[]
+  RoundingRules                     RoundingRules[]
+  InsuranceType                     InsuranceType[]
+  Payer                             Payer[]
+  CompensationTypes                 CompensationTypes[]
+  IncomeItems                       IncomeItems[]
+  Deductions                        Deductions[]
+  PayrollCycles                     PayrollCycles[]
+  Forms                             Forms[]
+  FormResponses                     FormResponses[]
+  reportTemplates                   ClinicalReportTemplates[]
+  clinicalReports                   ClinicalReport[]
+  tenantGeneralSettings             TenantGeneralSettings[]
+  tenantAdditionalSecurityQuestions TenantAdditionalSecurityQuestions[]
+  roles                             Role[]
+  teams                             Teams[]                             @relation("tenantTeam")
+  tenantDeactivation                TenantDeactivation?
+  serverRequests                    ServerRequest[]
+}
+
+model TenantDeactivation {
+  id               String    @id @default(uuid())
+  tenantId         String    @unique
+  reason           String
+  details          String
+  deactivatedById  String
+  deactivatedAt    DateTime  @default(now())
+  reactivationDate DateTime?
+
+  tenant        Tenant @relation(fields: [tenantId], references: [id])
+  deactivatedBy Admin  @relation(fields: [deactivatedById], references: [id])
+}
+
+model TenantStaff {
+  id       String  @id @default(uuid())
+  fullName String
+  email    String  @unique
+  stage    String?
+  roleId   String
+  tenantId String
+  dob      String?
+  gender   String?
+  npi      String?
+  address  String?
+  city     String?
+  state    String?
+  zip      String?
+  country  String?
+
+  phoneNumber  String   @unique
+  active       Boolean  @default(true)
+  isDeleted    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  password     String?
+  authType     String?
+  authQuestion String?
+  auth2FADone  Boolean  @default(false)
+
+  role                         Role                          @relation(fields: [roleId], references: [id])
+  tenant                       Tenant                        @relation(fields: [tenantId], references: [id])
+  PipelineItem                 PipelineItem[]
+  ClientTenant                 ClientTenant[]                @relation("ClientClinicians")
+  teamLead                     Teams[]                       @relation("TeamLead")
+  TenantStaffLicenses          TenantStaffLicenses[]
+  TenantStaffPayroll           TenantStaffPayroll[]
+  TenantStaffDocuments         TenantStaffDocuments[]
+  appointments                 Appointment[]                 @relation("AppointmentClinicians")
+  clientTenants                ClientTenant[]
+  clientDocuments              ClientDocuments[]
+  staffAvailabilities          StaffAvailability[]
+  sessions                     Session[]
+  timesheetHistories           TimesheetHistory[]
+  sessionUpdateRequests        SessionUpdateRequest[]
+  clientFiles                  ClientFiles[]
+  clinicalReportsCreator       ClinicalReport[]              @relation("ReportsCreator")
+  clinicalReportsApprover      ClinicalReport[]              @relation("ReportsApprover")
+  clinicalReportHistories      ClinicalReportHistory[]
+  clinicalReportChangeRequests ClinicalReportChangeRequest[] @relation("ReportsRequestApprover")
+  payrollCycleStaffs           PayrollCycleStaffs[]
+  teamMembers                  TeamMembers[]
+  serverRequests               ServerRequest[]
+  tenantNotificationSettings   TenantNotificationSettings?
+}
+
+model TenantNotificationSettings {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  settings  Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user TenantStaff @relation(fields: [userId], references: [id])
+}
+
+model Teams {
+  id         String   @id @default(uuid())
+  name       String
+  tenantId   String
+  teamLeadId String
+  isDeleted  Boolean  @default(false)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  tenant      Tenant        @relation("tenantTeam", fields: [tenantId], references: [id])
+  teamLead    TenantStaff   @relation("TeamLead", fields: [teamLeadId], references: [id])
+  teamMembers TeamMembers[]
+}
+
+model TeamMembers {
+  id      String @id @default(uuid())
+  teamId  String
+  staffId String
+
+  team  Teams       @relation(fields: [teamId], references: [id])
+  staff TenantStaff @relation(fields: [staffId], references: [id])
+}
+
+model TenantStaffLicenses {
+  id            String   @id @default(uuid())
+  licenseName   String
+  licenseNumber String
+  tenantStaffId String
+  issueState    String
+  expiryDate    DateTime
+  isDeleted     Boolean  @default(false)
+
+  tenantStaff TenantStaff @relation(fields: [tenantStaffId], references: [id])
+}
+
+model TenantStaffPayroll {
+  id              String          @id @default(uuid())
+  paymentSchedule PaymentSchedule
+  ratePerHour     String
+  tenantStaffId   String
+  minimumHours    String?
+  isDeleted       Boolean         @default(false)
+
+  tenantStaff TenantStaff   @relation(fields: [tenantStaffId], references: [id])
+  incomeItems IncomeItems[] @relation("PayrollIncomItems")
+  deductions  Deductions[]  @relation("PayrollDeductions")
+}
+
+model TenantStaffDocuments {
+  id            String   @id @default(uuid())
+  documentsUrl  Json
+  tenantStaffId String
+  isDeleted     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  tenantStaff TenantStaff @relation(fields: [tenantStaffId], references: [id])
+}
+
+model Client {
+  id                     String    @id @default(uuid())
+  firstName              String
+  lastName               String
+  preferredName          String?
+  email                  String    @unique
+  avatarUrl              String?
+  phoneNumber            String    @unique
+  DOB                    DateTime?
+  gender                 String
+  primaryPayer           String?
+  streetAddress          String?
+  city                   String?
+  state                  String?
+  country                String?
+  zipCode                String?
+  caregiverName          String?
+  caregiverRelationship  String?
+  caregiverPhone         String?
+  caregiverEmail         String?
+  caregiverStreetAddress String?
+  caregiverCity          String?
+  caregiverState         String?
+  caregiverCountry       String?
+  caregiverZip           String?
+
+  isVerified Boolean  @default(false)
+  isDeleted  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  pipelineItems PipelineItem[]
+  tenantLinks   ClientTenant[]
+  logs          Logs[]
+  payer         Payer?          @relation(fields: [primaryPayer], references: [id])
+  ClientProgram ClientProgram[]
+  ClientTarget  ClientTarget[]
+  Appointment   Appointment[]
+}
+
+model ClientTenant {
+  id                 String   @id @default(uuid())
+  clientId           String
+  tenantId           String
+  createdBy          String
+  dbAccess           Boolean  @default(false)
+  active             Boolean  @default(true)
+  stage              String
+  requestAppointment Boolean  @default(true)
+  documentAccess     Boolean  @default(true)
+  password           String
+  passwordChanged    Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  tenantStaff                  TenantStaff                   @relation(fields: [createdBy], references: [id])
+  client                       Client                        @relation(fields: [clientId], references: [id])
+  tenant                       Tenant                        @relation(fields: [tenantId], references: [id])
+  FormResponses                FormResponses[]
+  clientDocuments              ClientDocuments[]
+  clientRequestedDocuments     ClientRequestedDocuments[]
+  clinicians                   TenantStaff[]                 @relation("ClientClinicians")
+  forms                        Forms[]
+  clientAuthorizations         ClientAuthorization[]
+  clientForms                  ClientForm[]
+  clientFolders                ClientFolder[]
+  clinicalReports              ClinicalReport[]
+  clinicalReportChangeRequests ClinicalReportChangeRequest[]
+  clientFiles                  ClientFiles[]
+  clientNotificationSettings   ClientNotificationSettings[]
+  serverRequests               ServerRequest[]
+
+  @@unique([clientId, tenantId])
+}
+
+model ClientDocuments {
+  id              String   @id @default(uuid())
+  tenantClientId  String
+  name            String
+  documentDetails Json
+  requestId       String?
+  isDeleted       Boolean
+  createdBy       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+
+  tenantStaff  TenantStaff?              @relation(fields: [createdBy], references: [id])
+  tenantClient ClientTenant              @relation(fields: [tenantClientId], references: [id])
+  request      ClientRequestedDocuments? @relation(fields: [requestId], references: [id])
+}
+
+model ClientRequestedDocuments {
+  id             String                @id @default(uuid())
+  tenantClientId String
+  name           String
+  description    String
+  allowMultiple  Boolean
+  status         DocumentRequestStatus @default(PENDING)
+  dueDate        DateTime
+  isDeleted      Boolean
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @default(now()) @updatedAt
+
+  tenantClient    ClientTenant      @relation(fields: [tenantClientId], references: [id])
+  clientDocuments ClientDocuments[]
+}
+
+model ClientNotificationSettings {
+  id                                   String   @id @default(uuid())
+  tenantClientId                       String   @unique
+  appointmentScheduled                 Boolean  @default(true)
+  appointmentRescheduled               Boolean  @default(true)
+  appointmentAboutToStart              Boolean  @default(true)
+  appointmentStarted                   Boolean  @default(true)
+  appointmentCancelled                 Boolean  @default(true)
+  appointmentCompletedAwaitingFeedback Boolean  @default(true)
+  documentRequested                    Boolean  @default(true)
+  formShared                           Boolean  @default(true)
+  authorizationAboutToExpire           Boolean  @default(true)
+  authorizationExpired                 Boolean  @default(true)
+  authorizationUnitsAlmostExhausted    Boolean  @default(true)
+  authorizationUnitsExhausted          Boolean  @default(true)
+  signatureRequested                   Boolean  @default(true)
+  createdAt                            DateTime @default(now())
+  updatedAt                            DateTime @updatedAt
+
+  tenantClient ClientTenant @relation(fields: [tenantClientId], references: [id])
+}
+
+model Pipeline {
+  id                String   @id @default(uuid())
+  module            Module
+  name              String
+  description       String?
+  createdByAdminId  String?
+  createdByTenantId String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  isActive          Boolean  @default(true)
+
+  pipelineStages  PipelineStage[]
+  createdByAdmin  Admin?          @relation(fields: [createdByAdminId], references: [id])
+  createdByTenant Tenant?         @relation(fields: [createdByTenantId], references: [id])
+}
+
+model PipelineStage {
+  id                String   @id @default(uuid())
+  pipelineId        String
+  name              String
+  colourCode        String
+  order             Int
+  description       String?
+  isActive          Boolean  @default(true)
+  requiredTasks     Json?
+  requiredDocuments Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  pipelineItem PipelineItem[]
+  pipeline     Pipeline       @relation(fields: [pipelineId], references: [id])
+}
+
+model PipelineItem {
+  id                  String   @id @default(uuid())
+  tenantId            String?
+  clientId            String?
+  pipelineStageId     String
+  assignToAdmin       String?
+  assignToTenantStaff String?
+  doneTasks           Json?
+  sentDocuments       Json?
+  isDeleted           Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  client                     Client?                     @relation(fields: [clientId], references: [id])
+  tenant                     Tenant?                     @relation(fields: [tenantId], references: [id])
+  pipelineStage              PipelineStage?              @relation(fields: [pipelineStageId], references: [id])
+  tenantStaff                TenantStaff?                @relation(fields: [assignToTenantStaff], references: [id])
+  admin                      Admin?                      @relation(fields: [assignToAdmin], references: [id])
+  pipelineDoneTasks          PipelineDoneTask[]
+  pipelineSubmittedDocuments PipelineSubmittedDocument[]
+}
+
+model PipelineDoneTask {
+  id             String    @id @default(uuid())
+  pipelineItemId String
+  taskName       String
+  isCompleted    Boolean   @default(false)
+  completedAt    DateTime?
+  createdAt      DateTime  @default(now())
+
+  pipelineItem PipelineItem @relation(fields: [pipelineItemId], references: [id], onDelete: Cascade)
+}
+
+model PipelineSubmittedDocument {
+  id             String   @id @default(uuid())
+  pipelineItemId String
+  documentName   String
+  fileUrl        String
+  isVerified     Boolean  @default(false)
+  uploadedAt     DateTime @default(now())
+
+  pipelineItem PipelineItem @relation(fields: [pipelineItemId], references: [id], onDelete: Cascade)
+}
+
+model BillingMetadata {
+  id             String         @id @default(uuid())
+  tenantId       String         @unique
+  paymentMethod  String
+  billingAddress String
+  paymentHistory Transactions[]
+  tenant         Tenant         @relation(fields: [tenantId], references: [id])
+}
+
+model Transactions {
+  id                String  @id @default(uuid())
+  billingMetadataId String?
+  status            String
+
+  BillingMetadata BillingMetadata? @relation(fields: [billingMetadataId], references: [id])
+}
+
+model Subscription {
+  id               String             @id @default(uuid())
+  tenantId         String
+  planId           String
+  status           SubscriptionStatus
+  startDate        DateTime
+  billingCycle     String
+  // lastPaymentStatus String
+  // amount            Int
+  pauseSchedule    DateTime?
+  resumeShedule    DateTime?
+  autoRenew        Boolean?           @default(true)
+  mailNotification Boolean?
+  endDate          DateTime
+  paymentId        Int                @unique
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  tenant  Tenant      @relation(fields: [tenantId], references: [id])
+  payment Payment     @relation(fields: [paymentId], references: [id])
+  plan    BillingPlan @relation(fields: [planId], references: [id])
+  Logs    Logs[]
+}
+
+model BillingPlan {
+  id                     String   @id @default(uuid())
+  planType               PlanType
+  name                   String
+  colourCode             String
+  description            String?
+  pricePerMonth          Json
+  pricePerYear           Json
+  forClient              Int
+  extraFeaturesWithPrice Json?
+  forStaff               Int
+  forStorage             Float
+  extraFeaturesEnabled   Boolean  @default(false)
+  active                 Boolean  @default(true)
+  tenantId               String?
+  adminId                String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  features       Feature[]      @relation("PlanFeatures")
+  extraFeatures  Feature[]      @relation("ExtraFeatures")
+  subscriptions  Subscription[]
+  assignedTo     Tenant?        @relation(fields: [tenantId], references: [id])
+  accountManager Admin?         @relation(fields: [adminId], references: [id])
+  Invoice        Invoice[]
+}
+
+model Feature {
+  id             String   @id @default(uuid())
+  name           String
+  description    String?
+  featureGroupId String
+  active         Boolean  @default(true)
+  // applicablePlans Json
+  managedBy      String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  plans        BillingPlan[] @relation("PlanFeatures")
+  extraPlans   BillingPlan[] @relation("ExtraFeatures")
+  featureGroup FeatureGroup? @relation(fields: [featureGroupId], references: [id])
+}
+
+model FeatureGroup {
+  id        String   @id @default(uuid())
+  name      String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Feature Feature[]
+}
+
+model SuperAdminChoices {
+  id               String   @id @default(uuid())
+  Authenticator2FA Boolean
+  securityQuestion Boolean
+  setForAll        Boolean
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model TenantAdminChoices {
+  id               String   @id @default(uuid())
+  tenantId         String   @unique
+  Authenticator2FA Boolean
+  securityQuestion Boolean
+  setForAll        Boolean
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model Payment {
+  id              Int      @id @default(autoincrement())
+  tenantId        String
+  status          String
+  transactionId   String?
+  transactionRef  String?
+  gateway         String
+  amount          Int
+  invoiceId       Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  paymentMethodId String
+
+  subscription  Subscription?
+  tenant        Tenant?        @relation(fields: [tenantId], references: [id])
+  invoice       Invoice?       @relation(fields: [invoiceId], references: [id])
+  paymentMethod PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
+}
+
+model Logs {
+  logId          String   @id @default(uuid())
+  tenantId       String?
+  clientId       String?
+  adminId        String?
+  feature        String?
+  module         Module?
+  action         String
+  reason         String
+  details        String?
+  ipAddress      String?
+  subscriptionId String?
+  issueId        String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tenant       Tenant?       @relation(fields: [tenantId], references: [id])
+  client       Client?       @relation(fields: [clientId], references: [id])
+  admin        Admin?        @relation(fields: [adminId], references: [id])
+  issue        Issue?        @relation(fields: [issueId], references: [id])
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+}
+
+model Invoice {
+  id               Int                     @id @default(autoincrement())
+  tenantId         String
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+  dueDate          DateTime
+  status           InvoiceStatus
+  planId           String
+  quantity         Int
+  total            Int
+  billingFrequency incoiceBillingFrequency
+
+  tenant        Tenant?        @relation(fields: [tenantId], references: [id])
+  plan          BillingPlan?   @relation(fields: [planId], references: [id])
+  Payment       Payment[]
+  invoiceTokens InvoiceToken[]
+}
+
+model InvoiceToken {
+  id        String   @id @default(uuid())
+  invoiceId Int
+  tokenHash String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  used      Boolean  @default(false)
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model PaymentMethod {
+  id             String   @id @default(uuid())
+  cardType       String
+  lastFourDigits String
+  holderName     String?
+  tenantId       String
+  gatewayToken   String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  payment Payment[]
+  tenant  Tenant?   @relation(fields: [tenantId], references: [id])
+}
+
+model InvoiceManagement {
+  id                        String  @id @default(uuid())
+  onPlanPurchase            Boolean
+  daysBeforeDueDate         Int
+  upcomingInvoiceHeader     String
+  upcomingInvoiceBody       String
+  onDueDate                 Boolean
+  dueInvoiceHeader          String
+  dueInvoiceBody            String
+  markOverDue               Int
+  unpaidReminderTimesBefore Int
+  attachInvoiceToReminder   Boolean
+  reminderEmail             Json
+}
+
+model PaymentAndAccountAccess {
+  id                       String  @id @default(uuid())
+  chargeOnDueDate          Boolean
+  chargeLastUsedFirst      Boolean
+  chargeAlternative        Boolean
+  retryBefore              Int
+  retryAfter               Int
+  notifyTenant             Boolean
+  notificationEmailHeader  String
+  notificationEmailBody    String
+  cancelAfter              Int
+  manualCancel             Boolean
+  suspensionAction         String
+  errorMessage             String
+  emailAfterAttempts       Int
+  warningMailHeader        String
+  warningMailBody          String
+  sendOnSubscriptionCancel Boolean
+  cancelMailHeader         String
+  cancelMailBody           String
+}
+
+model Issue {
+  id                    String    @id @default(uuid())
+  category              String
+  priority              String?
+  tenantId              String
+  adminId               String?
+  title                 String
+  adminLoggedById       String?
+  status                String
+  resolutionDeadline    DateTime?
+  attachments           Json?
+  description           String
+  resolutionDescription String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  tenant     Tenant @relation(fields: [tenantId], references: [id])
+  assignedTo Admin? @relation("AssignedAdmin", fields: [adminId], references: [id])
+  loggedBy   Admin? @relation("LoggedByAdmin", fields: [adminLoggedById], references: [id])
+
+  comments IssueComment[]
+  Logs     Logs[]
+}
+
+model IssueComment {
+  id        String   @id @default(uuid())
+  issueId   String
+  comment   String
+  adminId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  issue     Issue @relation(fields: [issueId], references: [id])
+  commentBy Admin @relation(fields: [adminId], references: [id])
+}
+
+model Domain {
+  id          String     @id @default(uuid())
+  name        String
+  description String
+  tenantId    String
+  domainType  DomainType
+  isDeleted   Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  tenant  Tenant    @relation(fields: [tenantId], references: [id])
+  program Program[]
+}
+
+model Program {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  domainId    String?
+  isCustom    Boolean  @default(false)
+  isDeleted   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  domain        Domain?         @relation(fields: [domainId], references: [id])
+  target        Target[]
+  ClientProgram ClientProgram[]
+}
+
+model Target {
+  id                   String   @id @default(uuid())
+  name                 String
+  description          String
+  programId            String?
+  isCustom             Boolean  @default(false)
+  isDeleted            Boolean  @default(false)
+  sd                   String
+  expectedResponse     String
+  teachingProcedure    String
+  promptingStrategy    Json
+  dataCollectionType   String
+  baselineDataRequired Boolean
+  numberOfTrials       Int?
+  numberOfTasks        Int?
+  taskSteps            Json?
+  masteryMetric        String
+  masteryCriteria      Json
+  initialStatus        String
+  attachment           String?
+  notes                String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  program      Program?       @relation(fields: [programId], references: [id])
+  ClientTarget ClientTarget[]
+  sessionDatas SessionData[]
+}
+
+model ClientProgram {
+  id        String   @id @default(uuid())
+  clientId  String
+  programId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  client  Client  @relation(fields: [clientId], references: [id])
+  program Program @relation(fields: [programId], references: [id])
+
+  @@unique([clientId, programId])
+}
+
+model ClientTarget {
+  id        String   @id @default(uuid())
+  clientId  String
+  targetId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  client                     Client                       @relation(fields: [clientId], references: [id])
+  target                     Target                       @relation(fields: [targetId], references: [id])
+  ClientTargetDataCollection ClientTargetDataCollection[]
+}
+
+model ClientTargetDataCollection {
+  id             String   @id @default(uuid())
+  clientTargetId String
+  data           Json
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  clientTarget ClientTarget @relation(fields: [clientTargetId], references: [id])
+}
+
+model OrganizationInformation {
+  id            String @id @default(uuid())
+  tenantId      String @unique
+  name          String
+  email         String
+  phoneNumber   String
+  website       String
+  practiceNPI   String
+  streetAddress String
+  city          String
+  state         String
+  country       String
+  zipCode       String
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model OrganizationLicenses {
+  id            String   @id @default(uuid())
+  tenantId      String
+  licenseName   String
+  licenseNumber String
+  issueState    String
+  expiryDate    DateTime
+  isDeleted     Boolean  @default(false)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model OrganizationDocuments {
+  id           String   @id @default(uuid())
+  tenantId     String
+  documentName String
+  documentUrl  String
+  uploadedBy   String
+  createdAt    DateTime @default(now())
+  isDeleted    Boolean  @default(false)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model OrganizationDiagnosisCodes {
+  id          String  @id @default(uuid())
+  tenantId    String
+  code        String
+  description String
+  isActive    Boolean
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model OrganizationSessionTypes {
+  id                String  @id @default(uuid())
+  tenantId          String
+  name              String
+  category          String
+  staffRolesAllowed Json
+  locationsAllowed  Json
+  defaultDuration   Int
+  isActive          Boolean
+  isBillable        Boolean
+
+  tenant              Tenant               @relation(fields: [tenantId], references: [id])
+  Appointment         Appointment[]
+  sessionTypeServices SessionTypeService[]
+}
+
+model SessionTypeService {
+  id            String @id @default(uuid())
+  serviceCodeId String
+  sessionTypeId String
+  modifiers     Json
+
+  serviceCode ServiceCodes             @relation(fields: [serviceCodeId], references: [id])
+  sessionType OrganizationSessionTypes @relation(fields: [sessionTypeId], references: [id])
+}
+
+model Appointment {
+  id                       String    @id @default(uuid())
+  clientId                 String
+  tenantId                 String
+  sessionId                String
+  date                     String
+  isRecurring              Boolean
+  startTime                String
+  endTime                  String
+  recurrence               Json
+  isBillable               Boolean
+  serviceLocation          String
+  requiresTravel           Boolean
+  colourCode               String
+  relatedAppointment       String?
+  isCanceled               Boolean   @default(false)
+  reasonForCancel          String?
+  reasonForReschedule      String?
+  rescheduled              Boolean   @default(false)
+  rescheduleAccepted       Boolean   @default(false)
+  rescheduleRejected       Boolean   @default(false)
+  clientRescheduleAccepted Boolean   @default(false)
+  clientRescheduleRejected Boolean   @default(false)
+  canceledBy               String?
+  cancelTime               DateTime?
+  previousDate             String?
+  previousStartTime        String?
+  previousEndTime          String?
+
+  client              Client                   @relation(fields: [clientId], references: [id])
+  tenant              Tenant                   @relation(fields: [tenantId], references: [id])
+  session             OrganizationSessionTypes @relation(fields: [sessionId], references: [id])
+  relatedTo           Appointment?             @relation("AppointmentRelation", fields: [relatedAppointment], references: [id])
+  relatedFrom         Appointment[]            @relation("AppointmentRelation")
+  clinicians          TenantStaff[]            @relation("AppointmentClinicians")
+  sessions            Session[]
+  appointmentServices AppointmentService[]
+}
+
+model AppointmentService {
+  id            String @id @default(uuid())
+  serviceCodeId String
+  appointmentId String
+  modifiers     Json
+
+  serviceCode ServiceCodes @relation(fields: [serviceCodeId], references: [id])
+  appointment Appointment  @relation(fields: [appointmentId], references: [id])
+}
+
+model ServiceCodes {
+  id          String  @id @default(uuid())
+  tenantId    String
+  code        String
+  description String
+  modifiers   Json
+  isDeleted   Boolean @default(false)
+  isActive    Boolean @default(true)
+
+  tenant                      Tenant                       @relation(fields: [tenantId], references: [id])
+  PayerServiceCodes           PayerServiceCodes[]
+  sessionTypeServices         SessionTypeService[]
+  appointmentServices         AppointmentService[]
+  clientAuthorizationServices ClientAuthorizationService[]
+}
+
+model RoundingRules {
+  id           String  @id @default(uuid())
+  tenantId     String
+  ruleType     String
+  ruleName     String
+  description  String
+  standardUnit Int?
+  roundingRule Json?
+  isDeleted    Boolean @default(false)
+  isActive     Boolean @default(true)
+
+  tenant            Tenant              @relation(fields: [tenantId], references: [id])
+  PayerServiceCodes PayerServiceCodes[]
+}
+
+model InsuranceType {
+  id          String  @id @default(uuid())
+  tenantId    String
+  name        String
+  description String
+  isDeleted   Boolean @default(false)
+  isActive    Boolean @default(true)
+
+  tenant               Tenant                @relation(fields: [tenantId], references: [id])
+  Payer                Payer[]
+  clientAuthorizations ClientAuthorization[]
+}
+
+model Payer {
+  id              String  @id @default(uuid())
+  tenantId        String
+  payerName       String
+  email           String
+  phone           String
+  insuranceTypeId String
+  tplCode         String
+  carrierPayerId  String
+  address         String
+  city            String
+  state           String
+  zip             String
+  country         String
+  serviceCodes    Json
+  isDeleted       Boolean @default(false)
+  isActive        Boolean @default(true)
+
+  tenant               Tenant                @relation(fields: [tenantId], references: [id])
+  insuranceType        InsuranceType         @relation(fields: [insuranceTypeId], references: [id])
+  PayerServiceCodes    PayerServiceCodes[]
+  clientAuthorizations ClientAuthorization[]
+  clients              Client[]
+}
+
+model PayerServiceCodes {
+  id             String  @id @default(uuid())
+  payerId        String
+  serviceCodeId  String
+  unitCurrency   String
+  modifiers      Json
+  ratePerUnit    Int
+  roundingRuleId String
+  billable       Boolean
+  isDeleted      Boolean @default(false)
+  isActive       Boolean @default(true)
+
+  serviceCode  ServiceCodes  @relation(fields: [serviceCodeId], references: [id])
+  roundingRule RoundingRules @relation(fields: [roundingRuleId], references: [id])
+  payer        Payer         @relation(fields: [payerId], references: [id])
+}
+
+model CompensationTypes {
+  id        String  @id @default(uuid())
+  tenantId  String
+  name      String
+  isDeleted Boolean @default(false)
+  isActive  Boolean @default(true)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model IncomeItems {
+  id        String  @id @default(uuid())
+  tenantId  String
+  name      String
+  type      String
+  rate      Json
+  isDeleted Boolean @default(false)
+  isActive  Boolean @default(true)
+
+  tenant             Tenant               @relation(fields: [tenantId], references: [id])
+  tenantStaffPayroll TenantStaffPayroll[] @relation("PayrollIncomItems")
+}
+
+model Deductions {
+  id        String  @id @default(uuid())
+  tenantId  String
+  name      String
+  type      String
+  rate      Json
+  isDeleted Boolean @default(false)
+  isActive  Boolean @default(true)
+
+  tenant             Tenant               @relation(fields: [tenantId], references: [id])
+  tenantStaffPayroll TenantStaffPayroll[] @relation("PayrollDeductions")
+}
+
+model PayrollCycles {
+  id               String           @id @default(uuid())
+  tenantId         String
+  name             String?
+  compensationType PaymentSchedule?
+  interval         Int
+  startDate        String
+  autoRun          Boolean          @default(false)
+  isDeleted        Boolean          @default(false)
+  isActive         Boolean          @default(true)
+
+  tenant             Tenant               @relation(fields: [tenantId], references: [id])
+  payrollCycleStaffs PayrollCycleStaffs[]
+}
+
+model PayrollCycleStaffs {
+  id              String          @id @default(uuid())
+  payrollCycleId  String
+  staffId         String
+  paymentSchedule PaymentSchedule
+  ratePerHour     String
+  minimumHours    String?
+
+  payrollCycle                 PayrollCycles                  @relation(fields: [payrollCycleId], references: [id])
+  staff                        TenantStaff                    @relation(fields: [staffId], references: [id])
+  payrollCycleStaffIncomeItems PayrollCycleStaffIncomeItems[]
+  payrollCycleStaffDeductions  PayrollCycleStaffDeductions[]
+}
+
+model PayrollCycleStaffIncomeItems {
+  id                  String @id @default(uuid())
+  payrollCycleStaffId String
+  name                String
+  type                String
+  rate                Json
+
+  PayrollCycleStaffs PayrollCycleStaffs @relation(fields: [payrollCycleStaffId], references: [id])
+}
+
+model PayrollCycleStaffDeductions {
+  id                  String @id @default(uuid())
+  payrollCycleStaffId String
+  name                String
+  type                String
+  rate                Json
+
+  PayrollCycleStaffs PayrollCycleStaffs @relation(fields: [payrollCycleStaffId], references: [id])
+}
+
+model Forms {
+  id             String   @id @default(uuid())
+  tenantId       String
+  name           String
+  isDraft        Boolean  @default(false)
+  isTemplate     Boolean  @default(false)
+  tenantClientId String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  FormFields    FormFields[]
+  tenant        Tenant          @relation(fields: [tenantId], references: [id])
+  tenantClient  ClientTenant?   @relation(fields: [tenantClientId], references: [id])
+  FormResponses FormResponses[]
+  clientForms   ClientForm[]
+}
+
+model FormFields {
+  id          String  @id @default(uuid())
+  formId      String
+  fieldType   String
+  label       String
+  placeholder String
+  options     Json?
+  fileUpload  Json?
+  starRating  Json?
+  signature   Json?
+  isRequired  Boolean @default(false)
+  order       Int
+
+  form               Forms                @relation(fields: [formId], references: [id])
+  FormResponseFields FormResponseFields[]
+}
+
+model FormResponses {
+  id          String   @id @default(uuid())
+  formId      String
+  tenantId    String
+  submittedBy String?
+  submittedAt DateTime @default(now())
+
+  form   Forms                @relation(fields: [formId], references: [id])
+  tenant Tenant               @relation(fields: [tenantId], references: [id])
+  client ClientTenant?        @relation(fields: [submittedBy], references: [id])
+  fields FormResponseFields[]
+}
+
+model FormResponseFields {
+  id             String @id @default(uuid())
+  formResponseId String
+  formFieldId    String
+  value          String
+
+  formResponse FormResponses @relation(fields: [formResponseId], references: [id])
+  formField    FormFields    @relation(fields: [formFieldId], references: [id])
+}
+
+model ClientAuthorization {
+  id                  String  @id @default(uuid())
+  tenantClientId      String
+  title               String
+  authorizationNumber String
+  startDate           String
+  endDate             String
+  payer               String
+  insuranceType       String
+  isDeleted           Boolean @default(false)
+  isActive            Boolean @default(true)
+
+  tenantClient                ClientTenant                 @relation(fields: [tenantClientId], references: [id])
+  payerDetails                Payer                        @relation(fields: [payer], references: [id])
+  insurance                   InsuranceType                @relation(fields: [insuranceType], references: [id])
+  clientAuthorizationServices ClientAuthorizationService[]
+  sessions                    Session[]                    @relation("SessionAuthorizations")
+}
+
+model ClientAuthorizationService {
+  id                    String @id @default(uuid())
+  serviceCodeId         String
+  clientAuthorizationId String
+  modifiers             Json
+  units                 Int
+  usedUnit              Int    @default(0)
+  per                   String
+
+  serviceCode         ServiceCodes        @relation(fields: [serviceCodeId], references: [id])
+  clientAuthorization ClientAuthorization @relation(fields: [clientAuthorizationId], references: [id])
+}
+
+model ClientForm {
+  id             String           @id @default(uuid())
+  tenantClientId String
+  status         ClientFormStatus @default(PENDING)
+  formId         String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  client ClientTenant @relation(fields: [tenantClientId], references: [id])
+  form   Forms        @relation(fields: [formId], references: [id])
+
+  @@unique([tenantClientId, formId])
+}
+
+model StaffAvailability {
+  id      String @id @default(uuid())
+  staffId String
+
+  staff            TenantStaff        @relation(fields: [staffId], references: [id])
+  availabilityDays AvailabilityDays[]
+}
+
+model AvailabilityDays {
+  id             String  @id @default(uuid())
+  dayOfWeek      WeekDay
+  available      Boolean
+  from           String
+  to             String
+  availabilityId String
+
+  availability StaffAvailability @relation(fields: [availabilityId], references: [id])
+}
+
+model Session {
+  id                       String         @id @default(uuid())
+  note                     String
+  appointmentId            String
+  supervisorApprovalStatus ApprovalStatus @default(PENDING)
+  clientApprovalStatus     ApprovalStatus @default(PENDING)
+  supervisorId             String?
+  startTime                DateTime
+  endTime                  DateTime
+  travelStartTime          DateTime?
+  travelEndTime            DateTime?
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
+
+  appointment           Appointment            @relation(fields: [appointmentId], references: [id])
+  approver              TenantStaff?           @relation(fields: [supervisorId], references: [id])
+  sessionDatas          SessionData[]
+  sessionApprovals      SessionApproval[]
+  timesheetHistories    TimesheetHistory[]
+  sessionUpdateRequests SessionUpdateRequest[]
+  authorizationsUsed    ClientAuthorization[]  @relation("SessionAuthorizations")
+}
+
+model SessionData {
+  id        String   @id @default(uuid())
+  sessionId String
+  data      Json
+  targetId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  session Session @relation(fields: [sessionId], references: [id])
+  target  Target  @relation(fields: [targetId], references: [id])
+}
+
+model SessionApproval {
+  id              String   @id @default(uuid())
+  sessionId       String
+  confirmDelivery Boolean
+  rateService     Int      @default(0)
+  rateTherapist   Int      @default(0)
+  feedback        String?
+  signature       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  session Session @relation(fields: [sessionId], references: [id])
+}
+
+model TimesheetHistory {
+  id        String   @id @default(uuid())
+  sessionId String
+  action    String
+  details   String?
+  createdBy String?
+  createdAt DateTime @default(now())
+
+  staff   TenantStaff? @relation(fields: [createdBy], references: [id])
+  session Session      @relation(fields: [sessionId], references: [id])
+}
+
+model SessionUpdateRequest {
+  id          String   @id @default(uuid())
+  sessionId   String
+  description String
+  requestedBy String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  staff   TenantStaff? @relation(fields: [requestedBy], references: [id])
+  session Session      @relation(fields: [sessionId], references: [id])
+}
+
+model ClientFolder {
+  id             String   @id @default(uuid())
+  name           String
+  clientTenantId String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  clientTenant ClientTenant  @relation(fields: [clientTenantId], references: [id])
+  clientFiles  ClientFiles[]
+}
+
+model ClientFiles {
+  id             String   @id @default(uuid())
+  name           String
+  url            String
+  size           String
+  uploadedBy     String?
+  clientTenantId String
+  fileType       String
+  folderId       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  clientTenant ClientTenant  @relation(fields: [clientTenantId], references: [id])
+  folder       ClientFolder? @relation(fields: [folderId], references: [id])
+  staff        TenantStaff?  @relation(fields: [uploadedBy], references: [id])
+}
+
+model ClinicalReportTemplates {
+  id        String   @id @default(uuid())
+  tenantId  String
+  title     String
+  isActive  Boolean  @default(false)
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant                 Tenant                          @relation(fields: [tenantId], references: [id])
+  reportTemplateSections ClinicalReportTemplateSection[]
+}
+
+model ClinicalReportTemplateSection {
+  id         String @id @default(uuid())
+  section    String
+  content    Json
+  templateId String
+
+  template ClinicalReportTemplates @relation(fields: [templateId], references: [id])
+}
+
+model ClinicalReport {
+  id             String               @id @default(uuid())
+  title          String
+  clientTenantId String
+  creatorId      String
+  approverId     String?
+  tenantId       String
+  status         ClinicalReportStatus @default(DRAFT)
+  isDeleted      Boolean              @default(false)
+  tokenVersion   Int                  @default(0)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  creator                      TenantStaff                   @relation("ReportsCreator", fields: [creatorId], references: [id])
+  client                       ClientTenant                  @relation(fields: [clientTenantId], references: [id])
+  approver                     TenantStaff?                  @relation("ReportsApprover", fields: [approverId], references: [id])
+  tenant                       Tenant                        @relation(fields: [tenantId], references: [id])
+  clinicalReportSections       ClinicalReportSection[]
+  clinicalReportHistories      ClinicalReportHistory[]
+  clinicalReportChangeRequests ClinicalReportChangeRequest[]
+  clinicalReportVersions       ClinicalReportVersion[]
+}
+
+model ClinicalReportSection {
+  id               String @id @default(uuid())
+  section          String
+  content          Json
+  order            Int
+  clinicalReportId String
+
+  clinicalReport ClinicalReport @relation(fields: [clinicalReportId], references: [id])
+}
+
+model ClinicalReportHistory {
+  id               String   @id @default(uuid())
+  clinicalReportId String
+  action           String
+  details          String?
+  createdBy        String
+  createdAt        DateTime @default(now())
+
+  staff          TenantStaff    @relation(fields: [createdBy], references: [id])
+  clinicalReport ClinicalReport @relation(fields: [clinicalReportId], references: [id])
+}
+
+model ClinicalReportChangeRequest {
+  id               String   @id @default(uuid())
+  description      String
+  viewed           Boolean  @default(false)
+  clinicalReportId String
+  clientTenantId   String?
+  approverId       String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  clinicalReport ClinicalReport @relation(fields: [clinicalReportId], references: [id])
+  client         ClientTenant?  @relation(fields: [clientTenantId], references: [id])
+  approver       TenantStaff?   @relation("ReportsRequestApprover", fields: [approverId], references: [id])
+}
+
+model ClinicalReportVersion {
+  id               String   @id @default(uuid())
+  clinicalReportId String
+  versionNumber    Int
+  url              String
+  createdAt        DateTime @default(now())
+
+  clinicalReport ClinicalReport @relation(fields: [clinicalReportId], references: [id])
+}
+
+model TenantGeneralSettings {
+  id         String   @id @default(uuid())
+  tenantId   String   @unique
+  dateFormat String
+  timeFormat String
+  currency   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model TenantAdditionalSecurityQuestions {
+  id        String   @id @default(uuid())
+  tenantId  String
+  question  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model Message {
+  id           String   @id @default(uuid())
+  senderId     String
+  senderType   UserType
+  receiverId   String
+  receiverType UserType
+  content      String
+  isRead       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  userType  UserType
+  type      String
+  title     String
+  content   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model ServerRequest {
+  id             String   @id @default(uuid())
+  tenantId       String?
+  adminId        String?
+  tenantStaffId  String?
+  tenantClientId String?
+  method         String
+  endpoint       String
+  statusCode     Int
+  durationMs     Int
+  ipAddress      String?
+  userAgent      String?
+  errorMessage   String?
+  createdAt      DateTime @default(now())
+
+  tenant      Tenant?       @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  admin       Admin?        @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  tenantStaff TenantStaff?  @relation(fields: [tenantStaffId], references: [id], onDelete: SetNull)
+  client      ClientTenant? @relation(fields: [tenantClientId], references: [id], onDelete: SetNull)
+}

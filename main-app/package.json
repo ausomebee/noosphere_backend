@@ -1,0 +1,117 @@
+{
+  "name": "@org/main-app",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "targets": {
+      "prisma:migrate": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "prisma migrate dev",
+          "cwd": "{projectRoot}"
+        }
+      },
+      "prisma:migrate:deploy": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "prisma migrate deploy",
+          "cwd": "{projectRoot}"
+        }
+      },
+      "prisma:generate": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "prisma generate",
+          "cwd": "{projectRoot}"
+        }
+      },
+      "prune-lockfile": {
+        "dependsOn": [
+          "build"
+        ],
+        "cache": true,
+        "executor": "@nx/js:prune-lockfile",
+        "outputs": [
+          "{workspaceRoot}/main-app/dist/package.json",
+          "{workspaceRoot}/main-app/dist/package-lock.json"
+        ],
+        "options": {
+          "buildTarget": "build"
+        }
+      },
+      "copy-workspace-modules": {
+        "dependsOn": [
+          "build"
+        ],
+        "cache": true,
+        "outputs": [
+          "{workspaceRoot}/main-app/dist/workspace_modules"
+        ],
+        "executor": "@nx/js:copy-workspace-modules",
+        "options": {
+          "buildTarget": "build"
+        }
+      },
+      "prune": {
+        "dependsOn": [
+          "prune-lockfile",
+          "copy-workspace-modules"
+        ],
+        "executor": "nx:noop"
+      },
+      "serve": {
+        "continuous": true,
+        "executor": "@nx/js:node",
+        "defaultConfiguration": "development",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "buildTarget": "@org/main-app:build",
+          "runBuildTargetDependencies": false
+        },
+        "configurations": {
+          "development": {
+            "buildTarget": "@org/main-app:build:development"
+          },
+          "production": {
+            "buildTarget": "@org/main-app:build:production"
+          }
+        }
+      }
+    }
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9",
+    "prisma": "^7.0.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cloudwatch": "^3.821.0",
+    "@aws-sdk/client-s3": "^3.830.0",
+    "@aws-sdk/client-sesv2": "^3.971.0",
+    "@prisma/adapter-pg": "^7.0.0",
+    "@prisma/client": "^7.0.0",
+    "argon2": "^0.41.1",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "express-async-handler": "^1.2.0",
+    "express-session": "^1.18.1",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "multer": "^2.0.1",
+    "multer-s3": "^3.0.1",
+    "nodemailer": "^6.10.0",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "pdfkit": "^0.17.2",
+    "qrcode": "^1.5.4",
+    "socket.io": "^4.8.1",
+    "speakeasy": "^2.0.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  }
+}

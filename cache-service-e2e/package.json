@@ -1,0 +1,26 @@
+{
+  "name": "@org/cache-service-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "@org/cache-service"
+    ],
+    "targets": {
+      "e2e": {
+        "executor": "@nx/jest:jest",
+        "outputs": [
+          "{projectRoot}/test-output/jest/coverage"
+        ],
+        "options": {
+          "jestConfig": "cache-service-e2e/jest.config.cts",
+          "passWithNoTests": true
+        },
+        "dependsOn": [
+          "@org/cache-service:build",
+          "@org/cache-service:serve"
+        ]
+      }
+    }
+  }
+}

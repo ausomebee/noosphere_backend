@@ -1,0 +1,301 @@
+import "./config/env.js";
+import express from "express";
+import http from "http";
+import cors from "cors";
+import morgan from "morgan";
+import swaggerUi from 'swagger-ui-express';
+import { specs } from './config/swagger.js';
+import errorHandler from "./middleware/error-handler.js";
+import prismaService from "./config/prisma.js";
+import socketService from "./config/socket.js"
+import PassportUtil from "./config/passport.js";
+import healthRoute from "./health.route.js";
+import department_route from "./features/departmentAndTeams/presentation/routes/departmentRoutes.js"
+import admin_route from "./features/admin/presentation/routes/adminRoute.js"
+import role_route from "./features/role/presentation/routes/roleRoute.js"
+import pipeline_route from "./features/pipeline/presentation/routes/pipelineRoute.js"
+import tenant_route from "./features/tenant/presentation/routes/tenantRoute.js"
+import client_route from "./features/client/presentation/routes/clientRoute.js"
+import auth_route from "./features/auth/presentation/routes/authRoute.js"
+import billing_route from "./features/billing/presentation/routes/billingRoute.js"
+import feature_route from "./features/planAndFeature/presentation/routes/featureRoute.js"
+import plan_route from "./features/planAndFeature/presentation/routes/planRoute.js"
+import subscription_route from "./features/planAndFeature/presentation/routes/subscriptionRoute.js"
+import invoice_route from "./features/invoice/presentation/routes/invoiceRoute.js"
+import log_route from "./features/logs/presentation/routes/logRoute.js"
+import server_request_route from "./features/logs/presentation/routes/serverRequestRoutes.js"
+import performance_route from "./features/performance/presentation/routes/performanceRoute.js"
+import issue_route from "./features/issue/presentation/routes/issueRoute.js"
+import program_route from "./features/program/presentation/routes/programRoute.js"
+import domain_route from "./features/program/presentation/routes/domainRoute.js"
+import target_route from "./features/program/presentation/routes/targetRoute.js"
+import target_data_route from "./features/program/presentation/routes/targetDataRoute.js";
+import client_program_route from "./features/program/presentation/routes/clientProgramRoute.js";
+import client_target_route from "./features/program/presentation/routes/clientTargetRoute.js";
+import organization_information_route from "./features/organization/presentation/routes/informationRoute.js";
+import organization_document_route from "./features/organization/presentation/routes/documentRoute.js";
+import organization_license_route from "./features/organization/presentation/routes/licenseRoute.js";
+import organization_session_type_route from "./features/organization/presentation/routes/sessionTypeRoute.js";
+import organization_diagnosis_code_route from "./features/organization/presentation/routes/diagnosisCodeRoute.js";
+import organization_staff_route from "./features/organizationStaff/presentation/routes/staffRoute.js";
+import organization_staff_document_route from "./features/organizationStaff/presentation/routes/DocumentRoute.js";
+import organization_staff_license_route from "./features/organizationStaff/presentation/routes/licenseRoute.js";
+import organization_staff_payroll_route from "./features/organizationStaff/presentation/routes/payrollRoute.js";
+import image_route from "./features/images/presentation/routes/imageRoutes.js";
+import appointment_route from "./features/appointment/presentation/routes/appointmentRoute.js";
+import service_codes_route from "./features/tenantBilling/presentation/routes/serviceCodesRoutes.js";
+import rounding_rules_route from "./features/tenantBilling/presentation/routes/roundingRulesRoutes.js";
+import insurance_type_route from "./features/tenantBilling/presentation/routes/insuranceTypeRoutes.js";
+import payer_route from "./features/tenantBilling/presentation/routes/payerRoutes.js";
+import payer_service_codes_route from "./features/tenantBilling/presentation/routes/payerServiceCodeRoutes.js";
+import compensation_type_route from "./features/tenantPayroll/presentation/routes/compensationTypeRoutes.js";
+import income_item_route from "./features/tenantPayroll/presentation/routes/incomeItemRoutes.js";
+import deduction_route from "./features/tenantPayroll/presentation/routes/deductionRoutes.js";
+import payroll_cycle_route from "./features/tenantPayroll/presentation/routes/payrollCycleRoutes.js";
+import form_route from "./features/customForms/presentation/routes/formRoutes.js";
+import form_field_route from "./features/customForms/presentation/routes/formFieldRoutes.js";
+import form_response_route from "./features/customForms/presentation/routes/formResponseRoutes.js";
+import form_response_field_route from "./features/customForms/presentation/routes/formResponseFieldRoutes.js";
+import client_documents_route from "./features/client/presentation/routes/clientDocumentsRoutes.js";
+import requested_documents_route from "./features/client/presentation/routes/requestedDocumentsRoutes.js";
+import client_authorization_route from "./features/client/presentation/routes/clientAuthorizationRoutes.js";
+import client_forms_route from "./features/customForms/presentation/routes/clientFormRoutes.js";
+import availabilityDaysRoute from "./features/organization/presentation/routes/availabilityDaysRoutes.js";
+import staffAvailabilityRoute from "./features/organization/presentation/routes/staffAvailabilityRoutes.js";
+import sessionRoute from "./features/session/presentation/routes/sessionRoutes.js";
+import sessionDataRoute from "./features/session/presentation/routes/sessionDataRoutes.js";
+import sessionApprovalRoute from "./features/session/presentation/routes/sessionApprovalRoutes.js";
+import timesheetHistoryRoute from "./features/session/presentation/routes/timesheetHistoryRoutes.js";
+import sessionUpdateRequestRoute from "./features/session/presentation/routes/sessionUpdateRequestRoutes.js";
+import clientFilesRoute from "./features/folder/presentation/routes/clientFilesRoutes.js";
+import clientFolderRoute from "./features/folder/presentation/routes/clientFolderRoutes.js";
+import clinicalReportTemplatesRoute from "./features/clinicalReport/presentation/routes/reportTemplateRoutes.js";
+import clinicalReportTemplateSectionsRoute from "./features/clinicalReport/presentation/routes/reportTemplateSectionRoutes.js";
+import clinicalReportsRoute from "./features/clinicalReport/presentation/routes/reportRoutes.js";
+import clinicalReportSectionsRoute from "./features/clinicalReport/presentation/routes/reportSectionRoutes.js";
+import clinicalReportHistoriesRoute from "./features/clinicalReport/presentation/routes/reportHistoryRoutes.js";
+import clinicalReportRequestsRoute from "./features/clinicalReport/presentation/routes/reportRequestRoutes.js";
+import tenantGeneralSettingsRoute from "./features/tenant/presentation/routes/tenantGeneralSettingsRoutes.js";
+import tenantAdditionalSecurityQuestionsRoute from "./features/tenant/presentation/routes/tenantAdditionalSecurityQuestionsRoutes.js";
+import clientNotificationSettingsRoute from "./features/client/presentation/routes/clientNotificationSettingsRoutes.js";
+import payrollCycleStaffRoute from "./features/tenantPayroll/presentation/routes/payrollCycleStaffRoutes.js";
+import teamRoute from "./features/departmentAndTeams/presentation/routes/teamsRoutes.js";
+import teamMembersRoute from "./features/departmentAndTeams/presentation/routes/teamMembersRoutes.js";
+import departmentRoute from "./features/departmentAndTeams/presentation/routes/departmentRoutes.js";
+import departmentMembersRoute from "./features/departmentAndTeams/presentation/routes/departmentMembersRoutes.js";
+import notificationsRoute from "./features/notifications/presentation/routes/notificationRoutes.js";
+import messagesRoute from "./features/messaging/presentation/routes/messageRoutes.js";
+import tenantNotificationSettingsRoute from "./features/tenant/presentation/routes/tenantNotificationSettingsRoutes.js";
+
+class App {
+    constructor() {
+        this.app = express();
+        this.server = http.createServer(this.app);
+
+        this.prisma = prismaService;
+        this.port = process.env.PORT || 5000;
+        this.allowedOrigins = {
+            origin(origin, callback) {
+                if (!origin) return callback(null, true);
+                const allowed =
+                    /^https:\/\/([a-z0-9-]+\.)*noospherehub\.net$/.test(origin) ||
+                    /^http:\/\/localhost:\d+$/.test(origin) ||
+                    /^http:\/\/127\.0\.0\.1:\d+$/.test(origin) ||
+                    /^http:\/\/([a-z0-9-]+\.)*localhost:\d+$/.test(origin) ||
+                    /^http:\/\/ec2-[\d-]+\.[\w-]+\.compute\.amazonaws\.com:\d+$/.test(origin);
+                if (allowed) {
+                    callback(null, true);
+                } else {
+                    console.error("❌ Blocked by CORS:", origin);
+                    callback(new Error("CORS not allowed"));
+                }
+            },
+            credentials: true,
+            methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
+        };
+        this.initializeDatabase();
+        this.initializeMiddlewares();
+        this.initializeRequestTracking();
+        this.initializeSwagger();
+        this.initializeRoutes();
+        this.initializeErrorHandler();
+    }
+
+    async initializeDatabase() {
+        await this.prisma.connect();
+    }
+
+    initializeMiddlewares() {
+        new PassportUtil(this.app)
+        this.app.use(morgan("dev"));
+        this.app.use(cors(this.allowedOrigins));
+        this.app.use(express.json({ limit: "50mb" }));
+        this.app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+    }
+
+    initializeSwagger() {
+        this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+    }
+
+    initializeRequestTracking() {
+        const prisma = this.prisma.getClient();
+
+        this.app.use((req, res, next) => {
+            if (
+                req.originalUrl.startsWith("/api-docs") ||
+                req.originalUrl.startsWith("/health")
+            ) {
+                return next();
+            }
+
+            const start = process.hrtime.bigint();
+
+            res.on("finish", async () => {
+                try {
+                    const durationMs =
+                        Number(process.hrtime.bigint() - start) / 1_000_000;
+
+                    const logData = {
+                        tenantId: null,
+                        adminId: null,
+                        tenantStaffId: null,
+                        tenantClientId: null,
+                        method: req.method,
+                        endpoint: req.originalUrl,
+                        statusCode: res.statusCode,
+                        durationMs: Math.round(durationMs),
+                        ipAddress: req.ip,
+                        userAgent: req.headers["user-agent"],
+                        errorMessage:
+                            res.statusCode >= 500
+                                ? res.statusMessage || "Server Error"
+                                : null,
+                    };
+
+                    if (req.user) {
+                        logData.tenantId = req.user.tenantId ?? null;
+
+                        switch (req.user.type) {
+                            case "ADMIN":
+                                logData.adminId = req.user.id;
+                                break;
+                            case "STAFF":
+                                logData.tenantStaffId = req.user.id;
+                                break;
+                            case "CLIENT":
+                                logData.tenantClientId = req.user.id;
+                                break;
+                        }
+                    }
+
+                    if (!prisma?.serverRequest) {
+                        console.error("Prisma ServerRequest model not available");
+                        return;
+                    }
+
+                    await prisma.serverRequest.create({ data: logData });
+                } catch (err) {
+                    console.error("Request tracking failed:", err);
+                }
+            });
+
+            next();
+        });
+    }
+
+    initializeRoutes() {
+        this.app.use("/health", healthRoute);
+        this.app.use("/api/v1/department", department_route);
+        this.app.use("/api/v1/role", role_route);
+        this.app.use("/api/v1/admin", admin_route);
+        this.app.use("/api/v1/pipeline", pipeline_route);
+        this.app.use("/api/v1/tenant", tenant_route);
+        this.app.use("/api/v1/client", client_route);
+        this.app.use("/api/v1/auth", auth_route);
+        this.app.use("/api/v1/billing", billing_route);
+        this.app.use("/api/v1/feature", feature_route);
+        this.app.use("/api/v1/plan", plan_route);
+        this.app.use("/api/v1/subscription", subscription_route);
+        this.app.use("/api/v1/invoice", invoice_route);
+        this.app.use("/api/v1/logs", log_route);
+        this.app.use("/api/v1/server-requests", server_request_route);
+        this.app.use("/api/v1/performance", performance_route);
+        this.app.use("/api/v1/issue", issue_route);
+        this.app.use("/api/v1/programs", program_route);
+        this.app.use("/api/v1/domains", domain_route);
+        this.app.use("/api/v1/targets", target_route);
+        this.app.use("/api/v1/target-data", target_data_route);
+        this.app.use("/api/v1/client-programs", client_program_route);
+        this.app.use("/api/v1/client-targets", client_target_route);
+        this.app.use("/api/v1/organization/information", organization_information_route);
+        this.app.use("/api/v1/organization/document", organization_document_route);
+        this.app.use("/api/v1/organization/license", organization_license_route);
+        this.app.use("/api/v1/organization/diagnosis-codes", organization_diagnosis_code_route);
+        this.app.use("/api/v1/organization/session-types", organization_session_type_route);
+        this.app.use("/api/v1/organization-staff/document", organization_staff_document_route);
+        this.app.use("/api/v1/organization-staff/license", organization_staff_license_route);
+        this.app.use("/api/v1/organization-staff/payroll", organization_staff_payroll_route);
+        this.app.use("/api/v1/organization-staff/staff", organization_staff_route);
+        this.app.use("/api/v1/images", image_route);
+        this.app.use("/api/v1/appointments", appointment_route);
+        this.app.use("/api/v1/service-codes", service_codes_route);
+        this.app.use("/api/v1/rounding-rules", rounding_rules_route);
+        this.app.use("/api/v1/insurance-types", insurance_type_route);
+        this.app.use("/api/v1/payers", payer_route);
+        this.app.use("/api/v1/payer-service-codes", payer_service_codes_route);
+        this.app.use("/api/v1/compensation-types", compensation_type_route);
+        this.app.use("/api/v1/income-items", income_item_route);
+        this.app.use("/api/v1/deductions", deduction_route);
+        this.app.use("/api/v1/payroll-cycles", payroll_cycle_route);
+        this.app.use("/api/v1/forms", form_route);
+        this.app.use("/api/v1/form-fields", form_field_route);
+        this.app.use("/api/v1/form-responses", form_response_route);
+        this.app.use("/api/v1/form-response-fields", form_response_field_route);
+        this.app.use("/api/v1/client-documents", client_documents_route);
+        this.app.use("/api/v1/client-requested-documents", requested_documents_route);
+        this.app.use("/api/v1/client-authorization", client_authorization_route);
+        this.app.use("/api/v1/client-forms", client_forms_route);
+        this.app.use("/api/v1/organization/availability-days", availabilityDaysRoute);
+        this.app.use("/api/v1/organization/staff-availability", staffAvailabilityRoute);
+        this.app.use("/api/v1/sessions", sessionRoute);
+        this.app.use("/api/v1/session-data", sessionDataRoute);
+        this.app.use("/api/v1/sessions-approval", sessionApprovalRoute);
+        this.app.use("/api/v1/sessions-timesheet-history", timesheetHistoryRoute);
+        this.app.use("/api/v1/sessions-update-requests", sessionUpdateRequestRoute);
+        this.app.use("/api/v1/client-folders", clientFolderRoute);
+        this.app.use("/api/v1/client-files", clientFilesRoute);
+        this.app.use("/api/v1/clinical-report-templates", clinicalReportTemplatesRoute);
+        this.app.use("/api/v1/clinical-report-template-sections", clinicalReportTemplateSectionsRoute);
+        this.app.use("/api/v1/clinical-reports", clinicalReportsRoute);
+        this.app.use("/api/v1/clinical-report-sections", clinicalReportSectionsRoute);
+        this.app.use("/api/v1/clinical-report-histories", clinicalReportHistoriesRoute);
+        this.app.use("/api/v1/clinical-report-change-requests", clinicalReportRequestsRoute);
+        this.app.use("/api/v1/tenant-security-questions", tenantAdditionalSecurityQuestionsRoute);
+        this.app.use("/api/v1/tenant-general-settings", tenantGeneralSettingsRoute);
+        this.app.use("/api/v1/client/notification-settings", clientNotificationSettingsRoute);
+        this.app.use("/api/v1/payroll-cycle-staffs", payrollCycleStaffRoute);
+        this.app.use("/api/v1/organization/teams", teamRoute);
+        this.app.use("/api/v1/organization/team-members", teamMembersRoute);
+        this.app.use("/api/v1/organization/departments", departmentRoute);
+        this.app.use("/api/v1/organization/department-members", departmentMembersRoute);
+        this.app.use("/api/v1/notifications", notificationsRoute);
+        this.app.use("/api/v1/messages", messagesRoute);
+        this.app.use("/api/v1/tenant/notification-settings", tenantNotificationSettingsRoute);
+    }
+
+    initializeErrorHandler() {
+        this.app.use(errorHandler.handleError);
+    }
+
+    start() {
+        this.server.listen(this.port, () => {
+            console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${this.port}`);
+
+            socketService.init(this.server);
+            console.log("✅ WebSocket initialized");
+        });
+    }
+}
+
+const appInstance = new App();
+appInstance.start();

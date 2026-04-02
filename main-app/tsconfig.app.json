@@ -1,0 +1,22 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "types": ["node", "express"],
+    "rootDir": "src",
+    "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo",
+    "allowJs": true,          
+    "checkJs": false,       
+    "noEmit": false
+  },
+  "include": ["src/**/*.ts", "src/**/*.js"],
+  "exclude": [
+    "out-tsc",
+    "dist",
+    "src/**/*.spec.js",
+    "src/**/*.test.js",
+    "eslint.config.js",
+    "eslint.config.cjs",
+    "eslint.config.mjs"
+  ]
+}
