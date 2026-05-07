@@ -20,11 +20,6 @@ class Admin {
             phoneNumber: this.phoneNumber,
             roleId: this.roleId,
             superAdmin: this.superAdmin,
-            departmentMembers: {
-                create: {
-                    departmentId: this.departmentId
-                }
-            }
         };
     }
 
