@@ -92,9 +92,7 @@ import AdminDto from "../dto/adminDto.js";
  *         - firstName
  *         - lastName
  *         - email
- *         - password
  *         - phoneNumber
- *         - roleId
  *       properties:
  *         firstName:
  *           type: string
@@ -114,7 +112,7 @@ import AdminDto from "../dto/adminDto.js";
  *           type: string
  *           minLength: 10
  *           maxLength: 15
- *           description: Phone number (10 to 15 digits)
+ *           description: Phone number (10 to 15 digits, optional leading +)
  *     AuthRequest:
  *       type: object
  *       required:
@@ -260,6 +258,10 @@ class AdminRoutes {
          *         description: super Admin created successfully
          *       400:
          *         description: Validation error
+         *       409:
+         *         description: Conflict (email or phone already exists)
+         *       500:
+         *         description: Internal server error
          */
         this.router.post("/superadmin", AdminDto.createSuperAdminDto, this.controller.createSuperAdmin);
 

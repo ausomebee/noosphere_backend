@@ -180,7 +180,7 @@ class AdminService {
             });
 
             return admin;
-        });
+        }, { timeout: 10_000 });
 
         if (!newAdmin) {
             throw new Error("Failed to create admin");

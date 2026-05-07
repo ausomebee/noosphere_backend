@@ -1,6 +1,5 @@
 import Joi from "joi";
 import Validator from "../../../../utilities/validate.js";
-import { id } from "date-fns/locale";
 
 const strongPasswordRegex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
 const stringPasswordError = "Password must be strong. At least one upper case letter, one lower case letter, one digit, one special character, and at least 8 characters long.";
@@ -155,12 +154,10 @@ class AdminDto {
             phoneNumber: Joi.string()
                 .required()
                 .trim()
-                .min(10)
-                .max(15)
+                .pattern(/^\+?\d{10,15}$/)
                 .messages({
                     "string.empty": "Phone number is required",
-                    "string.min": "Phone number must be at least 10 characters long",
-                    "string.max": "Phone number must be at most 15 characters long"
+                    "string.pattern.base": "Phone number must be 10 to 15 digits and may start with +"
                 })
         });
 
