@@ -7,7 +7,7 @@ async function main() {
     if (pipelineCount === 0) {
         await prisma.pipeline.create({
             data: {
-                module: "ADMIN",
+                module: "TENANT",
                 name: "Client Onboarding",
                 description: "Manage your client intake process seamlessly"
             }
