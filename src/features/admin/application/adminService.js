@@ -163,9 +163,15 @@ class AdminService {
         }
 
         const newAdmin = await this.repository.prisma.$transaction(async (tx) => {
-            const department = await this.departmentRepository.createAdminDepartment(tx);
-            const role = await this.roleRepository.createAdminRole(department.id, tx)
+            const role = await this.roleRepository.createAdminRole("GLOBAL", null, tx);
             const admin = await this.repository.txCreate({ ...data, password: hashedPass, administratorPassword: hashedAdminPass, roleId: role.id }, tx);
+            await tx.department.create({
+                data: {
+                    name: "General",
+                    teamLeadId: admin.id,
+                    createdByAdminId: admin.id,
+                },
+            });
 
             return admin;
         });
@@ -203,7 +209,7 @@ class AdminService {
         return { ...admin, accessToken: this.token.generateAccessToken(claims), refreshToken: this.token.generateRefreshToken() };
     }
 
-    async verifyPassword(data){
+    async verifyPassword(data) {
         const admin = await this.repository.findAdmin({
             id: data.id
         });
@@ -255,7 +261,7 @@ class AdminService {
 
     async getAllAdmin() {
         const admins = await this.repository.findAll({
-            include:{
+            include: {
                 roles: {
                     select: {
                         name: true,

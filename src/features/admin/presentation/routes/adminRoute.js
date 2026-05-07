@@ -245,7 +245,7 @@ class AdminRoutes {
 
         /**
          * @swagger
-         * /api/v1/admin/createsuperadmin:
+         * /api/v1/admin/superadmin:
          *   post:
          *     summary: create a new super admin
          *     tags: [super admin]
@@ -261,7 +261,7 @@ class AdminRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/createsuperadmin", AdminDto.createSuperAdminDto, this.controller.createSuperAdmin);
+        this.router.post("/superadmin", AdminDto.createSuperAdminDto, this.controller.createSuperAdmin);
 
         /**
         * @swagger
