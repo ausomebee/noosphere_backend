@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .content {
+            background-color: #ffffff;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 16px;
+        }
+        .footer {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2 style="margin: 0; color: #2c3e50;">Clinical Report Ready</h2>
+    </div>
+    <div class="content">
+        <p>Dear {{firstName}},</p>
+        <p>Your clinical report has been completed and signed. Please find the attached PDF document.</p>
+        <p>You can also view your report online by clicking the button below:</p>
+        <a href="{{viewToken}}" class="button">View Report Online</a>
+        <p style="margin-top: 20px;">
+            <strong>Report Details:</strong><br>
+            Title: {{title}}<br>
+            Date: {{date}}<br>
+            Status: Signed
+        </p>
+    </div>
+    <div class="footer">
+        <p>
+            This email was sent by {{companyName}}.<br>
+            If you have any questions, please contact us.
+        </p>
+        <p>
+            <em>Please do not reply to this email. This mailbox is not monitored.</em>
+        </p>
+    </div>
+</body>
+</html>

@@ -4,6 +4,7 @@ import MailService from "../../../utilities/nodemailer.js";
 import emailService from "../../../utilities/ses.js";
 import Client from "../domain/client.js";
 import argon2 from "argon2";
+import templateRenderer from "../../../utilities/templateRenderer.js";
 
 class ClientService {
     constructor({ clientRepository, clientTenantRepository, generateCode, prisma, itemRepository }) {
@@ -73,116 +74,13 @@ class ClientService {
             }
         ]
 
-        const html = `
-            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-                <html xmlns="http://www.w3.org/1999/xhtml">
-                <head>
-                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-                <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-                <title>Welcome to NooSphere</title>
-                <style type="text/css">
-                    body { margin: 0; padding: 0; width: 100% !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-                    img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
-                    table { border-collapse: collapse !important; }
-                    
-                    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-                    
-                    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-                </style>
-                </head>
-                <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background-color: #f5f5f5;">
-                
-                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f5;">
-                    <tr>
-                    <td align="center" style="padding: 0;">
-                        
-                        <table border="0" cellpadding="0" cellspacing="0" width="600" style="max-width: 600px; background-color: #ffffff;">
-                        
-                        <tr>
-                            <td align="center" style="padding: 0; height: 60px; background: linear-gradient(90deg, #8B5CF6 0%, #EC4899 50%, #EF4444 100%);">
-                            <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:600px;height:60px;">
-                                <v:fill type="gradient" color="#8B5CF6" color2="#EF4444" angle="90" />
-                            </v:rect>
-                            </td>
-                        </tr>
-                        
-                        <tr>
-                            <td align="center" style="padding: 40px 40px 30px 40px;">
-                            <table border="0" cellpadding="0" cellspacing="0">
-                                <tr>
-                                <td align="center">
-                                    <img src="cid:unique@image" alt="NooSphere" width="180" height="40" style="display: block; font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; color: #000000;" />
-                                </td>
-                                </tr>
-                            </table>
-                            </td>
-                        </tr>
-                        
-                        <tr>
-                            <td align="center" style="padding: 0 40px 10px 40px;">
-                            <h1 style="margin: 0; font-size: 24px; font-weight: 400; color: #1a1a1a; line-height: 1.4;">
-                                Hello ${createData.preferredName},<br/>Welcome to ${tenant.companyName}
-                            </h1>
-                            </td>
-                        </tr>
-                        
-                        <tr>
-                            <td align="center" style="padding: 10px 40px 30px 40px;">
-                            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #666666; font-weight: 400;">
-                                An account has been created for you on NooSphere.<br/>
-                                Please log in to access your information and begin using<br/>
-                                your client portal.
-                            </p>
-                            </td>
-                        </tr>
-                        
-                        <tr>
-                            <td align="center" style="padding: 0 40px 30px 40px;">
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8f9fa; border-radius: 8px;">
-                                <tr>
-                                <td style="padding: 24px 24px 20px 24px;">
-                                    
-                                    <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: #666666;">
-                                    Log in here: <a href="https://www.${tenant.subdomain}.noospherehub.net/client/intialLogin" style="color: #2563eb; text-decoration: none; font-weight: 500;">https://www.${tenant.subdomain}.noospherehub.net/client/intialLogin</a>
-                                    </p>
-                                    
-                                    <p style="margin: 0 0 4px 0; font-size: 14px; line-height: 1.5; color: #1a1a1a;">
-                                    <strong style="font-weight: 600;">Email:</strong> ${createData.email}
-                                    </p>
-                                    
-                                    <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: #1a1a1a;">
-                                    <strong style="font-weight: 600;">Temporary Password:</strong> ${generatedPass}
-                                    </p>
-                                    
-                                    <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: #666666;">
-                                    When you log in for the first time, please change your password to something memorable and secure.
-                                    </p>
-                                    
-                                    <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: #666666;">
-                                    If you need help, we're just a message away at<br/>
-                                    <a href="mailto:${tenant.subdomain}.noospherehub.net" style="color: #2563eb; text-decoration: none;">${tenant.subdomain}.noospherehub.net</a>
-                                    </p>
-                                    <p style="margin: 0 0 4px 0; font-size: 14px; line-height: 1.5; color: #666666;">
-                                    Warmly,
-                                    </p>
-                                    <p style="margin: 0 0 4px 0; font-size: 14px; line-height: 1.5; color: #666666;">
-                                    The Tenant XYZ Team
-                                    </p>
-                                </td>
-                                </tr>
-                            </table>
-                            </td>
-                        </tr>
-                        
-                        </table>
-                        
-                    </td>
-                    </tr>
-                </table>
-                
-                </body>
-            </html>
-        `
+        const html = templateRenderer.render('client-welcome.html', {
+            preferredName: createData.preferredName,
+            companyName: tenant.companyName,
+            subdomain: tenant.subdomain,
+            email: createData.email,
+            password: generatedPass
+        });
         const sendMail = await emailService.sendTenantEmail({
             tenantSlug: tenant.subdomain,
             to: [data.email],
@@ -219,149 +117,10 @@ class ClientService {
             }
         ]
 
-        const html = `
-        <!DOCTYPE html
-            PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-        <html xmlns="http://www.w3.org/1999/xhtml">
-
-        <head>
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <title>Reset your password</title>
-            <style type="text/css">
-                body,
-                table,
-                td,
-                a {
-                    -webkit-text-size-adjust: 100%;
-                    -ms-text-size-adjust: 100%;
-                }
-
-                table,
-                td {
-                    mso-table-lspace: 0pt;
-                    mso-table-rspace: 0pt;
-                }
-
-                img {
-                    -ms-interpolation-mode: bicubic;
-                    border: 0;
-                    height: auto;
-                    line-height: 100%;
-                    outline: none;
-                    text-decoration: none;
-                }
-
-                body {
-                    height: 100% !important;
-                    margin: 0 !important;
-                    padding: 0 !important;
-                    width: 100% !important;
-                }
-
-                * {
-                    -webkit-font-smoothing: antialiased;
-                    -moz-osx-font-smoothing: grayscale;
-                }
-            </style>
-        </head>
-
-        <body style="margin: 0; padding: 0; background-color: #f5f5f5;">
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f5;">
-                <tr>
-                    <td align="center" style="padding: 0;">
-
-                        <table border="0" cellpadding="0" cellspacing="0" width="600"
-                            style="max-width: 600px; background-color: #ffffff;">
-
-                            <tr>
-                                <td align="center"
-                                    style="padding: 0; height: 90px; background: linear-gradient(90deg, #8B5CF6 0%, #EC4899 35%, #F97316 65%, #3B82F6 100%);">
-                                    <div style="height: 90px;"></div>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td align="center" style="padding: 60px 40px 40px 40px;">
-
-                                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                                        <tr>
-                                            <td align="center" style="padding: 40px 40px 30px 40px;">
-                                                <table border="0" cellpadding="0" cellspacing="0">
-                                                    <tr>
-                                                        <td align="center">
-                                                            <img src="cid:unique@image" alt="NooSphere" width="180" height="40"
-                                                                style="display: block; font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; color: #000000;" />
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td align="center" style="padding: 0 0 30px 0;">
-                                                <h1
-                                                    style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 32px; font-weight: 700; color: #000000; line-height: 1.3;">
-                                                    Reset your password</h1>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td align="center" style="padding: 0 0 10px 0;">
-                                                <p
-                                                    style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; color: #6B7280; line-height: 1.6;">
-                                                    We received a request to reset our password.</p>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td align="center" style="padding: 0 0 30px 0;">
-                                                <p
-                                                    style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; color: #6B7280; line-height: 1.6;">
-                                                    Follow the link to create a new password.</p>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td align="center" style="padding: 0 0 40px 0;">
-                                                <p
-                                                    style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; color: #6B7280; line-height: 1.6;">
-                                                    If this was not you, kindly ignore this email.</p>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td align="center" style="padding: 0;">
-                                                <table border="0" cellpadding="0" cellspacing="0">
-                                                    <tr>
-                                                        <td align="center"
-                                                            style="border-radius: 100px; background-color: #0066FF;">
-                                                                <a href="https://www.${client.tenant.subdomain}.noospherehub.net/client/changePassword/${client.id}" target="_blank"
-                                                                style="display: inline-block; padding: 18px 0; width: 500px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 100px;">Reset
-                                                                password</a>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-
-                                    </table>
-
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td style="height: 80px;"></td>
-                            </tr>
-
-                        </table>
-
-                    </td>
-                </tr>
-            </table>
-        </body>
-
-        </html>
-        `
+        const html = templateRenderer.render('client-password-reset.html', {
+            subdomain: client.tenant.subdomain,
+            clientId: client.id
+        });
 
         const sendMail = await emailService.sendTenantEmail({
             tenantSlug: client.tenant.subdomain,

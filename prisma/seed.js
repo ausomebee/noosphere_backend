@@ -1,13 +1,16 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import 'dotenv/config';
+import prismaService from '../src/config/prisma.js';
+const prisma = prismaService.getClient();
 
 async function main() {
     const pipelineCount = await prisma.pipeline.count();
     if (pipelineCount === 0) {
         await prisma.pipeline.create({
-            module: "ADMIN",
-            name: "Client Onboarding",
-            description: "Manage your client intake process seamlessly"
+            data: {
+                module: "ADMIN",
+                name: "Client Onboarding",
+                description: "Manage your client intake process seamlessly"
+            }
         });
 
         console.log("Initial pipeline seeded");
@@ -186,4 +189,5 @@ main()
     .catch(console.error)
     .finally(async () => {
         await prisma.$disconnect();
+        process.exit(0);
     });

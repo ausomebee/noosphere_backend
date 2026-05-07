@@ -6,6 +6,7 @@ import ReferralCodeGenerator from '../../../utilities/generateCode.js';
 import DepartmentRepository from '../../departmentAndTeams/infrastructure/departmentRepository.js';
 import RoleRepository from '../../role/infrastructure/roleRepository.js';
 import AuthRepository from '../../auth/infrastructure/authRepository.js';
+import templateRenderer from '../../../utilities/templateRenderer.js';
 
 class AdminService {
     constructor() {
@@ -52,24 +53,9 @@ class AdminService {
             },
         ]
 
-        const html = `
-        <body style="margin: 0%; padding: 0%; box-sizing: border-box;">
-            <main>
-                <img src="cid:unique2@image" alt="" style="width: 100%; height: 100px; object-fit: cover;">
-                <div
-                    style="text-align: center; font-family: Arial, Helvetica, sans-serif; max-width: 820px; margin: auto; padding: 20px; padding-bottom: 50px;">
-                    <img src="cid:unique@image" alt="" style="width: 230px; margin-top: 50px;">
-                    <p class="head" style="font-size: 26px; font-weight: 700; margin-top: 30px;">Hello there,<br>Get started on Noosphere
-                    </p>
-                    <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">You have been invited by
-                        NooSphere Admin to<br> create a profile on Noosphere<br><br>Click the button below to get started</p>
-                    <a href='http://localhost:5173/admin/onboarding/${newAdmin.email}/${newAdmin.id}' style="background-color: black; text-align: center; border-radius: 9999px; padding-top: 20px; padding-bottom: 20px; color: white; text-decoration: none; font-weight: 600; font-size: 18px; width: 90%; display: block; margin: auto;">Create Profile</a>
-                </div>
-            </main>
-        </body>
-        `
-        const sendMail = MailService.sendMail(newAdmin.email, "Welcome to Noosphere", null, html, attachments)
-        if (!sendMail) {
+        const html = await templateRenderer.render('admin-invitation.html', { email: newAdmin.email, adminId: newAdmin.id });
+        const sendMail = await MailService.sendMail(newAdmin.email, "Welcome to Noosphere", null, html, attachments)
+        if (!sendMail.success) {
             throw new Error("Failed to send mail");
         }
 
@@ -162,47 +148,14 @@ class AdminService {
             },
         ]
 
-        const html = `
-        <body style="margin: 0%; padding: 0%; box-sizing: border-box; background-color: white;">
-            <main>
-                <img src="cid:unique2@image" alt="" style="width: 100%; height: 70px; object-fit: cover;">
-                <div
-                    style="font-family: Arial, Helvetica, sans-serif; max-width: 820px; margin: auto; padding: 20px; padding-bottom: 50px;">
-                    <img src="cid:unique@image" alt="" style="width: 230px; margin-top: 50px;">
-                    <p class="head" style="font-size: 26px; font-weight: 700; margin-top: 30px;">Welcome to NooSphere</p>
-                    <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">You've been invited to
-                        join the NooSphere Control Platform as the Administrator. Click the button below to log in using your
-                        administrator credentials:<br><br>Email: ${data.email}<br>Password: ${generatedPass}</p>
-                    <a href="http://localhost:5173/" style="background-color: black; border-radius: 9999px; padding-top: 20px; padding-bottom: 20px; color: white; text-decoration: none; font-weight: 600; font-size: 18px; width: 90%; text-align: center; display: block; margin: auto;">Login as Administrator</a>
-                        <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">Once you're in, you'll be prompted to:<br><br>1. Set a new password<br>2. Configure 2-factor authentication<br>3. Set platform-wide preferences for your team<br><br>We recommend doing these right away to secure your account and prepare the system for other users.<br><br>Welcome aboard,<br>— The NooSphere Team</p>
-                        </div>
-                        </main>
-        </body>
-        `
+        const html = templateRenderer.render('admin-welcome-credentials.html', { email: data.email, password: generatedPass });
         const sendMail = await MailService.sendMail(data.email, "Welcome to Noosphere", null, html, attachments)
 
         if (!sendMail.success) {
             throw new Error("Failed to send mail");
         }
 
-        const html2 = `
-        <body style="margin: 0%; padding: 0%; box-sizing: border-box; background-color: white;">
-        <main>
-        <img src="cid:unique2@image" alt="" style="width: 100%; height: 90px; object-fit: cover;">
-        <div
-        style="font-family: Arial, Helvetica, sans-serif; max-width: 820px; margin: auto; padding: 20px; padding-bottom: 50px;">
-        <img src="cid:unique@image" alt="" style="width: 230px; margin-top: 50px;">
-        <p class="head" style="font-size: 26px; font-weight: 700; margin-top: 30px;">Your Administrator Password</p>
-        <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">You're receiving this message because you've been designated as the Administrator for the NooSphere Control Platform.<br><br>
-        Below is your Administrator Password, used to authorize sensitive, system-wide actions within the platform.<br><br><span style="font-weight: 700;">Administrator password:</span> ${generatedAdminPass}</p>
-        <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">1. You'll be required to set a new Administrator Password as soon as you log in.<br>
-        2. You will also need to change your Administrator Password every 90 days to ensure maximum security.<br><br>
-        Please keep this token secure. <br><br>If you didn't expect this, contact <a>security@noosphere.com</a>.<br><br>
-        — The NooSphere Security Team</p>
-        </div>
-        </main>
-        </body>
-        `
+        const html2 = templateRenderer.render('admin-password-delivery.html', { adminPassword: generatedAdminPass });
         const sendMail2 = await MailService.sendMail(data.email, "Your Administrator Password", null, html2, attachments)
 
         if (!sendMail2.success) {
@@ -269,6 +222,18 @@ class AdminService {
     async getSingleAdmin(data) {
         const admin = await this.repository.findOne({
             id: data.id
+        });
+
+        if (!admin) {
+            throw new Error("Admin not found")
+        }
+
+        return admin;
+    }
+
+    async getSuperAdmin(data) {
+        const admin = await this.repository.findFirst({
+            superAdmin: true
         });
 
         if (!admin) {
@@ -394,23 +359,9 @@ class AdminService {
             },
         ]
 
-        const html = `
-        <body style="margin: 0%; padding: 0%; box-sizing: border-box; background-color: white;">
-            <main>
-                <img src="/mailHeader.png" alt="" style="width: 100%; height: 70px; object-fit: cover;">
-                <div
-                    style="font-family: Arial, Helvetica, sans-serif; text-align: center; max-width: 820px; margin: auto; padding: 20px; padding-bottom: 50px;">
-                    <img src="/logo.png" alt="" style="width: 230px; margin-top: 70px;">
-                    <p class="head" style="font-size: 26px; font-weight: 700; margin-top: 70px;">Reset your password</p>
-                    <p style="color: #475467; font-size: 18px; margin-top: 20px; margin-bottom: 50px;">Please click the button
-                        below to reset your password</p>
-                    <a href="http://localhost:5173/SA/reset-password/${adminExists.id}" style="background-color: black; text-align: center; border-radius: 9999px; padding-top: 20px; padding-bottom: 20px; color: white; text-decoration: none; font-weight: 600; font-size: 18px; width: 90%; display: block; margin: auto;">Reset Password</a>
-                </div>
-            </main>
-        </body>
-        `
-        const sendMail = MailService.sendMail(adminExists.email, "Reset your password", null, html, attachments)
-        if (!sendMail) {
+        const html = await templateRenderer.render('admin-password-reset.html', { adminId: adminExists.id });
+        const sendMail = await MailService.sendMail(adminExists.email, "Reset your password", null, html, attachments)
+        if (!sendMail.success) {
             throw new Error("Failed to send mail");
         }
 

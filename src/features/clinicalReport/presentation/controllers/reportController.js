@@ -17,6 +17,7 @@ import ClinicalReportVersionRepository from "../../infrastructure/clinicalReport
 import ClinicalReportVersionService from "../../application/clinicalReportVersionService.js";
 import S3Service from "../../../../utilities/s3.js";
 import ClinicalReportVersion from "../../domain/clinicalReportVersion.js";
+import templateRenderer from "../../../../utilities/templateRenderer.js";
 
 class ClinicalReportController {
     constructor() {
@@ -507,83 +508,17 @@ class ClinicalReportController {
                 this.prisma
             );
 
-            const emailHtml = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="utf-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <style>
-                        body {
-                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-                            line-height: 1.6;
-                            color: #333;
-                            max-width: 600px;
-                            margin: 0 auto;
-                            padding: 20px;
-                        }
-                        .header {
-                            background-color: #f8f9fa;
-                            padding: 20px;
-                            border-radius: 8px;
-                            margin-bottom: 20px;
-                        }
-                        .content {
-                            background-color: #ffffff;
-                            padding: 20px;
-                            border: 1px solid #e0e0e0;
-                            border-radius: 8px;
-                        }
-                        .button {
-                            display: inline-block;
-                            padding: 12px 24px;
-                            background-color: #007bff;
-                            color: #ffffff;
-                            text-decoration: none;
-                            border-radius: 4px;
-                            margin-top: 16px;
-                        }
-                        .footer {
-                            margin-top: 20px;
-                            padding-top: 20px;
-                            border-top: 1px solid #e0e0e0;
-                            font-size: 12px;
-                            color: #666;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <h2 style="margin: 0; color: #2c3e50;">Clinical Report Ready</h2>
-                    </div>
-                    <div class="content">
-                        <p>Dear ${report.client.client.firstName},</p>
-                        <p>Your clinical report has been completed and signed. Please find the attached PDF document.</p>
-                        <p>You can also view your report online by clicking the button below:</p>
-                        <a href="${viewToken}" class="button">View Report Online</a>
-                        <p style="margin-top: 20px;">
-                            <strong>Report Details:</strong><br>
-                            Title: ${report.title}<br>
-                            Date: ${new Date().toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            })}<br>
-                            Status: Signed
-                        </p>
-                    </div>
-                    <div class="footer">
-                        <p>
-                            This email was sent by ${report.tenant.companyName}.<br>
-                            If you have any questions, please contact us.
-                        </p>
-                        <p>
-                            <em>Please do not reply to this email. This mailbox is not monitored.</em>
-                        </p>
-                    </div>
-                </body>
-                </html>
-            `;
+            const html = templateRenderer.render('clinical-report-signed.html', {
+                firstName: report.client.client.firstName,
+                title: report.title,
+                date: new Date().toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                }),
+                viewToken: viewToken,
+                companyName: report.tenant.companyName
+            });
 
             const emailText = `
                 Clinical Report Ready
@@ -736,152 +671,13 @@ class ClinicalReportController {
 
         const signatureLink = `http://${report.tenant.subdomain}.noospherehub.net/${await this.token.generateClinicalReportToken(report.id, this.prisma)}`
 
-        const html = `
-            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-            <html xmlns="http://www.w3.org/1999/xhtml">
-            <head>
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-            <title>Clinical Report Updated - Ready for Signature</title>
-            <style type="text/css">
-                body { margin: 0; padding: 0; width: 100% !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-                img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
-                table { border-collapse: collapse !important; }
-                
-                body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-                
-                table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-            </style>
-            </head>
-            <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background-color: #f5f5f5;">
-
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f5;">
-                <tr>
-                <td align="center" style="padding: 0;">
-                    
-                    <table border="0" cellpadding="0" cellspacing="0" width="600" style="max-width: 600px; background-color: #ffffff;">
-                    
-                    <tr>
-                        <td align="center" style="padding: 0; height: 60px; background: linear-gradient(90deg, #8B5CF6 0%, #EC4899 50%, #EF4444 100%);">
-                        <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:600px;height:60px;">
-                            <v:fill type="gradient" color="#8B5CF6" color2="#EF4444" angle="90" />
-                        </v:rect>
-                        </td>
-                    </tr>
-                    
-                    <tr>
-                        <td align="center" style="padding: 40px 40px 30px 40px;">
-                        <table border="0" cellpadding="0" cellspacing="0">
-                            <tr>
-                            <td align="center">
-                                <img src="cid:unique@image" alt="NooSphere" width="180" height="40" style="display: block; font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; color: #000000;" />
-                            </td>
-                            </tr>
-                        </table>
-                        </td>
-                    </tr>
-                    
-                    <tr>
-                        <td align="center" style="padding: 0 40px 10px 40px;">
-                        <h1 style="margin: 0; font-size: 24px; font-weight: 400; color: #1a1a1a; line-height: 1.4;">
-                            Hello ${report.client.client.firstName},<br/>Your Report Has Been Updated
-                        </h1>
-                        </td>
-                    </tr>
-                    
-                    <tr>
-                        <td align="center" style="padding: 10px 40px 30px 40px;">
-                        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #666666; font-weight: 400;">
-                            Good news! We've made the changes you requested to your clinical report.<br/>
-                            Please review the updated version and provide your signature<br/>
-                            so we can move forward with your care plan.
-                        </p>
-                        </td>
-                    </tr>
-                    
-                    <tr>
-                        <td align="center" style="padding: 0 40px 30px 40px;">
-                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0fdf4; border-left: 4px solid #22c55e; border-radius: 8px;">
-                            <tr>
-                            <td style="padding: 20px 24px;">
-                                <p style="margin: 0 0 8px 0; font-size: 14px; line-height: 1.5; color: #166534; font-weight: 600;">
-                                ✓ Changes Completed
-                                </p>
-                                <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #15803d;">
-                                Your requested changes have been incorporated into the clinical report. Please review and sign at your earliest convenience.
-                                </p>
-                            </td>
-                            </tr>
-                        </table>
-                        </td>
-                    </tr>
-                    
-                    <tr>
-                        <td align="center" style="padding: 0 40px 30px 40px;">
-                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8f9fa; border-radius: 8px;">
-                            <tr>
-                            <td style="padding: 24px 24px 20px 24px;">
-                                
-                                <p style="margin: 0 0 20px 0; font-size: 14px; line-height: 1.5; color: #666666;">
-                                <strong style="font-weight: 600; color: #1a1a1a;">Report Details:</strong>
-                                </p>
-                                
-                                <p style="margin: 0 0 4px 0; font-size: 14px; line-height: 1.5; color: #1a1a1a;">
-                                <strong style="font-weight: 600;">Report Type:</strong> Clinical Report
-                                </p>
-                                
-                                <p style="margin: 0 0 4px 0; font-size: 14px; line-height: 1.5; color: #1a1a1a;">
-                                <strong style="font-weight: 600;">Last Updated:</strong> ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                                </p>
-                                
-                                <p style="margin: 0 0 20px 0; font-size: 14px; line-height: 1.5; color: #1a1a1a;">
-                                <strong style="font-weight: 600;">Provider:</strong> ${report.tenant.companyName}
-                                </p>
-                                
-                                <table border="0" cellpadding="0" cellspacing="0" style="margin: 0 0 20px 0; width: 100%;">
-                                    <tr>
-                                    <td align="center" style="border-radius: 6px; background-color: #2563eb;">
-                                        <a href="${signatureLink}" target="_blank" style="display: inline-block; padding: 14px 32px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 15px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 6px;">
-                                        Review & Sign Updated Report
-                                        </a>
-                                    </td>
-                                    </tr>
-                                </table>
-                                
-                                <p style="margin: 0 0 16px 0; font-size: 13px; line-height: 1.5; color: #666666;">
-                                Or copy and paste this link into your browser:<br/>
-                                <a href="${signatureLink}" style="color: #2563eb; text-decoration: none; word-break: break-all;">${signatureLink}</a>
-                                </p>
-                                
-                                <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: #666666;">
-                                Please take a moment to review the changes and confirm everything looks correct. If you notice anything that still needs adjustment, let us know right away.
-                                </p>
-                                
-                                <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: #666666;">
-                                Questions or need further revisions?<br/>
-                                Contact us at <a href="mailto:${report.tenant.email}" style="color: #2563eb; text-decoration: none;">${report.tenant.email}</a>
-                                </p>
-                                <p style="margin: 0 0 4px 0; font-size: 14px; line-height: 1.5; color: #666666;">
-                                Best regards,
-                                </p>
-                                <p style="margin: 0 0 4px 0; font-size: 14px; line-height: 1.5; color: #666666;">
-                                ${report.tenant.companyName} Team
-                                </p>
-                            </td>
-                            </tr>
-                        </table>
-                        </td>
-                    </tr>
-                    
-                    </table>
-                    
-                </td>
-                </tr>
-            </table>
-
-            </body>
-            </html>
-        `;
+        const html = templateRenderer.render('clinical-report-updated.html', {
+            firstName: report.client.client.firstName,
+            lastUpdated: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+            companyName: report.tenant.companyName,
+            signatureLink: signatureLink,
+            tenantEmail: report.tenant.email
+        });
 
         const sendMail = await emailService.sendTenantEmail({
             tenantSlug: report.tenant.subdomain,
@@ -905,152 +701,13 @@ class ClinicalReportController {
 
         const signatureLink = `http://${report.tenant.subdomain}.noospherehub.net/${await this.token.generateClinicalReportToken(report.id, this.prisma)}`
 
-        const html = `
-            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-            <html xmlns="http://www.w3.org/1999/xhtml">
-            <head>
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-            <title>Reminder: Clinical Report Signature Needed</title>
-            <style type="text/css">
-                body { margin: 0; padding: 0; width: 100% !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-                img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
-                table { border-collapse: collapse !important; }
-                
-                body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-                
-                table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-            </style>
-            </head>
-            <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background-color: #f5f5f5;">
-
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f5;">
-                <tr>
-                <td align="center" style="padding: 0;">
-                    
-                    <table border="0" cellpadding="0" cellspacing="0" width="600" style="max-width: 600px; background-color: #ffffff;">
-                    
-                    <tr>
-                        <td align="center" style="padding: 0; height: 60px; background: linear-gradient(90deg, #8B5CF6 0%, #EC4899 50%, #EF4444 100%);">
-                        <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:600px;height:60px;">
-                            <v:fill type="gradient" color="#8B5CF6" color2="#EF4444" angle="90" />
-                        </v:rect>
-                        </td>
-                    </tr>
-                    
-                    <tr>
-                        <td align="center" style="padding: 40px 40px 30px 40px;">
-                        <table border="0" cellpadding="0" cellspacing="0">
-                            <tr>
-                            <td align="center">
-                                <img src="cid:unique@image" alt="NooSphere" width="180" height="40" style="display: block; font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; color: #000000;" />
-                            </td>
-                            </tr>
-                        </table>
-                        </td>
-                    </tr>
-                    
-                    <tr>
-                        <td align="center" style="padding: 0 40px 10px 40px;">
-                        <h1 style="margin: 0; font-size: 24px; font-weight: 400; color: #1a1a1a; line-height: 1.4;">
-                            Hi ${report.client.client.firstName},<br/>Friendly Reminder: Signature Needed
-                        </h1>
-                        </td>
-                    </tr>
-                    
-                    <tr>
-                        <td align="center" style="padding: 10px 40px 30px 40px;">
-                        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #666666; font-weight: 400;">
-                            We noticed your clinical report is still waiting for your signature.<br/>
-                            To keep your care on track, we'd appreciate if you could<br/>
-                            take a moment to review and sign it today.
-                        </p>
-                        </td>
-                    </tr>
-                    
-                    <tr>
-                        <td align="center" style="padding: 0 40px 30px 40px;">
-                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fff9f0; border-left: 4px solid #f59e0b; border-radius: 8px;">
-                            <tr>
-                            <td style="padding: 20px 24px;">
-                                <p style="margin: 0 0 8px 0; font-size: 14px; line-height: 1.5; color: #92400e; font-weight: 600;">
-                                ⏰ Action Required
-                                </p>
-                                <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #78350f;">
-                                Your signature is pending for the clinical report sent on ${new Date(report.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}.
-                                </p>
-                            </td>
-                            </tr>
-                        </table>
-                        </td>
-                    </tr>
-                    
-                    <tr>
-                        <td align="center" style="padding: 0 40px 30px 40px;">
-                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8f9fa; border-radius: 8px;">
-                            <tr>
-                            <td style="padding: 24px 24px 20px 24px;">
-                                
-                                <p style="margin: 0 0 20px 0; font-size: 14px; line-height: 1.5; color: #666666;">
-                                <strong style="font-weight: 600; color: #1a1a1a;">Report Details:</strong>
-                                </p>
-                                
-                                <p style="margin: 0 0 4px 0; font-size: 14px; line-height: 1.5; color: #1a1a1a;">
-                                <strong style="font-weight: 600;">Report Type:</strong> Clinical Report
-                                </p>
-                                
-                                <p style="margin: 0 0 4px 0; font-size: 14px; line-height: 1.5; color: #1a1a1a;">
-                                <strong style="font-weight: 600;">Date Sent:</strong> ${new Date(report.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                                </p>
-                                
-                                <p style="margin: 0 0 20px 0; font-size: 14px; line-height: 1.5; color: #1a1a1a;">
-                                <strong style="font-weight: 600;">Provider:</strong> ${report.tenant.companyName}
-                                </p>
-                                
-                                <table border="0" cellpadding="0" cellspacing="0" style="margin: 0 0 20px 0; width: 100%;">
-                                    <tr>
-                                    <td align="center" style="border-radius: 6px; background-color: #2563eb;">
-                                        <a href="${signatureLink}" target="_blank" style="display: inline-block; padding: 14px 32px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 15px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 6px;">
-                                        Sign Report Now
-                                        </a>
-                                    </td>
-                                    </tr>
-                                </table>
-                                
-                                <p style="margin: 0 0 16px 0; font-size: 13px; line-height: 1.5; color: #666666;">
-                                Or copy and paste this link into your browser:<br/>
-                                <a href="${signatureLink}" style="color: #2563eb; text-decoration: none; word-break: break-all;">${signatureLink}</a>
-                                </p>
-                                
-                                <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: #666666;">
-                                It only takes a minute! Signing this report helps us move forward with your treatment plan without delays.
-                                </p>
-                                
-                                <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: #666666;">
-                                Having trouble accessing the report or have questions?<br/>
-                                Contact us at <a href="mailto:${report.tenant.email}" style="color: #2563eb; text-decoration: none;">${report.tenant.email}</a>
-                                </p>
-                                <p style="margin: 0 0 4px 0; font-size: 14px; line-height: 1.5; color: #666666;">
-                                Thank you,
-                                </p>
-                                <p style="margin: 0 0 4px 0; font-size: 14px; line-height: 1.5; color: #666666;">
-                                ${report.tenant.companyName} Team
-                                </p>
-                            </td>
-                            </tr>
-                        </table>
-                        </td>
-                    </tr>
-                    
-                    </table>
-                    
-                </td>
-                </tr>
-            </table>
-
-            </body>
-            </html>
-        `;
+        const html = templateRenderer.render('clinical-report-reminder.html', {
+            firstName: report.client.client.firstName,
+            dateSent: new Date(report.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+            companyName: report.tenant.companyName,
+            signatureLink: signatureLink,
+            tenantEmail: report.tenant.email
+        });
 
         const sendMail = await emailService.sendTenantEmail({
             tenantSlug: report.tenant.subdomain,

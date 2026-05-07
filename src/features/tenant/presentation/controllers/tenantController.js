@@ -21,6 +21,10 @@ import LogsRepository from "../../../logs/infrastructure/logsRepository.js";
 import LogsService from "../../../logs/application/logsService.js";
 import ServerRequestRepository from "../../../logs/infrastructure/serverRequestRepository.js";
 import ServerRequestService from "../../../logs/application/serverRequestService.js";
+import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
+import NotificationService from "../../../notifications/application/notificationsService.js";
+import SocketService from "../../../../config/socket.js";
+import templateRenderer from "../../../../utilities/templateRenderer.js";
 
 class TenantController {
     constructor() {
@@ -36,6 +40,7 @@ class TenantController {
         this.token = TokenService;
         this.tenantDeactivationRepository = new TenantDeactivationRepository(this.prisma.tenantDeactivation);
         this.service = new TenantService({
+            templateRenderer: templateRenderer,
             tenantDeactivationRepository: this.tenantDeactivationRepository,
             tenantRepository: this.tenantRepository,
             prisma: this.prisma,
@@ -57,10 +62,30 @@ class TenantController {
         this.logService = new LogsService({ logsRepository: this.logsRepository });
         this.serverRequestRepository = new ServerRequestRepository(this.prisma.serverRequest, this.prisma);
         this.serverRequestService = new ServerRequestService({ serverRequestRepository: this.serverRequestRepository });
+        this.notificationRepository = new NotificationsRepository(this.prisma.notification);
+        this.notificationService = new NotificationService({ notificationRepository: this.notificationRepository });
     }
 
     createCandidate = expressAsyncHandler(async (req, res) => {
         const tenant = await this.service.createCandidate(req.body);
+
+        const superAdmin = await this.adminService.getSuperAdmin();
+        if (!superAdmin) {
+            res.status(500).json({ message: 'Failed to fetch super admin.' });
+        }
+
+        const notif = await this.notificationService.createNotification({
+            userId: superAdmin.id,
+            userType: "ADMIN",
+            type: "Tenant Creation on System",
+            title: "Tenant Creation on System",
+            content: `
+                A new tenant ${tenant.companyName} has been created on NooSphere. Click here to view details
+            `,
+            isRead: false
+        });
+
+        SocketService.emitToUser(notif.userId, notif.userType, "Tenant Creation on System", notif);
 
         if (!tenant) {
             res.status(500).json({ message: 'Failed to create candidate.' });

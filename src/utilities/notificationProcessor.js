@@ -1,4 +1,3 @@
-// import notificationConfig from "../config/notifications.json";
 import fs from "fs";
 
 const notificationConfig = JSON.parse(

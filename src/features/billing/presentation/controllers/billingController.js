@@ -14,6 +14,12 @@ import Subscription from "../../../planAndFeature/domain/subscription.js";
 import InvoiceTokenRepository from "../../../invoice/infrastructure/invoiceTokenRepository.js";
 import TenantRepository from "../../../tenant/infrastructure/tenantRepository.js";
 import TenantService from "../../../tenant/application/tenantService.js";
+import AdminService from "../../../admin/application/adminService.js";
+import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
+import NotificationService from "../../../notifications/application/notificationsService.js";
+import MailService from "../../../../utilities/nodemailer.js";
+import templateRenderer from "../../../../utilities/templateRenderer.js";
+import SocketService from "../../../../config/socket.js";
 
 class BillingController {
     constructor() {
@@ -42,6 +48,11 @@ class BillingController {
         this.tenantService = new TenantService({
             tenantRepository: this.tenantRepository,
         });
+
+        this.adminService = new AdminService();
+
+        this.notificationRepository = new NotificationsRepository(this.prisma.notification);
+        this.notificationService = new NotificationService({ notificationRepository: this.notificationRepository });
     }
 
     createBillingMetadata = expressAsyncHandler(async (req, res) => {
@@ -386,6 +397,59 @@ class BillingController {
 
         if (!tenant) {
             res.status(500).json({ message: 'Failed to update tenant.' });
+        }
+
+        const superAdmin = await this.adminService.getSuperAdmin();
+        if (!superAdmin) {
+            res.status(500).json({ message: 'Failed to fetch super admin.' });
+        }
+
+        const notif = await this.notificationService.createNotification({
+            userId: superAdmin.id,
+            userType: "ADMIN",
+            type: "Payment Made for Plan",
+            title: "Payment Made for Plan",
+            content: `
+                A payment has been recorded for tenant ${tenant.companyName}
+
+                Product: NooSphere ABA PMS
+                Subscription Plan: Enterprise Plan
+                Number of Licenses: 50
+                Billing Cycle: Annual
+                Amount Paid: $12,000
+                Payment Method: Card ending in 8421
+                Transaction ID: ${payment.id}
+                Purchase Date: ${payment.createdAt.toDateString()}
+            `,
+            isRead: false
+        });
+
+        SocketService.emitToUser(notif.userId, notif.userType, "Payment Made for Plan", notif);
+
+        const attachments = [
+            {
+                filename: "Logowrap.png",
+                path: "Logowrap.png",
+                cid: "unique@image",
+                contentType: "Logowrap/png",
+            }
+        ]
+
+        const html = templateRenderer.render('billing-payment-confirmation.html', {
+            customerName: data.customerName,
+            subscriptionPlan: data.subscriptionPlan,
+            numberOfLicenses: data.numberOfLicenses,
+            billingCycle: data.billingCycle,
+            amountPaid: data.amountPaid,
+            paymentMethod: data.paymentMethod,
+            transactionId: data.transactionId,
+            purchaseDate: data.purchaseDate
+        });
+
+        const sendMail = await MailService.sendMail(tenant.email, "Payment Made for Plan", null, html, attachments)
+
+        if (!sendMail.success) {
+            throw new Error("Failed to send mail");
         }
 
         return res.status(201).json({
