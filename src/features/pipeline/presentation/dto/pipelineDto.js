@@ -399,6 +399,82 @@ class PipelineDto {
 
         Validator.validateRequest(req, next, schema);
     };
+
+    // ── Custom task DTOs ─────────────────────────────────────────────────────
+
+    static createCustomTaskDto = (req, res, next) => {
+        const schema = Joi.object({
+            pipelineItemId: Joi.string().uuid().required().messages({
+                "string.empty": "Pipeline item ID is required",
+                "string.guid": "Pipeline item ID must be a valid UUID",
+            }),
+            taskName: Joi.string().trim().required().messages({
+                "string.empty": "Task name is required",
+            }),
+            isRequired: Joi.boolean().optional(),
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateCustomTaskDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID",
+            }),
+            taskName: Joi.string().trim().optional(),
+            isRequired: Joi.boolean().optional(),
+            isCompleted: Joi.boolean().optional(),
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static getCustomByItemIdDto = (req, res, next) => {
+        const schema = Joi.object({
+            pipelineItemId: Joi.string().uuid().required().messages({
+                "string.empty": "Pipeline item ID is required",
+                "string.guid": "Pipeline item ID must be a valid UUID",
+            }),
+        });
+
+        Validator.validateRequest(req, next, schema, req.params);
+    };
+
+    // ── Custom document DTOs ─────────────────────────────────────────────────
+
+    static createCustomDocumentDto = (req, res, next) => {
+        const schema = Joi.object({
+            pipelineItemId: Joi.string().uuid().required().messages({
+                "string.empty": "Pipeline item ID is required",
+                "string.guid": "Pipeline item ID must be a valid UUID",
+            }),
+            documentName: Joi.string().trim().required().messages({
+                "string.empty": "Document name is required",
+            }),
+            isRequired: Joi.boolean().optional(),
+            description: Joi.string().trim().optional(),
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateCustomDocumentDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID",
+            }),
+            documentName: Joi.string().trim().optional(),
+            isRequired: Joi.boolean().optional(),
+            description: Joi.string().trim().optional().allow(null, ""),
+            fileUrl: Joi.string().uri().optional().allow(null, ""),
+            isVerified: Joi.boolean().optional(),
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
 }
 
 export default PipelineDto;    

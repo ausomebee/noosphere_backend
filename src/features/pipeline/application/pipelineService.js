@@ -1,13 +1,15 @@
 import Pipeline from "../domain/pipeline.js";
 
 class PipelineService {
-    constructor({ pipelineRepository, stageRepository, itemRepository, tenantRepository, pipelineDoneTaskRepository, pipelineSubmittedDocumentRepository }) {
+    constructor({ pipelineRepository, stageRepository, itemRepository, tenantRepository, pipelineDoneTaskRepository, pipelineSubmittedDocumentRepository, pipelineItemCustomTaskRepository, pipelineItemCustomDocumentRepository }) {
         this.pipelineRepository = pipelineRepository;
         this.stageRepository = stageRepository;
         this.itemRepository = itemRepository;
         this.tenantRepository = tenantRepository;
         this.pipelineDoneTaskRepository = pipelineDoneTaskRepository;
         this.pipelineSubmittedDocumentRepository = pipelineSubmittedDocumentRepository;
+        this.pipelineItemCustomTaskRepository = pipelineItemCustomTaskRepository;
+        this.pipelineItemCustomDocumentRepository = pipelineItemCustomDocumentRepository;
     }
 
     async createPipeline(data) {
@@ -533,6 +535,86 @@ class PipelineService {
         );
 
         return results;
+    }
+
+    // ── Custom tasks per pipeline item ──────────────────────────────────────
+
+    async createCustomTask(data) {
+        const item = await this.itemRepository.findFirst({ id: data.pipelineItemId });
+        if (!item) throw new Error("Pipeline item not found.");
+
+        return await this.pipelineItemCustomTaskRepository.create({
+            pipelineItemId: data.pipelineItemId,
+            taskName: data.taskName,
+            isRequired: data.isRequired ?? false
+        });
+    }
+
+    async getCustomTasksByItemId(pipelineItemId) {
+        const item = await this.itemRepository.findFirst({ id: pipelineItemId });
+        if (!item) throw new Error("Pipeline item not found.");
+
+        return await this.pipelineItemCustomTaskRepository.findByPipelineItem(pipelineItemId);
+    }
+
+    async updateCustomTask(data) {
+        const task = await this.pipelineItemCustomTaskRepository.findOne({ id: data.id });
+        if (!task) throw new Error("Custom task not found.");
+
+        return await this.pipelineItemCustomTaskRepository.update(data.id, {
+            taskName: data.taskName ?? task.taskName,
+            isRequired: data.isRequired ?? task.isRequired,
+            isCompleted: data.isCompleted ?? task.isCompleted,
+            completedAt: data.isCompleted === true ? new Date() : data.isCompleted === false ? null : task.completedAt
+        });
+    }
+
+    async deleteCustomTask(id) {
+        const task = await this.pipelineItemCustomTaskRepository.findOne({ id });
+        if (!task) throw new Error("Custom task not found.");
+
+        return await this.pipelineItemCustomTaskRepository.delete(id);
+    }
+
+    // ── Custom documents per pipeline item ──────────────────────────────────
+
+    async createCustomDocument(data) {
+        const item = await this.itemRepository.findFirst({ id: data.pipelineItemId });
+        if (!item) throw new Error("Pipeline item not found.");
+
+        return await this.pipelineItemCustomDocumentRepository.create({
+            pipelineItemId: data.pipelineItemId,
+            documentName: data.documentName,
+            isRequired: data.isRequired ?? false,
+            description: data.description ?? null
+        });
+    }
+
+    async getCustomDocumentsByItemId(pipelineItemId) {
+        const item = await this.itemRepository.findFirst({ id: pipelineItemId });
+        if (!item) throw new Error("Pipeline item not found.");
+
+        return await this.pipelineItemCustomDocumentRepository.findByPipelineItem(pipelineItemId);
+    }
+
+    async updateCustomDocument(data) {
+        const doc = await this.pipelineItemCustomDocumentRepository.findOne({ id: data.id });
+        if (!doc) throw new Error("Custom document not found.");
+
+        return await this.pipelineItemCustomDocumentRepository.update(data.id, {
+            documentName: data.documentName ?? doc.documentName,
+            isRequired: data.isRequired ?? doc.isRequired,
+            description: data.description ?? doc.description,
+            fileUrl: data.fileUrl ?? doc.fileUrl,
+            isVerified: data.isVerified ?? doc.isVerified
+        });
+    }
+
+    async deleteCustomDocument(id) {
+        const doc = await this.pipelineItemCustomDocumentRepository.findOne({ id });
+        if (!doc) throw new Error("Custom document not found.");
+
+        return await this.pipelineItemCustomDocumentRepository.delete(id);
     }
 }
 

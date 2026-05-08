@@ -10,6 +10,8 @@ import ClientService from "../../../client/application/clientService.js";
 import ClientTenantRepository from "../../../client/infrastructure/clientTenantRepository.js";
 import PipelineDoneTaskRepository from "../../infrastructure/pipelineDoneTaskRepository.js";
 import PipelineSubmittedDocumentRepository from "../../infrastructure/pipelineSubmittedDocumentRepository.js";
+import PipelineItemCustomTaskRepository from "../../infrastructure/pipelineItemCustomTaskRepository.js";
+import PipelineItemCustomDocumentRepository from "../../infrastructure/pipelineItemCustomDocumentRepository.js";
 
 class PipelineController {
     constructor() {
@@ -20,7 +22,18 @@ class PipelineController {
         this.itemRepository = new ItemRepository(this.prisma.pipelineItem)
         this.pipelineDoneTaskRepository = new PipelineDoneTaskRepository(this.prisma.pipelineDoneTask)
         this.pipelineSubmittedDocumentRepository = new PipelineSubmittedDocumentRepository(this.prisma.pipelineSubmittedDocument)
-        this.service = new PipelineService({ pipelineRepository: this.pipelineRepository, stageRepository: this.stageRepository, itemRepository: this.itemRepository, tenantRepository: this.tenantRepository, pipelineSubmittedDocumentRepository: this.pipelineSubmittedDocumentRepository, pipelineDoneTaskRepository: this.pipelineDoneTaskRepository });
+        this.pipelineItemCustomTaskRepository = new PipelineItemCustomTaskRepository(this.prisma.pipelineItemCustomTask)
+        this.pipelineItemCustomDocumentRepository = new PipelineItemCustomDocumentRepository(this.prisma.pipelineItemCustomDocument)
+        this.service = new PipelineService({
+            pipelineRepository: this.pipelineRepository,
+            stageRepository: this.stageRepository,
+            itemRepository: this.itemRepository,
+            tenantRepository: this.tenantRepository,
+            pipelineSubmittedDocumentRepository: this.pipelineSubmittedDocumentRepository,
+            pipelineDoneTaskRepository: this.pipelineDoneTaskRepository,
+            pipelineItemCustomTaskRepository: this.pipelineItemCustomTaskRepository,
+            pipelineItemCustomDocumentRepository: this.pipelineItemCustomDocumentRepository
+        });
         this.clientRepository = new ClientRepository(this.prisma.client);
         this.clientService = new ClientService({ clientRepository: this.clientRepository });
         this.clientTenantRepository = new ClientTenantRepository(this.prisma.clientTenant);
@@ -372,6 +385,90 @@ class PipelineController {
             message: "Items assigned successfully",
             status: 'ok',
             data: item
+        });
+    });
+
+    // ── Custom task handlers ─────────────────────────────────────────────────
+
+    createCustomTask = expressAsyncHandler(async (req, res) => {
+        const task = await this.service.createCustomTask(req.body);
+
+        return res.status(201).json({
+            message: "Custom task created successfully",
+            status: 'ok',
+            data: task
+        });
+    });
+
+    getCustomTasksByItemId = expressAsyncHandler(async (req, res) => {
+        const tasks = await this.service.getCustomTasksByItemId(req.params.pipelineItemId);
+
+        return res.status(200).json({
+            message: "Custom tasks fetched successfully",
+            status: 'ok',
+            data: tasks
+        });
+    });
+
+    updateCustomTask = expressAsyncHandler(async (req, res) => {
+        const task = await this.service.updateCustomTask(req.body);
+
+        return res.status(200).json({
+            message: "Custom task updated successfully",
+            status: 'ok',
+            data: task
+        });
+    });
+
+    deleteCustomTask = expressAsyncHandler(async (req, res) => {
+        const task = await this.service.deleteCustomTask(req.params.id);
+
+        return res.status(200).json({
+            message: "Custom task deleted successfully",
+            status: 'ok',
+            data: task
+        });
+    });
+
+    // ── Custom document handlers ──────────────────────────────────────────────
+
+    createCustomDocument = expressAsyncHandler(async (req, res) => {
+        const doc = await this.service.createCustomDocument(req.body);
+
+        return res.status(201).json({
+            message: "Custom document created successfully",
+            status: 'ok',
+            data: doc
+        });
+    });
+
+    getCustomDocumentsByItemId = expressAsyncHandler(async (req, res) => {
+        const docs = await this.service.getCustomDocumentsByItemId(req.params.pipelineItemId);
+
+        return res.status(200).json({
+            message: "Custom documents fetched successfully",
+            status: 'ok',
+            data: docs
+        });
+    });
+
+    updateCustomDocument = expressAsyncHandler(async (req, res) => {
+        const doc = await this.service.updateCustomDocument(req.body);
+
+        return res.status(200).json({
+            message: "Custom document updated successfully",
+            status: 'ok',
+            data: doc
+        });
+    });
+
+    deleteCustomDocument = expressAsyncHandler(async (req, res) => {
+        const doc = await this.service.deleteCustomDocument(req.params.id);
+
+        return res.status(200).json({
+            message: "Custom document deleted successfully",
+            status: 'ok',
+            data: doc
         });
     });
 }

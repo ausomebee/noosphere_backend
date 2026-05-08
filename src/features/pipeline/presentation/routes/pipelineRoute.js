@@ -1047,6 +1047,226 @@ class PipelineRoutes {
          */
         this.router.post("/item/document/:id", this.S3Service.any(), this.controller.updateItemSentDocuments);
 
+        // ── Custom task routes ─────────────────────────────────────────────────
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/item/custom/task:
+         *   post:
+         *     summary: Create a custom task for a pipeline item
+         *     tags: [PipelineItemCustomTask]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             required:
+         *               - pipelineItemId
+         *               - taskName
+         *             properties:
+         *               pipelineItemId:
+         *                 type: string
+         *                 format: uuid
+         *               taskName:
+         *                 type: string
+         *               isRequired:
+         *                 type: boolean
+         *     responses:
+         *       201:
+         *         description: Custom task created successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/item/custom/task", PipelineDto.createCustomTaskDto, this.controller.createCustomTask);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/item/{pipelineItemId}/custom/tasks:
+         *   get:
+         *     summary: Get all custom tasks for a pipeline item
+         *     tags: [PipelineItemCustomTask]
+         *     parameters:
+         *       - in: path
+         *         name: pipelineItemId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *     responses:
+         *       200:
+         *         description: Custom tasks fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/item/:pipelineItemId/custom/tasks", PipelineDto.getCustomByItemIdDto, this.controller.getCustomTasksByItemId);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/item/custom/task:
+         *   patch:
+         *     summary: Update a custom task
+         *     tags: [PipelineItemCustomTask]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             required:
+         *               - id
+         *             properties:
+         *               id:
+         *                 type: string
+         *                 format: uuid
+         *               taskName:
+         *                 type: string
+         *               isRequired:
+         *                 type: boolean
+         *               isCompleted:
+         *                 type: boolean
+         *     responses:
+         *       200:
+         *         description: Custom task updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/item/custom/task", PipelineDto.updateCustomTaskDto, this.controller.updateCustomTask);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/item/custom/task/{id}:
+         *   delete:
+         *     summary: Delete a custom task
+         *     tags: [PipelineItemCustomTask]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *     responses:
+         *       200:
+         *         description: Custom task deleted successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.delete("/item/custom/task/:id", PipelineDto.getByIdDto, this.controller.deleteCustomTask);
+
+        // ── Custom document routes ─────────────────────────────────────────────
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/item/custom/document:
+         *   post:
+         *     summary: Create a custom document requirement for a pipeline item
+         *     tags: [PipelineItemCustomDocument]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             required:
+         *               - pipelineItemId
+         *               - documentName
+         *             properties:
+         *               pipelineItemId:
+         *                 type: string
+         *                 format: uuid
+         *               documentName:
+         *                 type: string
+         *               isRequired:
+         *                 type: boolean
+         *               description:
+         *                 type: string
+         *     responses:
+         *       201:
+         *         description: Custom document created successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/item/custom/document", PipelineDto.createCustomDocumentDto, this.controller.createCustomDocument);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/item/{pipelineItemId}/custom/documents:
+         *   get:
+         *     summary: Get all custom documents for a pipeline item
+         *     tags: [PipelineItemCustomDocument]
+         *     parameters:
+         *       - in: path
+         *         name: pipelineItemId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *     responses:
+         *       200:
+         *         description: Custom documents fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/item/:pipelineItemId/custom/documents", PipelineDto.getCustomByItemIdDto, this.controller.getCustomDocumentsByItemId);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/item/custom/document:
+         *   patch:
+         *     summary: Update a custom document requirement
+         *     tags: [PipelineItemCustomDocument]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             required:
+         *               - id
+         *             properties:
+         *               id:
+         *                 type: string
+         *                 format: uuid
+         *               documentName:
+         *                 type: string
+         *               isRequired:
+         *                 type: boolean
+         *               description:
+         *                 type: string
+         *               fileUrl:
+         *                 type: string
+         *               isVerified:
+         *                 type: boolean
+         *     responses:
+         *       200:
+         *         description: Custom document updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/item/custom/document", PipelineDto.updateCustomDocumentDto, this.controller.updateCustomDocument);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/item/custom/document/{id}:
+         *   delete:
+         *     summary: Delete a custom document requirement
+         *     tags: [PipelineItemCustomDocument]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *     responses:
+         *       200:
+         *         description: Custom document deleted successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.delete("/item/custom/document/:id", PipelineDto.getByIdDto, this.controller.deleteCustomDocument);
+
     }
 
     getRouter() {

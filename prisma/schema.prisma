@@ -602,6 +602,8 @@ model PipelineItem {
   admin                      Admin?                      @relation(fields: [assignToAdmin], references: [id])
   pipelineDoneTasks          PipelineDoneTask[]
   pipelineSubmittedDocuments PipelineSubmittedDocument[]
+  customTasks                PipelineItemCustomTask[]
+  customDocuments            PipelineItemCustomDocument[]
 }
 
 model PipelineDoneTask {
@@ -622,6 +624,33 @@ model PipelineSubmittedDocument {
   fileUrl        String
   isVerified     Boolean  @default(false)
   uploadedAt     DateTime @default(now())
+
+  pipelineItem PipelineItem @relation(fields: [pipelineItemId], references: [id], onDelete: Cascade)
+}
+
+model PipelineItemCustomTask {
+  id             String    @id @default(uuid())
+  pipelineItemId String
+  taskName       String
+  isRequired     Boolean   @default(false)
+  isCompleted    Boolean   @default(false)
+  completedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  pipelineItem PipelineItem @relation(fields: [pipelineItemId], references: [id], onDelete: Cascade)
+}
+
+model PipelineItemCustomDocument {
+  id             String   @id @default(uuid())
+  pipelineItemId String
+  documentName   String
+  isRequired     Boolean  @default(false)
+  description    String?
+  fileUrl        String?
+  isVerified     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   pipelineItem PipelineItem @relation(fields: [pipelineItemId], references: [id], onDelete: Cascade)
 }
