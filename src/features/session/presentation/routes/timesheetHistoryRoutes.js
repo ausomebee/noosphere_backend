@@ -1,6 +1,7 @@
 import express from "express";
 import TimesheetHistoryController from "../controllers/timesheetHistoryController.js";
 import TimesheetHistoryDto from "../dto/timesheetHistoryDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -68,6 +69,7 @@ class TimesheetHistoryRoutes {
          */
         this.router.post(
             "/",
+            staffProtect,
             TimesheetHistoryDto.createTimesheetHistoryDto,
             this.controller.createTimesheetHistory
         );
@@ -90,6 +92,7 @@ class TimesheetHistoryRoutes {
          */
         this.router.put(
             "/",
+            staffProtect,
             TimesheetHistoryDto.updateTimesheetHistoryDto,
             this.controller.updateTimesheetHistory
         );
@@ -114,6 +117,7 @@ class TimesheetHistoryRoutes {
          */
         this.router.get(
             "/:id",
+            staffProtect,
             this.controller.getSingleTimesheetHistory
         );
 
@@ -137,6 +141,7 @@ class TimesheetHistoryRoutes {
          */
         this.router.get(
             "/session/:sessionId",
+            staffProtect,
             this.controller.getTimesheetHistories
         );
     }

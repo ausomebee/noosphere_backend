@@ -1,6 +1,7 @@
 import express from "express";
 import PlanController from "../controllers/planController.js";
 import PlanDto from "../dto/planDto.js";
+import { adminProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -346,7 +347,7 @@ class PlanRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", PlanDto.createBillingPlanDto, this.controller.createBillingPlan);
+        this.router.post("/", adminProtect(), PlanDto.createBillingPlanDto, this.controller.createBillingPlan);
 
         /**
          * @swagger
@@ -366,7 +367,7 @@ class PlanRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/active", PlanDto.activityDto, this.controller.updateBillingPlan);
+        this.router.post("/active", adminProtect(), PlanDto.activityDto, this.controller.updateBillingPlan);
 
         /**
         * @swagger
@@ -387,7 +388,7 @@ class PlanRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/:id", PlanDto.checkIdDto, this.controller.getSingleBillingPlan);
+        this.router.get("/:id", adminProtect(), PlanDto.checkIdDto, this.controller.getSingleBillingPlan);
 
         /**
          * @swagger
@@ -401,7 +402,7 @@ class PlanRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/", this.controller.getAllBillingPlan);
+        this.router.get("/", adminProtect(), this.controller.getAllBillingPlan);
 
         /**
         * @swagger
@@ -422,7 +423,7 @@ class PlanRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/type/:planType", PlanDto.planTypeDto, this.controller.getBillingPlanByType);
+        this.router.get("/type/:planType", adminProtect(), PlanDto.planTypeDto, this.controller.getBillingPlanByType);
 
         /**
         * @swagger
@@ -443,7 +444,7 @@ class PlanRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/duplicate/:id", PlanDto.checkIdDto, this.controller.duplicateBillingPlan);
+        this.router.get("/duplicate/:id", adminProtect(), PlanDto.checkIdDto, this.controller.duplicateBillingPlan);
 
         /**
          * @swagger
@@ -463,7 +464,7 @@ class PlanRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/", PlanDto.updateBillingPlanDto, this.controller.updateBillingPlan);
+        this.router.patch("/", adminProtect(), PlanDto.updateBillingPlanDto, this.controller.updateBillingPlan);
 
         /**
          * @swagger
@@ -483,7 +484,7 @@ class PlanRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.delete("/", PlanDto.deletePlanDto, this.controller.deleteBillingPlan);
+        this.router.delete("/", adminProtect(), PlanDto.deletePlanDto, this.controller.deleteBillingPlan);
 
     }
 

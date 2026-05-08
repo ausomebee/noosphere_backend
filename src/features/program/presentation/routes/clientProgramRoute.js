@@ -1,6 +1,7 @@
 import express from "express";
 import ClientProgramController from "../controllers/clientProgramController.js";
 import ClientProgramDto from "../dto/clientProgramDto.js";
+import { clientProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -50,7 +51,7 @@ class ClientProgramRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", ClientProgramDto.createClientProgramDto, this.controller.createClientProgram);
+        this.router.post("/", clientProtect, ClientProgramDto.createClientProgramDto, this.controller.createClientProgram);
 
         /**
          * @swagger
@@ -71,7 +72,7 @@ class ClientProgramRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/:clientId", this.controller.getClientPrograms);
+        this.router.get("/:clientId", clientProtect, this.controller.getClientPrograms);
 
         /**
          * @swagger
@@ -92,7 +93,7 @@ class ClientProgramRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/target/:clientId", this.controller.getClientProgramAndTraget);
+        this.router.get("/target/:clientId", clientProtect, this.controller.getClientProgramAndTraget);
     }
 
     getRouter() {

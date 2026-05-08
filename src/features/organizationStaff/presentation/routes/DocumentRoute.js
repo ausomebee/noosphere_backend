@@ -1,6 +1,7 @@
 import express from "express";
 import DocumentController from "../controller/documentController.js";
 import DocumentDto from "../dto/documentDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -77,7 +78,7 @@ class DocumentRoutes {
          *       404:
          *         description: Document not found
          */
-        this.router.put("/", DocumentDto.updateDocumentDto, this.controller.updateDocument);
+        this.router.put("/", staffProtect, DocumentDto.updateDocumentDto, this.controller.updateDocument);
 
         /**
          * @swagger
@@ -99,7 +100,7 @@ class DocumentRoutes {
          *       404:
          *         description: Document not found
          */
-        this.router.post("/", DocumentDto.createDocumentDto, this.controller.createDocument);
+        this.router.post("/", staffProtect, DocumentDto.createDocumentDto, this.controller.createDocument);
 
         /**
          * @swagger
@@ -120,7 +121,7 @@ class DocumentRoutes {
          *       404:
          *         description: Documents not found
          */
-        this.router.get("/tenant-staff/:tenantStaffId", this.controller.getTenantStaffDocuments);
+        this.router.get("/tenant-staff/:tenantStaffId", staffProtect, this.controller.getTenantStaffDocuments);
 
         /**
          * @swagger
@@ -141,7 +142,7 @@ class DocumentRoutes {
          *       404:
          *         description: Document not found
          */
-        this.router.get("/:id", this.controller.getDocument);
+        this.router.get("/:id", staffProtect, this.controller.getDocument);
 
         /**
          * @swagger
@@ -170,7 +171,7 @@ class DocumentRoutes {
          *       404:
          *         description: Document not found
          */
-        this.router.patch("/deleted/:id/:isDeleted", this.controller.updateDocument);
+        this.router.patch("/deleted/:id/:isDeleted", staffProtect, this.controller.updateDocument);
     }
 
     getRouter() {

@@ -1,6 +1,7 @@
 import express from "express";
 import ClinicalReportTemplateController from "../controllers/reportTemplateController.js";
 import ClinicalReportTemplateDto from "../dto/reportTemplateDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -107,6 +108,7 @@ class ClinicalReportTemplateRoutes {
          */
         this.router.post(
             "/",
+            staffProtect,
             ClinicalReportTemplateDto.createTemplateDto,
             this.controller.createTemplate
         );
@@ -129,6 +131,7 @@ class ClinicalReportTemplateRoutes {
          */
         this.router.put(
             "/",
+            staffProtect,
             ClinicalReportTemplateDto.updateTemplateDto,
             this.controller.updateTemplate
         );
@@ -151,6 +154,7 @@ class ClinicalReportTemplateRoutes {
          */
         this.router.get(
             "/tenant/:tenantId",
+            staffProtect,
             this.controller.getTenantTemplates
         );
 
@@ -172,6 +176,7 @@ class ClinicalReportTemplateRoutes {
          */
         this.router.get(
             "/:id",
+            staffProtect,
             this.controller.getSingleTemplate
         );
 
@@ -193,6 +198,7 @@ class ClinicalReportTemplateRoutes {
          */
         this.router.delete(
             "/:id",
+            staffProtect,
             this.controller.deleteTemplate
         );
 
@@ -214,6 +220,7 @@ class ClinicalReportTemplateRoutes {
          */
         this.router.post(
             "/duplicate/:id",
+            staffProtect,
             this.controller.duplicateTemplate
         );
     }

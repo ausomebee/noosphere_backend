@@ -1,6 +1,7 @@
 import express from "express";
 import ClientNotificationSettingsController from "../controllers/clientNotificationSettingsController.js";
 import ClientNotificationSettingsDto from "../dto/clientNotificationSettingsDto.js";
+import { clientProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -99,6 +100,7 @@ class ClientNotificationSettingsRoutes {
          */
         this.router.post(
             "/",
+            clientProtect,
             ClientNotificationSettingsDto.createNotificationSettingsDto,
             this.controller.createNotificationSettings
         );
@@ -128,6 +130,7 @@ class ClientNotificationSettingsRoutes {
          */
         this.router.put(
             "/:id",
+            clientProtect,
             this.controller.updateNotificationSettings
         );
 
@@ -150,6 +153,7 @@ class ClientNotificationSettingsRoutes {
          */
         this.router.get(
             "/single/:id",
+            clientProtect,
             this.controller.getSingleNotificationSettings
         );
 
@@ -172,6 +176,7 @@ class ClientNotificationSettingsRoutes {
          */
         this.router.get(
             "/:tenantClientId",
+            clientProtect,
             this.controller.getNotificationSettingsByClient
         );
     }

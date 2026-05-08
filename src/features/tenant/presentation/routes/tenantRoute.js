@@ -2,6 +2,7 @@ import express from "express";
 import TenantDto from "../dto/tenantDto.js";
 import TenantController from "../controllers/tenantController.js";
 import multer from "multer";
+import { adminProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -342,7 +343,7 @@ class TenantRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.post("/candidate", TenantDto.createCandidateDto, this.controller.createCandidate);
+        this.router.post("/candidate", adminProtect(), TenantDto.createCandidateDto, this.controller.createCandidate);
 
         /**
          * @swagger
@@ -363,7 +364,7 @@ class TenantRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.patch("/", TenantDto.updateTenantDto, this.controller.updateTenant);
+        this.router.patch("/", adminProtect(), TenantDto.updateTenantDto, this.controller.updateTenant);
 
         /**
          * @swagger
@@ -384,7 +385,7 @@ class TenantRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.patch("/active-status", this.controller.tenantActiveStatus);
+        this.router.patch("/active-status", adminProtect(), this.controller.tenantActiveStatus);
 
         /**
          * @swagger
@@ -417,7 +418,7 @@ class TenantRoutes {
          *       404:
          *         description: Tenant or account officer not found
          */
-        this.router.patch("/account-officer/:tenantId/:officerId", this.controller.updateAccountOfficer);
+        this.router.patch("/account-officer/:tenantId/:officerId", adminProtect(), this.controller.updateAccountOfficer);
 
         /**
          * @swagger
@@ -438,7 +439,7 @@ class TenantRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.patch("/change-password", TenantDto.updatePasswordDto, this.controller.updateStaffPassword);
+        this.router.patch("/change-password", adminProtect(), TenantDto.updatePasswordDto, this.controller.updateStaffPassword);
 
         /**
          * @swagger
@@ -459,7 +460,7 @@ class TenantRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.patch("/organization", TenantDto.updateTenantDto, this.controller.updateTenant);
+        this.router.patch("/organization", adminProtect(), TenantDto.updateTenantDto, this.controller.updateTenant);
 
         /**
          * @swagger
@@ -473,7 +474,7 @@ class TenantRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/", this.controller.getAllTenant);
+        this.router.get("/", adminProtect(), this.controller.getAllTenant);
 
         /**
          * @swagger
@@ -500,7 +501,7 @@ class TenantRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/deactivation-logs", this.controller.getDeactivationLogs);
+        this.router.get("/deactivation-logs", adminProtect(), this.controller.getDeactivationLogs);
 
         /**
          * @swagger
@@ -527,7 +528,7 @@ class TenantRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/activation-logs", this.controller.getActivationLogs);
+        this.router.get("/activation-logs", adminProtect(), this.controller.getActivationLogs);
 
         /**
          * @swagger
@@ -541,7 +542,7 @@ class TenantRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/count", this.controller.countAllTenant);
+        this.router.get("/count", adminProtect(), this.controller.countAllTenant);
 
         /**
          * @swagger
@@ -562,7 +563,7 @@ class TenantRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/subdomain/:subdomain", this.controller.checkDomain);
+        this.router.get("/subdomain/:subdomain", adminProtect(), this.controller.checkDomain);
 
         /**
          * @swagger
@@ -582,7 +583,7 @@ class TenantRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.post("/contact", this.memoryUpload.single("attachment"), TenantDto.contactTenantDto, this.controller.contactTenantByEmail);
+        this.router.post("/contact", adminProtect(), this.memoryUpload.single("attachment"), TenantDto.contactTenantDto, this.controller.contactTenantByEmail);
 
         /**
          * @swagger
@@ -602,7 +603,7 @@ class TenantRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/createstaff", TenantDto.createStaffDto, this.controller.createTenantStaff);
+        this.router.post("/createstaff", adminProtect(), TenantDto.createStaffDto, this.controller.createTenantStaff);
 
         /**
         * @swagger
@@ -662,7 +663,7 @@ class TenantRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.post("/tenantadminchoices", TenantDto.tenantAdminChoicesDto, this.controller.tenantAdminChoices);
+        this.router.post("/tenantadminchoices", adminProtect(), TenantDto.tenantAdminChoicesDto, this.controller.tenantAdminChoices);
 
         /**
         * @swagger
@@ -711,7 +712,7 @@ class TenantRoutes {
         *       400:
         *         description: Bad request or invalid payment schedule value provided
         */
-        this.router.get("/getstaffbypaymentschedule/:tenantId/:paymentSchedule", this.controller.getStaffByPaymentSchedule);
+        this.router.get("/getstaffbypaymentschedule/:tenantId/:paymentSchedule", adminProtect(), this.controller.getStaffByPaymentSchedule);
 
         /**
         * @swagger
@@ -733,7 +734,7 @@ class TenantRoutes {
         *       400:
         *         description: Bad request or invalid tenant ID provided
         */
-        this.router.get("/getstaffpayrollsummary/:tenantId", this.controller.getStaffPayrollSummary);
+        this.router.get("/getstaffpayrollsummary/:tenantId", adminProtect(), this.controller.getStaffPayrollSummary);
 
         /**
          * @swagger
@@ -774,6 +775,7 @@ class TenantRoutes {
          */
         this.router.patch(
             "/change-admin-password/:tenantId",
+            adminProtect(),
             this.controller.changeAdminPassword
         );
 
@@ -829,6 +831,7 @@ class TenantRoutes {
          */
         this.router.patch(
             "/change-email/:tenantId",
+            adminProtect(),
             this.controller.changeEmail
         );
 
@@ -883,6 +886,7 @@ class TenantRoutes {
          */
         this.router.patch(
             "/change-phone-number/:tenantId",
+            adminProtect(),
             this.controller.changePhoneNumber
         );
 
@@ -925,6 +929,7 @@ class TenantRoutes {
          */
         this.router.get(
             "/usage-statistics-overview/:tenantId",
+            adminProtect(),
             this.controller.getTenantRelationsCount
         );
 
@@ -975,7 +980,7 @@ class TenantRoutes {
          *       500:
          *         description: Internal server error
          */
-        this.router.get("/getstaffwithpayrollbydate/:tenantId", this.controller.findStaffWithPayrollByTenantAndDateRange);
+        this.router.get("/getstaffwithpayrollbydate/:tenantId", adminProtect(), this.controller.findStaffWithPayrollByTenantAndDateRange);
 
         /**
          * @swagger
@@ -1041,7 +1046,7 @@ class TenantRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/count-staff/:tenantId", this.controller.availaibleStaffs);
+        this.router.get("/count-staff/:tenantId", adminProtect(), this.controller.availaibleStaffs);
 
         /**
          * @swagger
@@ -1063,7 +1068,7 @@ class TenantRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/avg-staff/:tenantId", this.controller.averageClinicians);
+        this.router.get("/avg-staff/:tenantId", adminProtect(), this.controller.averageClinicians);
 
         /**
          * @swagger
@@ -1106,7 +1111,7 @@ class TenantRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/staff/team/:tenantId", this.controller.getStaffsWithTeamAccess);
+        this.router.get("/staff/team/:tenantId", adminProtect(), this.controller.getStaffsWithTeamAccess);
 
         /**
          * @swagger
@@ -1120,7 +1125,7 @@ class TenantRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/active", this.controller.getAllActiveTenant);
+        this.router.get("/active", adminProtect(), this.controller.getAllActiveTenant);
 
         /**
          * @swagger
@@ -1134,7 +1139,7 @@ class TenantRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/management-overview", this.controller.tenantManagementOverview);
+        this.router.get("/management-overview", adminProtect(), this.controller.tenantManagementOverview);
 
         /**
          * @swagger
@@ -1155,7 +1160,7 @@ class TenantRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/:id", this.controller.getTenant);
+        this.router.get("/:id", adminProtect(), this.controller.getTenant);
 
         /**
          * @swagger
@@ -1176,7 +1181,7 @@ class TenantRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/staff/:tenantId", this.controller.getTenantStaffs);
+        this.router.get("/staff/:tenantId", adminProtect(), this.controller.getTenantStaffs);
 
     }
 

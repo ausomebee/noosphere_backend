@@ -1,6 +1,7 @@
 import express from "express";
 import TeamsController from "../controllers/teamsController.js";
 import TeamsDto from "../dto/teamDto.js";
+import { adminProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -77,6 +78,7 @@ class TeamsRoutes {
          */
         this.router.post(
             "/",
+            adminProtect(),
             TeamsDto.createTeamDto,
             this.controller.createTeam
         );
@@ -99,6 +101,7 @@ class TeamsRoutes {
          */
         this.router.put(
             "/",
+            adminProtect(),
             TeamsDto.updateTeamDto,
             this.controller.updateTeam
         );
@@ -122,6 +125,7 @@ class TeamsRoutes {
          */
         this.router.get(
             "/:id",
+            adminProtect(),
             this.controller.getSingleTeam
         );
 
@@ -145,6 +149,7 @@ class TeamsRoutes {
          */
         this.router.get(
             "/",
+            adminProtect(),
             this.controller.getTeams
         );
 
@@ -168,6 +173,7 @@ class TeamsRoutes {
          */
         this.router.delete(
             "/:id/delete",
+            adminProtect(),
             this.controller.deleteTeam
         );
 
@@ -197,6 +203,7 @@ class TeamsRoutes {
          */
         this.router.patch(
             "/:id/active/:active",
+            adminProtect(),
             this.controller.updateTeamActiveStatus
         );
     }

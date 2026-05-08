@@ -1,6 +1,7 @@
 import express from "express";
 import InformationDto from "../dto/informationDto.js";
 import InformationController from "../controller/informationController.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -144,7 +145,7 @@ class InformationRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", InformationDto.createInformationDto, this.controller.createInformation);
+        this.router.post("/", staffProtect, InformationDto.createInformationDto, this.controller.createInformation);
 
         /**
          * @swagger
@@ -164,7 +165,7 @@ class InformationRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.put("/", InformationDto.updateInformationDto, this.controller.updateInformation);
+        this.router.put("/", staffProtect, InformationDto.updateInformationDto, this.controller.updateInformation);
 
         /**
         * @swagger
@@ -185,7 +186,7 @@ class InformationRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/:tenantId", this.controller.getInformation);
+        this.router.get("/:tenantId", staffProtect, this.controller.getInformation);
 
     }
 

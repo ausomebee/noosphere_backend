@@ -1,6 +1,7 @@
 import express from "express";
 import FeatureController from "../controllers/featureController.js";
 import FeatureDto from "../dto/featureDto.js";
+import { adminProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -158,7 +159,7 @@ class FeatureRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/feature", FeatureDto.createFeatureDto, this.controller.createFeature);
+        this.router.post("/feature", adminProtect(), FeatureDto.createFeatureDto, this.controller.createFeature);
 
         /**
         * @swagger
@@ -179,7 +180,7 @@ class FeatureRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/getfeature/:id", FeatureDto.checkIdDto, this.controller.getSingleFeature);
+        this.router.get("/getfeature/:id", adminProtect(), FeatureDto.checkIdDto, this.controller.getSingleFeature);
 
         /**
          * @swagger
@@ -193,7 +194,7 @@ class FeatureRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/allfeature", this.controller.getAllFeature);
+        this.router.get("/allfeature", adminProtect(), this.controller.getAllFeature);
 
         /**
          * @swagger
@@ -213,7 +214,7 @@ class FeatureRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/featuregroup", FeatureDto.createFeatureGroupDto, this.controller.createFeatureGroup);
+        this.router.post("/featuregroup", adminProtect(), FeatureDto.createFeatureGroupDto, this.controller.createFeatureGroup);
 
         /**
         * @swagger
@@ -234,7 +235,7 @@ class FeatureRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/getfeaturegroup/:id", FeatureDto.checkIdDto, this.controller.getSingleFeatureGroup);
+        this.router.get("/getfeaturegroup/:id", adminProtect(), FeatureDto.checkIdDto, this.controller.getSingleFeatureGroup);
 
         /**
          * @swagger
@@ -248,7 +249,7 @@ class FeatureRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/allfeaturegroup", this.controller.getAllFeatureGroup);
+        this.router.get("/allfeaturegroup", adminProtect(), this.controller.getAllFeatureGroup);
 
         /**
         * @swagger
@@ -268,7 +269,7 @@ class FeatureRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.patch("/group", FeatureDto.updateFeatureGroupDto, this.controller.updateFeatureGroup);
+        this.router.patch("/group", adminProtect(), FeatureDto.updateFeatureGroupDto, this.controller.updateFeatureGroup);
 
         /**
          * @swagger
@@ -289,7 +290,7 @@ class FeatureRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.delete("/group", FeatureDto.deleteFeatureGroupDto, this.controller.deleteSingleFeatureGroup);
+        this.router.delete("/group", adminProtect(), FeatureDto.deleteFeatureGroupDto, this.controller.deleteSingleFeatureGroup);
 
         /**
         * @swagger
@@ -309,7 +310,7 @@ class FeatureRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.patch("/move", FeatureDto.moveFeatureDto, this.controller.updateFeature);
+        this.router.patch("/move", adminProtect(), FeatureDto.moveFeatureDto, this.controller.updateFeature);
 
         /**
         * @swagger
@@ -329,7 +330,7 @@ class FeatureRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.patch("/feature", FeatureDto.updateFeatureDto, this.controller.updateFeature);
+        this.router.patch("/feature", adminProtect(), FeatureDto.updateFeatureDto, this.controller.updateFeature);
 
         /**
         * @swagger
@@ -350,7 +351,7 @@ class FeatureRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.delete("/feature", FeatureDto.deleteFeatureGroupDto, this.controller.deleteSingleFeature);
+        this.router.delete("/feature", adminProtect(), FeatureDto.deleteFeatureGroupDto, this.controller.deleteSingleFeature);
 
         /**
         * @swagger
@@ -370,7 +371,7 @@ class FeatureRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.patch("/plan", FeatureDto.assignFeatureToPlanDto, this.controller.updateFeature);
+        this.router.patch("/plan", adminProtect(), FeatureDto.assignFeatureToPlanDto, this.controller.updateFeature);
 
         /**
         * @swagger
@@ -390,7 +391,7 @@ class FeatureRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.patch("/active", FeatureDto.updateActivityDto, this.controller.updateFeature);
+        this.router.patch("/active", adminProtect(), FeatureDto.updateActivityDto, this.controller.updateFeature);
 
     }
 

@@ -1,6 +1,7 @@
 import express from "express";
 import ClientFormController from "../controllers/clientFormController.js";
 import ClientFormDto from "../dto/clientFormDto.js";
+import { clientProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -48,6 +49,7 @@ class ClientFormRoutes {
          */
         this.router.post(
             "/",
+            clientProtect,
             ClientFormDto.createClientFormDto,
             this.controller.createClientForm
         );
@@ -68,7 +70,7 @@ class ClientFormRoutes {
          *       200:
          *         description: Forms fetched successfully
          */
-        this.router.get("/:tenantClientId", this.controller.getClientForms);
+        this.router.get("/:tenantClientId", clientProtect, this.controller.getClientForms);
 
         /**
          * @swagger
@@ -86,7 +88,7 @@ class ClientFormRoutes {
          *       200:
          *         description: Forms counted successfully
          */
-        this.router.get("/count/status/:tenantClientId", this.controller.countAllClientFormsByStatus);
+        this.router.get("/count/status/:tenantClientId", clientProtect, this.controller.countAllClientFormsByStatus);
     }
 
     getRouter() {

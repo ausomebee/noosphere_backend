@@ -2,6 +2,7 @@ import express from "express";
 import PerformanceController from "../controller/performanceController.js";
 import PerformanceDto from "../dto/performanceDto.js";
 import CloudWatchUtil from "../../../../utilities/cloudWatch.js";
+import { adminProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -64,7 +65,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input (e.g. endTime earlier than startTime)
          */
-        this.router.get("/metrics", PerformanceDto.checkTimeDto, this.controller.getAllMetrics);
+        this.router.get("/metrics", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getAllMetrics);
 
         /**
          * @swagger
@@ -95,7 +96,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/cpu-utilization", PerformanceDto.checkTimeDto, this.controller.getCPUUtilizationMetric);
+        this.router.get("/cpu-utilization", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getCPUUtilizationMetric);
 
         /**
          * @swagger
@@ -126,7 +127,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/disk-read-bytes", PerformanceDto.checkTimeDto, this.controller.getDiskReadBytesMetric);
+        this.router.get("/disk-read-bytes", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getDiskReadBytesMetric);
 
         /**
          * @swagger
@@ -157,7 +158,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/disk-write-bytes", PerformanceDto.checkTimeDto, this.controller.getDiskWriteBytesMetric);
+        this.router.get("/disk-write-bytes", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getDiskWriteBytesMetric);
 
         /**
          * @swagger
@@ -188,7 +189,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/disk-read-ops", PerformanceDto.checkTimeDto, this.controller.getDiskReadOpsMetric);
+        this.router.get("/disk-read-ops", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getDiskReadOpsMetric);
 
         /**
          * @swagger
@@ -219,7 +220,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/disk-write-ops", PerformanceDto.checkTimeDto, this.controller.getDiskWriteOpsMetric);
+        this.router.get("/disk-write-ops", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getDiskWriteOpsMetric);
 
         /**
          * @swagger
@@ -250,7 +251,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/network-in", PerformanceDto.checkTimeDto, this.controller.getNetworkInMetric);
+        this.router.get("/network-in", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getNetworkInMetric);
 
         /**
          * @swagger
@@ -281,7 +282,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/network-out", PerformanceDto.checkTimeDto, this.controller.getNetworkOutMetric);
+        this.router.get("/network-out", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getNetworkOutMetric);
 
         /**
          * @swagger
@@ -312,7 +313,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/network-packets-in", PerformanceDto.checkTimeDto, this.controller.getNetworkPacketsInMetric);
+        this.router.get("/network-packets-in", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getNetworkPacketsInMetric);
 
         /**
          * @swagger
@@ -343,7 +344,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/network-packets-out", PerformanceDto.checkTimeDto, this.controller.getNetworkPacketsOutMetric);
+        this.router.get("/network-packets-out", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getNetworkPacketsOutMetric);
 
         /**
          * @swagger
@@ -374,7 +375,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/status-check-failed", PerformanceDto.checkTimeDto, this.controller.getStatusCheckFailedMetric);
+        this.router.get("/status-check-failed", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getStatusCheckFailedMetric);
 
         /**
          * @swagger
@@ -405,7 +406,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/status-check-failed-instance", PerformanceDto.checkTimeDto, this.controller.getStatusCheckFailedInstanceMetric);
+        this.router.get("/status-check-failed-instance", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getStatusCheckFailedInstanceMetric);
 
         /**
          * @swagger
@@ -436,7 +437,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/status-check-failed-system", PerformanceDto.checkTimeDto, this.controller.getStatusCheckFailedSystemMetric);
+        this.router.get("/status-check-failed-system", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getStatusCheckFailedSystemMetric);
 
         /**
          * @swagger
@@ -467,7 +468,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input (e.g. endTime earlier than startTime)
          */
-        this.router.get("/rds-cpu-utilization", PerformanceDto.checkTimeDto, this.controller.getRDSCPUUtilizationMetric);
+        this.router.get("/rds-cpu-utilization", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getRDSCPUUtilizationMetric);
 
         /**
          * @swagger
@@ -498,7 +499,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/rds-database-connections", PerformanceDto.checkTimeDto, this.controller.getRDSDatabaseConnectionsMetric);
+        this.router.get("/rds-database-connections", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getRDSDatabaseConnectionsMetric);
 
         /**
          * @swagger
@@ -529,7 +530,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/rds-free-storage-space", PerformanceDto.checkTimeDto, this.controller.getRDSFreeStorageSpaceMetric);
+        this.router.get("/rds-free-storage-space", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getRDSFreeStorageSpaceMetric);
 
         /**
          * @swagger
@@ -560,7 +561,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/rds-freeable-memory", PerformanceDto.checkTimeDto, this.controller.getRDSFreeableMemoryMetric);
+        this.router.get("/rds-freeable-memory", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getRDSFreeableMemoryMetric);
 
         /**
          * @swagger
@@ -591,7 +592,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/rds-read-iops", PerformanceDto.checkTimeDto, this.controller.getRDSReadIOPSMetric);
+        this.router.get("/rds-read-iops", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getRDSReadIOPSMetric);
 
         /**
          * @swagger
@@ -622,7 +623,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/rds-write-iops", PerformanceDto.checkTimeDto, this.controller.getRDSWriteIOPSMetric);
+        this.router.get("/rds-write-iops", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getRDSWriteIOPSMetric);
 
         /**
          * @swagger
@@ -653,7 +654,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/rds-read-latency", PerformanceDto.checkTimeDto, this.controller.getRDSReadLatencyMetric);
+        this.router.get("/rds-read-latency", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getRDSReadLatencyMetric);
 
         /**
          * @swagger
@@ -684,7 +685,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/rds-write-latency", PerformanceDto.checkTimeDto, this.controller.getRDSWriteLatencyMetric);
+        this.router.get("/rds-write-latency", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getRDSWriteLatencyMetric);
 
         /**
          * @swagger
@@ -715,7 +716,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/rds-read-throughput", PerformanceDto.checkTimeDto, this.controller.getRDSReadThroughputMetric);
+        this.router.get("/rds-read-throughput", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getRDSReadThroughputMetric);
 
         /**
          * @swagger
@@ -746,7 +747,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/rds-write-throughput", PerformanceDto.checkTimeDto, this.controller.getRDSWriteThroughputMetric);
+        this.router.get("/rds-write-throughput", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getRDSWriteThroughputMetric);
 
         /**
          * @swagger
@@ -777,7 +778,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/rds-replica-lag", PerformanceDto.checkTimeDto, this.controller.getRDSReplicaLagMetric);
+        this.router.get("/rds-replica-lag", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getRDSReplicaLagMetric);
 
         /**
          * @swagger
@@ -808,7 +809,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/rds-swap-usage", PerformanceDto.checkTimeDto, this.controller.getRDSSwapUsageMetric);
+        this.router.get("/rds-swap-usage", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getRDSSwapUsageMetric);
 
         /**
          * @swagger
@@ -839,7 +840,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/rds-disk-queue-depth", PerformanceDto.checkTimeDto, this.controller.getRDSDiskQueueDepthMetric);
+        this.router.get("/rds-disk-queue-depth", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getRDSDiskQueueDepthMetric);
 
         /**
          * @swagger
@@ -870,7 +871,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/rds-network-receive-throughput", PerformanceDto.checkTimeDto, this.controller.getRDSNetworkReceiveThroughputMetric);
+        this.router.get("/rds-network-receive-throughput", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getRDSNetworkReceiveThroughputMetric);
 
         /**
          * @swagger
@@ -901,7 +902,7 @@ class PerformanceRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.get("/rds-network-transmit-throughput", PerformanceDto.checkTimeDto, this.controller.getRDSNetworkTransmitThroughputMetric);
+        this.router.get("/rds-network-transmit-throughput", adminProtect(), PerformanceDto.checkTimeDto, this.controller.getRDSNetworkTransmitThroughputMetric);
 
         /**
          * @swagger
@@ -915,7 +916,7 @@ class PerformanceRoutes {
          *       500:
          *         description: Server error
          */
-        this.router.get("/general", async (req, res) => {
+        this.router.get("/general", adminProtect(), async (req, res) => {
             const result = await this.cloudWatchUtil.getGeneralMetrics({
                 instanceId: process.env.EC2_INSTANCE_ID,
                 dbInstanceIdentifier: process.env.RDS_INSTANCE_ID
@@ -936,7 +937,7 @@ class PerformanceRoutes {
          *       500:
          *         description: Server error
          */
-        this.router.get("/general/timeseries", async (req, res) => {
+        this.router.get("/general/timeseries", adminProtect(), async (req, res) => {
             const result = await this.cloudWatchUtil.getGeneralTimeseries({
                 instanceId: process.env.EC2_INSTANCE_ID,
                 dbInstanceIdentifier: process.env.RDS_INSTANCE_ID
@@ -956,7 +957,7 @@ class PerformanceRoutes {
          *       500:
          *         description: Server error
          */
-        this.router.get("/api-error-rate", async (req, res) => {
+        this.router.get("/api-error-rate", adminProtect(), async (req, res) => {
             const result = await this.cloudWatchUtil.getApiErrorRate({
                 instanceId: process.env.EC2_INSTANCE_ID
             });
@@ -975,7 +976,7 @@ class PerformanceRoutes {
          *       500:
          *         description: Server error
          */
-        this.router.get("/resources", async (req, res) => {
+        this.router.get("/resources", adminProtect(), async (req, res) => {
             const result = await this.cloudWatchUtil.getResourceMetrics({
                 instanceId: process.env.EC2_INSTANCE_ID,
                 dbInstanceIdentifier: process.env.RDS_INSTANCE_ID
@@ -995,7 +996,7 @@ class PerformanceRoutes {
          *       500:
          *         description: Server error
          */
-        this.router.get("/resources/timeseries", async (req, res) => {
+        this.router.get("/resources/timeseries", adminProtect(), async (req, res) => {
             const result = await this.cloudWatchUtil.getResourceTimeseries({
                 instanceId: process.env.EC2_INSTANCE_ID,
                 dbInstanceIdentifier: process.env.RDS_INSTANCE_ID

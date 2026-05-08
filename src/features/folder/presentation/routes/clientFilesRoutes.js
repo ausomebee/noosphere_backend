@@ -1,6 +1,7 @@
 import express from "express";
 import ClientFilesController from "../controllers/clientFilesController.js";
 import ClientFilesDto from "../dtos/clientFilesDto.js";
+import { clientProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -89,6 +90,7 @@ class ClientFilesRoutes {
          */
         this.router.post(
             "/",
+            clientProtect,
             ClientFilesDto.createClientFileDto,
             this.controller.createClientFile
         );
@@ -111,6 +113,7 @@ class ClientFilesRoutes {
          */
         this.router.put(
             "/",
+            clientProtect,
             ClientFilesDto.updateClientFileDto,
             this.controller.updateClientFile
         );
@@ -134,6 +137,7 @@ class ClientFilesRoutes {
          */
         this.router.get(
             "/:id",
+            clientProtect,
             this.controller.getSingleClientFile
         );
 
@@ -156,6 +160,7 @@ class ClientFilesRoutes {
          */
         this.router.get(
             "/recent/:clientTenantId",
+            clientProtect,
             this.controller.findRecentFilesByClientTenant
         );
 
@@ -178,6 +183,7 @@ class ClientFilesRoutes {
          */
         this.router.get(
             "/client/:clientTenantId",
+            clientProtect,
             this.controller.findFilesByClientTenant
         );
 
@@ -200,6 +206,7 @@ class ClientFilesRoutes {
          */
         this.router.get(
             "/folder/:folderId",
+            clientProtect,
             this.controller.getClientFiles
         );
     }

@@ -1,6 +1,7 @@
 import express from "express";
 import PayerServiceCodesController from "../controllers/payerServiceCodesController.js";
 import PayerServiceCodesDto from "../dto/payerServiceCodesDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -85,7 +86,7 @@ class PayerServiceCodeRoutes {
          *       201:
          *         description: Payer service code created successfully
          */
-        this.router.post("/", PayerServiceCodesDto.createPayerServiceCodeDto, this.controller.createPayerServiceCode);
+        this.router.post("/", staffProtect, PayerServiceCodesDto.createPayerServiceCodeDto, this.controller.createPayerServiceCode);
 
         /**
          * @swagger
@@ -108,7 +109,7 @@ class PayerServiceCodeRoutes {
          *       200:
          *         description: Payer service code deactivated successfully
          */
-        this.router.patch("/:id/:active", this.controller.deactivatePayerServiceCode);
+        this.router.patch("/:id/:active", staffProtect, this.controller.deactivatePayerServiceCode);
 
     }
 

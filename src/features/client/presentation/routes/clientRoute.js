@@ -1,6 +1,7 @@
 import express from "express";
 import ClientController from "../controllers/clientController.js";
 import ClientDto from "../dto/clientDto.js";
+import { adminProtect, clientProtect } from "../../../../middleware/auth_handlers.js";
 /**
  * @swagger
  * components:
@@ -338,7 +339,7 @@ class ClientRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", ClientDto.createClientDto, this.controller.createClientCandidate);
+        this.router.post("/", adminProtect(), ClientDto.createClientDto, this.controller.createClientCandidate);
 
        /**
          * @swagger
@@ -409,7 +410,7 @@ class ClientRoutes {
          *       404:
          *         description: Client not found
          */
-        this.router.put("/", ClientDto.updateClientDto, this.controller.updateClient);
+        this.router.put("/", adminProtect(), ClientDto.updateClientDto, this.controller.updateClient);
 
         /**
         * @swagger
@@ -430,7 +431,7 @@ class ClientRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/tenant/:tenantId", this.controller.getTenantClients);
+        this.router.get("/tenant/:tenantId", adminProtect(), this.controller.getTenantClients);
 
         /**
         * @swagger
@@ -451,7 +452,7 @@ class ClientRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/client/:clientId", this.controller.getSingleClient);
+        this.router.get("/client/:clientId", clientProtect, this.controller.getSingleClient);
 
         /**
          * @swagger
@@ -474,7 +475,7 @@ class ClientRoutes {
         *       200:
         *         description: clients fetched successfully
         */
-        this.router.get("/clinician/:staffId/:tenantId", this.controller.getClientsByClinician);
+        this.router.get("/clinician/:staffId/:tenantId", adminProtect(), this.controller.getClientsByClinician);
 
         /**
          * @swagger
@@ -492,7 +493,7 @@ class ClientRoutes {
          *       200:
          *         description: Client portal access set successfully
          */
-        this.router.patch("/portal-access", this.controller.clientPortalSettings);
+        this.router.patch("/portal-access", adminProtect(), this.controller.clientPortalSettings);
 
         /**
         * @swagger
@@ -515,7 +516,7 @@ class ClientRoutes {
         *       200:
         *         description: Client deactivated successfully
         */
-        this.router.patch("/:clientTenantId/:active", this.controller.deactivateClient);
+        this.router.patch("/:clientTenantId/:active", adminProtect(), this.controller.deactivateClient);
 
         /**
         * @swagger
@@ -551,7 +552,7 @@ class ClientRoutes {
         *       200:
         *         description: Password updated successfully
         */
-        this.router.patch("/update-password", ClientDto.updatePasswordDto, this.controller.updateClientPassword);
+        this.router.patch("/update-password", clientProtect, ClientDto.updatePasswordDto, this.controller.updateClientPassword);
 
         /**
          * @swagger
@@ -569,7 +570,7 @@ class ClientRoutes {
          *       200:
          *         description: Avatar updated successfully
          */
-        this.router.patch("/update-avatar", this.controller.updateClientAvatar);
+        this.router.patch("/update-avatar", clientProtect, this.controller.updateClientAvatar);
 
     }
 

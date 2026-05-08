@@ -1,6 +1,7 @@
 import express from "express";
 import PayrollCycleStaffController from "../controllers/payrollCycleStaffController.js";
 import PayrollCycleStaffDto from "../dto/payrollCycleStaffDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -66,6 +67,7 @@ class PayrollCycleStaffRoutes {
          */
         this.router.post(
             "/",
+            staffProtect,
             PayrollCycleStaffDto.createPayrollCycleStaffDto,
             this.controller.createPayrollCycleStaff
         );
@@ -88,6 +90,7 @@ class PayrollCycleStaffRoutes {
          */
         this.router.put(
             "/",
+            staffProtect,
             PayrollCycleStaffDto.updatePayrollCycleStaffDto,
             this.controller.updatePayrollCycleStaff
         );
@@ -110,6 +113,7 @@ class PayrollCycleStaffRoutes {
          */
         this.router.get(
             "/cycle/:payrollCycleId",
+            staffProtect,
             this.controller.getPayrollCycleStaffs
         );
 
@@ -131,6 +135,7 @@ class PayrollCycleStaffRoutes {
          */
         this.router.get(
             "/:id",
+            staffProtect,
             this.controller.getSinglePayrollCycleStaff
         );
 
@@ -152,6 +157,7 @@ class PayrollCycleStaffRoutes {
          */
         this.router.delete(
             "/:id",
+            staffProtect,
             this.controller.deletePayrollCycleStaff
         );
 
@@ -239,6 +245,7 @@ class PayrollCycleStaffRoutes {
          */
         this.router.put(
             "/edit-breakdown",
+            staffProtect,
             this.controller.editBreakdown
         );
 

@@ -380,7 +380,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/tenants", PipelineDto.tenantPipelineDto, this.controller.createPipeline);
+        this.router.post("/tenants", adminProtect(), PipelineDto.tenantPipelineDto, this.controller.createPipeline);
 
         /**
          * @swagger
@@ -400,7 +400,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/clients", PipelineDto.clientPipelineDto, this.controller.createPipeline);
+        this.router.post("/clients", adminProtect(), PipelineDto.clientPipelineDto, this.controller.createPipeline);
 
         /**
          * @swagger
@@ -421,7 +421,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/module/:module", PipelineDto.getPipelinesByModuleDto, this.controller.getPipelinesByModule);
+        this.router.get("/module/:module", adminProtect(), PipelineDto.getPipelinesByModuleDto, this.controller.getPipelinesByModule);
 
         /**
          * @swagger
@@ -442,7 +442,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/tenant/:tenantId", PipelineDto.getPipelinesByTenantIdDto, this.controller.getPipelinesByTenantId);
+        this.router.get("/tenant/:tenantId", adminProtect(), PipelineDto.getPipelinesByTenantIdDto, this.controller.getPipelinesByTenantId);
 
         /**
          * @swagger
@@ -462,7 +462,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/active", PipelineDto.updateActivityDto, this.controller.updatePipeline);
+        this.router.patch("/active", adminProtect(), PipelineDto.updateActivityDto, this.controller.updatePipeline);
 
         /**
          * @swagger
@@ -482,7 +482,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/stage", PipelineDto.createStageDto, this.controller.createPipelineStage);
+        this.router.post("/stage", adminProtect(), PipelineDto.createStageDto, this.controller.createPipelineStage);
 
         /**
          * @swagger
@@ -503,7 +503,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/stage/pipeline/:pipelineId", PipelineDto.getStagesByPipelineIdDto, this.controller.getStageByPipelineId);
+        this.router.get("/stage/pipeline/:pipelineId", adminProtect(), PipelineDto.getStagesByPipelineIdDto, this.controller.getStageByPipelineId);
 
         /**
          * @swagger
@@ -524,7 +524,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/stage/:id", PipelineDto.getByIdDto, this.controller.getStageById);
+        this.router.get("/stage/:id", adminProtect(), PipelineDto.getByIdDto, this.controller.getStageById);
 
         /**
          * @swagger
@@ -544,7 +544,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/stage/active", PipelineDto.updateActivityDto, this.controller.updateStage);
+        this.router.patch("/stage/active", adminProtect(), PipelineDto.updateActivityDto, this.controller.updateStage);
 
         /**
          * @swagger
@@ -564,7 +564,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/client/pipelineitem", PipelineDto.createClientPipelineItemDto, this.controller.createPipelineItem);
+        this.router.post("/client/pipelineitem", adminProtect(), PipelineDto.createClientPipelineItemDto, this.controller.createPipelineItem);
 
         /**
          * @swagger
@@ -584,7 +584,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/tenant/pipelineitem", PipelineDto.createTenantPipelineItemDto, this.controller.createPipelineItem);
+        this.router.post("/tenant/pipelineitem", adminProtect(), PipelineDto.createTenantPipelineItemDto, this.controller.createPipelineItem);
 
         /**
          * @swagger
@@ -605,7 +605,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/item/stage/tenant/:pipelineStageId", PipelineDto.getItemByStageIdDto, this.controller.getItemByStageIdTenant);
+        this.router.get("/item/stage/tenant/:pipelineStageId", adminProtect(), PipelineDto.getItemByStageIdDto, this.controller.getItemByStageIdTenant);
 
         /**
          * @swagger
@@ -626,7 +626,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/item/stage/client/:pipelineStageId", PipelineDto.getItemByStageIdDto, this.controller.getItemByStageIdClient);
+        this.router.get("/item/stage/client/:pipelineStageId", adminProtect(), PipelineDto.getItemByStageIdDto, this.controller.getItemByStageIdClient);
 
         /**
          * @swagger
@@ -648,7 +648,7 @@ class PipelineRoutes {
          *         description: Validation error
          */
 
-        this.router.get("/item/:id", PipelineDto.getByIdDto, this.controller.getItemById);
+        this.router.get("/item/:id", adminProtect(), PipelineDto.getByIdDto, this.controller.getItemById);
 
         /**
          * @swagger
@@ -670,7 +670,7 @@ class PipelineRoutes {
          *         description: Validation error
          */
 
-        this.router.get("/item/client/:id", PipelineDto.getByIdDto, this.controller.getItemByIdClient);
+        this.router.get("/item/client/:id", adminProtect(), PipelineDto.getByIdDto, this.controller.getItemByIdClient);
 
          /**
          * @swagger
@@ -692,7 +692,7 @@ class PipelineRoutes {
          *         description: Validation error
          */
 
-        this.router.get("/overview/:tenantId", this.controller.getTenantPipelineSummary);
+        this.router.get("/overview/:tenantId", adminProtect(), this.controller.getTenantPipelineSummary);
 
         /**
          * @swagger
@@ -712,7 +712,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/item/stage", PipelineDto.updateItemStageDto, this.controller.updateItem);
+        this.router.patch("/item/stage", adminProtect(), PipelineDto.updateItemStageDto, this.controller.updateItem);
 
         /**
           * @swagger
@@ -733,7 +733,7 @@ class PipelineRoutes {
           *       400:
           *         description: Validation error
           */
-        this.router.delete("/stage/:id", PipelineDto.getByIdDto, this.controller.deleteStage);
+        this.router.delete("/stage/:id", adminProtect(), PipelineDto.getByIdDto, this.controller.deleteStage);
 
         /**
         * @swagger
@@ -753,7 +753,7 @@ class PipelineRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.patch("/stage/order", PipelineDto.updateStageOrderDto, this.controller.updateStage);
+        this.router.patch("/stage/order", adminProtect(), PipelineDto.updateStageOrderDto, this.controller.updateStage);
 
         /**
         * @swagger
@@ -773,7 +773,7 @@ class PipelineRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.patch("/stage", PipelineDto.updateStageDto, this.controller.updateStage);
+        this.router.patch("/stage", adminProtect(), PipelineDto.updateStageDto, this.controller.updateStage);
 
         /**
         * @swagger
@@ -793,7 +793,7 @@ class PipelineRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.patch("/stage/task", PipelineDto.updateTasksDto, this.controller.updateStage);
+        this.router.patch("/stage/task", adminProtect(), PipelineDto.updateTasksDto, this.controller.updateStage);
 
         /**
         * @swagger
@@ -813,7 +813,7 @@ class PipelineRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.patch("/stage/document", PipelineDto.updateDocumentsDto, this.controller.updateStage);
+        this.router.patch("/stage/document", adminProtect(), PipelineDto.updateDocumentsDto, this.controller.updateStage);
 
         /**
         * @swagger
@@ -833,7 +833,7 @@ class PipelineRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.patch("/item/assign", PipelineDto.assignCandidateDto, this.controller.updateItem);
+        this.router.patch("/item/assign", adminProtect(), PipelineDto.assignCandidateDto, this.controller.updateItem);
 
         /**
          * @swagger
@@ -854,7 +854,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.delete("/tenant/item/:id", PipelineDto.deleteTenantPipelineItemDto, this.controller.deleteTenantPipelineItem);
+        this.router.delete("/tenant/item/:id", adminProtect(), PipelineDto.deleteTenantPipelineItemDto, this.controller.deleteTenantPipelineItem);
 
         /**
          * @swagger
@@ -875,7 +875,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.delete("/client/item/:id", PipelineDto.deleteTenantPipelineItemDto, this.controller.deleteClientPipelineItem);
+        this.router.delete("/client/item/:id", adminProtect(), PipelineDto.deleteTenantPipelineItemDto, this.controller.deleteClientPipelineItem);
 
         /**
          * @swagger
@@ -896,7 +896,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.delete("/client/item/:id", PipelineDto.deleteTenantPipelineItemDto, this.controller.moveToClient);
+        this.router.delete("/client/item/:id", adminProtect(), PipelineDto.deleteTenantPipelineItemDto, this.controller.moveToClient);
 
         /**
          * @swagger
@@ -917,7 +917,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.delete("/multi/tenant/item", PipelineDto.deleteMultipleItemsDto, this.controller.deleteMultipleTenantPipelineItems);
+        this.router.delete("/multi/tenant/item", adminProtect(), PipelineDto.deleteMultipleItemsDto, this.controller.deleteMultipleTenantPipelineItems);
 
         /**
          * @swagger
@@ -938,7 +938,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/multi/move/tenant/item", PipelineDto.moveMultipleItemsDto, this.controller.moveMultipleTenantPipelineItems);
+        this.router.patch("/multi/move/tenant/item", adminProtect(), PipelineDto.moveMultipleItemsDto, this.controller.moveMultipleTenantPipelineItems);
 
         /**
          * @swagger
@@ -959,7 +959,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/multi/assign/tenant/item", PipelineDto.assignMultipleItemsDto, this.controller.assignMultipleTenantPipelineItems);
+        this.router.patch("/multi/assign/tenant/item", adminProtect(), PipelineDto.assignMultipleItemsDto, this.controller.assignMultipleTenantPipelineItems);
 
         /**
         * @swagger
@@ -979,7 +979,7 @@ class PipelineRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.patch("/item/task", PipelineDto.updateItemDoneTasksDto, this.controller.updateItem);
+        this.router.patch("/item/task", adminProtect(), PipelineDto.updateItemDoneTasksDto, this.controller.updateItem);
 
         /**
         * @swagger
@@ -999,7 +999,7 @@ class PipelineRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.patch("/item/document", PipelineDto.updateItemSentDocumentsDto, this.controller.updateItem);
+        this.router.patch("/item/document", adminProtect(), PipelineDto.updateItemSentDocumentsDto, this.controller.updateItem);
 
         /**
          * @swagger
@@ -1045,7 +1045,7 @@ class PipelineRoutes {
          *       500:
          *         description: Failed to update item
          */
-        this.router.post("/item/document/:id", this.S3Service.any(), this.controller.updateItemSentDocuments);
+        this.router.post("/item/document/:id", adminProtect(), this.S3Service.any(), this.controller.updateItemSentDocuments);
 
         // ── Custom task routes ─────────────────────────────────────────────────
 
@@ -1078,7 +1078,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/item/custom/task", PipelineDto.createCustomTaskDto, this.controller.createCustomTask);
+        this.router.post("/item/custom/task", adminProtect(), PipelineDto.createCustomTaskDto, this.controller.createCustomTask);
 
         /**
          * @swagger
@@ -1099,7 +1099,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/item/:pipelineItemId/custom/tasks", PipelineDto.getCustomByItemIdDto, this.controller.getCustomTasksByItemId);
+        this.router.get("/item/:pipelineItemId/custom/tasks", adminProtect(), PipelineDto.getCustomByItemIdDto, this.controller.getCustomTasksByItemId);
 
         /**
          * @swagger
@@ -1131,7 +1131,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/item/custom/task", PipelineDto.updateCustomTaskDto, this.controller.updateCustomTask);
+        this.router.patch("/item/custom/task", adminProtect(), PipelineDto.updateCustomTaskDto, this.controller.updateCustomTask);
 
         /**
          * @swagger
@@ -1152,7 +1152,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.delete("/item/custom/task/:id", PipelineDto.getByIdDto, this.controller.deleteCustomTask);
+        this.router.delete("/item/custom/task/:id", adminProtect(), PipelineDto.getByIdDto, this.controller.deleteCustomTask);
 
         // ── Custom document routes ─────────────────────────────────────────────
 
@@ -1185,7 +1185,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/item/custom/document", PipelineDto.createCustomDocumentDto, this.controller.createCustomDocument);
+        this.router.post("/item/custom/document", adminProtect(), PipelineDto.createCustomDocumentDto, this.controller.createCustomDocument);
 
         /**
          * @swagger
@@ -1206,7 +1206,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/item/:pipelineItemId/custom/documents", PipelineDto.getCustomByItemIdDto, this.controller.getCustomDocumentsByItemId);
+        this.router.get("/item/:pipelineItemId/custom/documents", adminProtect(), PipelineDto.getCustomByItemIdDto, this.controller.getCustomDocumentsByItemId);
 
         /**
          * @swagger
@@ -1236,7 +1236,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/item/custom/document", PipelineDto.updateCustomDocumentDto, this.controller.updateCustomDocument);
+        this.router.patch("/item/custom/document", adminProtect(), PipelineDto.updateCustomDocumentDto, this.controller.updateCustomDocument);
 
         /**
          * @swagger
@@ -1257,7 +1257,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.delete("/item/custom/document/:id", PipelineDto.getByIdDto, this.controller.deleteCustomDocument);
+        this.router.delete("/item/custom/document/:id", adminProtect(), PipelineDto.getByIdDto, this.controller.deleteCustomDocument);
 
     }
 

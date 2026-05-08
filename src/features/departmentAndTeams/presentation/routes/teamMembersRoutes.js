@@ -1,6 +1,7 @@
 import express from "express";
 import TeamMembersDto from "../dto/teamMembersDto.js";
 import TeamMembersController from "../controllers/teamMembersController.js";
+import { adminProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -48,6 +49,7 @@ class TeamMembersRoutes {
          */
         this.router.post(
             "/",
+            adminProtect(),
             TeamMembersDto.createTeamMemberDto,
             this.controller.createTeamMember
         );
@@ -72,6 +74,7 @@ class TeamMembersRoutes {
          */
         this.router.delete(
             "/:id",
+            adminProtect(),
             this.controller.removeTeamMember
         );
 
@@ -95,6 +98,7 @@ class TeamMembersRoutes {
          */
         this.router.get(
             "/team/:teamId",
+            adminProtect(),
             this.controller.getTeamMembers
         );
     }

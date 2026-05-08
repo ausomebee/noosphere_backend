@@ -1,6 +1,7 @@
 import express from "express";
 import StaffAvailabilityController from "../controller/staffAvailabilityController.js";
 import StaffAvailabilityDto from "../dto/staffAvailabilityDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -84,6 +85,7 @@ class StaffAvailabilityRoutes {
          */
         this.router.post(
             "/",
+            staffProtect,
             StaffAvailabilityDto.createStaffAvailabilityDto,
             this.controller.createStaffAvailability
         );
@@ -106,6 +108,7 @@ class StaffAvailabilityRoutes {
          */
         this.router.put(
             "/",
+            staffProtect,
             StaffAvailabilityDto.updateStaffAvailabilityDto,
             this.controller.updateStaffAvailability
         );
@@ -129,6 +132,7 @@ class StaffAvailabilityRoutes {
          */
         this.router.get(
             "/:id",
+            staffProtect,
             this.controller.getSingleStaffAvailability
         );
 
@@ -151,6 +155,7 @@ class StaffAvailabilityRoutes {
          */
         this.router.get(
             "/staff/:staffId",
+            staffProtect,
             this.controller.getStaffAvailabilities
         );
     }

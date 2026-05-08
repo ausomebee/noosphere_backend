@@ -1,6 +1,7 @@
 import express from "express";
 import ClinicalReportTemplateSectionController from "../controllers/reportTemplateSectionController.js";
 import ClinicalReportTemplateSectionDto from "../dto/reportTemplateSectionDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -67,6 +68,7 @@ class ClinicalReportTemplateSectionRoutes {
          */
         this.router.post(
             "/",
+            staffProtect,
             ClinicalReportTemplateSectionDto.createTemplateSectionDto,
             this.controller.createSection
         );
@@ -89,6 +91,7 @@ class ClinicalReportTemplateSectionRoutes {
          */
         this.router.put(
             "/",
+            staffProtect,
             ClinicalReportTemplateSectionDto.updateTemplateSectionDto,
             this.controller.updateSection
         );
@@ -112,6 +115,7 @@ class ClinicalReportTemplateSectionRoutes {
          */
         this.router.get(
             "/:id",
+            staffProtect,
             this.controller.getSingleSection
         );
 
@@ -134,6 +138,7 @@ class ClinicalReportTemplateSectionRoutes {
          */
         this.router.get(
             "/template/:clinicalReportTemplateId",
+            staffProtect,
             this.controller.getSections
         );
     }

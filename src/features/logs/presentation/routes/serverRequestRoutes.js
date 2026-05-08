@@ -1,6 +1,7 @@
 import express from "express";
 import ServerRequestDto from "../dto/serverRequestDto.js";
 import ServerRequestController from "../controllers/serverRequestController.js";
+import { adminProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -90,7 +91,7 @@ class ServerRequestRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", ServerRequestDto.createRequestDto, this.controller.createRequest);
+        this.router.post("/", adminProtect(), ServerRequestDto.createRequestDto, this.controller.createRequest);
 
         /**
          * @swagger
@@ -111,7 +112,7 @@ class ServerRequestRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/:id", ServerRequestDto.checkIdDto, this.controller.getSingleRequest);
+        this.router.get("/:id", adminProtect(), ServerRequestDto.checkIdDto, this.controller.getSingleRequest);
 
         /**
          * @swagger
@@ -154,7 +155,7 @@ class ServerRequestRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/tenant/activity", this.controller.getTenantRequests);
+        this.router.get("/tenant/activity", adminProtect(), this.controller.getTenantRequests);
 
         /**
          * @swagger
@@ -198,7 +199,7 @@ class ServerRequestRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/tenant/activity/date-range", this.controller.getRequestsByDateRange);
+        this.router.get("/tenant/activity/date-range", adminProtect(), this.controller.getRequestsByDateRange);
     }
 
     getRouter() {

@@ -1,6 +1,7 @@
 import express from "express";
 import SessionApprovalController from "../controllers/sessionApprovalController.js";
 import SessionApprovalDto from "../dto/sessionApprovalDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -79,6 +80,7 @@ class SessionApprovalRoutes {
          */
         this.router.post(
             "/",
+            staffProtect,
             SessionApprovalDto.createSessionApprovalDto,
             this.controller.createSessionApproval
         );
@@ -101,6 +103,7 @@ class SessionApprovalRoutes {
          */
         this.router.put(
             "/",
+            staffProtect,
             SessionApprovalDto.updateSessionApprovalDto,
             this.controller.updateSessionApproval
         );
@@ -125,6 +128,7 @@ class SessionApprovalRoutes {
          */
         this.router.get(
             "/:id",
+            staffProtect,
             this.controller.getSingleSessionApproval
         );
 
@@ -148,6 +152,7 @@ class SessionApprovalRoutes {
          */
         this.router.get(
             "/session/:sessionId",
+            staffProtect,
             this.controller.getSessionApprovals
         );
     }

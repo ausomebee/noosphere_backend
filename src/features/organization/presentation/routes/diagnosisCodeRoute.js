@@ -1,6 +1,7 @@
 import express from "express";
 import OrganizationDiagnosisCodesController from "../controller/diagnosisCodeController.js";
 import OrganizationDiagnosisCodesDto from "../dto/diagnosisCodeDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -82,7 +83,7 @@ class OrganizationDiagnosisCodesRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", OrganizationDiagnosisCodesDto.createDiagnosisCodeDto, this.controller.createDiagnosisCode);
+        this.router.post("/", staffProtect, OrganizationDiagnosisCodesDto.createDiagnosisCodeDto, this.controller.createDiagnosisCode);
 
         /**
          * @swagger
@@ -102,7 +103,7 @@ class OrganizationDiagnosisCodesRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.put("/", OrganizationDiagnosisCodesDto.updateDiagnosisCodeDto, this.controller.updateDiagnosisCode);
+        this.router.put("/", staffProtect, OrganizationDiagnosisCodesDto.updateDiagnosisCodeDto, this.controller.updateDiagnosisCode);
 
         /**
          * @swagger
@@ -121,7 +122,7 @@ class OrganizationDiagnosisCodesRoutes {
          *       200:
          *         description: Organization diagnosis codes fetched successfully
          */
-        this.router.get("/tenant/:tenantId", this.controller.getTenantDiagnosisCodes);
+        this.router.get("/tenant/:tenantId", staffProtect, this.controller.getTenantDiagnosisCodes);
 
         /**
          * @swagger
@@ -140,7 +141,7 @@ class OrganizationDiagnosisCodesRoutes {
          *       200:
          *         description: Organization diagnosis code fetched successfully
          */
-        this.router.get("/:id", this.controller.getSingleDiagnosisCode);
+        this.router.get("/:id", staffProtect, this.controller.getSingleDiagnosisCode);
 
         /**
          * @swagger
@@ -169,7 +170,7 @@ class OrganizationDiagnosisCodesRoutes {
          *       404:
          *         description: Diagnosis code not found
          */
-        this.router.patch("/active/:id/:active", this.controller.deactivateDiagnosisCode);
+        this.router.patch("/active/:id/:active", staffProtect, this.controller.deactivateDiagnosisCode);
     }
 
     getRouter() {

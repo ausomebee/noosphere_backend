@@ -1,6 +1,7 @@
 import express from "express";
 import OrganizationSessionTypesController from "../controller/sessionTypeController.js";
 import OrganizationSessionTypesDto from "../dto/sessionTypeDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -129,7 +130,7 @@ class OrganizationSessionTypesRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", OrganizationSessionTypesDto.createSessionTypeDto, this.controller.createSessionType);
+        this.router.post("/", staffProtect, OrganizationSessionTypesDto.createSessionTypeDto, this.controller.createSessionType);
 
         /**
          * @swagger
@@ -149,7 +150,7 @@ class OrganizationSessionTypesRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.put("/", OrganizationSessionTypesDto.updateSessionTypeDto, this.controller.updateSessionType);
+        this.router.put("/", staffProtect, OrganizationSessionTypesDto.updateSessionTypeDto, this.controller.updateSessionType);
 
         /**
          * @swagger
@@ -168,7 +169,7 @@ class OrganizationSessionTypesRoutes {
          *       200:
          *         description: Organization session types fetched successfully
          */
-        this.router.get("/tenant/:tenantId", this.controller.getTenantSessionTypes);
+        this.router.get("/tenant/:tenantId", staffProtect, this.controller.getTenantSessionTypes);
 
         /**
          * @swagger
@@ -187,7 +188,7 @@ class OrganizationSessionTypesRoutes {
          *       200:
          *         description: Organization session types fetched successfully
          */
-        this.router.get("/active/tenant/:tenantId", this.controller.getTenantSessionTypes);
+        this.router.get("/active/tenant/:tenantId", staffProtect, this.controller.getTenantSessionTypes);
 
         /**
          * @swagger
@@ -206,7 +207,7 @@ class OrganizationSessionTypesRoutes {
          *       200:
          *         description: Organization session type fetched successfully
          */
-        this.router.get("/:id", this.controller.getSingleSessionType);
+        this.router.get("/:id", staffProtect, this.controller.getSingleSessionType);
 
         /**
          * @swagger
@@ -235,7 +236,7 @@ class OrganizationSessionTypesRoutes {
          *       404:
          *         description: Session type not found
          */
-        this.router.patch("/active/:id/:active", this.controller.deactivateSessionType);
+        this.router.patch("/active/:id/:active", staffProtect, this.controller.deactivateSessionType);
     }
 
     getRouter() {

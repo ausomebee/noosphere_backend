@@ -1,6 +1,7 @@
 import express from "express";
 import AdminController from "../controllers/adminController.js";
 import AdminDto from "../dto/adminDto.js";
+import { adminProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -219,7 +220,7 @@ class AdminRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/createadmin", AdminDto.createAdminDto, this.controller.createAdmin);
+        this.router.post("/createadmin", adminProtect(), AdminDto.createAdminDto, this.controller.createAdmin);
 
         /**
          * @swagger
@@ -239,7 +240,7 @@ class AdminRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/updateadmin", AdminDto.updateAdminDto, this.controller.updateAdmin);
+        this.router.patch("/updateadmin", adminProtect(), AdminDto.updateAdminDto, this.controller.updateAdmin);
 
         /**
          * @swagger
@@ -297,7 +298,7 @@ class AdminRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/getadminswithteamaccess", this.controller.getAdminsWithTeamAccess);
+        this.router.get("/getadminswithteamaccess", adminProtect(), this.controller.getAdminsWithTeamAccess);
 
         /**
         * @swagger
@@ -403,7 +404,7 @@ class AdminRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/getadmin/:id", AdminDto.getSingleAdminDto, this.controller.getSingleAdmin);
+        this.router.get("/getadmin/:id", adminProtect(), AdminDto.getSingleAdminDto, this.controller.getSingleAdmin);
 
         /**
          * @swagger
@@ -417,7 +418,7 @@ class AdminRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/", this.controller.getAllAdmin);
+        this.router.get("/", adminProtect(), this.controller.getAllAdmin);
 
         /**
          * @swagger
@@ -467,7 +468,7 @@ class AdminRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/setactivestatus/:id/active/:active", this.controller.setAdminActiveStatus);
+        this.router.patch("/setactivestatus/:id/active/:active", adminProtect(), this.controller.setAdminActiveStatus);
     }
 
     getRouter() {

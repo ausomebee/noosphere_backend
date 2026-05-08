@@ -1,6 +1,7 @@
 import express from "express";
 import TargetDataDto from "../dto/targetDataDto.js";
 import TargetDataController from "../controllers/targetDataController.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -62,7 +63,7 @@ class TargetDataRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", TargetDataDto.createTargetDataDto, this.controller.createTargetData);
+        this.router.post("/", staffProtect, TargetDataDto.createTargetDataDto, this.controller.createTargetData);
 
         /**
          * @swagger
@@ -83,7 +84,7 @@ class TargetDataRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/:clientTargetId", this.controller.getClientTargetData);
+        this.router.get("/:clientTargetId", staffProtect, this.controller.getClientTargetData);
 
     }
 

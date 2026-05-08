@@ -1,6 +1,7 @@
 import express from "express";
 import SubscriptionController from "../controllers/subscriptionController.js";
 import SubscriptionDto from "../dto/subscriptionDto.js";
+import { adminProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -298,7 +299,7 @@ class SubscriptionRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", SubscriptionDto.createSubscriptionDto, this.controller.createSubscription);
+        this.router.post("/", adminProtect(), SubscriptionDto.createSubscriptionDto, this.controller.createSubscription);
 
         /**
         * @swagger
@@ -319,7 +320,7 @@ class SubscriptionRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/:id", SubscriptionDto.checkIdDto, this.controller.getAllSubscription);
+        this.router.get("/:id", adminProtect(), SubscriptionDto.checkIdDto, this.controller.getAllSubscription);
 
         /**
          * @swagger
@@ -333,7 +334,7 @@ class SubscriptionRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/", this.controller.getAllSubscription);
+        this.router.get("/", adminProtect(), this.controller.getAllSubscription);
 
         /**
         * @swagger
@@ -354,7 +355,7 @@ class SubscriptionRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/plan/:planId", SubscriptionDto.checkPlanIdDto, this.controller.getSubscriptionByPlan);
+        this.router.get("/plan/:planId", adminProtect(), SubscriptionDto.checkPlanIdDto, this.controller.getSubscriptionByPlan);
 
         /**
          * @swagger
@@ -368,7 +369,7 @@ class SubscriptionRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/count/total", this.controller.getTotalSubscriptionByStatus);
+        this.router.get("/count/total", adminProtect(), this.controller.getTotalSubscriptionByStatus);
 
         /**
         * @swagger
@@ -389,7 +390,7 @@ class SubscriptionRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/status/:status", SubscriptionDto.checkStatusDto, this.controller.getSubscriptionByStatus);
+        this.router.get("/status/:status", adminProtect(), SubscriptionDto.checkStatusDto, this.controller.getSubscriptionByStatus);
 
         /**
         * @swagger
@@ -410,7 +411,7 @@ class SubscriptionRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/tenant/:tenantId", this.controller.getTenantSubscriptions);
+        this.router.get("/tenant/:tenantId", adminProtect(), this.controller.getTenantSubscriptions);
 
         /**
          * @swagger
@@ -431,7 +432,7 @@ class SubscriptionRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.patch("/cancelnow", SubscriptionDto.cancelNowDto, this.controller.updateSubscription);
+        this.router.patch("/cancelnow", adminProtect(), SubscriptionDto.cancelNowDto, this.controller.updateSubscription);
 
         /**
          * @swagger
@@ -452,7 +453,7 @@ class SubscriptionRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.patch("/cancelatend", SubscriptionDto.cancelAtEndDto, this.controller.updateSubscription);
+        this.router.patch("/cancelatend", adminProtect(), SubscriptionDto.cancelAtEndDto, this.controller.updateSubscription);
 
         /**
          * @swagger
@@ -473,7 +474,7 @@ class SubscriptionRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.patch("/resumenow", SubscriptionDto.resumeNowDto, this.controller.updateSubscription);
+        this.router.patch("/resumenow", adminProtect(), SubscriptionDto.resumeNowDto, this.controller.updateSubscription);
 
         /**
          * @swagger
@@ -494,7 +495,7 @@ class SubscriptionRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.patch("/resumelater", SubscriptionDto.resumeLaterDto, this.controller.updateSubscription);
+        this.router.patch("/resumelater", adminProtect(), SubscriptionDto.resumeLaterDto, this.controller.updateSubscription);
 
         /**
          * @swagger
@@ -515,7 +516,7 @@ class SubscriptionRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.patch("/pausenow", SubscriptionDto.pauseNowDto, this.controller.updateSubscription);
+        this.router.patch("/pausenow", adminProtect(), SubscriptionDto.pauseNowDto, this.controller.updateSubscription);
 
         /**
          * @swagger
@@ -536,7 +537,7 @@ class SubscriptionRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.patch("/pauseuntil", SubscriptionDto.pauseUntilDto, this.controller.updateSubscription);
+        this.router.patch("/pauseuntil", adminProtect(), SubscriptionDto.pauseUntilDto, this.controller.updateSubscription);
 
         /**
          * @swagger
@@ -557,7 +558,7 @@ class SubscriptionRoutes {
          *       400:
          *         description: Invalid input
          */
-        this.router.patch("/pauseschedule", SubscriptionDto.pauseScheduleDto, this.controller.updateSubscription);
+        this.router.patch("/pauseschedule", adminProtect(), SubscriptionDto.pauseScheduleDto, this.controller.updateSubscription);
 
     }
 

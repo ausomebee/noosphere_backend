@@ -1,6 +1,7 @@
 import express from "express";
 import RoundingRulesDto from "../dto/roundingRulesDto.js";
 import RoundingRulesController from "../controllers/roundingRulesController.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -91,7 +92,7 @@ class RoundingRulesRoutes {
          *       201:
          *         description: Rounding rule created successfully
          */
-        this.router.post("/", RoundingRulesDto.createRoundingRuleDto, this.controller.createRoundingRule);
+        this.router.post("/", staffProtect, RoundingRulesDto.createRoundingRuleDto, this.controller.createRoundingRule);
 
         /**
          * @swagger
@@ -109,7 +110,7 @@ class RoundingRulesRoutes {
          *       201:
          *         description: Rounding rule updated successfully
          */
-        this.router.put("/", RoundingRulesDto.updateRoundingRuleDto, this.controller.updateRoundingRule);
+        this.router.put("/", staffProtect, RoundingRulesDto.updateRoundingRuleDto, this.controller.updateRoundingRule);
 
         /**
          * @swagger
@@ -127,7 +128,7 @@ class RoundingRulesRoutes {
          *       200:
          *         description: List of rounding rules
          */
-        this.router.get("/tenant/:tenantId", this.controller.getTenantRoundingRules);
+        this.router.get("/tenant/:tenantId", staffProtect, this.controller.getTenantRoundingRules);
 
         /**
          * @swagger
@@ -145,7 +146,7 @@ class RoundingRulesRoutes {
          *       200:
          *         description: Rounding rule fetched successfully
          */
-        this.router.get("/:id", this.controller.getSingleRoundingRule);
+        this.router.get("/:id", staffProtect, this.controller.getSingleRoundingRule);
 
         /**
          * @swagger
@@ -168,7 +169,7 @@ class RoundingRulesRoutes {
          *       200:
          *         description: Rounding rule deactivated successfully
          */
-        this.router.patch("/:id/:active", this.controller.deactivateRoundingRule);
+        this.router.patch("/:id/:active", staffProtect, this.controller.deactivateRoundingRule);
     }
 
     getRouter() {

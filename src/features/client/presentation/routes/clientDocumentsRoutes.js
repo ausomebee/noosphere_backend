@@ -1,6 +1,7 @@
 import express from "express";
 import ClientDocumentsController from "../controllers/clientDocumentsController.js";
 import ClientDocumentsDto from "../dto/clientDocumentsDto.js";
+import { clientProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -74,6 +75,7 @@ class ClientDocumentsRoutes {
 		 */
 		this.router.post(
 			"/",
+			clientProtect,
 			ClientDocumentsDto.createClientDocumentDto,
 			this.controller.createClientDocument.bind(this.controller)
 		);
@@ -96,6 +98,7 @@ class ClientDocumentsRoutes {
 		 */
 		this.router.put(
 			"/",
+			clientProtect,
 			ClientDocumentsDto.updateClientDocumentDto,
 			this.controller.updateClientDocument.bind(this.controller)
 		);
@@ -118,6 +121,7 @@ class ClientDocumentsRoutes {
 		 */
 		this.router.get(
 			"/client/:tenantClientId",
+			clientProtect,
 			this.controller.getClientDocuments.bind(this.controller)
 		);
 
@@ -139,6 +143,7 @@ class ClientDocumentsRoutes {
 		 */
 		this.router.get(
 			"/:id",
+			clientProtect,
 			this.controller.getSingleClientDocument.bind(this.controller)
 		);
 
@@ -161,7 +166,7 @@ class ClientDocumentsRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.delete("/:id", this.controller.deleteClientDocument);
+        this.router.delete("/:id", clientProtect, this.controller.deleteClientDocument);
 
 	}
 

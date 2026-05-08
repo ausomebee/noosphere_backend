@@ -1,6 +1,7 @@
 import express from "express";
 import ClientRequestedDocumentsController from "../controllers/clientRequestedDocumentsController.js";
 import ClientRequestedDocumentsDto from "../dto/clientRequestedDocumentsDto.js";
+import { clientProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -79,6 +80,7 @@ class ClientRequestedDocumentsRoutes {
 		 */
 		this.router.post(
 			"/",
+			clientProtect,
 			ClientRequestedDocumentsDto.createRequestedDocumentDto,
 			this.controller.createRequestedDocument.bind(this.controller)
 		);
@@ -101,6 +103,7 @@ class ClientRequestedDocumentsRoutes {
 		 */
 		this.router.put(
 			"/",
+			clientProtect,
 			ClientRequestedDocumentsDto.updateRequestedDocumentDto,
 			this.controller.updateRequestedDocument.bind(this.controller)
 		);
@@ -123,6 +126,7 @@ class ClientRequestedDocumentsRoutes {
 		 */
 		this.router.get(
 			"/client/:tenantClientId",
+			clientProtect,
 			this.controller.getRequestedDocuments.bind(this.controller)
 		);
 
@@ -144,6 +148,7 @@ class ClientRequestedDocumentsRoutes {
 		 */
 		this.router.get(
 			"/count/status/:tenantClientId",
+			clientProtect,
 			this.controller.countAllRequestedDocumentsByStatus.bind(this.controller)
 		);
 
@@ -165,6 +170,7 @@ class ClientRequestedDocumentsRoutes {
 		 */
 		this.router.get(
 			"/:id",
+			clientProtect,
 			this.controller.getSingleRequestedDocument.bind(this.controller)
 		);
 	}

@@ -1,6 +1,7 @@
 import express from "express";
 import ClinicalReportChangeRequestController from "../controllers/reportRequest.js";
 import ClinicalReportChangeRequestDto from "../dto/reportRequestDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -72,6 +73,7 @@ class ClinicalReportChangeRequestRoutes {
          */
         this.router.post(
             "/",
+            staffProtect,
             ClinicalReportChangeRequestDto.createChangeRequestDto,
             this.controller.createChangeRequest
         );
@@ -95,6 +97,7 @@ class ClinicalReportChangeRequestRoutes {
          */
         this.router.get(
             "/:id",
+            staffProtect,
             this.controller.getSingleChangeRequest
         );
 
@@ -117,6 +120,7 @@ class ClinicalReportChangeRequestRoutes {
          */
         this.router.get(
             "/report/:clinicalReportId",
+            staffProtect,
             this.controller.getReportChangeRequests
         );
     }

@@ -1,6 +1,7 @@
 import express from "express";
 import ClinicalReportHistoryController from "../controllers/reportHistoryController.js";
 import ClinicalReportHistoryDto from "../dto/reportHistoryDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -67,6 +68,7 @@ class ClinicalReportHistoryRoutes {
          */
         this.router.post(
             "/",
+            staffProtect,
             ClinicalReportHistoryDto.createHistoryDto,
             this.controller.createHistory
         );
@@ -90,6 +92,7 @@ class ClinicalReportHistoryRoutes {
          */
         this.router.get(
             "/:id",
+            staffProtect,
             this.controller.getSingleHistory
         );
 
@@ -112,6 +115,7 @@ class ClinicalReportHistoryRoutes {
          */
         this.router.get(
             "/report/:clinicalReportId",
+            staffProtect,
             this.controller.getReportHistories
         );
     }

@@ -1,6 +1,7 @@
 import express from "express";
 import NotificationController from "../controllers/notificationController.js";
 import NotificationDto from "../dtos/notificationDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -71,6 +72,7 @@ class NotificationRoutes {
          */
         this.router.post(
             "/",
+            staffProtect,
             NotificationDto.createNotificationDto,
             this.controller.createNotification
         );
@@ -93,6 +95,7 @@ class NotificationRoutes {
          */
         this.router.put(
             "/",
+            staffProtect,
             NotificationDto.updateNotificationDto,
             this.controller.updateNotification
         );
@@ -117,6 +120,7 @@ class NotificationRoutes {
          */
         this.router.get(
             "/:id",
+            staffProtect,
             this.controller.getSingleNotification
         );
 
@@ -145,6 +149,7 @@ class NotificationRoutes {
          */
         this.router.get(
             "/user/:userId/:userType",
+            staffProtect,
             this.controller.getNotificationsByUser
         );
 
@@ -168,6 +173,7 @@ class NotificationRoutes {
          */
         this.router.patch(
             "/read/:id",
+            staffProtect,
             this.controller.markAsRead
         );
     }

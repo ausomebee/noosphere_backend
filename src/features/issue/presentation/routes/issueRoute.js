@@ -2,6 +2,7 @@ import express from "express";
 import IssueController from "../controller/issueController.js";
 import IssueDto from "../dto/issueDto.js";
 import S3Service from "../../../../utilities/s3.js";
+import { adminProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -271,7 +272,7 @@ class IssueRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", this.S3Service.single("attachment"), IssueDto.createIssueDto, this.controller.createIssue);
+        this.router.post("/", adminProtect(), this.S3Service.single("attachment"), IssueDto.createIssueDto, this.controller.createIssue);
 
         /**
         * @swagger
@@ -292,7 +293,7 @@ class IssueRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/:id", IssueDto.checkIdDto, this.controller.getSingleIssue);
+        this.router.get("/:id", adminProtect(), IssueDto.checkIdDto, this.controller.getSingleIssue);
 
         /**
         * @swagger
@@ -313,7 +314,7 @@ class IssueRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/tenant/:tenantId",  this.controller.getTenantIssues);
+        this.router.get("/tenant/:tenantId", adminProtect(),  this.controller.getTenantIssues);
 
         /**
         * @swagger
@@ -334,7 +335,7 @@ class IssueRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/tenant-management-overview/:tenantId",  this.controller.tenantManagementOverview);
+        this.router.get("/tenant-management-overview/:tenantId", adminProtect(),  this.controller.tenantManagementOverview);
 
         /**
         * @swagger
@@ -361,7 +362,7 @@ class IssueRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/tenant/:tenantId/status/:status", this.controller.getTenantIssueByStatus);
+        this.router.get("/tenant/:tenantId/status/:status", adminProtect(), this.controller.getTenantIssueByStatus);
 
          /**
         * @swagger
@@ -382,7 +383,7 @@ class IssueRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/tenant-overview/:tenantId", this.controller.getTenantIssuesOverview);
+        this.router.get("/tenant-overview/:tenantId", adminProtect(), this.controller.getTenantIssuesOverview);
 
         /**
         * @swagger
@@ -396,7 +397,7 @@ class IssueRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/resolution/time", this.controller.getAverageDurationInHours);
+        this.router.get("/resolution/time", adminProtect(), this.controller.getAverageDurationInHours);
 
         /**
         * @swagger
@@ -410,7 +411,7 @@ class IssueRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/count/status", this.controller.getTotalByStatus);
+        this.router.get("/count/status", adminProtect(), this.controller.getTotalByStatus);
 
         /**
         * @swagger
@@ -424,7 +425,7 @@ class IssueRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/percent/status", this.controller.getStatusPercentages);
+        this.router.get("/percent/status", adminProtect(), this.controller.getStatusPercentages);
 
         /**
         * @swagger
@@ -438,7 +439,7 @@ class IssueRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/percent/category", this.controller.getCategoriesPercentages);
+        this.router.get("/percent/category", adminProtect(), this.controller.getCategoriesPercentages);
 
         /**
         * @swagger
@@ -452,7 +453,7 @@ class IssueRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/percent/time", this.controller.getCreatedAtPercentages);
+        this.router.get("/percent/time", adminProtect(), this.controller.getCreatedAtPercentages);
 
         /**
         * @swagger
@@ -466,7 +467,7 @@ class IssueRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/percent/assignee", this.controller.getAssigneePercentages);
+        this.router.get("/percent/assignee", adminProtect(), this.controller.getAssigneePercentages);
 
         /**
         * @swagger
@@ -480,7 +481,7 @@ class IssueRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/percent/priority", this.controller.getPriorityPercentages);
+        this.router.get("/percent/priority", adminProtect(), this.controller.getPriorityPercentages);
 
         /**
         * @swagger
@@ -501,7 +502,7 @@ class IssueRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/status/:status", IssueDto.checkStatusDto, this.controller.getIssueByStatus);
+        this.router.get("/status/:status", adminProtect(), IssueDto.checkStatusDto, this.controller.getIssueByStatus);
 
         /**
          * @swagger
@@ -521,7 +522,7 @@ class IssueRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/comment/new", IssueDto.createIssueCommentDto, this.controller.createIssueComment);
+        this.router.post("/comment/new", adminProtect(), IssueDto.createIssueCommentDto, this.controller.createIssueComment);
 
         /**
          * @swagger
@@ -543,7 +544,7 @@ class IssueRoutes {
          *       500:
          *         description: Server error
          */
-        this.router.patch("/issue/edit", IssueDto.editIssueDto, this.controller.updateIssue);
+        this.router.patch("/issue/edit", adminProtect(), IssueDto.editIssueDto, this.controller.updateIssue);
 
         /**
          * @swagger
@@ -565,7 +566,7 @@ class IssueRoutes {
          *       500:
          *         description: Server error
          */
-        this.router.patch("/issue/change-category", IssueDto.changeCategoryDto, this.controller.updateIssue);
+        this.router.patch("/issue/change-category", adminProtect(), IssueDto.changeCategoryDto, this.controller.updateIssue);
 
         /**
          * @swagger
@@ -587,7 +588,7 @@ class IssueRoutes {
          *       500:
          *         description: Server error
          */
-        this.router.patch("/issue/change-priority", IssueDto.changePriorityDto, this.controller.updateIssue);
+        this.router.patch("/issue/change-priority", adminProtect(), IssueDto.changePriorityDto, this.controller.updateIssue);
 
         /**
          * @swagger
@@ -609,7 +610,7 @@ class IssueRoutes {
          *       500:
          *         description: Server error
          */
-        this.router.patch("/issue/reassign", IssueDto.reassignIssueDto, this.controller.updateIssue);
+        this.router.patch("/issue/reassign", adminProtect(), IssueDto.reassignIssueDto, this.controller.updateIssue);
 
         /**
          * @swagger
@@ -631,7 +632,7 @@ class IssueRoutes {
          *       500:
          *         description: Server error
          */
-        this.router.patch("/issue/change-status", IssueDto.changeStatusDto, this.controller.updateIssue);
+        this.router.patch("/issue/change-status", adminProtect(), IssueDto.changeStatusDto, this.controller.updateIssue);
 
         /**
          * @swagger
@@ -651,7 +652,7 @@ class IssueRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/issue/attachment", this.S3Service.single("attachment"), IssueDto.checkBodyIdDto, this.controller.updateIssue);
+        this.router.patch("/issue/attachment", adminProtect(), this.S3Service.single("attachment"), IssueDto.checkBodyIdDto, this.controller.updateIssue);
 
         /**
          * @swagger
@@ -671,7 +672,7 @@ class IssueRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/issue/ressolved", this.S3Service.single("attachment"), IssueDto.markRessolvedDto, this.controller.updateIssue);
+        this.router.patch("/issue/ressolved", adminProtect(), this.S3Service.single("attachment"), IssueDto.markRessolvedDto, this.controller.updateIssue);
 
     }
 

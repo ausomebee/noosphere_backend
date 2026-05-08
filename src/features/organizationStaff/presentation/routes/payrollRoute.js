@@ -1,6 +1,7 @@
 import express from "express";
 import PayrollController from "../controller/payrollController.js";
 import PayrollDto from "../dto/payrollDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -70,7 +71,7 @@ class PayrollRoutes {
          *       404:
          *         description: Payroll not found
          */
-        this.router.put("/", PayrollDto.updatePayrollDto, this.controller.updatePayroll);
+        this.router.put("/", staffProtect, PayrollDto.updatePayrollDto, this.controller.updatePayroll);
 
         /**
          * @swagger
@@ -91,7 +92,7 @@ class PayrollRoutes {
          *       404:
          *         description: Payrolls not found
          */
-        this.router.get("/tenant-staff/:tenantStaffId", this.controller.getTenantStaffPayrolls);
+        this.router.get("/tenant-staff/:tenantStaffId", staffProtect, this.controller.getTenantStaffPayrolls);
 
         /**
          * @swagger
@@ -112,7 +113,7 @@ class PayrollRoutes {
          *       404:
          *         description: Payroll not found
          */
-        this.router.get("/:id", this.controller.getPayroll);
+        this.router.get("/:id", staffProtect, this.controller.getPayroll);
 
         /**
          * @swagger
@@ -141,7 +142,7 @@ class PayrollRoutes {
          *       404:
          *         description: Payroll not found
          */
-        this.router.patch("/deleted/:id/:isDeleted", this.controller.updatePayroll);
+        this.router.patch("/deleted/:id/:isDeleted", staffProtect, this.controller.updatePayroll);
     }
 
     getRouter() {

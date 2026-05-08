@@ -1,6 +1,7 @@
 import express from "express";
 import InsuranceTypeController from "../controllers/insuranceTypeController.js";
 import InsuranceTypeDto from "../dto/insuranceTypeDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -72,7 +73,7 @@ class InsuranceTypeRoutes {
          *       201:
          *         description: Insurance type created successfully
          */
-        this.router.post("/", InsuranceTypeDto.createInsuranceTypeDto, this.controller.createInsuranceType);
+        this.router.post("/", staffProtect, InsuranceTypeDto.createInsuranceTypeDto, this.controller.createInsuranceType);
 
         /**
          * @swagger
@@ -90,7 +91,7 @@ class InsuranceTypeRoutes {
          *       201:
          *         description: Insurance type updated successfully
          */
-        this.router.put("/", InsuranceTypeDto.updateInsuranceTypeDto, this.controller.updateInsuranceType);
+        this.router.put("/", staffProtect, InsuranceTypeDto.updateInsuranceTypeDto, this.controller.updateInsuranceType);
 
         /**
          * @swagger
@@ -108,7 +109,7 @@ class InsuranceTypeRoutes {
          *       200:
          *         description: List of insurance types
          */
-        this.router.get("/tenant/:tenantId", this.controller.getTenantInsuranceTypes);
+        this.router.get("/tenant/:tenantId", staffProtect, this.controller.getTenantInsuranceTypes);
 
         /**
          * @swagger
@@ -126,7 +127,7 @@ class InsuranceTypeRoutes {
          *       200:
          *         description: Insurance type fetched successfully
          */
-        this.router.get("/:id", this.controller.getSingleInsuranceType);
+        this.router.get("/:id", staffProtect, this.controller.getSingleInsuranceType);
 
         /**
          * @swagger
@@ -149,7 +150,7 @@ class InsuranceTypeRoutes {
          *       200:
          *         description: Insurance type deactivated successfully
          */
-        this.router.patch("/:id/:active", this.controller.deactivateInsuranceType);
+        this.router.patch("/:id/:active", staffProtect, this.controller.deactivateInsuranceType);
     }
 
     getRouter() {

@@ -1,6 +1,7 @@
 import express from "express";
 import BillingController from "../controllers/billingController.js";
 import BillingDto from "../dto/billingDto.js";
+import { adminProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -460,7 +461,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/billingmetadata", BillingDto.createBillingMetadataDto, this.controller.createBillingMetadata);
+        this.router.post("/billingmetadata", adminProtect(), BillingDto.createBillingMetadataDto, this.controller.createBillingMetadata);
 
         /**
          * @swagger
@@ -480,7 +481,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/pay-payment-link", this.controller.payPaymentLink);
+        this.router.post("/pay-payment-link", adminProtect(), this.controller.payPaymentLink);
 
         /**
         * @swagger
@@ -501,7 +502,7 @@ class BillingRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/getbillingmetadata/:id", BillingDto.checkIdDto, this.controller.getSingleBillingMetadata);
+        this.router.get("/getbillingmetadata/:id", adminProtect(), BillingDto.checkIdDto, this.controller.getSingleBillingMetadata);
 
         /**
         * @swagger
@@ -522,7 +523,7 @@ class BillingRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/payment-methods/tenant/:tenantId", this.controller.getTenantPaymentMethods);
+        this.router.get("/payment-methods/tenant/:tenantId", adminProtect(), this.controller.getTenantPaymentMethods);
 
         /**
          * @swagger
@@ -551,6 +552,7 @@ class BillingRoutes {
          */
         this.router.get(
             "/tenants/:tenantId/payments/status/:status",
+            adminProtect(),
             this.controller.getTenantPaymentsByStatus
         );
 
@@ -619,6 +621,7 @@ class BillingRoutes {
          */
         this.router.get(
             "/tenants/:tenantId/payments",
+            adminProtect(),
             this.controller.getTenantPayments
         );
 
@@ -634,7 +637,7 @@ class BillingRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/allbillingmetadata", this.controller.getAllBillingMetadata);
+        this.router.get("/allbillingmetadata", adminProtect(), this.controller.getAllBillingMetadata);
 
         /**
          * @swagger
@@ -654,7 +657,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/transaction", BillingDto.createTransactionDto, this.controller.createTransaction);
+        this.router.post("/transaction", adminProtect(), BillingDto.createTransactionDto, this.controller.createTransaction);
 
         /**
         * @swagger
@@ -675,7 +678,7 @@ class BillingRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/gettransaction/:id", BillingDto.checkIdDto, this.controller.getAllTransaction);
+        this.router.get("/gettransaction/:id", adminProtect(), BillingDto.checkIdDto, this.controller.getAllTransaction);
 
         /**
          * @swagger
@@ -689,7 +692,7 @@ class BillingRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/alltransaction", this.controller.getAllTransaction);
+        this.router.get("/alltransaction", adminProtect(), this.controller.getAllTransaction);
 
         /**
          * @swagger
@@ -709,7 +712,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/payment", BillingDto.createPaymentDto, this.controller.createPayment);
+        this.router.post("/payment", adminProtect(), BillingDto.createPaymentDto, this.controller.createPayment);
 
         /**
         * @swagger
@@ -730,7 +733,7 @@ class BillingRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/payment/:id", BillingDto.checkIntIdDto, this.controller.getSinglePayment);
+        this.router.get("/payment/:id", adminProtect(), BillingDto.checkIntIdDto, this.controller.getSinglePayment);
 
         /**
          * @swagger
@@ -759,7 +762,7 @@ class BillingRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/allpayment", this.controller.getAllPayments);
+        this.router.get("/allpayment", adminProtect(), this.controller.getAllPayments);
 
         /**
         * @swagger
@@ -780,7 +783,7 @@ class BillingRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/payment/status/:status", BillingDto.checkStatusDto, this.controller.getPaymentByStatus);
+        this.router.get("/payment/status/:status", adminProtect(), BillingDto.checkStatusDto, this.controller.getPaymentByStatus);
 
         /**
          * @swagger
@@ -803,7 +806,7 @@ class BillingRoutes {
          *       500:
          *         description: Server error
          */
-        this.router.post("/paymentmethod", BillingDto.createPaymentMethodDto, this.controller.createPaymentMethod);
+        this.router.post("/paymentmethod", adminProtect(), BillingDto.createPaymentMethodDto, this.controller.createPaymentMethod);
 
         /**
          * @swagger
@@ -817,7 +820,7 @@ class BillingRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/countpayment", this.controller.getTotalPaymentByStatus);
+        this.router.get("/countpayment", adminProtect(), this.controller.getTotalPaymentByStatus);
 
         /**
          * @swagger
@@ -837,7 +840,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/paymentaccess", BillingDto.createPaymentAceesDto, this.controller.createPaymentAccess);
+        this.router.post("/paymentaccess", adminProtect(), BillingDto.createPaymentAceesDto, this.controller.createPaymentAccess);
 
         /**
         * @swagger
@@ -851,7 +854,7 @@ class BillingRoutes {
         *       400:
         *         description: Bad request
         */
-        this.router.get("/paymentaccess", this.controller.getPaymentAccess);
+        this.router.get("/paymentaccess", adminProtect(), this.controller.getPaymentAccess);
 
         /**
          * @swagger
@@ -871,7 +874,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/paymentaccess/charge-on-due-date", BillingDto.updateChargeOnDueDateDto, this.controller.updatePaymentAccess);
+        this.router.patch("/paymentaccess/charge-on-due-date", adminProtect(), BillingDto.updateChargeOnDueDateDto, this.controller.updatePaymentAccess);
 
         /**
          * @swagger
@@ -891,7 +894,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/paymentaccess/charge-last-used-first", BillingDto.updateChargeLastUsedFirstDto, this.controller.updatePaymentAccess);
+        this.router.patch("/paymentaccess/charge-last-used-first", adminProtect(), BillingDto.updateChargeLastUsedFirstDto, this.controller.updatePaymentAccess);
 
         /**
          * @swagger
@@ -911,7 +914,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/paymentaccess/charge-alternative", BillingDto.updateChargeAlternativeDto, this.controller.updatePaymentAccess);
+        this.router.patch("/paymentaccess/charge-alternative", adminProtect(), BillingDto.updateChargeAlternativeDto, this.controller.updatePaymentAccess);
 
         /**
          * @swagger
@@ -931,7 +934,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/paymentaccess/retry-before", BillingDto.updateRetryBeforeDto, this.controller.updatePaymentAccess);
+        this.router.patch("/paymentaccess/retry-before", adminProtect(), BillingDto.updateRetryBeforeDto, this.controller.updatePaymentAccess);
 
         /**
          * @swagger
@@ -951,7 +954,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/paymentaccess/retry-after", BillingDto.updateRetryAfterDto, this.controller.updatePaymentAccess);
+        this.router.patch("/paymentaccess/retry-after", adminProtect(), BillingDto.updateRetryAfterDto, this.controller.updatePaymentAccess);
 
         /**
          * @swagger
@@ -971,7 +974,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/paymentaccess/notify-tenant", BillingDto.updateNotifyTenantDto, this.controller.updatePaymentAccess);
+        this.router.patch("/paymentaccess/notify-tenant", adminProtect(), BillingDto.updateNotifyTenantDto, this.controller.updatePaymentAccess);
 
         /**
          * @swagger
@@ -991,7 +994,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/paymentaccess/notification-email", BillingDto.updateNotificationEmailDto, this.controller.updatePaymentAccess);
+        this.router.patch("/paymentaccess/notification-email", adminProtect(), BillingDto.updateNotificationEmailDto, this.controller.updatePaymentAccess);
 
         /**
          * @swagger
@@ -1011,7 +1014,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/paymentaccess/cancel-after", BillingDto.updateCancelAfterDto, this.controller.updatePaymentAccess);
+        this.router.patch("/paymentaccess/cancel-after", adminProtect(), BillingDto.updateCancelAfterDto, this.controller.updatePaymentAccess);
 
         /**
          * @swagger
@@ -1031,7 +1034,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/paymentaccess/manual-cancel", BillingDto.updateManualCancelDto, this.controller.updatePaymentAccess);
+        this.router.patch("/paymentaccess/manual-cancel", adminProtect(), BillingDto.updateManualCancelDto, this.controller.updatePaymentAccess);
 
         /**
          * @swagger
@@ -1051,7 +1054,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/paymentaccess/suspension-action", BillingDto.updateSuspensionActionDto, this.controller.updatePaymentAccess);
+        this.router.patch("/paymentaccess/suspension-action", adminProtect(), BillingDto.updateSuspensionActionDto, this.controller.updatePaymentAccess);
 
         /**
          * @swagger
@@ -1071,7 +1074,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/paymentaccess/email-after-attempts", BillingDto.updateEmailAfterAttemptsDto, this.controller.updatePaymentAccess);
+        this.router.patch("/paymentaccess/email-after-attempts", adminProtect(), BillingDto.updateEmailAfterAttemptsDto, this.controller.updatePaymentAccess);
 
         /**
          * @swagger
@@ -1091,7 +1094,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/paymentaccess/warning-mail", BillingDto.updateWarningMailDto, this.controller.updatePaymentAccess);
+        this.router.patch("/paymentaccess/warning-mail", adminProtect(), BillingDto.updateWarningMailDto, this.controller.updatePaymentAccess);
 
         /**
          * @swagger
@@ -1111,7 +1114,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/paymentaccess/send-on-subscription-cancel", BillingDto.updateSendOnSubscriptionCancelDto, this.controller.updatePaymentAccess);
+        this.router.patch("/paymentaccess/send-on-subscription-cancel", adminProtect(), BillingDto.updateSendOnSubscriptionCancelDto, this.controller.updatePaymentAccess);
 
         /**
          * @swagger
@@ -1131,7 +1134,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/paymentaccess/cancel-mail", BillingDto.updateCancelMailDto, this.controller.updatePaymentAccess);
+        this.router.patch("/paymentaccess/cancel-mail", adminProtect(), BillingDto.updateCancelMailDto, this.controller.updatePaymentAccess);
 
     }
 

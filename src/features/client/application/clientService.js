@@ -295,7 +295,7 @@ class ClientService {
             id: client.tenantLinks.id,
         }
 
-        return { ...client, accessToken: this.token.generateAccessToken(claims), refreshToken: this.token.generateRefreshToken() };
+        return { ...client, accessToken: this.token.generateAccessToken(claims), refreshToken: this.token.generateRefreshToken(client.tenantLinks[0]?.id, "CLIENT") };
     }
 
     async updateClientPassword(data) {

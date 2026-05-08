@@ -29,6 +29,11 @@ const options = {
                 },
             },
         },
+        security: [
+            {
+                bearerAuth: [],
+            },
+        ],
     },
     apis: [
         join(rootDir, 'features/**/presentation/routes/*.js')

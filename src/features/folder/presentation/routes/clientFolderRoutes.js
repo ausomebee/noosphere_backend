@@ -1,6 +1,7 @@
 import express from "express";
 import ClientFolderController from "../controllers/clientFolderController.js";
 import ClientFolderDto from "../dtos/clientFolderDto.js";
+import { clientProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -57,6 +58,7 @@ class ClientFolderRoutes {
          */
         this.router.post(
             "/",
+            clientProtect,
             ClientFolderDto.createClientFolderDto,
             this.controller.createClientFolder
         );
@@ -79,6 +81,7 @@ class ClientFolderRoutes {
          */
         this.router.put(
             "/",
+            clientProtect,
             ClientFolderDto.updateClientFolderDto,
             this.controller.updateClientFolder
         );
@@ -102,6 +105,7 @@ class ClientFolderRoutes {
          */
         this.router.get(
             "/:id",
+            clientProtect,
             this.controller.getSingleClientFolder
         );
 
@@ -124,6 +128,7 @@ class ClientFolderRoutes {
          */
         this.router.get(
             "/tenant/:clientTenantId",
+            clientProtect,
             this.controller.getClientFolders
         );
     }

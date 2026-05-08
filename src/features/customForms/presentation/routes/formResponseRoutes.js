@@ -1,6 +1,7 @@
 import express from "express";
 import FormResponseDto from "../dto/formResponseDto.js";
 import FormResponseController from "../controllers/formResponseController.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -89,7 +90,7 @@ class FormResponseRoutes {
          *       201:
          *         description: Form response created successfully
          */
-        this.router.post("/", FormResponseDto.createFormResponseDto, this.controller.createFormResponse);
+        this.router.post("/", staffProtect, FormResponseDto.createFormResponseDto, this.controller.createFormResponse);
 
         /**
          * @swagger
@@ -107,7 +108,7 @@ class FormResponseRoutes {
          *       200:
          *         description: Form response updated successfully
          */
-        this.router.put("/", FormResponseDto.updateFormResponseDto, this.controller.updateFormResponse);
+        this.router.put("/", staffProtect, FormResponseDto.updateFormResponseDto, this.controller.updateFormResponse);
 
         /**
          * @swagger
@@ -125,7 +126,7 @@ class FormResponseRoutes {
          *       200:
          *         description: Form response fetched successfully
          */
-        this.router.get("/:id", this.controller.getSingleFormResponse);
+        this.router.get("/:id", staffProtect, this.controller.getSingleFormResponse);
 
         /**
          * @swagger
@@ -143,7 +144,7 @@ class FormResponseRoutes {
          *       200:
          *         description: form form responses fetched successfully
          */
-        this.router.get("/form/:formId", this.controller.getFormResponses);
+        this.router.get("/form/:formId", staffProtect, this.controller.getFormResponses);
 
         /**
          * @swagger
@@ -166,7 +167,7 @@ class FormResponseRoutes {
          *       200:
          *         description: Form response deletion status updated successfully
          */
-        this.router.patch("/:id/:deleted", this.controller.deleteFormResponse);
+        this.router.patch("/:id/:deleted", staffProtect, this.controller.deleteFormResponse);
     }
 
     getRouter() {

@@ -1,6 +1,7 @@
 import express from "express";
 import DomainController from "../controllers/domainController.js";
 import DomainDto from "../dto/domainDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -78,7 +79,7 @@ class DomainRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", DomainDto.createDomainDto, this.controller.createDomain);
+        this.router.post("/", staffProtect, DomainDto.createDomainDto, this.controller.createDomain);
 
         /**
          * @swagger
@@ -98,7 +99,7 @@ class DomainRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/", DomainDto.updateDomainDto, this.controller.updateDomain);
+        this.router.patch("/", staffProtect, DomainDto.updateDomainDto, this.controller.updateDomain);
 
         /**
          * @swagger
@@ -126,7 +127,7 @@ class DomainRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/:tenantId", this.controller.getAllTenantDomain);
+        this.router.get("/:tenantId", staffProtect, this.controller.getAllTenantDomain);
 
 
         /**
@@ -148,7 +149,7 @@ class DomainRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.delete("/:id", this.controller.deleteDomain);
+        this.router.delete("/:id", staffProtect, this.controller.deleteDomain);
 
     }
 

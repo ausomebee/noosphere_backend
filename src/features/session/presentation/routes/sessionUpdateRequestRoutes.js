@@ -1,6 +1,7 @@
 import express from "express";
 import SessionUpdateRequestController from "../controllers/sessionUpdateRequestController.js";
 import SessionUpdateRequestDto from "../dto/sessionUpdateRequestDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -63,6 +64,7 @@ class SessionUpdateRequestRoutes {
          */
         this.router.post(
             "/",
+            staffProtect,
             SessionUpdateRequestDto.createSessionUpdateRequestDto,
             this.controller.createSessionUpdateRequest
         );
@@ -85,6 +87,7 @@ class SessionUpdateRequestRoutes {
          */
         this.router.put(
             "/",
+            staffProtect,
             SessionUpdateRequestDto.updateSessionUpdateRequestDto,
             this.controller.updateSessionUpdateRequest
         );
@@ -109,6 +112,7 @@ class SessionUpdateRequestRoutes {
          */
         this.router.get(
             "/:id",
+            staffProtect,
             this.controller.getSingleSessionUpdateRequest
         );
 
@@ -132,6 +136,7 @@ class SessionUpdateRequestRoutes {
          */
         this.router.get(
             "/session/:sessionId",
+            staffProtect,
             this.controller.getSessionUpdateRequests
         );
     }

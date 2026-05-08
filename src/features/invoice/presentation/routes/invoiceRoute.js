@@ -1,6 +1,7 @@
 import express from "express";
 import InvoiceController from "../controller/invoiceController.js";
 import InvoiceDto from "../dto/invoiceDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -305,7 +306,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", InvoiceDto.createInvoiceDto, this.controller.createInvoice);
+        this.router.post("/", staffProtect, InvoiceDto.createInvoiceDto, this.controller.createInvoice);
 
         /**
         * @swagger
@@ -326,7 +327,7 @@ class InvoiceRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/:id", InvoiceDto.checkIdDto, this.controller.getSingleInvoice);
+        this.router.get("/:id", staffProtect, InvoiceDto.checkIdDto, this.controller.getSingleInvoice);
 
         /**
          * @swagger
@@ -355,7 +356,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/", this.controller.getAllInvoices);
+        this.router.get("/", staffProtect, this.controller.getAllInvoices);
 
         /**
          * @swagger
@@ -422,6 +423,7 @@ class InvoiceRoutes {
          */
         this.router.get(
             "/tenants/:tenantId/invoices",
+            staffProtect,
             this.controller.getTenantInvoices
         );
 
@@ -452,6 +454,7 @@ class InvoiceRoutes {
          */
         this.router.get(
             "/tenants/:tenantId/invoices/status/:status",
+            staffProtect,
             this.controller.getTenantInvoicesByStatus
         );
 
@@ -480,7 +483,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/billed/total/:from/:to", InvoiceDto.checkDurationDto, this.controller.getTotalBilled);
+        this.router.get("/billed/total/:from/:to", staffProtect, InvoiceDto.checkDurationDto, this.controller.getTotalBilled);
 
         /**
          * @swagger
@@ -507,7 +510,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/billed/due/:from/:to", InvoiceDto.checkDurationDto, this.controller.getTotalDueInvoice);
+        this.router.get("/billed/due/:from/:to", staffProtect, InvoiceDto.checkDurationDto, this.controller.getTotalDueInvoice);
 
         /**
         * @swagger
@@ -527,7 +530,7 @@ class InvoiceRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/status/:status", InvoiceDto.checkStatusDto, this.controller.getAllInvoiceByStatus);
+        this.router.get("/status/:status", staffProtect, InvoiceDto.checkStatusDto, this.controller.getAllInvoiceByStatus);
 
         /**
          * @swagger
@@ -541,7 +544,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/total/status", this.controller.getTotalByStatus);
+        this.router.get("/total/status", staffProtect, this.controller.getTotalByStatus);
 
         /**
          * @swagger
@@ -561,7 +564,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/management", InvoiceDto.createInvoiceManagementDto, this.controller.createInvoiceManagement);
+        this.router.post("/management", staffProtect, InvoiceDto.createInvoiceManagementDto, this.controller.createInvoiceManagement);
 
         /**
         * @swagger
@@ -576,7 +579,7 @@ class InvoiceRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/invoice/management", this.controller.getInvoiceManagement);
+        this.router.get("/invoice/management", staffProtect, this.controller.getInvoiceManagement);
 
         /**
         * @swagger
@@ -596,7 +599,7 @@ class InvoiceRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.post("/payment-link", this.controller.generatePaymentLink);
+        this.router.post("/payment-link", staffProtect, this.controller.generatePaymentLink);
 
         /**
         * @swagger
@@ -616,7 +619,7 @@ class InvoiceRoutes {
         *     400:
         *       description: Validation error
         */
-        this.router.get("/validate-payment-token/:token", this.controller.validatePaymentToken);
+        this.router.get("/validate-payment-token/:token", staffProtect, this.controller.validatePaymentToken);
 
         /**
          * @swagger
@@ -636,7 +639,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/regenerate/:tenantId", this.controller.regeneratePaymentLink);
+        this.router.patch("/regenerate/:tenantId", staffProtect, this.controller.regeneratePaymentLink);
 
         /**
          * @swagger
@@ -656,7 +659,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/history/:tenantId", this.controller.getInvoiceTokenHistory);
+        this.router.get("/history/:tenantId", staffProtect, this.controller.getInvoiceTokenHistory);
 
         /**
          * @swagger
@@ -676,7 +679,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/invoice/management/on-plan-purchase", InvoiceDto.updateOnPlanPurchaseDto, this.controller.updateInvoiceManagement);
+        this.router.patch("/invoice/management/on-plan-purchase", staffProtect, InvoiceDto.updateOnPlanPurchaseDto, this.controller.updateInvoiceManagement);
 
         /**
          * @swagger
@@ -696,7 +699,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/invoice/management/days-before-due-date", InvoiceDto.updateDaysBeforeDueDateDto, this.controller.updateInvoiceManagement);
+        this.router.patch("/invoice/management/days-before-due-date", staffProtect, InvoiceDto.updateDaysBeforeDueDateDto, this.controller.updateInvoiceManagement);
 
         /**
          * @swagger
@@ -716,7 +719,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/invoice/management/upcoming-invoice", InvoiceDto.updateUpcomingInvoiceDto, this.controller.updateInvoiceManagement);
+        this.router.patch("/invoice/management/upcoming-invoice", staffProtect, InvoiceDto.updateUpcomingInvoiceDto, this.controller.updateInvoiceManagement);
 
         /**
          * @swagger
@@ -736,7 +739,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/invoice/management/on-due-date", InvoiceDto.updateOnDueDateDto, this.controller.updateInvoiceManagement);
+        this.router.patch("/invoice/management/on-due-date", staffProtect, InvoiceDto.updateOnDueDateDto, this.controller.updateInvoiceManagement);
 
         /**
          * @swagger
@@ -756,7 +759,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/invoice/management/due-invoice", InvoiceDto.updateDueInvoiceDto, this.controller.updateInvoiceManagement);
+        this.router.patch("/invoice/management/due-invoice", staffProtect, InvoiceDto.updateDueInvoiceDto, this.controller.updateInvoiceManagement);
 
         /**
          * @swagger
@@ -776,7 +779,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/invoice/management/mark-over-due", InvoiceDto.updateMarkOverDueDto, this.controller.updateInvoiceManagement);
+        this.router.patch("/invoice/management/mark-over-due", staffProtect, InvoiceDto.updateMarkOverDueDto, this.controller.updateInvoiceManagement);
 
         /**
          * @swagger
@@ -796,7 +799,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/invoice/management/unpaid-reminder-times-before", InvoiceDto.updateUnpaidReminderTimesBeforeDto, this.controller.updateInvoiceManagement);
+        this.router.patch("/invoice/management/unpaid-reminder-times-before", staffProtect, InvoiceDto.updateUnpaidReminderTimesBeforeDto, this.controller.updateInvoiceManagement);
 
         /**
          * @swagger
@@ -816,7 +819,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/invoice/management/attach-invoice-to-reminder", InvoiceDto.updateAttachInvoiceToReminderDto, this.controller.updateInvoiceManagement);
+        this.router.patch("/invoice/management/attach-invoice-to-reminder", staffProtect, InvoiceDto.updateAttachInvoiceToReminderDto, this.controller.updateInvoiceManagement);
 
         /**
          * @swagger
@@ -836,7 +839,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/invoice/management/reminder-email", InvoiceDto.updateReminderEmailDto, this.controller.updateInvoiceManagement);
+        this.router.patch("/invoice/management/reminder-email", staffProtect, InvoiceDto.updateReminderEmailDto, this.controller.updateInvoiceManagement);
 
     }
 

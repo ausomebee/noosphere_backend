@@ -7,10 +7,12 @@ class TokenService {
         });
     }
 
-    static generateRefreshToken() {
-        return jwt.sign({}, process.env.REFRESH_TOKEN_SECRET || "secret", {
-            expiresIn: process.env.REFRESH_TOKEN_EXPIRE || "7d",
-        });
+    static generateRefreshToken(userId, ownerType) {
+        return jwt.sign(
+            { id: userId, ownerType },
+            process.env.REFRESH_TOKEN_SECRET || "secret",
+            { expiresIn: process.env.REFRESH_TOKEN_EXPIRE || "7d" }
+        );
     }
 
     static generatePaymentToken(claims) {

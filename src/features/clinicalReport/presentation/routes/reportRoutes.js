@@ -1,6 +1,7 @@
 import express from "express";
 import ClinicalReportController from "../controllers/reportController.js";
 import ClinicalReportDto from "../dto/reportDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -140,6 +141,7 @@ class ClinicalReportRoutes {
          */
         this.router.post(
             "/",
+            staffProtect,
             ClinicalReportDto.createReportDto,
             this.controller.createReport
         );
@@ -162,6 +164,7 @@ class ClinicalReportRoutes {
          */
         this.router.put(
             "/",
+            staffProtect,
             ClinicalReportDto.updateReportDto,
             this.controller.updateReport
         );
@@ -184,6 +187,7 @@ class ClinicalReportRoutes {
          */
         this.router.get(
             "/tenant/:tenantId",
+            staffProtect,
             this.controller.getTenantReports
         );
 
@@ -210,6 +214,7 @@ class ClinicalReportRoutes {
         */
         this.router.get(
             "/tenant/:tenantId/status/:status",
+            staffProtect,
             this.controller.getReportsByStatus
         );
 
@@ -236,6 +241,7 @@ class ClinicalReportRoutes {
          */
         this.router.get(
             "/client/:clientTenantId/status/:status",
+            staffProtect,
             this.controller.getClientReportsByStatus
         );
 
@@ -261,6 +267,7 @@ class ClinicalReportRoutes {
          */
         this.router.post(
             "/validate/:token",
+            staffProtect,
             this.controller.validateReportToken
         );
 
@@ -284,6 +291,7 @@ class ClinicalReportRoutes {
         */
         this.router.post(
             "/approve/:id",
+            staffProtect,
             this.controller.approveClinicalReport
         );
 
@@ -307,6 +315,7 @@ class ClinicalReportRoutes {
         */
         this.router.post(
             "/resubmit/:id",
+            staffProtect,
             this.controller.resubmitForSignature
         );
 
@@ -330,6 +339,7 @@ class ClinicalReportRoutes {
          */
         this.router.patch(
             "/:id/withdraw-token",
+            staffProtect,
             this.controller.withdrawReportToken
         );
 
@@ -353,6 +363,7 @@ class ClinicalReportRoutes {
          */
         this.router.patch(
             "/:id/withdraw-token",
+            staffProtect,
             this.controller.withdrawReportToken
         );
 
@@ -379,6 +390,7 @@ class ClinicalReportRoutes {
          */
         this.router.get(
             "/approver/:approverId/client/:clientTenantId",
+            staffProtect,
             this.controller.getReportsSubmittedForApprover
         );
 
@@ -405,6 +417,7 @@ class ClinicalReportRoutes {
         */
         this.router.patch(
             "/:id/status/:status",
+            staffProtect,
             this.controller.updateReportStatus
         );
 
@@ -426,6 +439,7 @@ class ClinicalReportRoutes {
          */
         this.router.get(
             "/:id",
+            staffProtect,
             this.controller.getSingleReport
         );
 
@@ -447,6 +461,7 @@ class ClinicalReportRoutes {
          */
         this.router.post(
             "/nudge-client/:id",
+            staffProtect,
             this.controller.nudgeClient
         );
 
@@ -468,6 +483,7 @@ class ClinicalReportRoutes {
          */
         this.router.post(
             "/duplicate/:id",
+            staffProtect,
             this.controller.duplicateReport
         );
 
@@ -489,6 +505,7 @@ class ClinicalReportRoutes {
          */
         this.router.delete(
             "/:id",
+            staffProtect,
             this.controller.deleteReport
         );
 
@@ -535,6 +552,7 @@ class ClinicalReportRoutes {
          */
         this.router.patch(
             "/submit-signature",
+            staffProtect,
             this.controller.submitSignature
         );
     }

@@ -2,6 +2,7 @@ import express from "express";
 import TargetController from "../controllers/targetController.js";
 import TargetDto from "../dto/targetDto.js";
 import S3Service from "../../../../utilities/s3.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -337,7 +338,7 @@ class TargetRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", this.S3Service.single("attachment"), TargetDto.createTargetDto, this.controller.createTarget);
+        this.router.post("/", staffProtect, this.S3Service.single("attachment"), TargetDto.createTargetDto, this.controller.createTarget);
 
         /**
          * @swagger
@@ -357,7 +358,7 @@ class TargetRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/custom", this.S3Service.single("attachment"), TargetDto.createCustomTargetDto, this.controller.createCustomTarget);
+        this.router.post("/custom", staffProtect, this.S3Service.single("attachment"), TargetDto.createCustomTargetDto, this.controller.createCustomTarget);
 
         /**
          * @swagger
@@ -377,7 +378,7 @@ class TargetRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/", this.S3Service.single("attachment"), TargetDto.updateTargetDto, this.controller.updateTarget);
+        this.router.patch("/", staffProtect, this.S3Service.single("attachment"), TargetDto.updateTargetDto, this.controller.updateTarget);
 
         /**
         * @swagger
@@ -398,7 +399,7 @@ class TargetRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/program/:programId", this.controller.getAllProgramTargets);
+        this.router.get("/program/:programId", staffProtect, this.controller.getAllProgramTargets);
 
         /**
         * @swagger
@@ -419,7 +420,7 @@ class TargetRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/baseline/:targetId", this.controller.findTargetWithFirstSessionData);
+        this.router.get("/baseline/:targetId", staffProtect, this.controller.findTargetWithFirstSessionData);
 
         /**
         * @swagger
@@ -440,7 +441,7 @@ class TargetRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/tenant/:tenantId", this.controller.getAllTenantTargets);
+        this.router.get("/tenant/:tenantId", staffProtect, this.controller.getAllTenantTargets);
 
         /**
          * @swagger
@@ -461,7 +462,7 @@ class TargetRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.delete("/:id", this.controller.deleteTarget);
+        this.router.delete("/:id", staffProtect, this.controller.deleteTarget);
 
         /**
          * @swagger
@@ -482,7 +483,7 @@ class TargetRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/:id", this.controller.getTarget);
+        this.router.get("/:id", staffProtect, this.controller.getTarget);
 
         /**
          * @swagger
@@ -503,7 +504,7 @@ class TargetRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/duplicate/:id", this.controller.duplicateTarget);
+        this.router.post("/duplicate/:id", staffProtect, this.controller.duplicateTarget);
     }
 
     getRouter() {

@@ -1,6 +1,7 @@
 import express from "express";
 import PayrollCycleController from "../controllers/payrollCycleController.js";
 import PayrollCycleDto from "../dto/payrollCycleDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -178,7 +179,7 @@ class PayrollCycleRoutes {
          *       201:
          *         description: Payroll cycle created successfully
          */
-        this.router.post("/", PayrollCycleDto.createPayrollCycleDto, this.controller.createPayrollCycle);
+        this.router.post("/", staffProtect, PayrollCycleDto.createPayrollCycleDto, this.controller.createPayrollCycle);
 
          /**
          * @swagger
@@ -196,7 +197,7 @@ class PayrollCycleRoutes {
          *       201:
          *         description: Payroll cycle created successfully
          */
-        this.router.post("/manual", PayrollCycleDto.manuallyCreatePayrollCycleDto, this.controller.manuallyCreatePayrollCycle);
+        this.router.post("/manual", staffProtect, PayrollCycleDto.manuallyCreatePayrollCycleDto, this.controller.manuallyCreatePayrollCycle);
 
         /**
          * @swagger
@@ -214,7 +215,7 @@ class PayrollCycleRoutes {
          *       200:
          *         description: Payroll cycle updated successfully
          */
-        this.router.put("/", PayrollCycleDto.updatePayrollCycleDto, this.controller.updatePayrollCycle);
+        this.router.put("/", staffProtect, PayrollCycleDto.updatePayrollCycleDto, this.controller.updatePayrollCycle);
 
         /**
          * @swagger
@@ -232,7 +233,7 @@ class PayrollCycleRoutes {
          *       200:
          *         description: List of payroll cycles retrieved successfully
          */
-        this.router.get("/tenant/:tenantId", this.controller.getTenantPayrollCycles);
+        this.router.get("/tenant/:tenantId", staffProtect, this.controller.getTenantPayrollCycles);
 
         /**
          * @swagger
@@ -250,7 +251,7 @@ class PayrollCycleRoutes {
          *       200:
          *         description: List of payroll cycles retrieved successfully
          */
-        this.router.get("/tenant/:tenantId/stats", this.controller.getPayrollCyclesStatsByTenant);
+        this.router.get("/tenant/:tenantId/stats", staffProtect, this.controller.getPayrollCyclesStatsByTenant);
 
         /**
          * @swagger
@@ -268,7 +269,7 @@ class PayrollCycleRoutes {
          *       200:
          *         description: List of payroll cycles retrieved successfully
          */
-        this.router.get("/staff/:staffId/stats", this.controller.findPayrollCyclesByStaff);
+        this.router.get("/staff/:staffId/stats", staffProtect, this.controller.findPayrollCyclesByStaff);
 
         /**
          * @swagger
@@ -286,7 +287,7 @@ class PayrollCycleRoutes {
          *       200:
          *         description: Payroll cycle retrieved successfully
          */
-        this.router.get("/:id", this.controller.getSinglePayrollCycle);
+        this.router.get("/:id", staffProtect, this.controller.getSinglePayrollCycle);
 
         /**
          * @swagger
@@ -309,7 +310,7 @@ class PayrollCycleRoutes {
          *       200:
          *         description: Payroll cycle status updated successfully
          */
-        this.router.patch("/:id/:active", this.controller.deactivatePayrollCycle);
+        this.router.patch("/:id/:active", staffProtect, this.controller.deactivatePayrollCycle);
     }
 
     getRouter() {

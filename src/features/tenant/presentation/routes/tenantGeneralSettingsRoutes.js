@@ -1,6 +1,7 @@
 import express from "express";
 import TenantGeneralSettingsController from "../controllers/tenantGeneralSettingsController.js";
 import TenantGeneralSettingsDto from "../dto/tenantGeneralSettingsDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -70,6 +71,7 @@ class TenantGeneralSettingsRoutes {
          */
         this.router.post(
             "/",
+            staffProtect,
             TenantGeneralSettingsDto.createSettingsDto,
             this.controller.createSettings
         );
@@ -92,6 +94,7 @@ class TenantGeneralSettingsRoutes {
          */
         this.router.put(
             "/",
+            staffProtect,
             TenantGeneralSettingsDto.updateSettingsDto,
             this.controller.updateSettings
         );
@@ -115,6 +118,7 @@ class TenantGeneralSettingsRoutes {
          */
         this.router.get(
             "/:tenantId",
+            staffProtect,
             this.controller.getSettings
         );
     }

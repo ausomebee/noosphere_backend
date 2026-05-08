@@ -1,6 +1,7 @@
 import express from "express";
 import TenantNotificationSettingsController from "../controllers/tenantNotificationSettingsController.js";
 import TenantNotificationSettingsDto from "../dto/tenantNotificationSettingsDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -66,6 +67,7 @@ class TenantNotificationSettingsRoutes {
          */
         this.router.post(
             "/",
+            staffProtect,
             TenantNotificationSettingsDto.createNotificationSettingsDto,
             this.controller.saveNotificationSettings
         );
@@ -89,6 +91,7 @@ class TenantNotificationSettingsRoutes {
          */
         this.router.put(
             "/",
+            staffProtect,
             TenantNotificationSettingsDto.updateNotificationSettingsDto,
             this.controller.saveNotificationSettings
         );
@@ -112,6 +115,7 @@ class TenantNotificationSettingsRoutes {
          */
         this.router.get(
             "/:userId",
+            staffProtect,
             this.controller.getNotificationSettings
         );
     }

@@ -296,6 +296,36 @@ class AuthRoutes {
         */
         this.router.post("/tenant/verifysecretmessage", AuthDto.verifySecretMessageDto, this.controller.verifyStaffSecretMessage);
 
+        /**
+        * @swagger
+        * /api/v1/auth/refresh-token:
+        *   post:
+        *     summary: Refresh access token
+        *     description: Issues a new access token and refresh token using a valid refresh token.
+        *     tags:
+        *       - Auth
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             type: object
+        *             required:
+        *               - refreshToken
+        *             properties:
+        *               refreshToken:
+        *                 type: string
+        *                 description: The refresh token issued at login
+        *     responses:
+        *       200:
+        *         description: New access and refresh tokens
+        *       400:
+        *         description: Missing refresh token
+        *       401:
+        *         description: Invalid or expired refresh token
+        */
+        this.router.post("/refresh-token", this.controller.refreshToken);
+
     }
 
     getRouter() {

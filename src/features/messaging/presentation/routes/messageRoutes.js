@@ -1,6 +1,7 @@
 import express from "express";
 import MessageController from "../controllers/messageController.js";
 import MessageDto from "../dtos/messageDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -72,6 +73,7 @@ class MessageRoutes {
          */
         this.router.post(
             "/",
+            staffProtect,
             MessageDto.createMessageDto,
             this.controller.createMessage
         );
@@ -94,6 +96,7 @@ class MessageRoutes {
          */
         this.router.put(
             "/",
+            staffProtect,
             MessageDto.updateMessageDto,
             this.controller.updateMessage
         );
@@ -118,6 +121,7 @@ class MessageRoutes {
          */
         this.router.get(
             "/:id",
+            staffProtect,
             this.controller.getSingleMessage
         );
 
@@ -146,6 +150,7 @@ class MessageRoutes {
          */
         this.router.get(
             "/user/:userId/:userType",
+            staffProtect,
             this.controller.getMessagesByUser
         );
 
@@ -169,6 +174,7 @@ class MessageRoutes {
          */
         this.router.patch(
             "/read/:id",
+            staffProtect,
             this.controller.markAsRead
         );
     }

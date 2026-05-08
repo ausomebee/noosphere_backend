@@ -1,6 +1,7 @@
 import express from "express";
 import TenantAdditionalSecurityQuestionsController from "../controllers/tenantAdditionalSecurityQuestionsController.js";
 import TenantAdditionalSecurityQuestionsDto from "../dto/tenantAdditionalSecurityQuestionsDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -58,6 +59,7 @@ class TenantAdditionalSecurityQuestionsRoutes {
          */
         this.router.post(
             "/",
+            staffProtect,
             TenantAdditionalSecurityQuestionsDto.createQuestionDto,
             this.controller.createQuestion
         );
@@ -80,6 +82,7 @@ class TenantAdditionalSecurityQuestionsRoutes {
          */
         this.router.put(
             "/",
+            staffProtect,
             TenantAdditionalSecurityQuestionsDto.updateQuestionDto,
             this.controller.updateQuestion
         );
@@ -103,6 +106,7 @@ class TenantAdditionalSecurityQuestionsRoutes {
          */
         this.router.get(
             "/:id",
+            staffProtect,
             this.controller.getQuestion
         );
 
@@ -125,6 +129,7 @@ class TenantAdditionalSecurityQuestionsRoutes {
          */
         this.router.get(
             "/tenant/:tenantId",
+            staffProtect,
             this.controller.getQuestions
         );
     }

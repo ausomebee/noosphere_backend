@@ -1,7 +1,7 @@
 import express from "express";
 import RoleDto from "../dto/roleDto.js";
 import RoleController from "../controllers/roleController.js";
-import { adminProtect } from "../../../../middleware/auth_handlers.js";
+import { adminProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -157,7 +157,7 @@ class RoleRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/adminrole", adminProtect, RoleDto.createRoleDto, this.controller.createAdminRole);
+        this.router.post("/adminrole", adminProtect(), RoleDto.createRoleDto, this.controller.createAdminRole);
 
         /**
          * @swagger
@@ -177,7 +177,7 @@ class RoleRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", RoleDto.createRoleDto, this.controller.createRole);
+        this.router.post("/", adminProtect(), RoleDto.createRoleDto, this.controller.createRole);
 
         /**
          * @swagger
@@ -197,7 +197,7 @@ class RoleRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/", RoleDto.updateRoleDto, this.controller.updateRole);
+        this.router.patch("/", adminProtect(), RoleDto.updateRoleDto, this.controller.updateRole);
 
         /**
          * @swagger
@@ -217,7 +217,7 @@ class RoleRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/tenantrole", RoleDto.createRoleDto, this.controller.createTenantRole);
+        this.router.post("/tenantrole", staffProtect, RoleDto.createRoleDto, this.controller.createTenantRole);
 
         /**
          * @swagger
@@ -236,7 +236,7 @@ class RoleRoutes {
          *       200:
          *         description: Roles fetched successfully
          */
-        this.router.get("/module/:systemModule", this.controller.getRolesByModule);
+        this.router.get("/module/:systemModule", adminProtect(), this.controller.getRolesByModule);
         
         /**
          * @swagger
@@ -255,7 +255,7 @@ class RoleRoutes {
          *       200:
          *         description: Role fetched successfully
          */
-        this.router.get("/:id", this.controller.getRole);
+        this.router.get("/:id", adminProtect(), this.controller.getRole);
         
         /**
          * @swagger
@@ -274,7 +274,7 @@ class RoleRoutes {
          *       200:
          *         description: Role deactivated successfully
          */
-        this.router.patch("/deactivate/:id", this.controller.deactivateRole);
+        this.router.patch("/deactivate/:id", adminProtect(), this.controller.deactivateRole);
 
          /**
          * @swagger
@@ -299,7 +299,7 @@ class RoleRoutes {
          *       200:
          *         description: Roles fetched successfully
          */
-        this.router.get("/module/:systemModule/:tenantId", this.controller.getRolesByModule);
+        this.router.get("/module/:systemModule/:tenantId", staffProtect, this.controller.getRolesByModule);
         
         /**
          * @swagger
@@ -320,7 +320,7 @@ class RoleRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/:departmentId", RoleDto.departmentIdDto, this.controller.getRoles);
+        this.router.get("/:departmentId", adminProtect(), RoleDto.departmentIdDto, this.controller.getRoles);
 
     }
 

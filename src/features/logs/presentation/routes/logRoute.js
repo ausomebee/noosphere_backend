@@ -1,6 +1,7 @@
 import express from "express";
 import LogsDto from "../dto/logDto.js";
 import LogsController from "../controllers/logController.js";
+import { adminProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -77,7 +78,7 @@ class LogsRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", LogsDto.createLogDto, this.controller.createLog);
+        this.router.post("/", adminProtect(), LogsDto.createLogDto, this.controller.createLog);
 
         /**
         * @swagger
@@ -98,7 +99,7 @@ class LogsRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/:id", LogsDto.checkIdDto, this.controller.getSingleLog);
+        this.router.get("/:id", adminProtect(), LogsDto.checkIdDto, this.controller.getSingleLog);
 
         /**
         * @swagger
@@ -141,7 +142,7 @@ class LogsRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/tenant/activity", this.controller.getTenantLogs);
+        this.router.get("/tenant/activity", adminProtect(), this.controller.getTenantLogs);
 
         /**
         * @swagger
@@ -184,7 +185,7 @@ class LogsRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/tenant/feature/activity", this.controller.getTenantLogsGroupedByFeature);
+        this.router.get("/tenant/feature/activity", adminProtect(), this.controller.getTenantLogsGroupedByFeature);
 
     }
 

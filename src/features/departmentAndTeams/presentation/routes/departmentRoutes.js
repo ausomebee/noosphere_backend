@@ -1,6 +1,7 @@
 import express from "express";
 import DepartmentDto from "../dto/departmentDto.js";
 import DepartmentController from "../controllers/departmentController.js";
+import { adminProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -79,6 +80,7 @@ class DepartmentsRoutes {
          */
         this.router.post(
             "/",
+            adminProtect(),
             DepartmentDto.createDepartmentDto,
             this.controller.createDepartment
         );
@@ -101,6 +103,7 @@ class DepartmentsRoutes {
          */
         this.router.put(
             "/",
+            adminProtect(),
             DepartmentDto.updateDepartmentDto,
             this.controller.updateDepartment
         );
@@ -124,6 +127,7 @@ class DepartmentsRoutes {
          */
         this.router.get(
             "/:id",
+            adminProtect(),
             this.controller.getSingleDepartment
         );
 
@@ -147,6 +151,7 @@ class DepartmentsRoutes {
          */
         this.router.get(
             "/",
+            adminProtect(),
             this.controller.getDepartments
         );
 
@@ -176,6 +181,7 @@ class DepartmentsRoutes {
          */
         this.router.patch(
             "/:id/active/:active",
+            adminProtect(),
             this.controller.updateDepartmentActiveStatus
         );
 
@@ -199,6 +205,7 @@ class DepartmentsRoutes {
          */
         this.router.delete(
             "/:id/delete",
+            adminProtect(),
             this.controller.deleteDepartment
         );
     }

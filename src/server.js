@@ -134,7 +134,7 @@ class App {
     }
 
     initializeSwagger() {
-        this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+        this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { swaggerOptions: { persistAuthorization: true } }));
     }
 
     initializeRequestTracking() {

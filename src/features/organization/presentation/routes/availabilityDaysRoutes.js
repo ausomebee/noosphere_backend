@@ -1,6 +1,7 @@
 import express from "express";
 import AvailabilityDaysController from "../controller/availabilityDaysController.js";
 import AvailabilityDaysDto from "../dto/availabilityDaysDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -75,6 +76,7 @@ class AvailabilityDaysRoutes {
          */
         this.router.post(
             "/",
+            staffProtect,
             AvailabilityDaysDto.createAvailabilityDayDto,
             this.controller.createAvailabilityDay
         );
@@ -97,6 +99,7 @@ class AvailabilityDaysRoutes {
          */
         this.router.put(
             "/",
+            staffProtect,
             AvailabilityDaysDto.updateAvailabilityDayDto,
             this.controller.updateAvailabilityDay
         );
@@ -120,6 +123,7 @@ class AvailabilityDaysRoutes {
          */
         this.router.get(
             "/:id",
+            staffProtect,
             this.controller.getSingleAvailabilityDay
         );
 
@@ -142,6 +146,7 @@ class AvailabilityDaysRoutes {
          */
         this.router.get(
             "/availability/:availabilityId",
+            staffProtect,
             this.controller.getAvailabilityDays
         );
     }

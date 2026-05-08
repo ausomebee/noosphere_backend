@@ -1,6 +1,7 @@
 import express from "express";
 import DeductionController from "../controllers/deductionController.js";
 import DeductionDto from "../dto/deductionDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -84,7 +85,7 @@ class DeductionRoutes {
          *       201:
          *         description: Deduction item created successfully
          */
-        this.router.post("/", DeductionDto.createDeductionDto, this.controller.createDeduction);
+        this.router.post("/", staffProtect, DeductionDto.createDeductionDto, this.controller.createDeduction);
 
         /**
          * @swagger
@@ -102,7 +103,7 @@ class DeductionRoutes {
          *       200:
          *         description: Deduction item updated successfully
          */
-        this.router.put("/", DeductionDto.updateDeductionDto, this.controller.updateDeduction);
+        this.router.put("/", staffProtect, DeductionDto.updateDeductionDto, this.controller.updateDeduction);
 
         /**
          * @swagger
@@ -120,7 +121,7 @@ class DeductionRoutes {
          *       200:
          *         description: List of deduction items retrieved successfully
          */
-        this.router.get("/tenant/:tenantId", this.controller.getTenantDeductions);
+        this.router.get("/tenant/:tenantId", staffProtect, this.controller.getTenantDeductions);
 
         /**
          * @swagger
@@ -138,7 +139,7 @@ class DeductionRoutes {
          *       200:
          *         description: Deduction item retrieved successfully
          */
-        this.router.get("/:id", this.controller.getSingleDeduction);
+        this.router.get("/:id", staffProtect, this.controller.getSingleDeduction);
 
         /**
          * @swagger
@@ -161,7 +162,7 @@ class DeductionRoutes {
          *       200:
          *         description: Deduction item status updated successfully
          */
-        this.router.patch("/:id/:active", this.controller.deactivateDeduction);
+        this.router.patch("/:id/:active", staffProtect, this.controller.deactivateDeduction);
     }
 
     getRouter() {

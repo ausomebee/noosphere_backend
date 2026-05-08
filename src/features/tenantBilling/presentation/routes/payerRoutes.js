@@ -1,6 +1,7 @@
 import express from "express";
 import PayerController from "../controllers/payerController.js";
 import PayerDto from "../dto/payerDto.js";
+import { staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -313,7 +314,7 @@ class PayerRoutes {
          *       201:
          *         description: Payer created successfully
          */
-        this.router.post("/", PayerDto.createPayerDto, this.controller.createPayer);
+        this.router.post("/", staffProtect, PayerDto.createPayerDto, this.controller.createPayer);
 
         /**
          * @swagger
@@ -331,7 +332,7 @@ class PayerRoutes {
          *       200:
          *         description: Payer updated successfully
          */
-        this.router.put("/", PayerDto.updatePayerDto, this.controller.updatePayer);
+        this.router.put("/", staffProtect, PayerDto.updatePayerDto, this.controller.updatePayer);
 
         /**
          * @swagger
@@ -349,7 +350,7 @@ class PayerRoutes {
          *       200:
          *         description: List of payers for the tenant
          */
-        this.router.get("/tenant/:tenantId", this.controller.getTenantPayers);
+        this.router.get("/tenant/:tenantId", staffProtect, this.controller.getTenantPayers);
 
         /**
          * @swagger
@@ -367,7 +368,7 @@ class PayerRoutes {
          *       200:
          *         description: Payer fetched successfully
          */
-        this.router.get("/:id", this.controller.getSinglePayer);
+        this.router.get("/:id", staffProtect, this.controller.getSinglePayer);
 
         /**
          * @swagger
@@ -385,7 +386,7 @@ class PayerRoutes {
          *       200:
          *         description: Payer deleted successfully
          */
-        this.router.patch("/:id/:active", this.controller.deactivatePayer);
+        this.router.patch("/:id/:active", staffProtect, this.controller.deactivatePayer);
     }
 
     getRouter() {
