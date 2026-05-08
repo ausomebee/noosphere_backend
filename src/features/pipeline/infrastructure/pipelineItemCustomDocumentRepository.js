@@ -11,20 +11,6 @@ class PipelineItemCustomDocumentRepository extends BaseRepository {
         });
     }
 
-    async verifyDocument(id) {
-        return await this.model.update({
-            where: { id },
-            data: { isVerified: true }
-        });
-    }
-
-    async unverifyDocument(id) {
-        return await this.model.update({
-            where: { id },
-            data: { isVerified: false }
-        });
-    }
-
     async deleteByPipelineItem(pipelineItemId) {
         return await this.model.deleteMany({
             where: { pipelineItemId }

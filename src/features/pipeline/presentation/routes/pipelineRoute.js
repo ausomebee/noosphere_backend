@@ -1179,8 +1179,6 @@ class PipelineRoutes {
          *                 type: string
          *               isRequired:
          *                 type: boolean
-         *               description:
-         *                 type: string
          *     responses:
          *       201:
          *         description: Custom document created successfully
@@ -1231,12 +1229,6 @@ class PipelineRoutes {
          *               documentName:
          *                 type: string
          *               isRequired:
-         *                 type: boolean
-         *               description:
-         *                 type: string
-         *               fileUrl:
-         *                 type: string
-         *               isVerified:
          *                 type: boolean
          *     responses:
          *       200:

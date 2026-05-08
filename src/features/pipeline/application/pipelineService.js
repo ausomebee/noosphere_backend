@@ -585,8 +585,7 @@ class PipelineService {
         return await this.pipelineItemCustomDocumentRepository.create({
             pipelineItemId: data.pipelineItemId,
             documentName: data.documentName,
-            isRequired: data.isRequired ?? false,
-            description: data.description ?? null
+            isRequired: data.isRequired ?? false
         });
     }
 
@@ -603,10 +602,7 @@ class PipelineService {
 
         return await this.pipelineItemCustomDocumentRepository.update(data.id, {
             documentName: data.documentName ?? doc.documentName,
-            isRequired: data.isRequired ?? doc.isRequired,
-            description: data.description ?? doc.description,
-            fileUrl: data.fileUrl ?? doc.fileUrl,
-            isVerified: data.isVerified ?? doc.isVerified
+            isRequired: data.isRequired ?? doc.isRequired
         });
     }
 

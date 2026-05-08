@@ -646,9 +646,6 @@ model PipelineItemCustomDocument {
   pipelineItemId String
   documentName   String
   isRequired     Boolean  @default(false)
-  description    String?
-  fileUrl        String?
-  isVerified     Boolean  @default(false)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

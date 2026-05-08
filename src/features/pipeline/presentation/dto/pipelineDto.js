@@ -454,7 +454,6 @@ class PipelineDto {
                 "string.empty": "Document name is required",
             }),
             isRequired: Joi.boolean().optional(),
-            description: Joi.string().trim().optional(),
         });
 
         Validator.validateRequest(req, next, schema);
@@ -468,9 +467,6 @@ class PipelineDto {
             }),
             documentName: Joi.string().trim().optional(),
             isRequired: Joi.boolean().optional(),
-            description: Joi.string().trim().optional().allow(null, ""),
-            fileUrl: Joi.string().uri().optional().allow(null, ""),
-            isVerified: Joi.boolean().optional(),
         });
 
         Validator.validateRequest(req, next, schema);
