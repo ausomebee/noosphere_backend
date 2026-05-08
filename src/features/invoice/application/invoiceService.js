@@ -170,7 +170,7 @@ class InvoiceService {
             throw new Error("Failed to create payment link");
         }
 
-        return `https://noospherehub.com/control/payment/${tok}`;
+        return `https://noospherehub.net/control/payment/${tok}`;
     }
 
     async validatePaymentToken(token) {
@@ -228,8 +228,8 @@ class InvoiceService {
             throw new Error("Failed to create payment link");
         }
 
-        return `https://noospherehub.com/control/payment/${tok}`;
-    };
+        return `https://noospherehub.net/control/payment/${tok}`;
+    }
 
     async getInvoiceTokenHistory(tenantId) {
         const invoice = await this.invoiceRepository.findFirst({ tenantId: tenantId });

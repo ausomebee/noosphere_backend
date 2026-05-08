@@ -1,4 +1,5 @@
 import expressAsyncHandler from "express-async-handler";
+import MailService from "../../../../utilities/nodemailer.js";
 import TenantService from "../../application/tenantService.js";
 import prismaService from "../../../../config/prisma.js";
 import TenantRepository from "../../infrastructure/tenantRepository.js";
@@ -69,26 +70,24 @@ class TenantController {
     createCandidate = expressAsyncHandler(async (req, res) => {
         const tenant = await this.service.createCandidate(req.body);
 
-        const superAdmin = await this.adminService.getSuperAdmin();
-        if (!superAdmin) {
-            res.status(500).json({ message: 'Failed to fetch super admin.' });
+        if (!tenant) {
+            return res.status(500).json({ message: 'Failed to create candidate.' });
         }
 
-        const notif = await this.notificationService.createNotification({
-            userId: superAdmin.id,
-            userType: "ADMIN",
-            type: "Tenant Creation on System",
-            title: "Tenant Creation on System",
-            content: `
-                A new tenant ${tenant.companyName} has been created on NooSphere. Click here to view details
-            `,
-            isRead: false
-        });
-
-        SocketService.emitToUser(notif.userId, notif.userType, "Tenant Creation on System", notif);
-
-        if (!tenant) {
-            res.status(500).json({ message: 'Failed to create candidate.' });
+        const superAdmin = await this.adminService.getSuperAdmin();
+        if (superAdmin?.email) {
+            const html = templateRenderer.render('tenant-created-superadmin', {
+                companyName: tenant.companyName || 'N/A',
+                email: tenant.email || 'N/A',
+                phoneNumber: tenant.phoneNumber || 'N/A',
+                createdAt: new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }),
+            });
+            await MailService.sendMail(
+                superAdmin.email,
+                'New Tenant Created on NooSphere',
+                `A new tenant ${tenant.companyName} has been created on NooSphere.`,
+                html
+            );
         }
 
         return res.status(201).json({
