@@ -456,6 +456,23 @@ class TenantController {
             res.status(500).json({ message: 'Failed to deactivate tenant.' });
         }
 
+        if (req.body.active === false) {
+            const superAdmin = await this.adminService.getSuperAdmin();
+            if (superAdmin?.email) {
+                const html = templateRenderer.render('tenant-deactivated-superadmin', {
+                    companyName: tenant.companyName || 'N/A',
+                    reason: req.body.reason || 'No reason provided',
+                    deactivatedAt: new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }),
+                });
+                await MailService.sendMail(
+                    superAdmin.email,
+                    `Tenant Deactivated: ${tenant.companyName}`,
+                    `A tenant ${tenant.companyName} has been deactivated on NooSphere. Click here to view details.`,
+                    html
+                );
+            }
+        }
+
         return res.status(201).json({
             message: "Tenant deactivated successfully",
             status: 'ok',

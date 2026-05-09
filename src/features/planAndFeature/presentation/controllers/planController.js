@@ -4,9 +4,8 @@ import PlanRepository from "../../../planAndFeature/infrastructure/planRepositio
 import PlanService from "../../application/planService.js";
 import AdminRepository from "../../../admin/infrastructure/adminRepository.js";
 import AdminService from "../../../admin/application/adminService.js";
-import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
-import NotificationService from "../../../notifications/application/notificationsService.js";
-import SocketService from "../../../../config/socket.js";
+import MailService from "../../../../utilities/nodemailer.js";
+import templateRenderer from "../../../../utilities/templateRenderer.js";
 
 class PlanController {
     constructor() {
@@ -15,8 +14,6 @@ class PlanController {
         this.adminRepository = new AdminRepository(this.prisma.admin);
         this.service = new PlanService({ planRepository: this.planRepository, adminRepository: this.adminRepository });
         this.adminService = new AdminService();
-        this.notificationRepository = new NotificationsRepository(this.prisma.notification);
-        this.notificationService = new NotificationService({ notificationRepository: this.notificationRepository });
     }
 
     createBillingPlan = expressAsyncHandler(async (req, res) => {
@@ -27,22 +24,17 @@ class PlanController {
         }
 
         const superAdmin = await this.adminService.getSuperAdmin();
-        if (!superAdmin) {
-            res.status(500).json({ message: 'Failed to fetch super admin.' });
+        if (superAdmin?.email) {
+            const html = templateRenderer.render('plan-created-superadmin', {
+                planName: billingPlan.name || 'N/A',
+            });
+            await MailService.sendMail(
+                superAdmin.email,
+                'New Plan Created on NooSphere',
+                `A new billing plan ${billingPlan.name} has been created on NooSphere. Click here to view details.`,
+                html
+            );
         }
-
-        const notif = await this.notificationService.createNotification({
-            userId: superAdmin.id,
-            userType: "ADMIN",
-            type: "Plan Created",
-            title: "Plan Created",
-            content: `
-                A plan has been created on NooSphere. Click here to view details
-            `,
-            isRead: false
-        });
-
-        SocketService.emitToUser(notif.userId, notif.userType, "Plan Created", notif);
 
         return res.status(201).json({
             message: "billing Plan created successfully",
@@ -56,6 +48,21 @@ class PlanController {
 
         if (!billingPlan) {
             res.status(500).json({ message: 'Failed to update billing Plan' });
+        }
+
+        if (req.body.active === false) {
+            const superAdmin = await this.adminService.getSuperAdmin();
+            if (superAdmin?.email) {
+                const html = templateRenderer.render('plan-deactivated-superadmin', {
+                    planName: billingPlan.name || 'N/A',
+                });
+                await MailService.sendMail(
+                    superAdmin.email,
+                    `Plan Deactivated: ${billingPlan.name}`,
+                    `The billing plan ${billingPlan.name} has been deactivated on NooSphere. Click here to view details.`,
+                    html
+                );
+            }
         }
 
         return res.status(201).json({
@@ -129,22 +136,15 @@ class PlanController {
         }
 
         const superAdmin = await this.adminService.getSuperAdmin();
-        if (!superAdmin) {
-            res.status(500).json({ message: 'Failed to fetch super admin.' });
+        if (superAdmin?.email) {
+            const html = templateRenderer.render('plan-deleted-superadmin', {});
+            await MailService.sendMail(
+                superAdmin.email,
+                'A Billing Plan Has Been Deleted on NooSphere',
+                'A billing plan has been deleted on NooSphere.',
+                html
+            );
         }
-
-        const notif = await this.notificationService.createNotification({
-            userId: superAdmin.id,
-            userType: "ADMIN",
-            type: "Plan Deleted",
-            title: "Plan Deleted",
-            content: `
-                A plan has been deleted on NooSphere.
-            `,
-            isRead: false
-        });
-
-        SocketService.emitToUser(notif.userId, notif.userType, "Plan Deleted", notif);
 
         return res.status(201).json({
             message: "billing Plan deleted successfully",
