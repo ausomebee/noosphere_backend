@@ -231,7 +231,10 @@ class InvoiceService {
     }
 
     async regeneratePaymentLink(tenantId) {
-        const invoice = await this.invoiceRepository.findFirst({ tenantId: tenantId });
+        const invoice = await this.invoiceRepository.findFirst(
+            { tenantId: tenantId },
+            { orderBy: { createdAt: 'desc' } }
+        );
 
         if (!invoice) {
             throw new Error("Invoice not found")

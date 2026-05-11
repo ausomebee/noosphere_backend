@@ -7,9 +7,10 @@ class InvoiceRepository {
         return await this.model.create({ data });
     }
 
-    async findFirst(query) {
+    async findFirst(query, options = {}) {
         return await this.model.findFirst({
             where: query,
+            ...options,
         });
     }
 
