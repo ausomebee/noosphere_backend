@@ -211,6 +211,10 @@ class InvoiceService {
             throw new Error("Token expired");
         }
 
+        if (tokenRecord.used) {
+            throw new Error("Token has already been used");
+        }
+
         const invoice = await this.invoiceRepository.findOneAndPopulate(
             { id: decoded.invoiceId },
             {
