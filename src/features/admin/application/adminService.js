@@ -212,7 +212,8 @@ class AdminService {
             permissions: admin.roles
         }
 
-        return { ...admin, accessToken: this.token.generateAccessToken(claims), refreshToken: this.token.generateRefreshToken(admin.id, "ADMIN") };
+        const { password: _ap, ...adminData } = admin;
+        return { ...adminData, accessToken: this.token.generateAccessToken(claims), refreshToken: this.token.generateRefreshToken(admin.id, "ADMIN") };
     }
 
     async verifyPassword(data) {

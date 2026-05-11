@@ -472,7 +472,8 @@ class TenantService {
             permissions: tenantStaff.role.access
         }
 
-        return { ...tenantStaff, accessToken: this.token.generateAccessToken(claims), refreshToken: this.token.generateRefreshToken(tenantStaff.id, "STAFF") };
+        const { password: _sp, ...staffData } = tenantStaff;
+        return { ...staffData, accessToken: this.token.generateAccessToken(claims), refreshToken: this.token.generateRefreshToken(tenantStaff.id, "STAFF") };
     }
 
     async tenantAdminChoices(data) {
