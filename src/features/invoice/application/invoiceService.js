@@ -253,7 +253,32 @@ class InvoiceService {
             throw new Error("Failed to create payment link");
         }
 
-        return `https://noospherehub.net/control/payment/${tok}`;
+        const paymentLink = `https://noospherehub.net/control/payment/${tok}`;
+
+        const [tenant, plan] = await Promise.all([
+            this.tenantRepository.findOne({ id: tenantId }),
+            this.planRepository.findOne({ id: invoice.planId })
+        ]);
+
+        if (tenant) {
+            const html = templateRenderer.render('invoice-payment-link.html', {
+                companyName: tenant.companyName,
+                planName: plan?.planType ?? '',
+                billingFrequency: invoice.billingFrequency || 'Monthly',
+                total: Number(invoice.total).toFixed(2),
+                dueDate: new Date(invoice.dueDate).toDateString(),
+                paymentLink
+            });
+
+            await MailService.sendMail(
+                tenant.email,
+                'Your Payment Link - Noosphere',
+                null,
+                html
+            );
+        }
+
+        return paymentLink;
     }
 
     async getInvoiceTokenHistory(tenantId) {
