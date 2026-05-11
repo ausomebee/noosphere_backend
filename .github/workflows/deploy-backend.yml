@@ -25,13 +25,15 @@ jobs:
       - name: Test SSH connection
         run: |
           ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 \
-          ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST_BACKEND }} "echo ✅ Connected to EC2"
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST_BACKEND }} \
+            "echo ✅ Connected to EC2"
 
       - name: Deploy to EC2 (Production Grade)
         run: |
           BRANCH=${GITHUB_REF##*/}
 
-          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST_BACKEND }} << EOF
+          ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST_BACKEND }} << EOF
             set -e
 
             echo '🚀 Starting deployment...'
@@ -54,32 +56,31 @@ jobs:
             git reset --hard origin/$BRANCH
 
             echo '📝 Creating .env file...'
-
             cat > .env << EOL
-AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-AWS_REGION=${{ secrets.AWS_REGION }}
-AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-CLIENT_URL=${{ secrets.CLIENT_URL }}
-CLOUDWATCH_USERNAME=${{ secrets.CLOUDWATCH_USERNAME }}
-DATABASE_URL=${{ secrets.DATABASE_URL }}
-EC2_INSTANCE_ID=${{ secrets.EC2_INSTANCE_ID }}
-GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
-JWT_EXPIRE=${{ secrets.JWT_EXPIRE }}
-JWT_SECRET=${{ secrets.JWT_SECRET }}
-MAIL_PASS=${{ secrets.MAIL_PASS }}
-MONGO_URI=${{ secrets.MONGO_URI }}
-MY_DB_INSTANCE=${{ secrets.MY_DB_INSTANCE }}
-NODE_ENV=${{ secrets.NODE_ENV }}
-PORT=${{ secrets.PORT }}
-RDS_INSTANCE_ID=${{ secrets.RDS_INSTANCE_ID }}
-RDS_TOTAL_MEMORY_GB=${{ secrets.RDS_TOTAL_MEMORY_GB }}
-RDS_TOTAL_STORAGE_GB=${{ secrets.RDS_TOTAL_STORAGE_GB }}
-S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
-SERVER_URL=${{ secrets.SERVER_URL }}
-SESSION_SECRET=${{ secrets.SESSION_SECRET }}
-TRY=${{ secrets.TRY }}
-EOL
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_REGION=${{ secrets.AWS_REGION }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          CLIENT_URL=${{ secrets.CLIENT_URL }}
+          CLOUDWATCH_USERNAME=${{ secrets.CLOUDWATCH_USERNAME }}
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          EC2_INSTANCE_ID=${{ secrets.EC2_INSTANCE_ID }}
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+          JWT_EXPIRE=${{ secrets.JWT_EXPIRE }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          MAIL_PASS=${{ secrets.MAIL_PASS }}
+          MONGO_URI=${{ secrets.MONGO_URI }}
+          MY_DB_INSTANCE=${{ secrets.MY_DB_INSTANCE }}
+          NODE_ENV=${{ secrets.NODE_ENV }}
+          PORT=${{ secrets.PORT }}
+          RDS_INSTANCE_ID=${{ secrets.RDS_INSTANCE_ID }}
+          RDS_TOTAL_MEMORY_GB=${{ secrets.RDS_TOTAL_MEMORY_GB }}
+          RDS_TOTAL_STORAGE_GB=${{ secrets.RDS_TOTAL_STORAGE_GB }}
+          S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
+          SERVER_URL=${{ secrets.SERVER_URL }}
+          SESSION_SECRET=${{ secrets.SESSION_SECRET }}
+          TRY=${{ secrets.TRY }}
+          EOL
 
             echo '✅ .env file created successfully'
 
