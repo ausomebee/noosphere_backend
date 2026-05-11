@@ -304,7 +304,7 @@ class TenantService {
     }
 
     async getAllActiveTenant() {
-        const tenants = await this.tenantRepository.findAllAndPopulate({ active: true });
+        const tenants = await this.tenantRepository.findAllWithActiveSubscription();
 
         if (!tenants) {
             throw new Error("Tenants not found")

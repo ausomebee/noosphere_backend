@@ -35,6 +35,33 @@ class TenantRepository extends BaseRepository {
         });
     }
 
+    async findAllWithActiveSubscription() {
+        return await this.model.findMany({
+            where: {
+                active: true,
+                Subscription: {
+                    some: { status: 'ACTIVE' }
+                }
+            },
+            include: {
+                BillingPlan: {
+                    select: {
+                        planType: true
+                    }
+                },
+                Subscription: {
+                    include: { plan: true }
+                },
+                accountOfficer: {
+                    select: { firstName: true, lastName: true }
+                },
+                admin: {
+                    select: { firstName: true, lastName: true }
+                },
+            }
+        });
+    }
+
     async findOneAndPopulate(filter = {}) {
         return await this.model.findUnique({
             where: filter,
