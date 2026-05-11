@@ -425,8 +425,8 @@ class TenantController {
         const totalStaffs = await this.service.countAllStaffs();
         const totalClients = await this.clientService.countAllClients();
 
-        if (!totalTenants || !totalStaffs || !totalClients) {
-            res.status(500).json({ message: 'Failed to fetch tenants, staffs, or clients.' });
+        if (totalTenants == null || totalStaffs == null || totalClients == null) {
+            return res.status(500).json({ message: 'Failed to fetch tenants, staffs, or clients.' });
         }
 
         return res.status(201).json({
