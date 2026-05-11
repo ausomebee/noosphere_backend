@@ -599,7 +599,7 @@ class InvoiceRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.post("/payment-link", adminProtect, this.controller.generatePaymentLink);
+        this.router.post("/payment-link", adminProtect(), this.controller.generatePaymentLink);
 
         /**
         * @swagger
