@@ -173,7 +173,7 @@ class InvoiceService {
             throw new Error("Failed to create payment link");
         }
 
-        const paymentLink = `https://noospherehub.net/control/payment/${tok}`;
+        const paymentLink = `http://noospherehub.net/control/payment/${tok}`;
 
         const tenant = await this.tenantRepository.findOne({ id: data.tenantId });
 
@@ -256,7 +256,7 @@ class InvoiceService {
             throw new Error("Failed to create payment link");
         }
 
-        const paymentLink = `https://noospherehub.net/control/payment/${tok}`;
+        const paymentLink = `http://noospherehub.net/control/payment/${tok}`;
 
         const [tenant, plan] = await Promise.all([
             this.tenantRepository.findOne({ id: tenantId }),
