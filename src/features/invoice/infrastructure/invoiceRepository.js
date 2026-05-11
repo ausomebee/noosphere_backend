@@ -105,53 +105,59 @@ class InvoiceRepository {
         });
     }
 
-    async getInvoiceTokenHistory(invoiceId) {
-        const invoice = await this.model.findFirst({
-            where: { id: invoiceId },
+    async getInvoiceTokenHistory(tenantId) {
+        const invoices = await this.model.findMany({
+            where: { tenantId },
             include: {
-                invoiceTokens: true,
+                invoiceTokens: {
+                    orderBy: { createdAt: "asc" },
+                },
                 Payment: true,
             },
+            orderBy: { createdAt: "asc" },
         });
 
-        if (!invoice) {
-            throw new Error("Invoice not found");
+        if (!invoices || invoices.length === 0) {
+            throw new Error("No invoices found for this tenant");
         }
 
         const history = [];
 
-        const sortedTokens = invoice.invoiceTokens.sort(
-            (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-        );
+        for (const invoice of invoices) {
+            const tokens = invoice.invoiceTokens;
 
-        for (let i = 0; i < sortedTokens.length; i++) {
-            const token = sortedTokens[i];
+            for (let i = 0; i < tokens.length; i++) {
+                const token = tokens[i];
 
-            history.push({
-                event: i === 0 ? "PAYMENT_LINK_GENERATED" : "PAYMENT_LINK_REGENERATED",
-                time: token.createdAt,
-                tokenId: token.id,
-            });
-
-            if (new Date() > token.expiresAt && !token.used) {
                 history.push({
-                    event: "PAYMENT_LINK_EXPIRED",
-                    time: token.expiresAt,
+                    event: i === 0 ? "PAYMENT_LINK_GENERATED" : "PAYMENT_LINK_REGENERATED",
+                    time: token.createdAt,
+                    invoiceId: invoice.id,
                     tokenId: token.id,
                 });
-            }
 
-            if (token.used) {
-                const payment = invoice.Payment.find(
-                    (p) => p.invoiceId === invoiceId
-                );
-
-                if (payment) {
+                if (new Date() > token.expiresAt && !token.used) {
                     history.push({
-                        event: "PAYMENT_LINK_PAID",
-                        time: payment.createdAt,
+                        event: "PAYMENT_LINK_EXPIRED",
+                        time: token.expiresAt,
+                        invoiceId: invoice.id,
                         tokenId: token.id,
                     });
+                }
+
+                if (token.used) {
+                    const payment = invoice.Payment.find(
+                        (p) => p.invoiceId === invoice.id
+                    );
+
+                    if (payment) {
+                        history.push({
+                            event: "PAYMENT_LINK_PAID",
+                            time: payment.createdAt,
+                            invoiceId: invoice.id,
+                            tokenId: token.id,
+                        });
+                    }
                 }
             }
         }

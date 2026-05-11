@@ -282,13 +282,7 @@ class InvoiceService {
     }
 
     async getInvoiceTokenHistory(tenantId) {
-        const invoice = await this.invoiceRepository.findFirst({ tenantId: tenantId });
-
-        if (!invoice) {
-            throw new Error("Invoice not found")
-        }
-
-        const history = await this.invoiceRepository.getInvoiceTokenHistory(invoice.id);
+        const history = await this.invoiceRepository.getInvoiceTokenHistory(tenantId);
 
         if (!history) {
             throw new Error("Failed to fetch invoice token history");
