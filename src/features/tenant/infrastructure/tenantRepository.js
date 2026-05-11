@@ -13,6 +13,16 @@ class TenantRepository extends BaseRepository {
         return await this.model.count();
     }
 
+    async countPaidTenants() {
+        return await this.model.count({
+            where: {
+                Subscription: {
+                    some: { status: 'ACTIVE' }
+                }
+            }
+        });
+    }
+
     async findAllAndPopulate(filter = {}) {
         return await this.model.findMany({
             where: filter,

@@ -13,6 +13,23 @@ class ClientRepository extends BaseRepository {
         return await this.model.count();
     }
 
+    async countClientsOfPaidTenants() {
+        return await this.model.count({
+            where: {
+                isDeleted: false,
+                tenantLinks: {
+                    some: {
+                        tenant: {
+                            Subscription: {
+                                some: { status: 'ACTIVE' }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     async getClientsByClinician(staffId, tenantId) {
         return await this.model.findMany({
             where: {

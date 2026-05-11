@@ -360,6 +360,10 @@ class TenantService {
         return totalTenants;
     }
 
+    async countPaidTenants() {
+        return await this.tenantRepository.countPaidTenants();
+    }
+
     async countAllStaffs() {
         const totalStaffs = await this.staffRepository.countAllStaffs();
 
@@ -368,6 +372,10 @@ class TenantService {
         }
 
         return totalStaffs;
+    }
+
+    async countStaffsOfPaidTenants() {
+        return await this.staffRepository.countStaffsOfPaidTenants();
     }
 
     async contactTenantByEmail(data) {

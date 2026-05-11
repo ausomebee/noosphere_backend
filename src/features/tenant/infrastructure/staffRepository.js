@@ -64,6 +64,19 @@ class StaffRepository extends BaseRepository {
         });
     }
 
+    async countStaffsOfPaidTenants() {
+        return await this.model.count({
+            where: {
+                isDeleted: false,
+                tenant: {
+                    Subscription: {
+                        some: { status: 'ACTIVE' }
+                    }
+                }
+            }
+        });
+    }
+
     async cliniciansPerClient(tenantId) {
         return await this.model.findMany({
             where: {

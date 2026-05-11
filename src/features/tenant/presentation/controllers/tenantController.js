@@ -421,9 +421,9 @@ class TenantController {
     });
 
     tenantManagementOverview = expressAsyncHandler(async (req, res) => {
-        const totalTenants = await this.service.countAllTenant();
-        const totalStaffs = await this.service.countAllStaffs();
-        const totalClients = await this.clientService.countAllClients();
+        const totalTenants = await this.service.countPaidTenants();
+        const totalStaffs = await this.service.countStaffsOfPaidTenants();
+        const totalClients = await this.clientService.countClientsOfPaidTenants();
 
         if (totalTenants == null || totalStaffs == null || totalClients == null) {
             return res.status(500).json({ message: 'Failed to fetch tenants, staffs, or clients.' });

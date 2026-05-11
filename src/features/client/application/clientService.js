@@ -324,6 +324,10 @@ class ClientService {
     async countAllClients() {
         return await this.clientRepository.countAllClients();
     }
+
+    async countClientsOfPaidTenants() {
+        return await this.clientRepository.countClientsOfPaidTenants();
+    }
 }
 
 export default ClientService;
