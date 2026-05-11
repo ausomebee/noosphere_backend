@@ -316,7 +316,7 @@ class InvoiceService {
             pageSize
         );
 
-        if (!invoices || invoices.data.length === 0) {
+        if (!invoices) {
             throw new Error("No invoices found for this tenant");
         }
 
@@ -336,18 +336,8 @@ class InvoiceService {
         return invoices;
     }
 
-    async getTenantInvoicesByStatus(tenantId, status) {
-        const invoices =
-            await this.invoiceRepository.getTenantInvoicesByStatus(
-                tenantId,
-                status
-            );
-
-        if (!invoices || invoices.length === 0) {
-            throw new Error(`No invoices found with status ${status}`);
-        }
-
-        return invoices;
+    async getTenantInvoicesByStatus(tenantId, status, page = 1, pageSize = 10) {
+        return await this.getTenantInvoices(tenantId, { status }, page, pageSize);
     }
 
     async getTotalBilled(data) {

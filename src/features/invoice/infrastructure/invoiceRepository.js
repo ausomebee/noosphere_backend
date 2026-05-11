@@ -94,18 +94,6 @@ class InvoiceRepository {
         };
     }
 
-    async getTenantInvoicesByStatus(tenantId, status) {
-        return await this.model.findMany({
-            where: {
-                tenantId,
-                status,
-            },
-            orderBy: {
-                createdAt: "desc",
-            },
-        });
-    }
-
     async getInvoiceTokenHistory(tenantId) {
         const invoices = await this.model.findMany({
             where: { tenantId },

@@ -156,10 +156,14 @@ class InvoiceController {
 
     getTenantInvoicesByStatus = expressAsyncHandler(async (req, res) => {
         const { status, tenantId } = req.params;
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = parseInt(req.query.pageSize) || 10;
 
         const invoices = await this.service.getTenantInvoicesByStatus(
             tenantId,
-            status
+            status,
+            page,
+            pageSize
         );
 
         return res.status(200).json({
