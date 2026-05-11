@@ -639,7 +639,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/regenerate/:tenantId", staffProtect, this.controller.regeneratePaymentLink);
+        this.router.patch("/regenerate/:tenantId", adminProtect(), this.controller.regeneratePaymentLink);
 
         /**
          * @swagger
