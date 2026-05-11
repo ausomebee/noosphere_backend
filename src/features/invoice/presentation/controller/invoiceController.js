@@ -5,6 +5,7 @@ import InvoiceService from "../../application/invoiceService.js";
 import PlanRepository from "../../../planAndFeature/infrastructure/planRepositiory.js";
 import InvoiceManagementRepository from "../../infrastructure/invoiceManagementRepository.js";
 import InvoiceTokenRepository from "../../infrastructure/invoiceTokenRepository.js";
+import TenantRepository from "../../../tenant/infrastructure/tenantRepository.js";
 
 class InvoiceController {
     constructor() {
@@ -12,8 +13,9 @@ class InvoiceController {
         this.invoiceRepository = new InvoiceRepository(this.prisma.invoice);
         this.invoiceManagementRepository = new InvoiceManagementRepository(this.prisma.invoiceManagement);
         this.invoiceTokenRepository = new InvoiceTokenRepository(this.prisma.invoiceToken);
-        this.planRepository = new PlanRepository(this.prisma.billingPlan)
-        this.service = new InvoiceService({ invoiceRepository: this.invoiceRepository, planRepository: this.planRepository, invoiceManagementRepository: this.invoiceManagementRepository, invoiceTokenRepository: this.invoiceTokenRepository });
+        this.planRepository = new PlanRepository(this.prisma.billingPlan);
+        this.tenantRepository = new TenantRepository(this.prisma.tenant);
+        this.service = new InvoiceService({ invoiceRepository: this.invoiceRepository, planRepository: this.planRepository, invoiceManagementRepository: this.invoiceManagementRepository, invoiceTokenRepository: this.invoiceTokenRepository, tenantRepository: this.tenantRepository });
     }
 
     createInvoice = expressAsyncHandler(async (req, res) => {

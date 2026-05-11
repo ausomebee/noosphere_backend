@@ -1,13 +1,16 @@
 import e from "express";
 import TokenService from "../../../utilities/generate_token.js";
 import Invoice from "../domain/invoice.js";
+import MailService from "../../../utilities/nodemailer.js";
+import templateRenderer from "../../../utilities/templateRenderer.js";
 
 class InvoiceService {
-    constructor({ invoiceRepository, planRepository, invoiceManagementRepository, invoiceTokenRepository }) {
+    constructor({ invoiceRepository, planRepository, invoiceManagementRepository, invoiceTokenRepository, tenantRepository }) {
         this.invoiceRepository = invoiceRepository;
         this.planRepository = planRepository;
         this.invoiceManagementRepository = invoiceManagementRepository;
         this.invoiceTokenRepository = invoiceTokenRepository;
+        this.tenantRepository = tenantRepository;
         this.token = TokenService;
     }
 
@@ -170,7 +173,29 @@ class InvoiceService {
             throw new Error("Failed to create payment link");
         }
 
-        return `https://noospherehub.net/control/payment/${tok}`;
+        const paymentLink = `https://noospherehub.net/control/payment/${tok}`;
+
+        const tenant = await this.tenantRepository.findOne({ id: data.tenantId });
+
+        if (tenant) {
+            const html = templateRenderer.render('invoice-payment-link.html', {
+                companyName: tenant.companyName,
+                planName: plan.planType,
+                billingFrequency: data.billingFrequency || 'Monthly',
+                total: total.toFixed(2),
+                dueDate: dueDate.toDateString(),
+                paymentLink
+            });
+
+            await MailService.sendMail(
+                tenant.email,
+                'Your Payment Link - Noosphere',
+                null,
+                html
+            );
+        }
+
+        return paymentLink;
     }
 
     async validatePaymentToken(token) {
