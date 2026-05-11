@@ -619,7 +619,7 @@ class InvoiceRoutes {
         *     400:
         *       description: Validation error
         */
-        this.router.get("/validate-payment-token/:token", staffProtect, this.controller.validatePaymentToken);
+        this.router.get("/validate-payment-token/:token", this.controller.validatePaymentToken);
 
         /**
          * @swagger
