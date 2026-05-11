@@ -120,10 +120,15 @@ class InvoiceRepository {
 
         const history = [];
 
-        for (const token of invoice.invoiceTokens) {
+        const sortedTokens = invoice.invoiceTokens.sort(
+            (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+        );
+
+        for (let i = 0; i < sortedTokens.length; i++) {
+            const token = sortedTokens[i];
 
             history.push({
-                event: "PAYMENT_LINK_GENERATED",
+                event: i === 0 ? "PAYMENT_LINK_GENERATED" : "PAYMENT_LINK_REGENERATED",
                 time: token.createdAt,
                 tokenId: token.id,
             });
@@ -148,20 +153,6 @@ class InvoiceRepository {
                         tokenId: token.id,
                     });
                 }
-            }
-        }
-
-        if (invoice.invoiceTokens.length > 1) {
-            const sortedTokens = invoice.invoiceTokens.sort(
-                (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-            );
-
-            for (let i = 1; i < sortedTokens.length; i++) {
-                history.push({
-                    event: "PAYMENT_LINK_REGENERATED",
-                    time: sortedTokens[i].createdAt,
-                    tokenId: sortedTokens[i].id,
-                });
             }
         }
 
