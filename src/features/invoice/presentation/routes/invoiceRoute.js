@@ -1,7 +1,7 @@
 import express from "express";
 import InvoiceController from "../controller/invoiceController.js";
 import InvoiceDto from "../dto/invoiceDto.js";
-import { staffProtect } from "../../../../middleware/auth_handlers.js";
+import { staffProtect, adminProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -599,7 +599,7 @@ class InvoiceRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.post("/payment-link", staffProtect, this.controller.generatePaymentLink);
+        this.router.post("/payment-link", adminProtect, this.controller.generatePaymentLink);
 
         /**
         * @swagger
