@@ -454,7 +454,7 @@ class InvoiceRoutes {
          */
         this.router.get(
             "/tenants/:tenantId/invoices/status/:status",
-            staffProtect,
+            adminProtect(),
             this.controller.getTenantInvoicesByStatus
         );
 
