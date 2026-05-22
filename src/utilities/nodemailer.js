@@ -6,7 +6,7 @@ class MailService {
     secure: true,
     port: 465,
     auth: {
-      user: process.env.TRY,
+      user: process.env.MAIL_USER,
       pass: process.env.MAIL_PASS,
     },
   });
@@ -14,7 +14,7 @@ class MailService {
   static async sendMail(to, subject, text, html = null, attachments = null) {
     try {
       const mailOptions = {
-        from: '"Noosphere" <ayodejiamzat@gmail.com>',
+        from: `"Noosphere" <${process.env.MAIL_USER}>`,
         to,
         subject,
         ...(text && { text }),
