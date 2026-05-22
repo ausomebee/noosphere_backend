@@ -1,4 +1,4 @@
-name: Deploy Backend to Dev Server
+name: Deploy Backend
 
 on:
   push:
@@ -12,91 +12,190 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      #################################################
+      # CHECKOUT
+      #################################################
 
-      - name: Set up SSH key
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      #################################################
+      # DETERMINE ENVIRONMENT
+      #################################################
+
+      - name: Set environment variables
+        id: env
+        run: |
+          BRANCH=${GITHUB_REF##*/}
+
+          if [ "$BRANCH" = "develop" ]; then
+            echo "host=${{ secrets.DEV_EC2_HOST_BACKEND }}" >> $GITHUB_OUTPUT
+            echo "env=dev" >> $GITHUB_OUTPUT
+
+          elif [ "$BRANCH" = "pre-prod" ]; then
+            echo "host=${{ secrets.PREPROD_EC2_HOST_BACKEND }}" >> $GITHUB_OUTPUT
+            echo "env=preprod" >> $GITHUB_OUTPUT
+
+          elif [ "$BRANCH" = "master" ]; then
+            echo "host=${{ secrets.PROD_EC2_HOST_BACKEND }}" >> $GITHUB_OUTPUT
+            echo "env=prod" >> $GITHUB_OUTPUT
+          fi
+
+      #################################################
+      # SETUP SSH KEY
+      #################################################
+
+      - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
           printf "%s" "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.EC2_HOST_BACKEND }} >> ~/.ssh/known_hosts || true
+          ssh-keyscan -H ${{ steps.env.outputs.host }} >> ~/.ssh/known_hosts
+
+      #################################################
+      # TEST CONNECTION
+      #################################################
 
       - name: Test SSH connection
         run: |
-          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 \
-            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST_BACKEND }} \
-            "echo ✅ Connected to EC2"
+          ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.EC2_USER }}@${{ steps.env.outputs.host }} \
+            "echo Connected to backend server"
 
-      - name: Deploy to EC2 (Production Grade)
+      #################################################
+      # DEPLOY TO SERVER
+      #################################################
+
+      - name: Deploy backend
         run: |
           BRANCH=${GITHUB_REF##*/}
 
           ssh -o StrictHostKeyChecking=no \
-            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST_BACKEND }} << EOF
+            ${{ secrets.EC2_USER }}@${{ steps.env.outputs.host }} << EOF
             set -e
 
-            echo '🚀 Starting deployment...'
-            echo 'Branch: $BRANCH'
+            echo "🚀 Deploying backend ($BRANCH)"
 
-            # Ensure directory exists
-            mkdir -p ${{ secrets.DEPLOY_PATH }}
-            cd ${{ secrets.DEPLOY_PATH }}
+            DEPLOY_PATH=${{ secrets.DEPLOY_PATH }}
 
-            # First-time setup (clone if missing)
-            if [ ! -d '.git' ]; then
-              echo '📦 Cloning repository...'
+            mkdir -p \$DEPLOY_PATH
+            cd \$DEPLOY_PATH
+
+            #################################################
+            # CLONE OR UPDATE REPO
+            #################################################
+
+            if [ ! -d ".git" ]; then
+              echo "📦 Cloning repository..."
               git clone git@github.com:ausomebee/noosphere_backend.git .
             fi
 
-            echo '🔄 Fetching latest code...'
+            echo "🔄 Updating code..."
             git fetch origin
-
-            echo '⚡ Resetting to latest version...'
             git reset --hard origin/$BRANCH
 
-            echo '📝 Creating .env file...'
-            cat > .env << EOL
-          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_REGION=${{ secrets.AWS_REGION }}
-          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          CLIENT_URL=${{ secrets.CLIENT_URL }}
-          CLOUDWATCH_USERNAME=${{ secrets.CLOUDWATCH_USERNAME }}
-          DATABASE_URL=${{ secrets.DATABASE_URL }}
-          EC2_INSTANCE_ID=${{ secrets.EC2_INSTANCE_ID }}
-          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
-          JWT_EXPIRE=${{ secrets.JWT_EXPIRE }}
-          JWT_SECRET=${{ secrets.JWT_SECRET }}
-          MAIL_PASS=${{ secrets.MAIL_PASS }}
-          MONGO_URI=${{ secrets.MONGO_URI }}
-          MY_DB_INSTANCE=${{ secrets.MY_DB_INSTANCE }}
-          NODE_ENV=${{ secrets.NODE_ENV }}
-          PORT=${{ secrets.PORT }}
-          RDS_INSTANCE_ID=${{ secrets.RDS_INSTANCE_ID }}
-          RDS_TOTAL_MEMORY_GB=${{ secrets.RDS_TOTAL_MEMORY_GB }}
-          RDS_TOTAL_STORAGE_GB=${{ secrets.RDS_TOTAL_STORAGE_GB }}
-          S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
-          SERVER_URL=${{ secrets.SERVER_URL }}
-          SESSION_SECRET=${{ secrets.SESSION_SECRET }}
-          TRY=${{ secrets.TRY }}
-          EOL
+            #################################################
+            # CREATE ENV FILE PER ENVIRONMENT
+            #################################################
 
-            echo '✅ .env file created successfully'
+            echo "📝 Creating environment-specific .env file..."
 
-            echo '📦 Installing dependencies...'
+            if [ "$BRANCH" = "develop" ]; then
+
+              cat > .env << EOL
+NODE_ENV=${{ secrets.DEV_NODE_ENV }}
+PORT=${{ secrets.DEV_PORT }}
+DATABASE_URL=${{ secrets.DEV_DATABASE_URL }}
+JWT_SECRET=${{ secrets.DEV_JWT_SECRET }}
+JWT_EXPIRE=${{ secrets.DEV_JWT_EXPIRE }}
+CLIENT_URL=${{ secrets.DEV_CLIENT_URL }}
+SERVER_URL=${{ secrets.DEV_SERVER_URL }}
+MAIL_PASS=${{ secrets.DEV_MAIL_PASS }}
+MAIL_USER=${{ secrets.DEV_MAIL_USER }}
+SESSION_SECRET=${{ secrets.DEV_SESSION_SECRET }}
+CLOUDWATCH_USERNAME=${{ secrets.DEV_CLOUDWATCH_USERNAME }}
+AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+AWS_SECRET_ACCESS_KEY=${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+AWS_REGION=${{ secrets.DEV_AWS_REGION }}
+EC2_INSTANCE_ID=${{ secrets.DEV_EC2_INSTANCE_ID }}
+MY_DB_INSTANCE=${{ secrets.DEV_MY_DB_INSTANCE }}
+S3_BUCKET_NAME=${{ secrets.DEV_S3_BUCKET_NAME }}
+RDS_INSTANCE_ID=${{ secrets.DEV_RDS_INSTANCE_ID }}
+RDS_TOTAL_MEMORY_GB=${{ secrets.DEV_RDS_TOTAL_MEMORY_GB }}
+RDS_TOTAL_STORAGE_GB=${{ secrets.DEV_RDS_TOTAL_STORAGE_GB }}
+EOL
+
+            elif [ "$BRANCH" = "pre-prod" ]; then
+
+              cat > .env << EOL
+NODE_ENV=${{ secrets.PREPROD_NODE_ENV }}
+PORT=${{ secrets.PREPROD_PORT }}
+DATABASE_URL=${{ secrets.PREPROD_DATABASE_URL }}
+JWT_SECRET=${{ secrets.PREPROD_JWT_SECRET }}
+JWT_EXPIRE=${{ secrets.PREPROD_JWT_EXPIRE }}
+CLIENT_URL=${{ secrets.PREPROD_CLIENT_URL }}
+SERVER_URL=${{ secrets.PREPROD_SERVER_URL }}
+MAIL_PASS=${{ secrets.PREPROD_MAIL_PASS }}
+MAIL_USER=${{ secrets.PREPROD_MAIL_USER }}
+SESSION_SECRET=${{ secrets.PREPROD_SESSION_SECRET }}
+CLOUDWATCH_USERNAME=${{ secrets.PREPROD_CLOUDWATCH_USERNAME }}
+AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+AWS_SECRET_ACCESS_KEY=${{ secrets.PREPROD_AWS_SECRET_ACCESS_KEY }}
+AWS_REGION=${{ secrets.PREPROD_AWS_REGION }}
+EC2_INSTANCE_ID=${{ secrets.PREPROD_EC2_INSTANCE_ID }}
+MY_DB_INSTANCE=${{ secrets.PREPROD_MY_DB_INSTANCE }}
+S3_BUCKET_NAME=${{ secrets.PREPROD_S3_BUCKET_NAME }}
+RDS_INSTANCE_ID=${{ secrets.PREPROD_RDS_INSTANCE_ID }}
+RDS_TOTAL_MEMORY_GB=${{ secrets.PREPROD_RDS_TOTAL_MEMORY_GB }}
+RDS_TOTAL_STORAGE_GB=${{ secrets.PREPROD_RDS_TOTAL_STORAGE_GB }}
+EOL
+
+            elif [ "$BRANCH" = "master" ]; then
+
+              cat > .env << EOL
+NODE_ENV=${{ secrets.PROD_NODE_ENV }}
+PORT=${{ secrets.PROD_PORT }}
+DATABASE_URL=${{ secrets.PROD_DATABASE_URL }}
+JWT_SECRET=${{ secrets.PROD_JWT_SECRET }}
+JWT_EXPIRE=${{ secrets.PROD_JWT_EXPIRE }}
+CLIENT_URL=${{ secrets.PROD_CLIENT_URL }}
+SERVER_URL=${{ secrets.PROD_SERVER_URL }}
+MAIL_PASS=${{ secrets.PROD_MAIL_PASS }}
+MAIL_USER=${{ secrets.PROD_MAIL_USER }}
+SESSION_SECRET=${{ secrets.PROD_SESSION_SECRET }}
+CLOUDWATCH_USERNAME=${{ secrets.PROD_CLOUDWATCH_USERNAME }}
+AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+AWS_SECRET_ACCESS_KEY=${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+AWS_REGION=${{ secrets.PROD_AWS_REGION }}
+EC2_INSTANCE_ID=${{ secrets.PROD_EC2_INSTANCE_ID }}
+MY_DB_INSTANCE=${{ secrets.PROD_MY_DB_INSTANCE }}
+S3_BUCKET_NAME=${{ secrets.PROD_S3_BUCKET_NAME }}
+RDS_INSTANCE_ID=${{ secrets.PROD_RDS_INSTANCE_ID }}
+RDS_TOTAL_MEMORY_GB=${{ secrets.PROD_RDS_TOTAL_MEMORY_GB }}
+RDS_TOTAL_STORAGE_GB=${{ secrets.PROD_RDS_TOTAL_STORAGE_GB }}
+EOL
+
+            fi
+
+            echo "✅ .env created successfully"
+
+            #################################################
+            # INSTALL + DEPLOY
+            #################################################
+
             npm install --production
 
-            echo '🧠 Checking PM2...'
+            #################################################
+            # PM2 SETUP
+            #################################################
+
             if ! command -v pm2 &> /dev/null; then
-              echo 'Installing PM2...'
+              echo "Installing PM2..."
               npm install -g pm2
             fi
 
-            echo '🔁 Restarting application (zero downtime)...'
             pm2 reload noosphere-backend || pm2 start src/server.js --name noosphere-backend
-
             pm2 save
 
-            echo '✅ Deployment completed successfully'
+            echo "✅ Deployment completed"
           EOF
