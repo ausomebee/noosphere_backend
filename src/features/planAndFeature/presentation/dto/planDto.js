@@ -51,7 +51,7 @@ class PlanDto {
                         currency: Joi.string().valid('USD').optional()
                     }).optional()
                 })
-            )
+            ).optional()
         });
 
         Validator.validateRequest(req, next, schema);
