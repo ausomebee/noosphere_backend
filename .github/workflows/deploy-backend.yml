@@ -12,38 +12,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      #################################################
-      # CHECKOUT
-      #################################################
-
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      #################################################
-      # DETERMINE ENVIRONMENT
-      #################################################
 
       - name: Set environment variables
         id: env
         run: |
           BRANCH=${GITHUB_REF##*/}
-
           if [ "$BRANCH" = "develop" ]; then
             echo "host=${{ secrets.DEV_EC2_HOST_BACKEND }}" >> $GITHUB_OUTPUT
             echo "env=dev" >> $GITHUB_OUTPUT
-
           elif [ "$BRANCH" = "pre-prod" ]; then
             echo "host=${{ secrets.PREPROD_EC2_HOST_BACKEND }}" >> $GITHUB_OUTPUT
             echo "env=preprod" >> $GITHUB_OUTPUT
-
           elif [ "$BRANCH" = "master" ]; then
             echo "host=${{ secrets.PROD_EC2_HOST_BACKEND }}" >> $GITHUB_OUTPUT
             echo "env=prod" >> $GITHUB_OUTPUT
           fi
-
-      #################################################
-      # SETUP SSH KEY
-      #################################################
 
       - name: Setup SSH key
         run: |
@@ -52,19 +37,11 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ steps.env.outputs.host }} >> ~/.ssh/known_hosts
 
-      #################################################
-      # TEST CONNECTION
-      #################################################
-
       - name: Test SSH connection
         run: |
           ssh -o StrictHostKeyChecking=no \
             ${{ secrets.EC2_USER }}@${{ steps.env.outputs.host }} \
             "echo Connected to backend server"
-
-      #################################################
-      # DEPLOY TO SERVER
-      #################################################
 
       - name: Deploy backend
         run: |
@@ -77,13 +54,8 @@ jobs:
             echo "🚀 Deploying backend ($BRANCH)"
 
             DEPLOY_PATH=${{ secrets.DEPLOY_PATH }}
-
             mkdir -p \$DEPLOY_PATH
             cd \$DEPLOY_PATH
-
-            #################################################
-            # CLONE OR UPDATE REPO
-            #################################################
 
             if [ ! -d ".git" ]; then
               echo "📦 Cloning repository..."
@@ -94,100 +66,82 @@ jobs:
             git fetch origin
             git reset --hard origin/$BRANCH
 
-            #################################################
-            # CREATE ENV FILE PER ENVIRONMENT
-            #################################################
-
-            echo "📝 Creating environment-specific .env file..."
+            echo "📝 Creating .env file..."
 
             if [ "$BRANCH" = "develop" ]; then
-
-              cat > .env << EOL
-NODE_ENV=${{ secrets.DEV_NODE_ENV }}
-PORT=${{ secrets.DEV_PORT }}
-DATABASE_URL=${{ secrets.DEV_DATABASE_URL }}
-JWT_SECRET=${{ secrets.DEV_JWT_SECRET }}
-JWT_EXPIRE=${{ secrets.DEV_JWT_EXPIRE }}
-CLIENT_URL=${{ secrets.DEV_CLIENT_URL }}
-SERVER_URL=${{ secrets.DEV_SERVER_URL }}
-MAIL_PASS=${{ secrets.DEV_MAIL_PASS }}
-MAIL_USER=${{ secrets.DEV_MAIL_USER }}
-SESSION_SECRET=${{ secrets.DEV_SESSION_SECRET }}
-CLOUDWATCH_USERNAME=${{ secrets.DEV_CLOUDWATCH_USERNAME }}
-AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-AWS_SECRET_ACCESS_KEY=${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
-AWS_REGION=${{ secrets.DEV_AWS_REGION }}
-EC2_INSTANCE_ID=${{ secrets.DEV_EC2_INSTANCE_ID }}
-MY_DB_INSTANCE=${{ secrets.DEV_MY_DB_INSTANCE }}
-S3_BUCKET_NAME=${{ secrets.DEV_S3_BUCKET_NAME }}
-RDS_INSTANCE_ID=${{ secrets.DEV_RDS_INSTANCE_ID }}
-RDS_TOTAL_MEMORY_GB=${{ secrets.DEV_RDS_TOTAL_MEMORY_GB }}
-RDS_TOTAL_STORAGE_GB=${{ secrets.DEV_RDS_TOTAL_STORAGE_GB }}
-EOL
-
+              {
+                echo "NODE_ENV=${{ secrets.DEV_NODE_ENV }}"
+                echo "PORT=${{ secrets.DEV_PORT }}"
+                echo "DATABASE_URL=${{ secrets.DEV_DATABASE_URL }}"
+                echo "JWT_SECRET=${{ secrets.DEV_JWT_SECRET }}"
+                echo "JWT_EXPIRE=${{ secrets.DEV_JWT_EXPIRE }}"
+                echo "CLIENT_URL=${{ secrets.DEV_CLIENT_URL }}"
+                echo "SERVER_URL=${{ secrets.DEV_SERVER_URL }}"
+                echo "MAIL_PASS=${{ secrets.DEV_MAIL_PASS }}"
+                echo "MAIL_USER=${{ secrets.DEV_MAIL_USER }}"
+                echo "SESSION_SECRET=${{ secrets.DEV_SESSION_SECRET }}"
+                echo "CLOUDWATCH_USERNAME=${{ secrets.DEV_CLOUDWATCH_USERNAME }}"
+                echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}"
+                echo "AWS_SECRET_ACCESS_KEY=${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}"
+                echo "AWS_REGION=${{ secrets.DEV_AWS_REGION }}"
+                echo "EC2_INSTANCE_ID=${{ secrets.DEV_EC2_INSTANCE_ID }}"
+                echo "MY_DB_INSTANCE=${{ secrets.DEV_MY_DB_INSTANCE }}"
+                echo "S3_BUCKET_NAME=${{ secrets.DEV_S3_BUCKET_NAME }}"
+                echo "RDS_INSTANCE_ID=${{ secrets.DEV_RDS_INSTANCE_ID }}"
+                echo "RDS_TOTAL_MEMORY_GB=${{ secrets.DEV_RDS_TOTAL_MEMORY_GB }}"
+                echo "RDS_TOTAL_STORAGE_GB=${{ secrets.DEV_RDS_TOTAL_STORAGE_GB }}"
+              } > .env
             elif [ "$BRANCH" = "pre-prod" ]; then
-
-              cat > .env << EOL
-NODE_ENV=${{ secrets.PREPROD_NODE_ENV }}
-PORT=${{ secrets.PREPROD_PORT }}
-DATABASE_URL=${{ secrets.PREPROD_DATABASE_URL }}
-JWT_SECRET=${{ secrets.PREPROD_JWT_SECRET }}
-JWT_EXPIRE=${{ secrets.PREPROD_JWT_EXPIRE }}
-CLIENT_URL=${{ secrets.PREPROD_CLIENT_URL }}
-SERVER_URL=${{ secrets.PREPROD_SERVER_URL }}
-MAIL_PASS=${{ secrets.PREPROD_MAIL_PASS }}
-MAIL_USER=${{ secrets.PREPROD_MAIL_USER }}
-SESSION_SECRET=${{ secrets.PREPROD_SESSION_SECRET }}
-CLOUDWATCH_USERNAME=${{ secrets.PREPROD_CLOUDWATCH_USERNAME }}
-AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-AWS_SECRET_ACCESS_KEY=${{ secrets.PREPROD_AWS_SECRET_ACCESS_KEY }}
-AWS_REGION=${{ secrets.PREPROD_AWS_REGION }}
-EC2_INSTANCE_ID=${{ secrets.PREPROD_EC2_INSTANCE_ID }}
-MY_DB_INSTANCE=${{ secrets.PREPROD_MY_DB_INSTANCE }}
-S3_BUCKET_NAME=${{ secrets.PREPROD_S3_BUCKET_NAME }}
-RDS_INSTANCE_ID=${{ secrets.PREPROD_RDS_INSTANCE_ID }}
-RDS_TOTAL_MEMORY_GB=${{ secrets.PREPROD_RDS_TOTAL_MEMORY_GB }}
-RDS_TOTAL_STORAGE_GB=${{ secrets.PREPROD_RDS_TOTAL_STORAGE_GB }}
-EOL
-
+              {
+                echo "NODE_ENV=${{ secrets.PREPROD_NODE_ENV }}"
+                echo "PORT=${{ secrets.PREPROD_PORT }}"
+                echo "DATABASE_URL=${{ secrets.PREPROD_DATABASE_URL }}"
+                echo "JWT_SECRET=${{ secrets.PREPROD_JWT_SECRET }}"
+                echo "JWT_EXPIRE=${{ secrets.PREPROD_JWT_EXPIRE }}"
+                echo "CLIENT_URL=${{ secrets.PREPROD_CLIENT_URL }}"
+                echo "SERVER_URL=${{ secrets.PREPROD_SERVER_URL }}"
+                echo "MAIL_PASS=${{ secrets.PREPROD_MAIL_PASS }}"
+                echo "MAIL_USER=${{ secrets.PREPROD_MAIL_USER }}"
+                echo "SESSION_SECRET=${{ secrets.PREPROD_SESSION_SECRET }}"
+                echo "CLOUDWATCH_USERNAME=${{ secrets.PREPROD_CLOUDWATCH_USERNAME }}"
+                echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}"
+                echo "AWS_SECRET_ACCESS_KEY=${{ secrets.PREPROD_AWS_SECRET_ACCESS_KEY }}"
+                echo "AWS_REGION=${{ secrets.PREPROD_AWS_REGION }}"
+                echo "EC2_INSTANCE_ID=${{ secrets.PREPROD_EC2_INSTANCE_ID }}"
+                echo "MY_DB_INSTANCE=${{ secrets.PREPROD_MY_DB_INSTANCE }}"
+                echo "S3_BUCKET_NAME=${{ secrets.PREPROD_S3_BUCKET_NAME }}"
+                echo "RDS_INSTANCE_ID=${{ secrets.PREPROD_RDS_INSTANCE_ID }}"
+                echo "RDS_TOTAL_MEMORY_GB=${{ secrets.PREPROD_RDS_TOTAL_MEMORY_GB }}"
+                echo "RDS_TOTAL_STORAGE_GB=${{ secrets.PREPROD_RDS_TOTAL_STORAGE_GB }}"
+              } > .env
             elif [ "$BRANCH" = "master" ]; then
-
-              cat > .env << EOL
-NODE_ENV=${{ secrets.PROD_NODE_ENV }}
-PORT=${{ secrets.PROD_PORT }}
-DATABASE_URL=${{ secrets.PROD_DATABASE_URL }}
-JWT_SECRET=${{ secrets.PROD_JWT_SECRET }}
-JWT_EXPIRE=${{ secrets.PROD_JWT_EXPIRE }}
-CLIENT_URL=${{ secrets.PROD_CLIENT_URL }}
-SERVER_URL=${{ secrets.PROD_SERVER_URL }}
-MAIL_PASS=${{ secrets.PROD_MAIL_PASS }}
-MAIL_USER=${{ secrets.PROD_MAIL_USER }}
-SESSION_SECRET=${{ secrets.PROD_SESSION_SECRET }}
-CLOUDWATCH_USERNAME=${{ secrets.PROD_CLOUDWATCH_USERNAME }}
-AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-AWS_SECRET_ACCESS_KEY=${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
-AWS_REGION=${{ secrets.PROD_AWS_REGION }}
-EC2_INSTANCE_ID=${{ secrets.PROD_EC2_INSTANCE_ID }}
-MY_DB_INSTANCE=${{ secrets.PROD_MY_DB_INSTANCE }}
-S3_BUCKET_NAME=${{ secrets.PROD_S3_BUCKET_NAME }}
-RDS_INSTANCE_ID=${{ secrets.PROD_RDS_INSTANCE_ID }}
-RDS_TOTAL_MEMORY_GB=${{ secrets.PROD_RDS_TOTAL_MEMORY_GB }}
-RDS_TOTAL_STORAGE_GB=${{ secrets.PROD_RDS_TOTAL_STORAGE_GB }}
-EOL
-
+              {
+                echo "NODE_ENV=${{ secrets.PROD_NODE_ENV }}"
+                echo "PORT=${{ secrets.PROD_PORT }}"
+                echo "DATABASE_URL=${{ secrets.PROD_DATABASE_URL }}"
+                echo "JWT_SECRET=${{ secrets.PROD_JWT_SECRET }}"
+                echo "JWT_EXPIRE=${{ secrets.PROD_JWT_EXPIRE }}"
+                echo "CLIENT_URL=${{ secrets.PROD_CLIENT_URL }}"
+                echo "SERVER_URL=${{ secrets.PROD_SERVER_URL }}"
+                echo "MAIL_PASS=${{ secrets.PROD_MAIL_PASS }}"
+                echo "MAIL_USER=${{ secrets.PROD_MAIL_USER }}"
+                echo "SESSION_SECRET=${{ secrets.PROD_SESSION_SECRET }}"
+                echo "CLOUDWATCH_USERNAME=${{ secrets.PROD_CLOUDWATCH_USERNAME }}"
+                echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}"
+                echo "AWS_SECRET_ACCESS_KEY=${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}"
+                echo "AWS_REGION=${{ secrets.PROD_AWS_REGION }}"
+                echo "EC2_INSTANCE_ID=${{ secrets.PROD_EC2_INSTANCE_ID }}"
+                echo "MY_DB_INSTANCE=${{ secrets.PROD_MY_DB_INSTANCE }}"
+                echo "S3_BUCKET_NAME=${{ secrets.PROD_S3_BUCKET_NAME }}"
+                echo "RDS_INSTANCE_ID=${{ secrets.PROD_RDS_INSTANCE_ID }}"
+                echo "RDS_TOTAL_MEMORY_GB=${{ secrets.PROD_RDS_TOTAL_MEMORY_GB }}"
+                echo "RDS_TOTAL_STORAGE_GB=${{ secrets.PROD_RDS_TOTAL_STORAGE_GB }}"
+              } > .env
             fi
 
             echo "✅ .env created successfully"
 
-            #################################################
-            # INSTALL + DEPLOY
-            #################################################
-
             npm install --production
-
-            #################################################
-            # PM2 SETUP
-            #################################################
 
             if ! command -v pm2 &> /dev/null; then
               echo "Installing PM2..."
