@@ -21,15 +21,12 @@ jobs:
           BRANCH=${GITHUB_REF##*/}
           if [ "$BRANCH" = "develop" ]; then
             echo "host=${{ secrets.DEV_EC2_HOST_BACKEND }}" >> $GITHUB_OUTPUT
-            echo "ssh_key=${{ secrets.DEV_EC2_SSH_KEY_BACKEND }}" >> $GITHUB_OUTPUT
             echo "env=dev" >> $GITHUB_OUTPUT
           elif [ "$BRANCH" = "pre-prod" ]; then
             echo "host=${{ secrets.PREPROD_EC2_HOST_BACKEND }}" >> $GITHUB_OUTPUT
-            echo "ssh_key=${{ secrets.PREPROD_EC2_SSH_KEY_BACKEND }}" >> $GITHUB_OUTPUT
             echo "env=preprod" >> $GITHUB_OUTPUT
           elif [ "$BRANCH" = "master" ]; then
             echo "host=${{ secrets.PROD_EC2_HOST_BACKEND }}" >> $GITHUB_OUTPUT
-            echo "ssh_key=${{ secrets.PROD_EC2_SSH_KEY_BACKEND }}" >> $GITHUB_OUTPUT
             echo "env=prod" >> $GITHUB_OUTPUT
           fi
 
@@ -38,9 +35,20 @@ jobs:
         run: |
           set -x
 
+          BRANCH=${GITHUB_REF##*/}
+
           mkdir -p ~/.ssh
 
-          echo "${{ steps.env.outputs.ssh_key }}" | tr -d '\r' > ~/.ssh/id_rsa
+          if [ "$BRANCH" = "develop" ]; then
+            echo "${{ secrets.DEV_EC2_SSH_KEY_BACKEND }}" | tr -d '\r' > ~/.ssh/id_rsa
+          elif [ "$BRANCH" = "pre-prod" ]; then
+            echo "${{ secrets.PREPROD_EC2_SSH_KEY_BACKEND }}" | tr -d '\r' > ~/.ssh/id_rsa
+          elif [ "$BRANCH" = "master" ]; then
+            echo "${{ secrets.PROD_EC2_SSH_KEY_BACKEND }}" | tr -d '\r' > ~/.ssh/id_rsa
+          else
+            echo "Unsupported branch: $BRANCH"
+            exit 1
+          fi
 
           chmod 600 ~/.ssh/id_rsa
 
