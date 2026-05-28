@@ -33,8 +33,9 @@ jobs:
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          # Use echo with quotes to preserve newlines
-          echo "${{ secrets.DEV_EC2_SSH_KEY_BACKEND }}" > ~/.ssh/id_rsa
+          cat << 'EOF' > ~/.ssh/id_rsa
+          ${{ secrets.DEV_EC2_SSH_KEY_BACKEND }}
+          EOF
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ steps.env.outputs.host }} >> ~/.ssh/known_hosts
 
