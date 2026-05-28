@@ -31,12 +31,24 @@ jobs:
           fi
 
       - name: Setup SSH key
+        shell: bash
         run: |
-          mkdir -p ~/.ssh
-          printf "%s" "${{ secrets.DEV_EC2_SSH_KEY_BACKEND }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ steps.env.outputs.host }} >> ~/.ssh/known_hosts
+          set -x
 
+          mkdir -p ~/.ssh
+
+          echo "${{ secrets.DEV_EC2_SSH_KEY_BACKEND }}" | tr -d '\r' > ~/.ssh/id_rsa
+
+          chmod 600 ~/.ssh/id_rsa
+
+          HOST="${{ steps.env.outputs.host }}"
+
+          if [ -z "$HOST" ]; then
+            echo "Host is empty"
+            exit 1
+          fi
+
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
       - name: Test SSH connection
         run: |
           ssh -o StrictHostKeyChecking=no \
