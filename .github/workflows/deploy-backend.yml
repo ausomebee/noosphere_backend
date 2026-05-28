@@ -31,31 +31,22 @@ jobs:
           fi
 
       - name: Setup SSH key
-        shell: bash
         run: |
-          mkdir -p "$HOME/.ssh"
-
-          echo "${{ secrets.DEV_EC2_SSH_KEY_BACKEND }}" | tr -d '\r' > "$HOME/.ssh/id_rsa"
-
-          chmod 600 "$HOME/.ssh/id_rsa"
-
-          ssh-keyscan -H "${{ steps.env.outputs.host }}" >> "$HOME/.ssh/known_hosts"
-
-          chmod 644 "$HOME/.ssh/known_hosts"
+          mkdir -p ~/.ssh
+          printf "%s" "${{ secrets.DEV_EC2_SSH_KEY_BACKEND }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ steps.env.outputs.host }} >> ~/.ssh/known_hosts
 
       - name: Test SSH connection
-        shell: bash
         run: |
-          ssh -i "$HOME/.ssh/id_rsa" \
-            -o StrictHostKeyChecking=no \
-            "${{ secrets.EC2_USER }}@${{ steps.env.outputs.host }}" \
+          ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.EC2_USER }}@${{ steps.env.outputs.host }} \
             "echo Connected to backend server"
 
       - name: Deploy backend
-        shell: bash
         run: |
           BRANCH=${GITHUB_REF##*/}
-          echo "Deploying branch: $BRANCH"
+
           ssh -o StrictHostKeyChecking=no \
             ${{ secrets.EC2_USER }}@${{ steps.env.outputs.host }} << EOF
             set -e
