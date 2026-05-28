@@ -7,6 +7,14 @@ class PlanService {
         this.adminRepository = adminRepository;
     }
 
+    normalizeConnectField(field) {
+        if (!field || !Array.isArray(field.connect)) {
+            return undefined;
+        }
+
+        return field.connect.length > 0 ? { connect: field.connect } : undefined;
+    }
+
     async createBillingPlan(data) {
         const billingPlanExists = await this.planRepository.findFirstDynamic({
             where: { name: data.name },
@@ -19,6 +27,8 @@ class PlanService {
 
         const planData = new Plan(data)
         const createData = data.planType === "ENTERPRISE" ? planData.createEnterpriseBillingPlan : planData.createStandardBillingPlan
+        createData.features = this.normalizeConnectField(createData.features);
+        createData.extraFeatures = this.normalizeConnectField(createData.extraFeatures);
         const newBillingPlan = await this.planRepository.create(createData);
 
         if (!newBillingPlan) {
@@ -47,7 +57,7 @@ class PlanService {
             throw new Error("BillingPlan not found");
         }
 
-        const update = await this.planRepository.update(data.id, {
+        const updateData = {
             name: data.name || billingPlan.name,
             description: data.description || billingPlan.description,
             planType: data.planType || billingPlan.planType,
@@ -61,10 +71,12 @@ class PlanService {
             active: data.active ?? billingPlan.active,
             tenantId: data.tenantId || billingPlan.tenantId,
             adminId: data.adminId || billingPlan.adminId,
-            features: data.features || billingPlan.features,
-            extraFeatures: data.extraFeatures || billingPlan.extraFeatures,
+            features: this.normalizeConnectField(data.features),
+            extraFeatures: this.normalizeConnectField(data.extraFeatures),
             forStaff: data.forStaff || billingPlan.forStaff,
-        });
+        };
+
+        const update = await this.planRepository.update(data.id, updateData);
 
         if (!update) {
             throw new Error("Failed to update Billing Plan");
@@ -139,6 +151,8 @@ class PlanService {
         })
 
         const createData = billingPlan.planType === "ENTERPRISE" ? planData.createEnterpriseBillingPlan : planData.createStandardBillingPlan
+        createData.features = this.normalizeConnectField(createData.features);
+        createData.extraFeatures = this.normalizeConnectField(createData.extraFeatures);
 
         const duplicate = await this.planRepository.create(createData)
 

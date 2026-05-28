@@ -37,7 +37,7 @@ class PlanDto {
                     Joi.object({
                         id: Joi.string().uuid().optional()
                     })
-                ).min(1).optional()
+                ).optional()
             }).optional(),
             extraFeaturesWithPrice: Joi.array().items(
                 Joi.object({
@@ -147,8 +147,8 @@ class PlanDto {
                     Joi.object({
                         id: Joi.string().uuid().required()
                     })
-                ).min(1).required()
-            }).required(),
+                ).optional()
+            }).optional(),
             extraFeaturesWithPrice: Joi.array().items(
                 Joi.object({
                     id: Joi.string().uuid().required(),
