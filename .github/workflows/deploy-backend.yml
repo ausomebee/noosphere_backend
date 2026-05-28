@@ -21,12 +21,15 @@ jobs:
           BRANCH=${GITHUB_REF##*/}
           if [ "$BRANCH" = "develop" ]; then
             echo "host=${{ secrets.DEV_EC2_HOST_BACKEND }}" >> $GITHUB_OUTPUT
+            echo "ssh_key=${{ secrets.DEV_EC2_SSH_KEY_BACKEND }}" >> $GITHUB_OUTPUT
             echo "env=dev" >> $GITHUB_OUTPUT
           elif [ "$BRANCH" = "pre-prod" ]; then
             echo "host=${{ secrets.PREPROD_EC2_HOST_BACKEND }}" >> $GITHUB_OUTPUT
+            echo "ssh_key=${{ secrets.PREPROD_EC2_SSH_KEY_BACKEND }}" >> $GITHUB_OUTPUT
             echo "env=preprod" >> $GITHUB_OUTPUT
           elif [ "$BRANCH" = "master" ]; then
             echo "host=${{ secrets.PROD_EC2_HOST_BACKEND }}" >> $GITHUB_OUTPUT
+            echo "ssh_key=${{ secrets.PROD_EC2_SSH_KEY_BACKEND }}" >> $GITHUB_OUTPUT
             echo "env=prod" >> $GITHUB_OUTPUT
           fi
 
@@ -37,18 +40,31 @@ jobs:
 
           mkdir -p ~/.ssh
 
-          echo "${{ secrets.DEV_EC2_SSH_KEY_BACKEND }}" | tr -d '\r' > ~/.ssh/id_rsa
+          echo "${{ steps.env.outputs.ssh_key }}" | tr -d '\r' > ~/.ssh/id_rsa
 
           chmod 600 ~/.ssh/id_rsa
 
-          HOST="${{ steps.env.outputs.host }}"
+          HOST="$(echo "${{ steps.env.outputs.host }}" | tr -d '[:space:]')"
+          HOST="${HOST#*@}"
 
           if [ -z "$HOST" ]; then
             echo "Host is empty"
             exit 1
           fi
 
-          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
+          KEYSCAN_OK=0
+          for attempt in 1 2 3; do
+            if ssh-keyscan -T 10 -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null; then
+              KEYSCAN_OK=1
+              break
+            fi
+            echo "ssh-keyscan attempt ${attempt} failed for ${HOST}"
+            sleep 2
+          done
+
+          if [ "$KEYSCAN_OK" -ne 1 ]; then
+            echo "Warning: ssh-keyscan could not fetch host key for ${HOST}. Continuing because StrictHostKeyChecking=no is used in SSH commands."
+          fi
       - name: Test SSH connection
         run: |
           ssh -o StrictHostKeyChecking=no \
