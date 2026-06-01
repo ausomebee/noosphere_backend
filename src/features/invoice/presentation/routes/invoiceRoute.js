@@ -544,7 +544,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/total/status", staffProtect, this.controller.getTotalByStatus);
+        this.router.get("/total/status", adminProtect(), this.controller.getTotalByStatus);
 
         /**
          * @swagger
