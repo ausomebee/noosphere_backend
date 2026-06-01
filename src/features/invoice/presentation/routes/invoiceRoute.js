@@ -510,7 +510,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/billed/due/:from/:to", staffProtect, InvoiceDto.checkDurationDto, this.controller.getTotalDueInvoice);
+        this.router.get("/billed/due/:from/:to", adminProtect(), InvoiceDto.checkDurationDto, this.controller.getTotalDueInvoice);
 
         /**
         * @swagger
