@@ -63,6 +63,19 @@ class PlanController {
                     html
                 );
             }
+        } else if (req.body.active === true) {
+            const superAdmin = await this.adminService.getSuperAdmin();
+            if (superAdmin?.email) {
+                const html = templateRenderer.render('plan-activated-superadmin', {
+                    planName: billingPlan.name || 'N/A',
+                });
+                await MailService.sendMail(
+                    superAdmin.email,
+                    `Plan Activated: ${billingPlan.name}`,
+                    `The billing plan ${billingPlan.name} has been activated on NooSphere. Click here to view details.`,
+                    html
+                );
+            }
         }
 
         return res.status(201).json({
