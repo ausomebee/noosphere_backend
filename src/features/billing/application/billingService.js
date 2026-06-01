@@ -230,9 +230,9 @@ class BillingService {
         const query = status === "all" ? {} : { status }
         const payments = await this.paymentRepository.findAllAndPopulate(query);
 
-        if (!payments) {
-            throw new Error("Payments not found")
-        }
+        // if (!payments) {
+        //     throw new Error("Payments not found")
+        // }
 
         return payments;
     }
