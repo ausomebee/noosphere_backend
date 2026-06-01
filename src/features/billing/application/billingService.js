@@ -230,9 +230,9 @@ class BillingService {
         const query = status === "all" ? {} : { status }
         const payments = await this.paymentRepository.findAllAndPopulate(query);
 
-        // if (!payments) {
-        //     throw new Error("Payments not found")
-        // }
+        if (!payments) {
+            throw new Error("Payments not found")
+        }
 
         return payments;
     }
@@ -251,7 +251,7 @@ class BillingService {
         const All = await this.paymentRepository.totalCount({});
         const Failed = await this.paymentRepository.totalCount({ status: "Failed" });
         const Successful = await this.paymentRepository.totalCount({ status: "Successful" });
-        const InProgress = await this.paymentRepository.totalCount({ status: "In Progress" });
+        const InProgress = await this.paymentRepository.totalCount({ status: "InProgress" });
 
         if (!All || !Failed || !Successful || !InProgress) {
             throw new Error("Failed to count payment");

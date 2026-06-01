@@ -279,9 +279,9 @@ class BillingController {
     getPaymentByStatus = expressAsyncHandler(async (req, res) => {
         const payment = await this.service.getPaymentByStatus(req.params.status);
 
-        // if (!payment) {
-        //     res.status(500).json({ message: 'Failed to fetch payment' });
-        // }
+        if (!payment) {
+            res.status(500).json({ message: 'Failed to fetch payment' });
+        }
 
         return res.status(201).json({
             message: "Payment fetched successfully",

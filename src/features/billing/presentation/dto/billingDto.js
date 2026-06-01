@@ -29,7 +29,7 @@ class BillingDto {
 
     static createPaymentDto = (req, res, next) => {
         const schema = Joi.object({
-            status: Joi.string().valid("Failed", "Successful", "In Progress").trim().required(),
+            status: Joi.string().valid("Failed", "Successful", "InProgress").trim().required(),
             tenantId: Joi.string().uuid().required().messages({
                 "string.empty": "Tenant ID is required",
                 "string.guid": "Tenant ID must be a valid UUID",
@@ -66,7 +66,7 @@ class BillingDto {
 
     static checkStatusDto = (req, res, next) => {
         const schema = Joi.object({
-            status: Joi.string().valid("Successful", "Failed", "In Progress", "all"),
+            status: Joi.string().valid("Successful", "Failed", "InProgress", "all"),
         });
 
         Validator.validateRequest(req, next, schema, req.params);
