@@ -22,7 +22,6 @@ class Admin {
             superAdmin: this.superAdmin,
         };
     }
-
 }
 
 export default Admin;
