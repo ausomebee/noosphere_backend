@@ -483,7 +483,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/billed/total/:from/:to", staffProtect, InvoiceDto.checkDurationDto, this.controller.getTotalBilled);
+        this.router.get("/billed/total/:from/:to", adminProtect(), InvoiceDto.checkDurationDto, this.controller.getTotalBilled);
 
         /**
          * @swagger
@@ -530,7 +530,7 @@ class InvoiceRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/status/:status", staffProtect, InvoiceDto.checkStatusDto, this.controller.getAllInvoiceByStatus);
+        this.router.get("/status/:status", adminProtect(), InvoiceDto.checkStatusDto, this.controller.getAllInvoiceByStatus);
 
         /**
          * @swagger
