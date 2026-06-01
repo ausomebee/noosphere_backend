@@ -8,7 +8,7 @@ import { specs } from './config/swagger.js';
 import errorHandler from "./middleware/error-handler.js";
 import prismaService from "./config/prisma.js";
 import socketService from "./config/socket.js"
-import PassportUtil from "./config/passport.js";
+// import PassportUtil from "./config/passport.js";
 import healthRoute from "./health.route.js";
 import department_route from "./features/departmentAndTeams/presentation/routes/departmentRoutes.js"
 import admin_route from "./features/admin/presentation/routes/adminRoute.js"
@@ -126,7 +126,7 @@ class App {
     }
 
     initializeMiddlewares() {
-        new PassportUtil(this.app)
+        // new PassportUtil(this.app)
         this.app.use(morgan("dev"));
         this.app.use(cors(this.allowedOrigins));
         this.app.use(express.json({ limit: "50mb" }));
