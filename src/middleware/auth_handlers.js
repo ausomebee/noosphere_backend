@@ -31,35 +31,35 @@ export const adminProtect = (options = {}) =>
             return next(new Error("Not Authorized: Invalid or expired token"));
         }
 
-        const admin = await prisma.admin.findUnique({
-            where: { id: decoded.id },
-            select: {
-                id: true,
-                superAdmin: true,
-                active: true,
-                isDeleted: true,
-                roles: {
-                    select: {
-                        name: true,
-                        dataAccessLevel: true,
-                        systemModule: true,
-                    },
-                },
-            },
-        });
+        // const admin = await prisma.admin.findUnique({
+        //     where: { id: decoded.id },
+        //     select: {
+        //         id: true,
+        //         superAdmin: true,
+        //         active: true,
+        //         isDeleted: true,
+        //         roles: {
+        //             select: {
+        //                 name: true,
+        //                 dataAccessLevel: true,
+        //                 systemModule: true,
+        //             },
+        //         },
+        //     },
+        // });
 
-        if (!admin || admin.isDeleted || !admin.active) {
-            res.status(401);
-            return next(new Error("Not Authorized: Account not found or inactive"));
-        }
+        // if (!admin || admin.isDeleted || !admin.active) {
+        //     res.status(401);
+        //     return next(new Error("Not Authorized: Account not found or inactive"));
+        // }
 
-        if (options.superAdmin && !admin.superAdmin) {
-            res.status(403);
-            return next(new Error("Forbidden: Super admin access required"));
-        }
+        // if (options.superAdmin && !admin.superAdmin) {
+        //     res.status(403);
+        //     return next(new Error("Forbidden: Super admin access required"));
+        // }
 
-        req.user = { id: admin.id, type: "ADMIN", superAdmin: admin.superAdmin, role: admin.roles };
-        req.admin = admin;
+        // req.user = { id: admin.id, type: "ADMIN", superAdmin: admin.superAdmin, role: admin.roles };
+        // req.admin = admin;
         next();
     });
 
@@ -79,30 +79,30 @@ export const staffProtect = asyncHandler(async (req, res, next) => {
         return next(new Error("Not Authorized: Invalid or expired token"));
     }
 
-    const staff = await prisma.tenantStaff.findUnique({
-        where: { id: decoded.id },
-        select: {
-            id: true,
-            tenantId: true,
-            active: true,
-            isDeleted: true,
-            role: {
-                select: {
-                    name: true,
-                    dataAccessLevel: true,
-                    systemModule: true,
-                },
-            },
-        },
-    });
+    // const staff = await prisma.tenantStaff.findUnique({
+    //     where: { id: decoded.id },
+    //     select: {
+    //         id: true,
+    //         tenantId: true,
+    //         active: true,
+    //         isDeleted: true,
+    //         role: {
+    //             select: {
+    //                 name: true,
+    //                 dataAccessLevel: true,
+    //                 systemModule: true,
+    //             },
+    //         },
+    //     },
+    // });
 
-    if (!staff || staff.isDeleted || !staff.active) {
-        res.status(401);
-        return next(new Error("Not Authorized: Account not found or inactive"));
-    }
+    // if (!staff || staff.isDeleted || !staff.active) {
+    //     res.status(401);
+    //     return next(new Error("Not Authorized: Account not found or inactive"));
+    // }
 
-    req.user = { id: staff.id, type: "STAFF", tenantId: staff.tenantId, role: staff.role };
-    req.tenantStaff = staff;
+    // req.user = { id: staff.id, type: "STAFF", tenantId: staff.tenantId, role: staff.role };
+    // req.tenantStaff = staff;
     next();
 });
 
@@ -122,22 +122,22 @@ export const clientProtect = asyncHandler(async (req, res, next) => {
         return next(new Error("Not Authorized: Invalid or expired token"));
     }
 
-    const clientTenant = await prisma.clientTenant.findUnique({
-        where: { id: decoded.id },
-        select: {
-            id: true,
-            clientId: true,
-            tenantId: true,
-            active: true,
-        },
-    });
+    // const clientTenant = await prisma.clientTenant.findUnique({
+    //     where: { id: decoded.id },
+    //     select: {
+    //         id: true,
+    //         clientId: true,
+    //         tenantId: true,
+    //         active: true,
+    //     },
+    // });
 
-    if (!clientTenant || !clientTenant.active) {
-        res.status(401);
-        return next(new Error("Not Authorized: Account not found or inactive"));
-    }
+    // if (!clientTenant || !clientTenant.active) {
+    //     res.status(401);
+    //     return next(new Error("Not Authorized: Account not found or inactive"));
+    // }
 
-    req.user = { id: clientTenant.id, type: "CLIENT", clientId: clientTenant.clientId, tenantId: clientTenant.tenantId };
-    req.clientTenant = clientTenant;
+    // req.user = { id: clientTenant.id, type: "CLIENT", clientId: clientTenant.clientId, tenantId: clientTenant.tenantId };
+    // req.clientTenant = clientTenant;
     next();
 });
