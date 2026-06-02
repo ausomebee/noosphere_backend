@@ -481,7 +481,7 @@ class BillingRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/pay-payment-link", BillingDto.payPaymentLinkDto, this.controller.payPaymentLink);
+        this.router.post("/pay-payment-link", BillingDto.payPaymentLinkDto, ()=>{ console.log("Pay payment link request received"); }, this.controller.payPaymentLink);
 
         /**
         * @swagger
