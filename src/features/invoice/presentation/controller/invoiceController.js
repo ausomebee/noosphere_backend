@@ -138,7 +138,7 @@ class InvoiceController {
         });
     });
 
-     getAllInvoices = expressAsyncHandler(async (req, res) => {
+    getAllInvoices = expressAsyncHandler(async (req, res) => {
         const { page = 1, pageSize = 10 } = req.query;
 
         const invoices = await this.service.getAllInvoices(
