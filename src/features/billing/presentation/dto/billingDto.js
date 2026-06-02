@@ -125,7 +125,7 @@ class BillingDto {
             amount: Joi.number().required(),
             cardType: Joi.string().trim().required(),
             lastFourDigits: Joi.string().trim().required(),
-            gatewayToken: Joi.string().trim().required(),
+            // gatewayToken: Joi.string().trim().required(),
             holderName: Joi.string().trim().required(),
             // transactionRef: Joi.string().trim().required(),
             paymentStatus: Joi.string().valid("Successful", "Failed", "InProgress").required(),
