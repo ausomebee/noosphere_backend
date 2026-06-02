@@ -177,7 +177,7 @@ class RoleRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", adminProtect(), RoleDto.createRoleDto, ()=>{console.log("e reach")}, this.controller.createRole);
+        this.router.post("/", adminProtect(), RoleDto.createRoleDto, this.controller.createRole);
 
         /**
          * @swagger
