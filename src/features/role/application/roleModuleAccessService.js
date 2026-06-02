@@ -14,7 +14,7 @@ class RoleModuleAccessService {
         }
 
         const newAccess = await this.roleModuleAccessRepository.create(data);
-
+console.log(newAccess)
         if (!newAccess) {
             throw new Error("Failed to create role module access.");
         }
