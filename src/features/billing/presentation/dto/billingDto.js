@@ -111,6 +111,30 @@ class BillingDto {
         Validator.validateRequest(req, next, schema);
     };
 
+    static payPaymentLinkDto = (req, res, next) => {
+        const schema = Joi.object({
+            tenantId: Joi.string().uuid().required().messages({
+                "string.empty": "Tenant ID is required",
+                "string.guid": "Tenant ID must be a valid UUID",
+            }),
+            invoiceId: Joi.number().required(),
+            planId: Joi.string().trim().required(),
+            billingCycle: Joi.string().trim().required(),
+            endDate: Joi.date().iso().required(),
+            transactionId: Joi.string().trim().required(),
+            amount: Joi.number().required(),
+            cardType: Joi.string().trim().required(),
+            lastFourDigits: Joi.string().trim().required(),
+            gatewayToken: Joi.string().trim().required(),
+            holderName: Joi.string().trim().required(),
+            transactionRef: Joi.string().trim().required(),
+            paymentStatus: Joi.string().valid("Successful", "Failed", "InProgress").required(),
+            gateway: Joi.string().trim().required(),
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
     static updateChargeOnDueDateDto = (req, res, next) => {
         const schema = Joi.object({
             id: Joi.string().uuid().required().messages({
