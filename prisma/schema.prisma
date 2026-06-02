@@ -95,6 +95,10 @@ enum FeatureModule {
   REPORTS
   HELP_SUPPORT
   SETTINGS
+  TENANT
+  BILLING
+  ISSUE_MANAGEMENT
+  FEATURE_MANAGEMENT
 }
 
 enum PaymentSchedule {
