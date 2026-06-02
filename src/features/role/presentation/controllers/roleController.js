@@ -114,15 +114,13 @@ class RoleController {
         }
 
         for (const moduleAccess of req.body.moduleAccesses) {
-            console.log("e reachccc 1")
             await this.roleModuleAccessService.createRoleModuleAccess({
                 roleId: role.id,
                 module: moduleAccess.module,
                 permissions: moduleAccess.permissions,
             });
-            console.log("e reachccc")
         }
-        
+
         return res.status(201).json({
             message: "Role created successfully",
             status: 'ok',

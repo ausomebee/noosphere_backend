@@ -4,18 +4,17 @@ class RoleModuleAccessService {
     }
 
     async createRoleModuleAccess(data) {
-        console.log("Creating role module access with data:", data);
-//         const exists = await this.roleModuleAccessRepository.findFirstDynamic({
-//             where: { roleId: data.roleId, module: data.module },
-//             select: { id: true }
-//         });
-// console.log("Existing access found:", exists);
-//         if (exists) {
-//             throw new Error("Role module access already exists for this role and module.");
-//         }
+        const exists = await this.roleModuleAccessRepository.findFirstDynamic({
+            where: { roleId: data.roleId, module: data.module },
+            select: { id: true }
+        });
+
+        if (exists) {
+            throw new Error("Role module access already exists for this role and module.");
+        }
 
         const newAccess = await this.roleModuleAccessRepository.create(data);
-console.log(newAccess)
+
         if (!newAccess) {
             throw new Error("Failed to create role module access.");
         }
