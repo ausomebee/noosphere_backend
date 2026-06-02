@@ -106,7 +106,6 @@ class RoleController {
     });
 
     createRole = expressAsyncHandler(async (req, res) => {
-        console.log(JSON.stringify(req.body, null, 2));
         const roleData = new Role(req.body);
         const role = await this.service.createRole(roleData.createRole);
 
@@ -121,7 +120,7 @@ console.log(role, req.body.moduleAccesses)
                 permissions: moduleAccess.permissions,
             });
         }
-
+console.log("e reachccc")
         return res.status(201).json({
             message: "Role created successfully",
             status: 'ok',
