@@ -106,7 +106,7 @@ class RoleController {
     });
 
     createRole = expressAsyncHandler(async (req, res) => {
-        clg(req.body)
+        console.log(JSON.stringify(req.body, null, 2));
         const roleData = new Role(req.body);
         const role = await this.service.createRole(roleData.createRole);
 
