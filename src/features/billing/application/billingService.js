@@ -129,25 +129,6 @@ class BillingService {
         return newTransaction;
     }
 
-    // async updateTransaction(data) {
-    //     const Transaction = await this.repository.findOneTransaction({ id: data.id })
-
-    //     if (!Transaction) {
-    //         throw new Error("Transaction not found");
-    //     }
-
-    //     const update = await this.repository.update(data.id, {
-    //         paymentMethod: data.paymentMethod || Transaction.paymentMethod,
-    //         billingAddress: data.billingAddress || Transaction.billingAddress
-    //     });
-
-    //     if (!update) {
-    //         throw new Error("Failed to update Transaction");
-    //     }
-
-    //     return update;
-    // }
-
     async getSingleTransaction(data) {
         const Transaction = await this.transactionsRepository.findOne({ id: data.id });
 
@@ -169,14 +150,14 @@ class BillingService {
     }
 
     async createPayment(data) {
-        const paymentExists = await this.paymentRepository.findFirstDynamic({
-            where: { tenantId: data.tenantId },
-            select: { tenantId: true }
-        });
+        // const paymentExists = await this.paymentRepository.findFirstDynamic({
+        //     where: { tenantId: data.tenantId },
+        //     select: { tenantId: true }
+        // });
 
-        if (paymentExists) {
-            throw new Error("This payment already exists.");
-        }
+        // if (paymentExists) {
+        //     throw new Error("This payment already exists.");
+        // }
 
         const newPayment = await this.paymentRepository.create(data);
 
