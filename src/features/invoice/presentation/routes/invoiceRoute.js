@@ -579,7 +579,7 @@ class InvoiceRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/invoice/management", staffProtect, this.controller.getInvoiceManagement);
+        this.router.get("/invoice/management", adminProtect(), this.controller.getInvoiceManagement);
 
         /**
         * @swagger
