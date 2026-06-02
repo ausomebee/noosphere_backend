@@ -4,6 +4,7 @@ class RoleModuleAccessService {
     }
 
     async createRoleModuleAccess(data) {
+        console.log("Creating role module access with data:", data);
         const exists = await this.roleModuleAccessRepository.findFirstDynamic({
             where: { roleId: data.roleId, module: data.module },
             select: { id: true }
