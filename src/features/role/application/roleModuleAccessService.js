@@ -9,7 +9,7 @@ class RoleModuleAccessService {
             where: { roleId: data.roleId, module: data.module },
             select: { id: true }
         });
-
+console.log("Existing access found:", exists);
         if (exists) {
             throw new Error("Role module access already exists for this role and module.");
         }
