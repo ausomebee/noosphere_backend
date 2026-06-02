@@ -356,7 +356,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/", staffProtect, this.controller.getAllInvoices);
+        this.router.get("/", staffProtect(), this.controller.getAllInvoices);
 
         /**
          * @swagger
