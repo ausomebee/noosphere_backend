@@ -21,19 +21,22 @@ jobs:
           BRANCH=${GITHUB_REF##*/}
           if [ "$BRANCH" = "develop" ]; then
             echo "host=${{ secrets.DEV_EC2_HOST_BACKEND }}" >> $GITHUB_OUTPUT
+            echo "ssh_key=${{ secrets.DEV_EC2_SSH_KEY_BACKEND }}" >> $GITHUB_OUTPUT
             echo "env=dev" >> $GITHUB_OUTPUT
           elif [ "$BRANCH" = "pre-prod" ]; then
             echo "host=${{ secrets.PREPROD_EC2_HOST_BACKEND }}" >> $GITHUB_OUTPUT
+            echo "ssh_key=${{ secrets.PREPROD_EC2_SSH_KEY_BACKEND }}" >> $GITHUB_OUTPUT
             echo "env=preprod" >> $GITHUB_OUTPUT
           elif [ "$BRANCH" = "master" ]; then
             echo "host=${{ secrets.PROD_EC2_HOST_BACKEND }}" >> $GITHUB_OUTPUT
+            echo "ssh_key=${{ secrets.PROD_EC2_SSH_KEY_BACKEND }}" >> $GITHUB_OUTPUT
             echo "env=prod" >> $GITHUB_OUTPUT
           fi
 
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          printf "%s" "${{ secrets.DEV_EC2_SSH_KEY_BACKEND }}" > ~/.ssh/id_rsa
+          printf "%s" "${{ steps.env.outputs.ssh_key }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ steps.env.outputs.host }} >> ~/.ssh/known_hosts
 
