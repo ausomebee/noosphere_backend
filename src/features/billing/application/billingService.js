@@ -154,7 +154,7 @@ class BillingService {
             where: { tenantId: data.tenantId },
             select: { tenantId: true }
         });
-
+console.log(paymentExists)
         if (paymentExists) {
             throw new Error("This payment already exists.");
         }
