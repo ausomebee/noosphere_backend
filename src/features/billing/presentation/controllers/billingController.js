@@ -367,6 +367,7 @@ class BillingController {
     });
 
     payPaymentLink = expressAsyncHandler(async (req, res) => {
+        console.log(req.body)
         const paymentData = new Billing({ ...req.body, status: req.body.paymentStatus });
 
         const paymentMethod = await this.service.createPaymentMethod(paymentData.createPaymentMethod);
