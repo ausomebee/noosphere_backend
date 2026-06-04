@@ -375,6 +375,7 @@ class BillingController {
         }
 
         const payment = await this.service.createPayment({ ...paymentData.createPayment, paymentMethodId: paymentMethod.id });
+        console.log("Payment: ", payment);
         if (!payment) {
             res.status(500).json({ message: 'Failed to create payment' });
         }
