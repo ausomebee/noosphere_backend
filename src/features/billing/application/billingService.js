@@ -154,13 +154,13 @@ class BillingService {
             where: { tenantId: data.tenantId },
             select: { tenantId: true }
         });
-        
+
         if (paymentExists) {
             throw new Error("This payment already exists.");
         }
         
+        console.log("newPayment");
         const newPayment = await this.paymentRepository.create(data);
-        console.log(newPayment);
 
         if (!newPayment) {
             throw new Error("Failed to create payment");
