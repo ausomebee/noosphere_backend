@@ -155,7 +155,7 @@ class BillingService {
         if (!newPayment) {
             throw new Error("Failed to create payment");
         }
-console.log(newPayment)
+
         return newPayment;
     }
 

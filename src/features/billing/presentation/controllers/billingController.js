@@ -375,17 +375,17 @@ class BillingController {
         }
 
         const payment = await this.service.createPayment({ ...paymentData.createPayment, paymentMethodId: paymentMethod.id });
-        console.log("Payment: ", payment);
         if (!payment) {
             res.status(500).json({ message: 'Failed to create payment' });
         }
-
+        
         if (payment.status === "FAILED") {
             return res.status(400).json({ message: "Payment failed, please try again." });
         }
-
+        
         const subscriptionData = new Subscription({ ...req.body, status: "ACTIVE", startDate: payment.createdAt, paymentId: payment.id });
         const subscription = await this.subscriptionService.createSubscription(subscriptionData.createSubscription);
+        console.log(subscription);
         if (!subscription) {
             res.status(500).json({ message: 'Failed to create subscription' });
         }
