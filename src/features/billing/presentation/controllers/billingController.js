@@ -368,14 +368,13 @@ class BillingController {
 
     payPaymentLink = expressAsyncHandler(async (req, res) => {
         const paymentData = new Billing({ ...req.body, status: req.body.paymentStatus });
-        
+
         const paymentMethod = await this.service.createPaymentMethod(paymentData.createPaymentMethod);
         if (!paymentMethod) {
             res.status(500).json({ message: 'Failed to create payment method' });
         }
-        
+
         const payment = await this.service.createPayment({ ...paymentData.createPayment, paymentMethodId: paymentMethod.id });
-        console.log(payment);
         if (!payment) {
             res.status(500).json({ message: 'Failed to create payment' });
         }

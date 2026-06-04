@@ -150,16 +150,6 @@ class BillingService {
     }
 
     async createPayment(data) {
-        const paymentExists = await this.paymentRepository.findFirstDynamic({
-            where: { tenantId: data.tenantId },
-            select: { tenantId: true }
-        });
-
-        if (paymentExists) {
-            throw new Error("This payment already exists.");
-        }
-        
-        console.log("newPayment");
         const newPayment = await this.paymentRepository.create(data);
 
         if (!newPayment) {
