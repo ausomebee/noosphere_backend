@@ -32,13 +32,10 @@ import { adminProtect } from "../../../../middleware/auth_handlers.js";
  *         - planId
  *         - billingCycle
  *         - endDate
- *         - transactionId
  *         - amount
  *         - cardType
  *         - lastFourDigits
- *         - gatewayToken
  *         - holderName
- *         - transactionRef
  *         - paymentStatus
  *         - gateway
  *       properties:
@@ -67,7 +64,7 @@ import { adminProtect } from "../../../../middleware/auth_handlers.js";
  *         transactionId:
  *           type: string
  *           example: "txn_1b7d72c4-6b6f-4e3a-8e2d-1e2f8c7c9a22"
- *           description: Transaction reference for the payment.
+ *           description: Transaction reference for the payment (optional).
  *         amount:
  *           type: number
  *           example: 5000
@@ -87,7 +84,7 @@ import { adminProtect } from "../../../../middleware/auth_handlers.js";
  *         gatewayToken:
  *           type: string
  *           example: "tok_visa_123456"
- *           description: Token returned by the payment gateway.
+ *           description: Token returned by the payment gateway (optional).
  *         holderName:
  *           type: string
  *           example: "John Doe"
@@ -95,11 +92,12 @@ import { adminProtect } from "../../../../middleware/auth_handlers.js";
  *         transactionRef:
  *           type: string
  *           example: "ref_abc123xyz789"
- *           description: Transaction reference number.
+ *           description: Transaction reference number (optional).
  *         paymentStatus:
  *           type: string
- *           example: "SUCCESS"
- *           description: Status of the payment (SUCCESS, FAILED, PENDING).
+ *           enum: [Successful, Failed, InProgress]
+ *           example: "Successful"
+ *           description: Status of the payment (Successful, Failed, InProgress).
  *     CreateTransactionDto:
  *       type: object
  *       required:

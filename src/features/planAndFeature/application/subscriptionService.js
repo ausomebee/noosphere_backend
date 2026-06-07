@@ -4,15 +4,6 @@ class SubscriptionService {
     }
 
     async createSubscription(data) {
-        const subscriptionExists = await this.subscriptionRepository.findFirstDynamic({
-            where: { OR: [{ tenantId: data.tenantId }] },
-            select: { tenantId: true }
-        });
-
-        if (subscriptionExists) {
-            throw new Error("This subscription already exists.");
-        }
-
         const newSubscription = await this.subscriptionRepository.create(data);
 
         if (!newSubscription) {

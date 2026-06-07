@@ -54,7 +54,10 @@ class RoleRepository {
             where: filter,
             include: {
                 roleModuleAccesses: true,
-            }
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
         });
     }
 

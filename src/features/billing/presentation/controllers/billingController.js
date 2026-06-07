@@ -11,6 +11,8 @@ import InvoiceService from "../../../invoice/application/invoiceService.js";
 import SubscriptionRepository from "../../../planAndFeature/infrastructure/subscriptionRepository.js";
 import SubscriptionService from "../../../planAndFeature/application/subscriptionService.js";
 import Subscription from "../../../planAndFeature/domain/subscription.js";
+import PlanRepository from "../../../planAndFeature/infrastructure/planRepositiory.js";
+import PlanService from "../../../planAndFeature/application/planService.js";
 import InvoiceTokenRepository from "../../../invoice/infrastructure/invoiceTokenRepository.js";
 import TenantRepository from "../../../tenant/infrastructure/tenantRepository.js";
 import TenantService from "../../../tenant/application/tenantService.js";
@@ -43,6 +45,9 @@ class BillingController {
 
         this.subscriptionRepository = new SubscriptionRepository(this.prisma.subscription);
         this.subscriptionService = new SubscriptionService({ subscriptionRepository: this.subscriptionRepository });
+
+        this.planRepository = new PlanRepository(this.prisma.billingPlan);
+        this.planService = new PlanService({ planRepository: this.planRepository, adminRepository: null });
 
         this.tenantRepository = new TenantRepository(this.prisma.tenant);
         this.tenantService = new TenantService({
@@ -373,16 +378,18 @@ class BillingController {
         if (!payment) {
             res.status(500).json({ message: 'Failed to create payment' });
         }
-
+        
         if (payment.status === "FAILED") {
             return res.status(400).json({ message: "Payment failed, please try again." });
         }
-
+        
         const subscriptionData = new Subscription({ ...req.body, status: "ACTIVE", startDate: payment.createdAt, paymentId: payment.id });
         const subscription = await this.subscriptionService.createSubscription(subscriptionData.createSubscription);
         if (!subscription) {
             res.status(500).json({ message: 'Failed to create subscription' });
         }
+
+        const plan = await this.planService.getSingleBillingPlan({ id: req.body.planId });
 
         const invoice = await this.invoiceService.updateInvoice({ id: req.body.invoiceId, status: "Paid" });
         const invoiceToken = await this.invoiceService.markLatestTokenAsUsed(req.body.invoiceId);
@@ -413,11 +420,11 @@ class BillingController {
                 A payment has been recorded for tenant ${tenant.companyName}
 
                 Product: NooSphere ABA PMS
-                Subscription Plan: Enterprise Plan
-                Number of Licenses: 50
-                Billing Cycle: Annual
-                Amount Paid: $12,000
-                Payment Method: Card ending in 8421
+                Subscription Plan: ${plan.name}
+                Number of Licenses: ${plan.forStaff + plan.forClient}
+                Billing Cycle: ${req.body.billingCycle}
+                Amount Paid: $${req.body.amount}
+                Payment Method: ${req.body.cardType} ending in ${req.body.lastFourDigits}
                 Transaction ID: ${payment.id}
                 Purchase Date: ${payment.createdAt.toDateString()}
             `,
@@ -436,14 +443,14 @@ class BillingController {
         ]
 
         const html = templateRenderer.render('billing-payment-confirmation.html', {
-            customerName: data.customerName,
-            subscriptionPlan: data.subscriptionPlan,
-            numberOfLicenses: data.numberOfLicenses,
-            billingCycle: data.billingCycle,
-            amountPaid: data.amountPaid,
-            paymentMethod: data.paymentMethod,
-            transactionId: data.transactionId,
-            purchaseDate: data.purchaseDate
+            customerName: tenant.companyName,
+            subscriptionPlan: plan.name,
+            numberOfLicenses: req.body.numberOfLicenses,
+            billingCycle: req.body.billingCycle,
+            amountPaid: req.body.amount,
+            paymentMethod: `${req.body.cardType} ending in ${req.body.lastFourDigits}`,
+            transactionId: payment.id,
+            purchaseDate: payment.createdAt.toDateString()
         });
 
         const sendMail = await MailService.sendMail(tenant.email, "Payment Made for Plan", null, html, attachments)

@@ -33,7 +33,14 @@ jobs:
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          printf "%s" "${{ secrets.DEV_EC2_SSH_KEY_BACKEND }}" > ~/.ssh/id_rsa
+          BRANCH=${GITHUB_REF##*/}
+          if [ "$BRANCH" = "develop" ]; then
+            printf "%s" "${{ secrets.DEV_EC2_SSH_KEY_BACKEND }}" > ~/.ssh/id_rsa
+          elif [ "$BRANCH" = "pre-prod" ]; then
+            printf "%s" "${{ secrets.PREPROD_EC2_SSH_KEY_BACKEND }}" > ~/.ssh/id_rsa
+          elif [ "$BRANCH" = "master" ]; then
+            printf "%s" "${{ secrets.PROD_EC2_SSH_KEY_BACKEND }}" > ~/.ssh/id_rsa
+          fi
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ steps.env.outputs.host }} >> ~/.ssh/known_hosts
 
