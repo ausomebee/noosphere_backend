@@ -106,18 +106,7 @@ const staffProtectMiddleware = asyncHandler(async (req, res, next) => {
     next();
 });
 
-export const staffProtect = (...args) => {
-    if (args.length === 0) {
-        return staffProtectMiddleware;
-    }
-
-    const [req] = args;
-    if (req && typeof req === "object" && req.headers && typeof req.headers === "object") {
-        return staffProtectMiddleware(...args);
-    }
-
-    return staffProtectMiddleware;
-};
+export const staffProtect = (options = {}) => staffProtectMiddleware;
 
 const clientProtectMiddleware = asyncHandler(async (req, res, next) => {
     const token = extractToken(req);
@@ -155,15 +144,4 @@ const clientProtectMiddleware = asyncHandler(async (req, res, next) => {
     next();
 });
 
-export const clientProtect = (...args) => {
-    if (args.length === 0) {
-        return clientProtectMiddleware;
-    }
-
-    const [req] = args;
-    if (req && typeof req === "object" && req.headers && typeof req.headers === "object") {
-        return clientProtectMiddleware(...args);
-    }
-
-    return clientProtectMiddleware;
-};
+export const clientProtect = (options = {}) => clientProtectMiddleware;
