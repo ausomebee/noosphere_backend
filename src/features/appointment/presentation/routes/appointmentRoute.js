@@ -568,7 +568,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/tenant/metric/:tenantId/:status/:period", staffProtect, this.controller.appointmentsMetric);
+        this.router.get("/tenant/metric/:tenantId/:status/:period", staffProtect(), this.controller.appointmentsMetric);
 
         /**
         * @swagger
@@ -589,7 +589,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/:id", staffProtect, this.controller.getAppointment);
+        this.router.get("/:id", staffProtect(), this.controller.getAppointment);
 
         /**
         * @swagger
@@ -610,7 +610,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/client/upcoming/:clientId", staffProtect, this.controller.getClientUpcomingAppointments);
+        this.router.get("/client/upcoming/:clientId", staffProtect(), this.controller.getClientUpcomingAppointments);
 
         /**
         * @swagger

@@ -118,7 +118,7 @@ class TenantGeneralSettingsRoutes {
          */
         this.router.get(
             "/:tenantId",
-            staffProtect,
+            staffProtect(),
             this.controller.getSettings
         );
     }

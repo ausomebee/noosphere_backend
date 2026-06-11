@@ -317,7 +317,7 @@ class ClientAuthorizationRoutes {
          */
         this.router.get(
             "/summary/:tenantId/:status",
-            clientProtect,
+            staffProtect(),
             this.controller.getClientAuthorizationsSummary.bind(this.controller)
         );
 
@@ -349,7 +349,7 @@ class ClientAuthorizationRoutes {
         */
         this.router.get(
             "/summary/:tenantId",
-            clientProtect,
+            staffProtect(),
             this.controller.countAuthorizationStatsByTenant.bind(this.controller)
         );
 
