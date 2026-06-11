@@ -1,5 +1,5 @@
 import express from "express";
-import { adminProtect } from "../../../../middleware/auth_handlers.js";
+import { adminProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 import PipelineDto from "../dto/pipelineDto.js";
 import PipelineController from "../controllers/pipeline.Controller.js";
 import S3Service from "../../../../utilities/s3.js";
