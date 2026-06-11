@@ -63,7 +63,7 @@ export const adminProtect = (options = {}) =>
         next();
     });
 
-export const staffProtect = asyncHandler(async (req, res, next) => {
+const staffProtectMiddleware = asyncHandler(async (req, res, next) => {
     const token = extractToken(req);
 
     if (!token) {
@@ -106,7 +106,20 @@ export const staffProtect = asyncHandler(async (req, res, next) => {
     next();
 });
 
-export const clientProtect = asyncHandler(async (req, res, next) => {
+export const staffProtect = (...args) => {
+    if (args.length === 0) {
+        return staffProtectMiddleware;
+    }
+
+    const [req] = args;
+    if (req && typeof req === "object" && req.headers && typeof req.headers === "object") {
+        return staffProtectMiddleware(...args);
+    }
+
+    return staffProtectMiddleware;
+};
+
+const clientProtectMiddleware = asyncHandler(async (req, res, next) => {
     const token = extractToken(req);
 
     if (!token) {
@@ -141,3 +154,16 @@ export const clientProtect = asyncHandler(async (req, res, next) => {
     req.clientTenant = clientTenant;
     next();
 });
+
+export const clientProtect = (...args) => {
+    if (args.length === 0) {
+        return clientProtectMiddleware;
+    }
+
+    const [req] = args;
+    if (req && typeof req === "object" && req.headers && typeof req.headers === "object") {
+        return clientProtectMiddleware(...args);
+    }
+
+    return clientProtectMiddleware;
+};
