@@ -2,7 +2,7 @@ import express from "express";
 import TenantDto from "../dto/tenantDto.js";
 import TenantController from "../controllers/tenantController.js";
 import multer from "multer";
-import { adminProtect } from "../../../../middleware/auth_handlers.js";
+import { adminProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
