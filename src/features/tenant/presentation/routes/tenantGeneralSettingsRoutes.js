@@ -113,7 +113,7 @@ class TenantGeneralSettingsRoutes {
          *         required: true
          *         description: Tenant ID
          *     responses:
-         *       200:
+         *       200: 
          *         description: Tenant general settings fetched successfully
          */
         this.router.get(
