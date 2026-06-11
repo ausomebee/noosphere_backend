@@ -59,7 +59,7 @@ class DocumentRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", staffProtect, this.S3Service.single("document"), this.controller.createDocument);
+        this.router.post("/", staffProtect(), this.S3Service.single("document"), this.controller.createDocument);
 
         /**
         * @swagger
@@ -80,7 +80,7 @@ class DocumentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/:id", staffProtect, this.controller.getSingleDocument);
+        this.router.get("/:id", staffProtect(), this.controller.getSingleDocument);
 
         /**
         * @swagger
@@ -101,7 +101,7 @@ class DocumentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/tenant/:tenantId", staffProtect, this.controller.getTenantDocuments);
+        this.router.get("/tenant/:tenantId", staffProtect(), this.controller.getTenantDocuments);
 
         /**
         * @swagger
@@ -122,7 +122,7 @@ class DocumentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.delete("/:id", staffProtect, this.controller.deleteDocument);
+        this.router.delete("/:id", staffProtect(), this.controller.deleteDocument);
 
     }
 

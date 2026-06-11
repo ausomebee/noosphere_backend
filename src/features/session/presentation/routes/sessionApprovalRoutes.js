@@ -80,7 +80,7 @@ class SessionApprovalRoutes {
          */
         this.router.post(
             "/",
-            staffProtect,
+            staffProtect(),
             SessionApprovalDto.createSessionApprovalDto,
             this.controller.createSessionApproval
         );
@@ -103,7 +103,7 @@ class SessionApprovalRoutes {
          */
         this.router.put(
             "/",
-            staffProtect,
+            staffProtect(),
             SessionApprovalDto.updateSessionApprovalDto,
             this.controller.updateSessionApproval
         );
@@ -128,7 +128,7 @@ class SessionApprovalRoutes {
          */
         this.router.get(
             "/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.getSingleSessionApproval
         );
 
@@ -152,7 +152,7 @@ class SessionApprovalRoutes {
          */
         this.router.get(
             "/session/:sessionId",
-            staffProtect,
+            staffProtect(),
             this.controller.getSessionApprovals
         );
     }

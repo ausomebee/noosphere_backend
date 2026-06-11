@@ -145,7 +145,7 @@ class InformationRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", staffProtect, InformationDto.createInformationDto, this.controller.createInformation);
+        this.router.post("/", staffProtect(), InformationDto.createInformationDto, this.controller.createInformation);
 
         /**
          * @swagger
@@ -165,7 +165,7 @@ class InformationRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.put("/", staffProtect, InformationDto.updateInformationDto, this.controller.updateInformation);
+        this.router.put("/", staffProtect(), InformationDto.updateInformationDto, this.controller.updateInformation);
 
         /**
         * @swagger
@@ -186,7 +186,7 @@ class InformationRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/:tenantId", staffProtect, this.controller.getInformation);
+        this.router.get("/:tenantId", staffProtect(), this.controller.getInformation);
 
     }
 

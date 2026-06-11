@@ -79,7 +79,7 @@ class DomainRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", staffProtect, DomainDto.createDomainDto, this.controller.createDomain);
+        this.router.post("/", staffProtect(), DomainDto.createDomainDto, this.controller.createDomain);
 
         /**
          * @swagger
@@ -99,7 +99,7 @@ class DomainRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/", staffProtect, DomainDto.updateDomainDto, this.controller.updateDomain);
+        this.router.patch("/", staffProtect(), DomainDto.updateDomainDto, this.controller.updateDomain);
 
         /**
          * @swagger
@@ -127,7 +127,7 @@ class DomainRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/:tenantId", staffProtect, this.controller.getAllTenantDomain);
+        this.router.get("/:tenantId", staffProtect(), this.controller.getAllTenantDomain);
 
 
         /**
@@ -149,7 +149,7 @@ class DomainRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.delete("/:id", staffProtect, this.controller.deleteDomain);
+        this.router.delete("/:id", staffProtect(), this.controller.deleteDomain);
 
     }
 

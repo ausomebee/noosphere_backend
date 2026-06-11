@@ -67,7 +67,7 @@ class PayrollCycleStaffRoutes {
          */
         this.router.post(
             "/",
-            staffProtect,
+            staffProtect(),
             PayrollCycleStaffDto.createPayrollCycleStaffDto,
             this.controller.createPayrollCycleStaff
         );
@@ -90,7 +90,7 @@ class PayrollCycleStaffRoutes {
          */
         this.router.put(
             "/",
-            staffProtect,
+            staffProtect(),
             PayrollCycleStaffDto.updatePayrollCycleStaffDto,
             this.controller.updatePayrollCycleStaff
         );
@@ -113,7 +113,7 @@ class PayrollCycleStaffRoutes {
          */
         this.router.get(
             "/cycle/:payrollCycleId",
-            staffProtect,
+            staffProtect(),
             this.controller.getPayrollCycleStaffs
         );
 
@@ -135,7 +135,7 @@ class PayrollCycleStaffRoutes {
          */
         this.router.get(
             "/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.getSinglePayrollCycleStaff
         );
 
@@ -157,7 +157,7 @@ class PayrollCycleStaffRoutes {
          */
         this.router.delete(
             "/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.deletePayrollCycleStaff
         );
 
@@ -245,7 +245,7 @@ class PayrollCycleStaffRoutes {
          */
         this.router.put(
             "/edit-breakdown",
-            staffProtect,
+            staffProtect(),
             this.controller.editBreakdown
         );
 

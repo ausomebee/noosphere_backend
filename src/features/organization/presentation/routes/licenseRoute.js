@@ -94,7 +94,7 @@ class LicenseRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", staffProtect, LicenseDto.createLicenseDto, this.controller.createLicense);
+        this.router.post("/", staffProtect(), LicenseDto.createLicenseDto, this.controller.createLicense);
 
         /**
          * @swagger
@@ -114,7 +114,7 @@ class LicenseRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.put("/", staffProtect, LicenseDto.updateLicenseDto, this.controller.updateLicense);
+        this.router.put("/", staffProtect(), LicenseDto.updateLicenseDto, this.controller.updateLicense);
 
         /**
         * @swagger
@@ -135,7 +135,7 @@ class LicenseRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/tenant/:tenantId", staffProtect, this.controller.getTenantLicense);
+        this.router.get("/tenant/:tenantId", staffProtect(), this.controller.getTenantLicense);
 
         /**
         * @swagger
@@ -156,7 +156,7 @@ class LicenseRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/:id", staffProtect, this.controller.getSingleLicense);
+        this.router.get("/:id", staffProtect(), this.controller.getSingleLicense);
 
         /**
         * @swagger
@@ -177,7 +177,7 @@ class LicenseRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.delete("/:id", staffProtect, this.controller.deleteLicense);
+        this.router.delete("/:id", staffProtect(), this.controller.deleteLicense);
 
     }
 

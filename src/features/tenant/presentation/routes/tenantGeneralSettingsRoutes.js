@@ -71,7 +71,7 @@ class TenantGeneralSettingsRoutes {
          */
         this.router.post(
             "/",
-            staffProtect,
+            staffProtect(),
             TenantGeneralSettingsDto.createSettingsDto,
             this.controller.createSettings
         );
@@ -94,7 +94,7 @@ class TenantGeneralSettingsRoutes {
          */
         this.router.put(
             "/",
-            staffProtect,
+            staffProtect(),
             TenantGeneralSettingsDto.updateSettingsDto,
             this.controller.updateSettings
         );

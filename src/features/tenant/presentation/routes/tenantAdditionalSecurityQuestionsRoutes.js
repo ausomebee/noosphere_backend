@@ -59,7 +59,7 @@ class TenantAdditionalSecurityQuestionsRoutes {
          */
         this.router.post(
             "/",
-            staffProtect,
+            staffProtect(),
             TenantAdditionalSecurityQuestionsDto.createQuestionDto,
             this.controller.createQuestion
         );
@@ -82,7 +82,7 @@ class TenantAdditionalSecurityQuestionsRoutes {
          */
         this.router.put(
             "/",
-            staffProtect,
+            staffProtect(),
             TenantAdditionalSecurityQuestionsDto.updateQuestionDto,
             this.controller.updateQuestion
         );
@@ -106,7 +106,7 @@ class TenantAdditionalSecurityQuestionsRoutes {
          */
         this.router.get(
             "/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.getQuestion
         );
 
@@ -129,7 +129,7 @@ class TenantAdditionalSecurityQuestionsRoutes {
          */
         this.router.get(
             "/tenant/:tenantId",
-            staffProtect,
+            staffProtect(),
             this.controller.getQuestions
         );
     }

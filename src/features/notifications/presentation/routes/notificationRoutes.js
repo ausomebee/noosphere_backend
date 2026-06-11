@@ -72,7 +72,7 @@ class NotificationRoutes {
          */
         this.router.post(
             "/",
-            staffProtect,
+            staffProtect(),
             NotificationDto.createNotificationDto,
             this.controller.createNotification
         );
@@ -95,7 +95,7 @@ class NotificationRoutes {
          */
         this.router.put(
             "/",
-            staffProtect,
+            staffProtect(),
             NotificationDto.updateNotificationDto,
             this.controller.updateNotification
         );
@@ -120,7 +120,7 @@ class NotificationRoutes {
          */
         this.router.get(
             "/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.getSingleNotification
         );
 
@@ -149,7 +149,7 @@ class NotificationRoutes {
          */
         this.router.get(
             "/user/:userId/:userType",
-            staffProtect,
+            staffProtect(),
             this.controller.getNotificationsByUser
         );
 
@@ -173,7 +173,7 @@ class NotificationRoutes {
          */
         this.router.patch(
             "/read/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.markAsRead
         );
     }

@@ -164,7 +164,7 @@ class FormRoutes {
          *       201:
          *         description: Form created successfully
          */
-        this.router.post("/", staffProtect, FormDto.createFormDto, this.controller.createForm);
+        this.router.post("/", staffProtect(), FormDto.createFormDto, this.controller.createForm);
 
         /**
          * @swagger
@@ -182,7 +182,7 @@ class FormRoutes {
          *       200:
          *         description: Form updated successfully
          */
-        this.router.put("/", staffProtect, FormDto.updateFormDto, this.controller.updateForm);
+        this.router.put("/", staffProtect(), FormDto.updateFormDto, this.controller.updateForm);
 
         /**
          * @swagger
@@ -200,7 +200,7 @@ class FormRoutes {
          *       200:
          *         description: List of tenant forms
          */
-        this.router.get("/tenant/:tenantId", staffProtect, this.controller.getTenantForms);
+        this.router.get("/tenant/:tenantId", staffProtect(), this.controller.getTenantForms);
 
         /**
          * @swagger
@@ -218,7 +218,7 @@ class FormRoutes {
          *       200:
          *         description: List of tenant forms
          */
-        this.router.get("/tenant/drafts/:tenantId", staffProtect, this.controller.getTenantDrafts);
+        this.router.get("/tenant/drafts/:tenantId", staffProtect(), this.controller.getTenantDrafts);
 
         /**
          * @swagger
@@ -236,7 +236,7 @@ class FormRoutes {
          *       200:
          *         description: List of tenant forms
          */
-        this.router.get("/tenant/templates/:tenantId", staffProtect, this.controller.getTenantTemplates);
+        this.router.get("/tenant/templates/:tenantId", staffProtect(), this.controller.getTenantTemplates);
 
         /**
          * @swagger
@@ -254,7 +254,7 @@ class FormRoutes {
          *       200:
          *         description: Form fetched successfully
          */
-        this.router.get("/:id", staffProtect, this.controller.getSingleForm);
+        this.router.get("/:id", staffProtect(), this.controller.getSingleForm);
 
         /**
          * @swagger
@@ -272,7 +272,7 @@ class FormRoutes {
          *       200:
          *         description: Form duplicated successfully
          */
-        this.router.post("/duplicate/:id", staffProtect, this.controller.duplicateForm);
+        this.router.post("/duplicate/:id", staffProtect(), this.controller.duplicateForm);
 
         /**
          * @swagger
@@ -295,7 +295,7 @@ class FormRoutes {
          *       200:
          *         description: Form deleted successfully
          */
-        this.router.patch("/:id/:delete", staffProtect, this.controller.deactivateForm);
+        this.router.patch("/:id/:delete", staffProtect(), this.controller.deactivateForm);
     }
 
     getRouter() {

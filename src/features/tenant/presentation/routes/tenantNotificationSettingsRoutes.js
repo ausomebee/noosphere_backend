@@ -67,7 +67,7 @@ class TenantNotificationSettingsRoutes {
          */
         this.router.post(
             "/",
-            staffProtect,
+            staffProtect(),
             TenantNotificationSettingsDto.createNotificationSettingsDto,
             this.controller.saveNotificationSettings
         );
@@ -91,7 +91,7 @@ class TenantNotificationSettingsRoutes {
          */
         this.router.put(
             "/",
-            staffProtect,
+            staffProtect(),
             TenantNotificationSettingsDto.updateNotificationSettingsDto,
             this.controller.saveNotificationSettings
         );
@@ -115,7 +115,7 @@ class TenantNotificationSettingsRoutes {
          */
         this.router.get(
             "/:userId",
-            staffProtect,
+            staffProtect(),
             this.controller.getNotificationSettings
         );
     }

@@ -1046,61 +1046,6 @@ class TenantRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/count-staff/:tenantId", adminProtect(), this.controller.availaibleStaffs);
-
-        /**
-         * @swagger
-         * /api/v1/tenant/count-staff/{tenantId}:
-         *   get:
-         *     summary: Count available staffs for a tenant
-         *     tags: [Tenant]
-         *     parameters:
-         *       - in: path
-         *         name: tenantId
-         *         required: true
-         *         schema:
-         *           type: string
-         *           format: uuid
-         *         description: The ID of the tenant
-         *     responses:
-         *       200:
-         *         description: Staffs counted successfully
-         *         content:
-         *           application/json:
-         *             schema:
-         *               type: object
-         *               properties:
-         *                 totalStaff:
-         *                   type: integer
-         *                   description: Total number of staff for the tenant
-         *                 availableStaff:
-         *                   type: integer
-         *                   description: Number of staff currently available
-         *       400:
-         *         description: Bad request
-         */
-        this.router.get("/count-staff/:tenantId", staffProtect(), this.controller.availaibleStaffs);
-
-        /**
-         * @swagger
-         * /api/v1/tenant/avg-staff/{tenantId}:
-         *   get:
-         *     summary: Count average client per therapist
-         *     tags: [Tenant]
-         *     parameters:
-         *       - in: path
-         *         name: tenantId
-         *         required: true
-         *         schema:
-         *           type: string
-         *           format: uuid
-         *         description: The ID of the tenant
-         *     responses:
-         *       200:
-         *         description: Staffs counted successfully
-         *       400:
-         *         description: Bad request
-         */
         this.router.get("/avg-staff/:tenantId", staffProtect(), this.controller.averageClinicians);
 
         // /**

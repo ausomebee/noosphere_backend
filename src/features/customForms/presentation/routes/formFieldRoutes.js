@@ -117,7 +117,7 @@ class FormFieldsRoutes {
 		 *       201:
 		 *         description: Form field created successfully
 		 */
-		this.router.post("/", staffProtect, FormFieldsDto.createFormFieldDto, this.controller.createFormField.bind(this.controller));
+		this.router.post("/", staffProtect(), FormFieldsDto.createFormFieldDto, this.controller.createFormField.bind(this.controller));
 
 		/**
 		 * @swagger
@@ -135,7 +135,7 @@ class FormFieldsRoutes {
 		 *       200:
 		 *         description: Form field updated successfully
 		 */
-		this.router.put("/", staffProtect, FormFieldsDto.updateFormFieldDto, this.controller.updateFormField.bind(this.controller));
+		this.router.put("/", staffProtect(), FormFieldsDto.updateFormFieldDto, this.controller.updateFormField.bind(this.controller));
 
 		/**
 		 * @swagger
@@ -153,7 +153,7 @@ class FormFieldsRoutes {
 		 *       200:
 		 *         description: List of form fields for the given form
 		 */
-		this.router.get("/form/:formId", staffProtect, this.controller.getFormFields.bind(this.controller));
+		this.router.get("/form/:formId", staffProtect(), this.controller.getFormFields.bind(this.controller));
 
 		/**
 		 * @swagger
@@ -171,7 +171,7 @@ class FormFieldsRoutes {
 		 *       200:
 		 *         description: Form field fetched successfully
 		 */
-		this.router.get("/:id", staffProtect, this.controller.getSingleFormField.bind(this.controller));
+		this.router.get("/:id", staffProtect(), this.controller.getSingleFormField.bind(this.controller));
 
 	}
 

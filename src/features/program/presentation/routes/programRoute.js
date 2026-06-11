@@ -91,7 +91,7 @@ class ProgramRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", staffProtect, ProgramDto.createProgramDto, this.controller.createProgram);
+        this.router.post("/", staffProtect(), ProgramDto.createProgramDto, this.controller.createProgram);
 
         /**
          * @swagger
@@ -111,7 +111,7 @@ class ProgramRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/custom", staffProtect, ProgramDto.createCustomProgramDto, this.controller.createCustomProgram);
+        this.router.post("/custom", staffProtect(), ProgramDto.createCustomProgramDto, this.controller.createCustomProgram);
 
         /**
          * @swagger
@@ -131,7 +131,7 @@ class ProgramRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/", staffProtect, ProgramDto.updateProgramDto, this.controller.updateProgram);
+        this.router.patch("/", staffProtect(), ProgramDto.updateProgramDto, this.controller.updateProgram);
 
         /**
         * @swagger
@@ -152,7 +152,7 @@ class ProgramRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/:domainId", staffProtect, this.controller.getAllDomainPrograms);
+        this.router.get("/:domainId", staffProtect(), this.controller.getAllDomainPrograms);
 
          /**
         * @swagger
@@ -173,7 +173,7 @@ class ProgramRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/tenant/:tenantId", staffProtect, this.controller.getAllTenantPrograms);
+        this.router.get("/tenant/:tenantId", staffProtect(), this.controller.getAllTenantPrograms);
 
         /**
          * @swagger
@@ -194,7 +194,7 @@ class ProgramRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.delete("/:id", staffProtect, this.controller.deleteProgram);
+        this.router.delete("/:id", staffProtect(), this.controller.deleteProgram);
 
     }
 

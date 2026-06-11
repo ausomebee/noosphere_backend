@@ -69,7 +69,7 @@ class TimesheetHistoryRoutes {
          */
         this.router.post(
             "/",
-            staffProtect,
+            staffProtect(),
             TimesheetHistoryDto.createTimesheetHistoryDto,
             this.controller.createTimesheetHistory
         );
@@ -92,7 +92,7 @@ class TimesheetHistoryRoutes {
          */
         this.router.put(
             "/",
-            staffProtect,
+            staffProtect(),
             TimesheetHistoryDto.updateTimesheetHistoryDto,
             this.controller.updateTimesheetHistory
         );
@@ -117,7 +117,7 @@ class TimesheetHistoryRoutes {
          */
         this.router.get(
             "/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.getSingleTimesheetHistory
         );
 
@@ -141,7 +141,7 @@ class TimesheetHistoryRoutes {
          */
         this.router.get(
             "/session/:sessionId",
-            staffProtect,
+            staffProtect(),
             this.controller.getTimesheetHistories
         );
     }

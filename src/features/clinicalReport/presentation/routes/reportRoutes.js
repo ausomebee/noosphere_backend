@@ -141,7 +141,7 @@ class ClinicalReportRoutes {
          */
         this.router.post(
             "/",
-            staffProtect,
+            staffProtect(),
             ClinicalReportDto.createReportDto,
             this.controller.createReport
         );
@@ -164,7 +164,7 @@ class ClinicalReportRoutes {
          */
         this.router.put(
             "/",
-            staffProtect,
+            staffProtect(),
             ClinicalReportDto.updateReportDto,
             this.controller.updateReport
         );
@@ -187,7 +187,7 @@ class ClinicalReportRoutes {
          */
         this.router.get(
             "/tenant/:tenantId",
-            staffProtect,
+            staffProtect(),
             this.controller.getTenantReports
         );
 
@@ -214,7 +214,7 @@ class ClinicalReportRoutes {
         */
         this.router.get(
             "/tenant/:tenantId/status/:status",
-            staffProtect,
+            staffProtect(),
             this.controller.getReportsByStatus
         );
 
@@ -241,7 +241,7 @@ class ClinicalReportRoutes {
          */
         this.router.get(
             "/client/:clientTenantId/status/:status",
-            staffProtect,
+            staffProtect(),
             this.controller.getClientReportsByStatus
         );
 
@@ -267,7 +267,7 @@ class ClinicalReportRoutes {
          */
         this.router.post(
             "/validate/:token",
-            staffProtect,
+            staffProtect(),
             this.controller.validateReportToken
         );
 
@@ -291,7 +291,7 @@ class ClinicalReportRoutes {
         */
         this.router.post(
             "/approve/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.approveClinicalReport
         );
 
@@ -315,7 +315,7 @@ class ClinicalReportRoutes {
         */
         this.router.post(
             "/resubmit/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.resubmitForSignature
         );
 
@@ -339,7 +339,7 @@ class ClinicalReportRoutes {
          */
         this.router.patch(
             "/:id/withdraw-token",
-            staffProtect,
+            staffProtect(),
             this.controller.withdrawReportToken
         );
 
@@ -363,7 +363,7 @@ class ClinicalReportRoutes {
          */
         this.router.patch(
             "/:id/withdraw-token",
-            staffProtect,
+            staffProtect(),
             this.controller.withdrawReportToken
         );
 
@@ -390,7 +390,7 @@ class ClinicalReportRoutes {
          */
         this.router.get(
             "/approver/:approverId/client/:clientTenantId",
-            staffProtect,
+            staffProtect(),
             this.controller.getReportsSubmittedForApprover
         );
 
@@ -417,7 +417,7 @@ class ClinicalReportRoutes {
         */
         this.router.patch(
             "/:id/status/:status",
-            staffProtect,
+            staffProtect(),
             this.controller.updateReportStatus
         );
 
@@ -439,7 +439,7 @@ class ClinicalReportRoutes {
          */
         this.router.get(
             "/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.getSingleReport
         );
 
@@ -461,7 +461,7 @@ class ClinicalReportRoutes {
          */
         this.router.post(
             "/nudge-client/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.nudgeClient
         );
 
@@ -483,7 +483,7 @@ class ClinicalReportRoutes {
          */
         this.router.post(
             "/duplicate/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.duplicateReport
         );
 
@@ -505,7 +505,7 @@ class ClinicalReportRoutes {
          */
         this.router.delete(
             "/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.deleteReport
         );
 
@@ -552,7 +552,7 @@ class ClinicalReportRoutes {
          */
         this.router.patch(
             "/submit-signature",
-            staffProtect,
+            staffProtect(),
             this.controller.submitSignature
         );
     }

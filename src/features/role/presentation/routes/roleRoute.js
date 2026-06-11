@@ -217,7 +217,7 @@ class RoleRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/tenantrole", staffProtect, RoleDto.createRoleDto, this.controller.createTenantRole);
+        this.router.post("/tenantrole", staffProtect(), RoleDto.createRoleDto, this.controller.createTenantRole);
 
         /**
          * @swagger
@@ -299,7 +299,7 @@ class RoleRoutes {
          *       200:
          *         description: Roles fetched successfully
          */
-        this.router.get("/module/:systemModule/:tenantId", staffProtect, this.controller.getRolesByModule);
+        this.router.get("/module/:systemModule/:tenantId", staffProtect(), this.controller.getRolesByModule);
         
         /**
          * @swagger

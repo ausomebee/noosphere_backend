@@ -104,7 +104,7 @@ class LicenseRoutes {
          *       404:
          *         description: License not found
          */
-        this.router.post("/", staffProtect, LicenseDto.createLicenseDto, this.controller.createStaffLicense);
+        this.router.post("/", staffProtect(), LicenseDto.createLicenseDto, this.controller.createStaffLicense);
 
         /**
          * @swagger
@@ -126,7 +126,7 @@ class LicenseRoutes {
          *       404:
          *         description: License not found
          */
-        this.router.put("/", staffProtect, LicenseDto.updateLicenseDto, this.controller.updateLicense);
+        this.router.put("/", staffProtect(), LicenseDto.updateLicenseDto, this.controller.updateLicense);
 
         /**
          * @swagger
@@ -147,7 +147,7 @@ class LicenseRoutes {
          *       404:
          *         description: Licenses not found
          */
-        this.router.get("/tenant-staff/:tenantStaffId", staffProtect, this.controller.getTenantStaffLicenses);
+        this.router.get("/tenant-staff/:tenantStaffId", staffProtect(), this.controller.getTenantStaffLicenses);
 
         /**
          * @swagger
@@ -168,7 +168,7 @@ class LicenseRoutes {
          *       404:
          *         description: License not found
          */
-        this.router.get("/:id", staffProtect, this.controller.getLicense);
+        this.router.get("/:id", staffProtect(), this.controller.getLicense);
 
         /**
          * @swagger
@@ -197,7 +197,7 @@ class LicenseRoutes {
          *       404:
          *         description: License not found
          */
-        this.router.patch("/deleted/:id/:isDeleted", staffProtect, this.controller.updateLicense);
+        this.router.patch("/deleted/:id/:isDeleted", staffProtect(), this.controller.updateLicense);
     }
 
     getRouter() {

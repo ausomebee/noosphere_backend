@@ -130,7 +130,7 @@ class SessionRoutes {
          */
         this.router.post(
             "/",
-            staffProtect,
+            staffProtect(),
             SessionDto.createSessionDto,
             this.controller.createSession
         );
@@ -153,7 +153,7 @@ class SessionRoutes {
          */
         this.router.put(
             "/",
-            staffProtect,
+            staffProtect(),
             SessionDto.updateSessionDto,
             this.controller.updateSession
         );
@@ -187,7 +187,7 @@ class SessionRoutes {
          */
         this.router.get(
             "/service/:tenantId/:serviceCodeId",
-            staffProtect,
+            staffProtect(),
             this.controller.getSessionsByServiceCode
         );
 
@@ -220,7 +220,7 @@ class SessionRoutes {
          */
         this.router.post(
             "/nudge-client/:clientId/:senderId",
-            staffProtect,
+            staffProtect(),
             this.controller.nudgeClient
         );
 
@@ -253,7 +253,7 @@ class SessionRoutes {
         */
         this.router.get(
             "/session-type/:tenantId/:sessionTypeId",
-            staffProtect,
+            staffProtect(),
             this.controller.getSessionsBySessionType
         );
 
@@ -276,7 +276,7 @@ class SessionRoutes {
          */
         this.router.get(
             "/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.getSingleSession
         );
 
@@ -305,7 +305,7 @@ class SessionRoutes {
          */
         this.router.patch(
             "/approve/:id/:supervisorId",
-            staffProtect,
+            staffProtect(),
             this.controller.approveSession
         );
 
@@ -336,7 +336,7 @@ class SessionRoutes {
          */
         this.router.get(
             "/performance/:targetId/:clientId",
-            staffProtect,
+            staffProtect(),
             this.controller.getTargetPerformanceGraph
         );
 
@@ -360,7 +360,7 @@ class SessionRoutes {
          */
         this.router.get(
             "/client/:clientId",
-            staffProtect,
+            staffProtect(),
             this.controller.getClientSessions
         );
 
@@ -384,7 +384,7 @@ class SessionRoutes {
          */
         this.router.get(
             "/client/awaiting-feedback/:clientId",
-            staffProtect,
+            staffProtect(),
             this.controller.getSessionsAwaitingApproval
         );
 
@@ -422,7 +422,7 @@ class SessionRoutes {
          */
         this.router.get(
             "/target/:targetId/:clientId/:tenantId",
-            staffProtect,
+            staffProtect(),
             this.controller.getSessionsByTargetId
         );
 
@@ -446,7 +446,7 @@ class SessionRoutes {
          */
         this.router.get(
             "/tenant/overview/:tenantId",
-            staffProtect,
+            staffProtect(),
             this.controller.getProductivityOverview
         );
 
@@ -475,7 +475,7 @@ class SessionRoutes {
          */
         this.router.patch(
             "/reject/:id/:supervisorId",
-            staffProtect,
+            staffProtect(),
             this.controller.rejectSession
         );
 
@@ -498,7 +498,7 @@ class SessionRoutes {
          */
         this.router.get(
             "/appointment/:tenantId",
-            staffProtect,
+            staffProtect(),
             this.controller.getSessions
         );
 
@@ -521,7 +521,7 @@ class SessionRoutes {
          */
         this.router.get(
             "/claims/:tenantId",
-            staffProtect,
+            staffProtect(),
             this.controller.getClaims
         );
 
@@ -550,7 +550,7 @@ class SessionRoutes {
         */
         this.router.get(
             "/client-approval/:tenantId/:clientId",
-            staffProtect,
+            staffProtect(),
             this.controller.getClientAwaitingApproval
         );
 
@@ -573,7 +573,7 @@ class SessionRoutes {
          */
         this.router.get(
             "/client/overview/:clientId",
-            staffProtect,
+            staffProtect(),
             this.controller.getClientSessionOverview
         );
 
@@ -602,7 +602,7 @@ class SessionRoutes {
          */
         this.router.get(
             "/client/overview-chart/:clientId/:groupBy",
-            staffProtect,
+            staffProtect(),
             this.controller.clientOverviewGraph
         );
     }

@@ -70,7 +70,7 @@ class SessionDataRoutes {
          */
         this.router.post(
             "/",
-            staffProtect,
+            staffProtect(),
             SessionDataDto.createSessionDataDto,
             this.controller.createSessionData
         );
@@ -93,7 +93,7 @@ class SessionDataRoutes {
          */
         this.router.put(
             "/",
-            staffProtect,
+            staffProtect(),
             SessionDataDto.updateSessionDataDto,
             this.controller.updateSessionData
         );
@@ -118,7 +118,7 @@ class SessionDataRoutes {
          */
         this.router.get(
             "/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.getSingleSessionData
         );
 
@@ -142,7 +142,7 @@ class SessionDataRoutes {
          */
         this.router.get(
             "/session/:sessionId",
-            staffProtect,
+            staffProtect(),
             this.controller.getSessionDatas
         );
     }
