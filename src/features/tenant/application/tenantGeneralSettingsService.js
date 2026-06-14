@@ -24,8 +24,17 @@ class TenantGeneralSettingsService {
     }
 
     async getSettings(tenantId) {
-        const record = await this.repository.findOne({ tenantId });
-        if (!record) throw new Error("Tenant General Settings not found");
+        let record = await this.repository.findOne({ tenantId });
+
+        if (!record) {
+            record = await this.createSettings({
+                tenantId,
+                dateFormat: "YYYY-MM-DD",
+                timeFormat: "HH:mm",
+                currency: "USD"
+            });
+        }
+
         return record;
     }
 }
