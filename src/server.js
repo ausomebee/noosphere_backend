@@ -112,7 +112,7 @@ class App {
                 }
             },
             credentials: true,
-            methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
+            methods: ["GET", "POST", "PATCH", "DELETE", "PUT", "OPTIONS"],
         };
         this.initializeDatabase();
         this.initializeMiddlewares();
