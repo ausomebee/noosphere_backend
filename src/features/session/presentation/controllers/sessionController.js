@@ -234,19 +234,10 @@ class SessionController {
     getProductivityOverview = expressAsyncHandler(async (req, res) => {
         const { tenantId } = req.params;
 
-        const sessions = await this.sessionService.countTenantSessions(tenantId);
-        if (sessions === null || sessions === undefined) {
-            return res.status(404).json({ message: "Sessions not found" });
-        }
+        const sessions = Number(await this.sessionService.countTenantSessions(tenantId)) || 0;
+        const appointments = Number(await this.appointmentService.countTenantAppointments(tenantId)) || 0;
 
-        const appointments =
-            await this.appointmentService.countTenantAppointments(tenantId);
-        if (appointments === null || appointments === undefined) {
-            return res.status(404).json({ message: "Appointments not found" });
-        }
-
-        const fulfillmentRatio =
-            appointments === 0 ? 0 : sessions / appointments;
+        const fulfillmentRatio = appointments === 0 ? 0 : sessions / appointments;
 
         const sessionSatisfactionPercentage = Number(
             (fulfillmentRatio * 100).toFixed(2)
