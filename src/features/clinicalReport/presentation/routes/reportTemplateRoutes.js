@@ -108,7 +108,7 @@ class ClinicalReportTemplateRoutes {
          */
         this.router.post(
             "/",
-            staffProtect,
+            staffProtect(),
             ClinicalReportTemplateDto.createTemplateDto,
             this.controller.createTemplate
         );
@@ -131,7 +131,7 @@ class ClinicalReportTemplateRoutes {
          */
         this.router.put(
             "/",
-            staffProtect,
+            staffProtect(),
             ClinicalReportTemplateDto.updateTemplateDto,
             this.controller.updateTemplate
         );
@@ -154,7 +154,7 @@ class ClinicalReportTemplateRoutes {
          */
         this.router.get(
             "/tenant/:tenantId",
-            staffProtect,
+            staffProtect(),
             this.controller.getTenantTemplates
         );
 
@@ -176,7 +176,7 @@ class ClinicalReportTemplateRoutes {
          */
         this.router.get(
             "/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.getSingleTemplate
         );
 
@@ -198,7 +198,7 @@ class ClinicalReportTemplateRoutes {
          */
         this.router.delete(
             "/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.deleteTemplate
         );
 
@@ -220,7 +220,7 @@ class ClinicalReportTemplateRoutes {
          */
         this.router.post(
             "/duplicate/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.duplicateTemplate
         );
     }

@@ -73,7 +73,7 @@ class MessageRoutes {
          */
         this.router.post(
             "/",
-            staffProtect,
+            staffProtect(),
             MessageDto.createMessageDto,
             this.controller.createMessage
         );
@@ -96,7 +96,7 @@ class MessageRoutes {
          */
         this.router.put(
             "/",
-            staffProtect,
+            staffProtect(),
             MessageDto.updateMessageDto,
             this.controller.updateMessage
         );
@@ -121,7 +121,7 @@ class MessageRoutes {
          */
         this.router.get(
             "/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.getSingleMessage
         );
 
@@ -150,7 +150,7 @@ class MessageRoutes {
          */
         this.router.get(
             "/user/:userId/:userType",
-            staffProtect,
+            staffProtect(),
             this.controller.getMessagesByUser
         );
 
@@ -174,7 +174,7 @@ class MessageRoutes {
          */
         this.router.patch(
             "/read/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.markAsRead
         );
     }

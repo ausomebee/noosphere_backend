@@ -80,7 +80,7 @@ class ServiceCodesRoutes {
          *       201:
          *         description: Service code created successfully
          */
-        this.router.post("/", staffProtect, ServiceCodesDto.createServiceCodeDto, this.controller.createServiceCode);
+        this.router.post("/", staffProtect(), ServiceCodesDto.createServiceCodeDto, this.controller.createServiceCode);
 
         /**
          * @swagger
@@ -98,7 +98,7 @@ class ServiceCodesRoutes {
          *       201:
          *         description: Service code updated successfully
          */
-        this.router.put("/", staffProtect, ServiceCodesDto.updateServiceCodeDto, this.controller.updateServiceCode);
+        this.router.put("/", staffProtect(), ServiceCodesDto.updateServiceCodeDto, this.controller.updateServiceCode);
 
         /**
          * @swagger
@@ -116,7 +116,7 @@ class ServiceCodesRoutes {
          *       200:
          *         description: List of service codes
          */
-        this.router.get("/tenant/:tenantId", staffProtect, this.controller.getTenantServiceCodes);
+        this.router.get("/tenant/:tenantId", staffProtect(), this.controller.getTenantServiceCodes);
 
         /**
          * @swagger
@@ -134,7 +134,7 @@ class ServiceCodesRoutes {
          *       200:
          *         description: Service code fetched successfully
          */
-        this.router.get("/:id", staffProtect, this.controller.getSingleServiceCode);
+        this.router.get("/:id", staffProtect(), this.controller.getSingleServiceCode);
 
         /**
          * @swagger
@@ -157,7 +157,7 @@ class ServiceCodesRoutes {
          *       200:
          *         description: Service code deleted successfully
          */
-        this.router.patch("/:id/:active", staffProtect, this.controller.deactivateServiceCode);
+        this.router.patch("/:id/:active", staffProtect(), this.controller.deactivateServiceCode);
     }
 
     getRouter() {

@@ -63,7 +63,7 @@ class TargetDataRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", staffProtect, TargetDataDto.createTargetDataDto, this.controller.createTargetData);
+        this.router.post("/", staffProtect(), TargetDataDto.createTargetDataDto, this.controller.createTargetData);
 
         /**
          * @swagger
@@ -84,7 +84,7 @@ class TargetDataRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/:clientTargetId", staffProtect, this.controller.getClientTargetData);
+        this.router.get("/:clientTargetId", staffProtect(), this.controller.getClientTargetData);
 
     }
 

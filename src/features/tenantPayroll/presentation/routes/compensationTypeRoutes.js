@@ -68,7 +68,7 @@ class CompensationTypeRoutes {
          *       201:
          *         description: Compensation type created successfully
          */
-        this.router.post("/", staffProtect, CompensationTypeDto.createCompensationTypeDto, this.controller.createCompensationType);
+        this.router.post("/", staffProtect(), CompensationTypeDto.createCompensationTypeDto, this.controller.createCompensationType);
 
         /**
          * @swagger
@@ -86,7 +86,7 @@ class CompensationTypeRoutes {
          *       200:
          *         description: Compensation type updated successfully
          */
-        this.router.put("/", staffProtect, CompensationTypeDto.updateCompensationTypeDto, this.controller.updateCompensationType);
+        this.router.put("/", staffProtect(), CompensationTypeDto.updateCompensationTypeDto, this.controller.updateCompensationType);
 
         /**
          * @swagger
@@ -104,7 +104,7 @@ class CompensationTypeRoutes {
          *       200:
          *         description: List of compensation types retrieved successfully
          */
-        this.router.get("/tenant/:tenantId", staffProtect, this.controller.getTenantCompensationTypes);
+        this.router.get("/tenant/:tenantId", staffProtect(), this.controller.getTenantCompensationTypes);
 
         /**
          * @swagger
@@ -122,7 +122,7 @@ class CompensationTypeRoutes {
          *       200:
          *         description: Compensation type retrieved successfully
          */
-        this.router.get("/:id", staffProtect, this.controller.getSingleCompensationType);
+        this.router.get("/:id", staffProtect(), this.controller.getSingleCompensationType);
 
         /**
          * @swagger
@@ -145,7 +145,7 @@ class CompensationTypeRoutes {
          *       200:
          *         description: Compensation type status updated successfully
          */
-        this.router.patch("/:id/:active", staffProtect, this.controller.deactivateCompensationType);
+        this.router.patch("/:id/:active", staffProtect(), this.controller.deactivateCompensationType);
     }
 
     getRouter() {

@@ -86,7 +86,7 @@ class PayerServiceCodeRoutes {
          *       201:
          *         description: Payer service code created successfully
          */
-        this.router.post("/", staffProtect, PayerServiceCodesDto.createPayerServiceCodeDto, this.controller.createPayerServiceCode);
+        this.router.post("/", staffProtect(), PayerServiceCodesDto.createPayerServiceCodeDto, this.controller.createPayerServiceCode);
 
         /**
          * @swagger
@@ -109,7 +109,7 @@ class PayerServiceCodeRoutes {
          *       200:
          *         description: Payer service code deactivated successfully
          */
-        this.router.patch("/:id/:active", staffProtect, this.controller.deactivatePayerServiceCode);
+        this.router.patch("/:id/:active", staffProtect(), this.controller.deactivatePayerServiceCode);
 
     }
 

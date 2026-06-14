@@ -85,7 +85,7 @@ class StaffAvailabilityRoutes {
          */
         this.router.post(
             "/",
-            staffProtect,
+            staffProtect(),
             StaffAvailabilityDto.createStaffAvailabilityDto,
             this.controller.createStaffAvailability
         );
@@ -108,7 +108,7 @@ class StaffAvailabilityRoutes {
          */
         this.router.put(
             "/",
-            staffProtect,
+            staffProtect(),
             StaffAvailabilityDto.updateStaffAvailabilityDto,
             this.controller.updateStaffAvailability
         );
@@ -132,7 +132,7 @@ class StaffAvailabilityRoutes {
          */
         this.router.get(
             "/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.getSingleStaffAvailability
         );
 
@@ -155,7 +155,7 @@ class StaffAvailabilityRoutes {
          */
         this.router.get(
             "/staff/:staffId",
-            staffProtect,
+            staffProtect(),
             this.controller.getStaffAvailabilities
         );
     }

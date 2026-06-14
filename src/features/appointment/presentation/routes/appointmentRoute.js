@@ -190,7 +190,7 @@ class AppointmentRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", staffProtect, AppointmentDto.createAppointmentDto, this.controller.createAppointment);
+        this.router.post("/", staffProtect(), AppointmentDto.createAppointmentDto, this.controller.createAppointment);
 
         /**
          * @swagger
@@ -212,7 +212,7 @@ class AppointmentRoutes {
          *       404:
          *         description: Appointment not found
          */
-        this.router.put("/", staffProtect, AppointmentDto.updateAppointmentDto, this.controller.updateAppointment);
+        this.router.put("/", staffProtect(), AppointmentDto.updateAppointmentDto, this.controller.updateAppointment);
 
         /**
         * @swagger
@@ -233,7 +233,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/tenant/:tenantId", staffProtect, this.controller.getTenantAppointments);
+        this.router.get("/tenant/:tenantId", staffProtect(), this.controller.getTenantAppointments);
 
         /**
         * @swagger
@@ -254,7 +254,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/tenant/rescheduled/:tenantId", staffProtect, this.controller.getTenantRescheduledAppointments);
+        this.router.get("/tenant/rescheduled/:tenantId", staffProtect(), this.controller.getTenantRescheduledAppointments);
 
         /**
         * @swagger
@@ -281,7 +281,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/clinician/:clientId/:tenantId", staffProtect, this.controller.getCliniciansByClientId);
+        this.router.get("/clinician/:clientId/:tenantId", staffProtect(), this.controller.getCliniciansByClientId);
 
         /**
         * @swagger
@@ -302,7 +302,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/staff/:staffId", staffProtect, this.controller.getStaffAppointments);
+        this.router.get("/staff/:staffId", staffProtect(), this.controller.getStaffAppointments);
 
         /**
         * @swagger
@@ -323,7 +323,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/tenant/canceled/:tenantId", staffProtect, this.controller.getTenantCanceledAppointments);
+        this.router.get("/tenant/canceled/:tenantId", staffProtect(), this.controller.getTenantCanceledAppointments);
 
         /**
         * @swagger
@@ -344,7 +344,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/client/canceled/:clientId", staffProtect, this.controller.getClientCanceledAppointments);
+        this.router.get("/client/canceled/:clientId", staffProtect(), this.controller.getClientCanceledAppointments);
 
         /**
         * @swagger
@@ -365,7 +365,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/staff/canceled/:staffId", staffProtect, this.controller.getStaffCanceledAppointments);
+        this.router.get("/staff/canceled/:staffId", staffProtect(), this.controller.getStaffCanceledAppointments);
 
         /**
         * @swagger
@@ -386,7 +386,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/staff/rescheduled/:staffId", staffProtect, this.controller.getStaffRescheduledAppointments);
+        this.router.get("/staff/rescheduled/:staffId", staffProtect(), this.controller.getStaffRescheduledAppointments);
 
         /**
        * @swagger
@@ -407,7 +407,7 @@ class AppointmentRoutes {
        *       400:
        *         description: Validation error
        */
-        this.router.get("/client/:clientId", staffProtect, this.controller.getClientAppointments);
+        this.router.get("/client/:clientId", staffProtect(), this.controller.getClientAppointments);
 
         /**
          * @swagger
@@ -439,7 +439,7 @@ class AppointmentRoutes {
          *       404:
          *         description: Appointment not found
          */
-        this.router.patch("/accept-reschedule", staffProtect, this.controller.acceptRescheduleAppointment);
+        this.router.patch("/accept-reschedule", staffProtect(), this.controller.acceptRescheduleAppointment);
 
         /**
          * @swagger
@@ -471,7 +471,7 @@ class AppointmentRoutes {
          *       404:
          *         description: Appointment not found
          */
-        this.router.patch("/reject-reschedule", staffProtect, this.controller.rejectRescheduleAppointment);
+        this.router.patch("/reject-reschedule", staffProtect(), this.controller.rejectRescheduleAppointment);
 
         /**
         * @swagger
@@ -493,7 +493,7 @@ class AppointmentRoutes {
         *       404:
         *         description: Appointment not found
         */
-        this.router.patch("/reschedule", staffProtect, AppointmentDto.updateAppointmentDto, this.controller.updateAppointment);
+        this.router.patch("/reschedule", staffProtect(), AppointmentDto.updateAppointmentDto, this.controller.updateAppointment);
 
         /**
         * @swagger
@@ -514,7 +514,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/tenant/upcoming/:tenantId", staffProtect, this.controller.getTenantUpcomingAppointments);
+        this.router.get("/tenant/upcoming/:tenantId", staffProtect(), this.controller.getTenantUpcomingAppointments);
 
         /**
         * @swagger
@@ -535,7 +535,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/tenant/past/:tenantId", staffProtect, this.controller.getTenantPastAppointments);
+        this.router.get("/tenant/past/:tenantId", staffProtect(), this.controller.getTenantPastAppointments);
 
         /**
         * @swagger
@@ -568,7 +568,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/tenant/metric/:tenantId/:status/:period", staffProtect, this.controller.appointmentsMetric);
+        this.router.get("/tenant/metric/:tenantId/:status/:period", staffProtect(), this.controller.appointmentsMetric);
 
         /**
         * @swagger
@@ -589,7 +589,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/:id", staffProtect, this.controller.getAppointment);
+        this.router.get("/:id", staffProtect(), this.controller.getAppointment);
 
         /**
         * @swagger
@@ -610,7 +610,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/client/upcoming/:clientId", staffProtect, this.controller.getClientUpcomingAppointments);
+        this.router.get("/client/upcoming/:clientId", staffProtect(), this.controller.getClientUpcomingAppointments);
 
         /**
         * @swagger
@@ -631,7 +631,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/client/past/:clientId", staffProtect, this.controller.getClientPastAppointments);
+        this.router.get("/client/past/:clientId", staffProtect(), this.controller.getClientPastAppointments);
 
         /**
         * @swagger
@@ -652,7 +652,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/client/rescheduled/:clientId", staffProtect, this.controller.getClientRescheduledAppointments);
+        this.router.get("/client/rescheduled/:clientId", staffProtect(), this.controller.getClientRescheduledAppointments);
 
         /**
         * @swagger
@@ -673,7 +673,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/client/past/:clientId", staffProtect, this.controller.getClientPastAppointments);
+        this.router.get("/client/past/:clientId", staffProtect(), this.controller.getClientPastAppointments);
 
         /**
         * @swagger
@@ -694,7 +694,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/staff/upcoming/:staffId", staffProtect, this.controller.getStaffUpcomingAppointments);
+        this.router.get("/staff/upcoming/:staffId", staffProtect(), this.controller.getStaffUpcomingAppointments);
 
         /**
         * @swagger
@@ -715,7 +715,7 @@ class AppointmentRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/staff/past/:staffId", staffProtect, this.controller.getStaffPastAppointments);
+        this.router.get("/staff/past/:staffId", staffProtect(), this.controller.getStaffPastAppointments);
 
     }
 

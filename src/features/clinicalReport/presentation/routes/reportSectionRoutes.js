@@ -63,7 +63,7 @@ class ClinicalReportSectionRoutes {
          */
         this.router.post(
             "/",
-            staffProtect,
+            staffProtect(),
             ClinicalReportSectionDto.createReportSectionDto,
             this.controller.createSection
         );
@@ -86,7 +86,7 @@ class ClinicalReportSectionRoutes {
          */
         this.router.put(
             "/",
-            staffProtect,
+            staffProtect(),
             ClinicalReportSectionDto.updateReportSectionDto,
             this.controller.updateSection
         );
@@ -110,7 +110,7 @@ class ClinicalReportSectionRoutes {
          */
         this.router.get(
             "/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.getSingleSection
         );
 
@@ -133,7 +133,7 @@ class ClinicalReportSectionRoutes {
          */
         this.router.get(
             "/report/:clinicalReportId",
-            staffProtect,
+            staffProtect(),
             this.controller.getSections
         );
     }

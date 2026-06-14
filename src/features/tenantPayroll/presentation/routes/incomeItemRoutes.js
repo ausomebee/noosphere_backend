@@ -85,7 +85,7 @@ class IncomeItemRoutes {
          *       201:
          *         description: Income item created successfully
          */
-        this.router.post("/", staffProtect, IncomeItemDto.createIncomeItemDto, this.controller.createIncomeItem);
+        this.router.post("/", staffProtect(), IncomeItemDto.createIncomeItemDto, this.controller.createIncomeItem);
 
         /**
          * @swagger
@@ -103,7 +103,7 @@ class IncomeItemRoutes {
          *       200:
          *         description: Income item updated successfully
          */
-        this.router.put("/", staffProtect, IncomeItemDto.updateIncomeItemDto, this.controller.updateIncomeItem);
+        this.router.put("/", staffProtect(), IncomeItemDto.updateIncomeItemDto, this.controller.updateIncomeItem);
 
         /**
          * @swagger
@@ -121,7 +121,7 @@ class IncomeItemRoutes {
          *       200:
          *         description: List of income items retrieved successfully
          */
-        this.router.get("/tenant/:tenantId", staffProtect, this.controller.getTenantIncomeItems);
+        this.router.get("/tenant/:tenantId", staffProtect(), this.controller.getTenantIncomeItems);
 
         /**
          * @swagger
@@ -139,7 +139,7 @@ class IncomeItemRoutes {
          *       200:
          *         description: Income item retrieved successfully
          */
-        this.router.get("/:id", staffProtect, this.controller.getSingleIncomeItem);
+        this.router.get("/:id", staffProtect(), this.controller.getSingleIncomeItem);
 
         /**
          * @swagger
@@ -162,7 +162,7 @@ class IncomeItemRoutes {
          *       200:
          *         description: Income item status updated successfully
          */
-        this.router.patch("/:id/:active", staffProtect, this.controller.deactivateIncomeItem);
+        this.router.patch("/:id/:active", staffProtect(), this.controller.deactivateIncomeItem);
     }
 
     getRouter() {

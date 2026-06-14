@@ -1,7 +1,7 @@
 import express from "express";
 import ClientAuthorizationController from "../controllers/clientAuthorizationController.js";
 import ClientAuthorizationDto from "../dto/clientAuthorizationDto.js";
-import { clientProtect } from "../../../../middleware/auth_handlers.js";
+import { clientProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 /**
  * @swagger
  * tags:
@@ -317,7 +317,7 @@ class ClientAuthorizationRoutes {
          */
         this.router.get(
             "/summary/:tenantId/:status",
-            clientProtect,
+            staffProtect(),
             this.controller.getClientAuthorizationsSummary.bind(this.controller)
         );
 
@@ -349,7 +349,7 @@ class ClientAuthorizationRoutes {
         */
         this.router.get(
             "/summary/:tenantId",
-            clientProtect,
+            staffProtect(),
             this.controller.countAuthorizationStatsByTenant.bind(this.controller)
         );
 

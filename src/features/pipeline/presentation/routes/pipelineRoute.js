@@ -1,5 +1,5 @@
 import express from "express";
-import { adminProtect } from "../../../../middleware/auth_handlers.js";
+import { adminProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 import PipelineDto from "../dto/pipelineDto.js";
 import PipelineController from "../controllers/pipeline.Controller.js";
 import S3Service from "../../../../utilities/s3.js";
@@ -693,6 +693,28 @@ class PipelineRoutes {
          */
 
         this.router.get("/overview/:tenantId", adminProtect(), this.controller.getTenantPipelineSummary);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/overview/{tenantId}:
+         *   get:
+         *     summary: Get pipeline overview
+         *     tags: [Pipeline]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The ID of the tenant
+         *     responses:
+         *       201:
+         *         description: Pipeline overview fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+
+        this.router.get("/overview/:tenantId", staffProtect(), this.controller.getTenantPipelineSummary);
 
         /**
          * @swagger

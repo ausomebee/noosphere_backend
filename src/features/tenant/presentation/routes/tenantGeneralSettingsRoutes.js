@@ -71,7 +71,7 @@ class TenantGeneralSettingsRoutes {
          */
         this.router.post(
             "/",
-            staffProtect,
+            staffProtect(),
             TenantGeneralSettingsDto.createSettingsDto,
             this.controller.createSettings
         );
@@ -94,7 +94,7 @@ class TenantGeneralSettingsRoutes {
          */
         this.router.put(
             "/",
-            staffProtect,
+            staffProtect(),
             TenantGeneralSettingsDto.updateSettingsDto,
             this.controller.updateSettings
         );
@@ -113,12 +113,12 @@ class TenantGeneralSettingsRoutes {
          *         required: true
          *         description: Tenant ID
          *     responses:
-         *       200:
+         *       200: 
          *         description: Tenant general settings fetched successfully
          */
         this.router.get(
             "/:tenantId",
-            staffProtect,
+            staffProtect(),
             this.controller.getSettings
         );
     }

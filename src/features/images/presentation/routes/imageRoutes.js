@@ -54,7 +54,7 @@ class ImageRoutes {
      *       500:
      *         description: Server error during upload
      */
-    this.router.post("/upload", staffProtect, this.S3Service.array("images", 10), this.uploadImages.bind(this));
+    this.router.post("/upload", staffProtect(), this.S3Service.array("images", 10), this.uploadImages.bind(this));
   }
 
   async uploadImages(req, res) {

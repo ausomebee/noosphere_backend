@@ -73,7 +73,7 @@ class ClinicalReportChangeRequestRoutes {
          */
         this.router.post(
             "/",
-            staffProtect,
+            staffProtect(),
             ClinicalReportChangeRequestDto.createChangeRequestDto,
             this.controller.createChangeRequest
         );
@@ -97,7 +97,7 @@ class ClinicalReportChangeRequestRoutes {
          */
         this.router.get(
             "/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.getSingleChangeRequest
         );
 
@@ -120,7 +120,7 @@ class ClinicalReportChangeRequestRoutes {
          */
         this.router.get(
             "/report/:clinicalReportId",
-            staffProtect,
+            staffProtect(),
             this.controller.getReportChangeRequests
         );
     }

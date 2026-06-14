@@ -68,7 +68,7 @@ class ClinicalReportHistoryRoutes {
          */
         this.router.post(
             "/",
-            staffProtect,
+            staffProtect(),
             ClinicalReportHistoryDto.createHistoryDto,
             this.controller.createHistory
         );
@@ -92,7 +92,7 @@ class ClinicalReportHistoryRoutes {
          */
         this.router.get(
             "/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.getSingleHistory
         );
 
@@ -115,7 +115,7 @@ class ClinicalReportHistoryRoutes {
          */
         this.router.get(
             "/report/:clinicalReportId",
-            staffProtect,
+            staffProtect(),
             this.controller.getReportHistories
         );
     }

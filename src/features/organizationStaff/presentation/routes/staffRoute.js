@@ -344,7 +344,7 @@ class TenantStaffRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", staffProtect, StaffDto.createTenantStaffDto, this.controller.createTenantStaff);
+        this.router.post("/", staffProtect(), StaffDto.createTenantStaffDto, this.controller.createTenantStaff);
 
         /**
          * @swagger
@@ -366,7 +366,7 @@ class TenantStaffRoutes {
          *       404:
          *         description: Staff not found
          */
-        this.router.put("/", staffProtect, StaffDto.updateTenantStaffDto, this.controller.updateTenantStaff);
+        this.router.put("/", staffProtect(), StaffDto.updateTenantStaffDto, this.controller.updateTenantStaff);
 
         /**
          * @swagger
@@ -388,7 +388,7 @@ class TenantStaffRoutes {
          *       404:
          *         description: Staff not found
          */
-        this.router.put("/staff", staffProtect, StaffDto.updateTenantStaffOnlyDto, this.controller.updateTenantStaff);
+        this.router.put("/staff", staffProtect(), StaffDto.updateTenantStaffOnlyDto, this.controller.updateTenantStaff);
 
         /**
          * @swagger
@@ -409,7 +409,7 @@ class TenantStaffRoutes {
          *       404:
          *         description: Staff not found
          */
-        this.router.get("/tenant/:tenantId", staffProtect, this.controller.getTenantStaffs);
+        this.router.get("/tenant/:tenantId", staffProtect(), this.controller.getTenantStaffs);
 
         /**
          * @swagger
@@ -430,7 +430,7 @@ class TenantStaffRoutes {
          *       404:
          *         description: Staff not found
          */
-        this.router.get("/:id", staffProtect, this.controller.getStaff);
+        this.router.get("/:id", staffProtect(), this.controller.getStaff);
 
         /**
          * @swagger
@@ -451,7 +451,7 @@ class TenantStaffRoutes {
          *       404:
          *         description: Staff not found
          */
-        this.router.get("/details/:id", staffProtect, this.controller.getStaffDetails);
+        this.router.get("/details/:id", staffProtect(), this.controller.getStaffDetails);
 
         /**
          * @swagger
@@ -480,7 +480,7 @@ class TenantStaffRoutes {
          *       404:
          *         description: Staff not found
          */
-        this.router.patch("/active/:id/:active", staffProtect, this.controller.updateTenantStaff);
+        this.router.patch("/active/:id/:active", staffProtect(), this.controller.updateTenantStaff);
     }
 
     getRouter() {

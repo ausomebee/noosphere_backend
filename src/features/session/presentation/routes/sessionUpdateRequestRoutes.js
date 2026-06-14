@@ -64,7 +64,7 @@ class SessionUpdateRequestRoutes {
          */
         this.router.post(
             "/",
-            staffProtect,
+            staffProtect(),
             SessionUpdateRequestDto.createSessionUpdateRequestDto,
             this.controller.createSessionUpdateRequest
         );
@@ -87,7 +87,7 @@ class SessionUpdateRequestRoutes {
          */
         this.router.put(
             "/",
-            staffProtect,
+            staffProtect(),
             SessionUpdateRequestDto.updateSessionUpdateRequestDto,
             this.controller.updateSessionUpdateRequest
         );
@@ -112,7 +112,7 @@ class SessionUpdateRequestRoutes {
          */
         this.router.get(
             "/:id",
-            staffProtect,
+            staffProtect(),
             this.controller.getSingleSessionUpdateRequest
         );
 
@@ -136,7 +136,7 @@ class SessionUpdateRequestRoutes {
          */
         this.router.get(
             "/session/:sessionId",
-            staffProtect,
+            staffProtect(),
             this.controller.getSessionUpdateRequests
         );
     }

@@ -66,7 +66,7 @@ class FormResponseFieldRoutes {
          *       201:
          *         description: Form response field created successfully
          */
-        this.router.post("/", staffProtect, FormResponseFieldDto.createFormResponseFieldDto, this.controller.createFormResponseField.bind(this.controller));
+        this.router.post("/", staffProtect(), FormResponseFieldDto.createFormResponseFieldDto, this.controller.createFormResponseField.bind(this.controller));
 
         /**
          * @swagger
@@ -90,7 +90,7 @@ class FormResponseFieldRoutes {
          *       200:
          *         description: Form response field updated successfully
          */
-        this.router.put("/:id", staffProtect, FormResponseFieldDto.updateFormResponseFieldDto, this.controller.updateFormResponseField.bind(this.controller));
+        this.router.put("/:id", staffProtect(), FormResponseFieldDto.updateFormResponseFieldDto, this.controller.updateFormResponseField.bind(this.controller));
 
         /**
          * @swagger
@@ -108,7 +108,7 @@ class FormResponseFieldRoutes {
          *       200:
          *         description: Form response field fetched successfully
          */
-        this.router.get("/:id", staffProtect, this.controller.getSingleFormResponseField.bind(this.controller));
+        this.router.get("/:id", staffProtect(), this.controller.getSingleFormResponseField.bind(this.controller));
 
         /**
          * @swagger
@@ -126,7 +126,7 @@ class FormResponseFieldRoutes {
          *       200:
          *         description: List of form response fields fetched successfully
          */
-        this.router.get("/response/:formResponseId", staffProtect, this.controller.getFormResponseFields.bind(this.controller));
+        this.router.get("/response/:formResponseId", staffProtect(), this.controller.getFormResponseFields.bind(this.controller));
     }
 
     getRouter() {

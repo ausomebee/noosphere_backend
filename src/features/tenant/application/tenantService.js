@@ -722,7 +722,18 @@ class TenantService {
         });
 
         if (!tenantAdminChoices) {
-            throw new Error("Tenant admin choices not found");
+            const created = await this.choiceRepository.create({
+                tenantId: data.tenantId,
+                Authenticator2FA: data.Authenticator2FA ?? false,
+                securityQuestion: data.securityQuestion ?? null,
+                setForAll: data.setForAll ?? false,
+            });
+
+            if (!created) {
+                throw new Error("Failed to create tenant admin choices");
+            }
+
+            return created;
         }
 
         const update = await this.choiceRepository.update(
