@@ -1046,7 +1046,7 @@ class TenantRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/avg-staff/:tenantId", staffProtect(), this.controller.averageClinicians);
+        this.router.get("/count-staff/:tenantId", staffProtect(), this.controller.averageClinicians);
 
         // /**
         //  * @swagger
