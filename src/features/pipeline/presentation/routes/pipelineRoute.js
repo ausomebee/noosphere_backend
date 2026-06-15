@@ -528,6 +528,27 @@ class PipelineRoutes {
 
         /**
          * @swagger
+         * /api/v1/pipeline/tenant/stage/pipeline/{pipelineId}:
+         *   get:
+         *     summary: Get pipeline stage by pipeline ID
+         *     tags: [PipelineStage]
+         *     parameters:
+         *       - in: path
+         *         name: pipelineId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The ID of the pipeline
+         *     responses:
+         *       201:
+         *         description: Pipeline stage fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/tenant/stage/pipeline/:pipelineId", staffProtect(), PipelineDto.getStagesByPipelineIdDto, this.controller.getStageByPipelineId);
+
+        /**
+         * @swagger
          * /api/v1/pipeline/stage/{id}:
          *   get:
          *     summary: Get pipeline stage by ID
