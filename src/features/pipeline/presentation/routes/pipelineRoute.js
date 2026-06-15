@@ -446,6 +446,27 @@ class PipelineRoutes {
 
         /**
          * @swagger
+         * /api/v1/pipeline/tenant/tenant/{tenantId}:
+         *   get:
+         *     summary: Get pipeline by tenant ID
+         *     tags: [Pipeline]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The tenant ID to fetch pipeline for
+         *     responses:
+         *       201:
+         *         description: Pipeline fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/tenant/tenant/:tenantId", staffProtect(), PipelineDto.getPipelinesByTenantIdDto, this.controller.getPipelinesByTenantId);
+
+        /**
+         * @swagger
          * /api/v1/pipeline/active:
          *   patch:
          *     summary: update activity
