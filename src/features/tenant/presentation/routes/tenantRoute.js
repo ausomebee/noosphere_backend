@@ -269,11 +269,11 @@ import { adminProtect, staffProtect } from "../../../../middleware/auth_handlers
  *         email:
  *           type: string
  *           format: email
- *           example: "admin@noosphere.com"
+ *           example: "ayodejiamzat+4@gmail.com"
  *         password:
  *           type: string
  *           format: password
- *           example: "LoginStrongP@ss1"
+ *           example: "Test@1234567"
  *
  *     TenantAdminChoicesDto:
  *       type: object
