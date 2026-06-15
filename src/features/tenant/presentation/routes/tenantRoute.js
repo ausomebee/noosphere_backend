@@ -269,11 +269,11 @@ import { adminProtect, staffProtect } from "../../../../middleware/auth_handlers
  *         email:
  *           type: string
  *           format: email
- *           example: "admin@noosphere.com"
+ *           example: "ayodejiamzat+4@gmail.com"
  *         password:
  *           type: string
  *           format: password
- *           example: "LoginStrongP@ss1"
+ *           example: "Test@1234567"
  *
  *     TenantAdminChoicesDto:
  *       type: object
@@ -1046,29 +1046,51 @@ class TenantRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/avg-staff/:tenantId", staffProtect(), this.controller.averageClinicians);
+        this.router.get("/count-staff/:tenantId", staffProtect(), this.controller.averageClinicians);
 
-        // /**
-        //  * @swagger
-        //  * /api/v1/tenant/avg-staff/{tenantId}:
-        //  *   get:
-        //  *     summary: Count average client per therapist
-        //  *     tags: [Tenant]
-        //  *     parameters:
-        //  *       - in: path
-        //  *         name: tenantId
-        //  *         required: true
-        //  *         schema:
-        //  *           type: string
-        //  *           format: uuid
-        //  *         description: The ID of the tenant
-        //  *     responses:
-        //  *       200:
-        //  *         description: Staffs counted successfully
-        //  *       400:
-        //  *         description: Bad request
-        //  */
-        // this.router.get("/avg-staff/:tenantId", adminProtect(), this.controller.averageClinicians);
+        /**
+         * @swagger
+         * /api/v1/tenant/avg-staff/{tenantId}:
+         *   get:
+         *     summary: Count average client per therapist
+         *     tags: [Tenant]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         description: The ID of the tenant
+         *     responses:
+         *       200:
+         *         description: Staffs counted successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get("/avg-staff/:tenantId", adminProtect(), this.controller.averageClinicians);
+
+        /**
+         * @swagger
+         * /api/v1/tenant/tenant/avg-staff/{tenantId}:
+         *   get:
+         *     summary: Count average client per therapist
+         *     tags: [Tenant]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         description: The ID of the tenant
+         *     responses:
+         *       200:
+         *         description: Staffs counted successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get("/tenant/avg-staff/:tenantId", adminProtect(), this.controller.averageClinicians);
 
         /**
          * @swagger

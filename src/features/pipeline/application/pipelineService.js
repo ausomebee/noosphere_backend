@@ -310,11 +310,7 @@ class PipelineService {
     async getTenantPipelineSummary(tenantId) {
         const overview = await this.pipelineRepository.overview(tenantId);
 
-        if (!overview) {
-            throw new Error("Failed to fetch overview.");
-        }
-
-        return overview;
+        return overview || { pipelineStages: [] };
     }
 
     async getItemByIdClient(id) {

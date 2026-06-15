@@ -182,10 +182,6 @@ class PipelineController {
     getTenantPipelineSummary = expressAsyncHandler(async (req, res) => {
         const overview = await this.service.getTenantPipelineSummary(req.params.tenantId);
 
-        if (!overview) {
-            res.status(500).json({ message: 'Failed to fetch overview' });
-        }
-
         return res.status(201).json({
             message: "overview fetched successfully",
             status: 'ok',
