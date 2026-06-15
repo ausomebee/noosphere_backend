@@ -40,7 +40,7 @@ class TimesheetHistoryController {
             data: updated
         });
     });
-
+ 
     getSingleTimesheetHistory = expressAsyncHandler(async (req, res) => {
         const record = await this.service.getSingleTimesheetHistory(req.params.id);
 
