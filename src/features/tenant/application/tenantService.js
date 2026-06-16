@@ -597,12 +597,7 @@ class TenantService {
 
     async getStaffsWithTeamAccess(tenantId) {
         const staffs = await this.staffRepository.getStaffsWithTeamAccess(tenantId);
-
-        if (!staffs || staffs.length === 0) {
-            throw new Error("No staff found for the given tenant");
-        }
-
-        return staffs;
+        return staffs ?? [];
     }
 
     async forgotPassword(email) {
