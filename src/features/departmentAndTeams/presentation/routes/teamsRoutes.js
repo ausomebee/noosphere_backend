@@ -1,7 +1,7 @@
 import express from "express";
 import TeamsController from "../controllers/teamsController.js";
 import TeamsDto from "../dto/teamDto.js";
-import { adminProtect } from "../../../../middleware/auth_handlers.js";
+import { adminProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -150,6 +150,30 @@ class TeamsRoutes {
         this.router.get(
             "/",
             adminProtect(),
+            this.controller.getTeams
+        );
+
+        /**
+         * @swagger
+         * /api/v1/organization/teams/tenant:
+         *   get:
+         *     summary: Get all teams (optionally filtered by query)
+         *     tags: [organization]
+         *     parameters:
+         *       - in: query
+         *         name: tenantId
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         required: false
+         *         description: Filter teams by tenant ID
+         *     responses:
+         *       200:
+         *         description: Teams fetched successfully
+         */
+        this.router.get(
+            "/tenant",
+            staffProtect(),
             this.controller.getTeams
         );
 
