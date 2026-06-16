@@ -435,6 +435,27 @@ class ClientRoutes {
 
         /**
         * @swagger
+        * /api/v1/client/tenant/tenant/{tenantId}:
+        *   get:
+        *     summary: gets tenant clients
+        *     tags: [Clients]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the tenant
+        *     responses:
+        *       200:
+        *         description: tenant clients fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant/tenant/:tenantId", staffProtect(), this.controller.getTenantClients);
+
+        /**
+        * @swagger
         * /api/v1/client/client/{clientId}:
         *   get:
         *     summary: gets client clients
