@@ -29,10 +29,7 @@ class TenantAdditionalSecurityQuestionsService {
 
     async getQuestions(tenantId) {
         const records = await this.repository.findAll({ tenantId });
-        if (!records || records.length === 0) {
-            throw new Error("No security questions found for this tenant");
-        }
-        return records;
+        return records ?? [];
     }
 }
 
