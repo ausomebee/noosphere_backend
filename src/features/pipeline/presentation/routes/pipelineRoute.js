@@ -507,6 +507,26 @@ class PipelineRoutes {
 
         /**
          * @swagger
+         * /api/v1/pipeline/tenant/stage:
+         *   post:
+         *     summary: Create a new pipeline stage 
+         *     tags: [PipelineStage]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/CreateStage'
+         *     responses:
+         *       201:
+         *         description: Pipeline stage created successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/tenant/stage", staffProtect(), PipelineDto.createStageDto, this.controller.createPipelineStage);
+
+        /**
+         * @swagger
          * /api/v1/pipeline/stage/pipeline/{pipelineId}:
          *   get:
          *     summary: Get pipeline stage by pipeline ID

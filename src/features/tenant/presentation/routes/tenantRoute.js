@@ -1137,6 +1137,28 @@ class TenantRoutes {
 
         /**
          * @swagger
+         * /api/v1/tenant/tenant/staff/team/{tenantId}:
+         *   get:
+         *     summary: Get staffs with team access for a tenant
+         *     tags: [Tenant]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         description: The ID of the tenant
+         *     responses:
+         *       200:
+         *         description: staffs fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/tenant/staff/team/:tenantId", staffProtect(), this.controller.getStaffsWithTeamAccess);
+
+        /**
+         * @swagger
          * /api/v1/tenant/active:
          *   get:
          *     summary: Get all active tenants
@@ -1183,6 +1205,27 @@ class TenantRoutes {
          *         description: Validation error
          */
         this.router.get("/:id", adminProtect(), this.controller.getTenant);
+
+        /**
+         * @swagger
+         * /api/v1/tenant/tenant/{id}:
+         *   get:
+         *     summary: Get tenant by tenant id
+         *     tags: [Tenant]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The id of the tenant 
+         *     responses:
+         *       200:
+         *         description: tenant fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/tenant/:id", staffProtect(), this.controller.getTenant);
 
         /**
          * @swagger

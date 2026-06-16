@@ -2,7 +2,7 @@ import express from "express";
 import IssueController from "../controller/issueController.js";
 import IssueDto from "../dto/issueDto.js";
 import S3Service from "../../../../utilities/s3.js";
-import { adminProtect } from "../../../../middleware/auth_handlers.js";
+import { adminProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -318,6 +318,27 @@ class IssueRoutes {
 
         /**
         * @swagger
+        * /api/v1/issue/tenant/tenant/{tenantId}:
+        *   get:
+        *     summary: gets tenant issue
+        *     tags: [Issue]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The ID of the tenant
+        *     responses:
+        *       200:
+        *         description: issue fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant/tenant/:tenantId", staffProtect(),  this.controller.getTenantIssues);
+
+        /**
+        * @swagger
         * /api/v1/issue/tenant-management-overview/{tenantId}:
         *   get:
         *     summary: gets tenant management overview
@@ -384,6 +405,27 @@ class IssueRoutes {
         *         description: Validation error
         */
         this.router.get("/tenant-overview/:tenantId", adminProtect(), this.controller.getTenantIssuesOverview);
+
+         /**
+        * @swagger
+        * /api/v1/issue/tenant/tenant-overview/{tenantId}:
+        *   get:
+        *     summary: gets tenant issue
+        *     tags: [Issue]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The ID of the tenant
+        *     responses:
+        *       200:
+        *         description: issue fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant/tenant-overview/:tenantId", staffProtect(), this.controller.getTenantIssuesOverview);
 
         /**
         * @swagger

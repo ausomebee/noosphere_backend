@@ -62,11 +62,7 @@ class FormService {
             ]
         });
 
-        if (!forms) {
-            throw new Error("Forms not found");
-        }
-
-        return forms;
+        return forms ?? [];
     }
 
     async getTenantDrafts(tenantId) {
@@ -77,11 +73,7 @@ class FormService {
             ]
         });
 
-        if (!forms) {
-            throw new Error("Forms not found");
-        }
-
-        return forms;
+        return forms ?? [];
     }
 
     async getTenantTemplates(tenantId) {
@@ -92,11 +84,7 @@ class FormService {
             ]
         });
 
-        if (!forms) {
-            throw new Error("Forms not found");
-        }
-
-        return forms;
+        return forms ?? [];
     }
 }
 
