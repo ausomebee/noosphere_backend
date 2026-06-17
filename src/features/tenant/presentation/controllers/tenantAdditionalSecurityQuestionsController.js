@@ -63,10 +63,6 @@ class TenantAdditionalSecurityQuestionsController {
     getQuestions = expressAsyncHandler(async (req, res) => {
         const records = await this.service.getQuestions(req.params.tenantId);
 
-        if (!records) {
-            return res.status(404).json({ message: "No security questions found for this tenant" });
-        }
-
         return res.status(200).json({
             message: "Security questions fetched successfully",
             status: "ok",

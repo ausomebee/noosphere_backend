@@ -6,7 +6,7 @@ class TenantNotificationSettingsService {
     async getNotificationSettings(userId) {
         let record = await this.tenantNotificationSettingsRepository.findByUserId(userId);
 
-        if (record.length === 0) {
+        if (!record) {
             const defaultSettings = [
                 {
                     key: "CALENDAR_APPOINTMENTS",
@@ -73,10 +73,17 @@ class TenantNotificationSettingsService {
                 },
             ];
 
-            record = await this.tenantNotificationSettingsRepository.upsert({
-                userId,
-                settings: defaultSettings
-            });
+            try {
+                record = await this.tenantNotificationSettingsRepository.upsert({
+                    userId,
+                    settings: defaultSettings
+                });
+            } catch (error) {
+                if (error.code === 'P2025' || error.message?.includes('Foreign key constraint')) {
+                    return defaultSettings;
+                }
+                throw error;
+            }
         }
 
         return record.settings;
@@ -85,19 +92,26 @@ class TenantNotificationSettingsService {
     async saveNotificationSettings(userId, settings) {
         const existing = await this.tenantNotificationSettingsRepository.findByUserId(userId);
 
-        const record = await this.tenantNotificationSettingsRepository.upsert({
-            userId,
-            settings
-        });
+        try {
+            const record = await this.tenantNotificationSettingsRepository.upsert({
+                userId,
+                settings
+            });
 
-        if (!record) {
-            throw new Error("Failed to save notification settings");
+            if (!record) {
+                throw new Error("Failed to save notification settings");
+            }
+
+            return {
+                record,
+                isNew: !existing
+            };
+        } catch (error) {
+            if (error.code === 'P2025' || error.message?.includes('Foreign key constraint')) {
+                throw new Error("User not found. Cannot save notification settings for a non-existent user.");
+            }
+            throw error;
         }
-
-        return {
-            record,
-            isNew: !existing
-        };
     }
 }
 

@@ -277,12 +277,6 @@ class TenantController {
     getStaffsWithTeamAccess = expressAsyncHandler(async (req, res) => {
         const staffs = await this.service.getStaffsWithTeamAccess(req.params.tenantId);
 
-        if (!staffs) {
-            return res.status(500).json({
-                message: 'Failed to fetch staff with team access.'
-            });
-        }
-
         return res.status(200).json({
             message: "Staff fetched successfully",
             status: 'ok',

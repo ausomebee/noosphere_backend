@@ -446,6 +446,27 @@ class PipelineRoutes {
 
         /**
          * @swagger
+         * /api/v1/pipeline/tenant/tenant/{tenantId}:
+         *   get:
+         *     summary: Get pipeline by tenant ID
+         *     tags: [Pipeline]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The tenant ID to fetch pipeline for
+         *     responses:
+         *       201:
+         *         description: Pipeline fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/tenant/tenant/:tenantId", staffProtect(), PipelineDto.getPipelinesByTenantIdDto, this.controller.getPipelinesByTenantId);
+
+        /**
+         * @swagger
          * /api/v1/pipeline/active:
          *   patch:
          *     summary: update activity
@@ -486,6 +507,26 @@ class PipelineRoutes {
 
         /**
          * @swagger
+         * /api/v1/pipeline/tenant/stage:
+         *   post:
+         *     summary: Create a new pipeline stage 
+         *     tags: [PipelineStage]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/CreateStage'
+         *     responses:
+         *       201:
+         *         description: Pipeline stage created successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/tenant/stage", staffProtect(), PipelineDto.createStageDto, this.controller.createPipelineStage);
+
+        /**
+         * @swagger
          * /api/v1/pipeline/stage/pipeline/{pipelineId}:
          *   get:
          *     summary: Get pipeline stage by pipeline ID
@@ -504,6 +545,27 @@ class PipelineRoutes {
          *         description: Validation error
          */
         this.router.get("/stage/pipeline/:pipelineId", adminProtect(), PipelineDto.getStagesByPipelineIdDto, this.controller.getStageByPipelineId);
+
+        /**
+         * @swagger
+         * /api/v1/pipeline/tenant/stage/pipeline/{pipelineId}:
+         *   get:
+         *     summary: Get pipeline stage by pipeline ID
+         *     tags: [PipelineStage]
+         *     parameters:
+         *       - in: path
+         *         name: pipelineId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The ID of the pipeline
+         *     responses:
+         *       201:
+         *         description: Pipeline stage fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/tenant/stage/pipeline/:pipelineId", staffProtect(), PipelineDto.getStagesByPipelineIdDto, this.controller.getStageByPipelineId);
 
         /**
          * @swagger

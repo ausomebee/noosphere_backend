@@ -1,7 +1,7 @@
 import express from "express";
 import ClientController from "../controllers/clientController.js";
 import ClientDto from "../dto/clientDto.js";
-import { adminProtect, clientProtect } from "../../../../middleware/auth_handlers.js";
+import { adminProtect, clientProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 /**
  * @swagger
  * components:
@@ -432,6 +432,27 @@ class ClientRoutes {
         *         description: Validation error
         */
         this.router.get("/tenant/:tenantId", adminProtect(), this.controller.getTenantClients);
+
+        /**
+        * @swagger
+        * /api/v1/client/tenant/tenant/{tenantId}:
+        *   get:
+        *     summary: gets tenant clients
+        *     tags: [Clients]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the tenant
+        *     responses:
+        *       200:
+        *         description: tenant clients fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant/tenant/:tenantId", staffProtect(), this.controller.getTenantClients);
 
         /**
         * @swagger

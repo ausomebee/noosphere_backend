@@ -1090,7 +1090,7 @@ class TenantRoutes {
          *       400:
          *         description: Bad request
          */
-        this.router.get("/tenant/avg-staff/:tenantId", adminProtect(), this.controller.averageClinicians);
+        this.router.get("/tenant/avg-staff/:tenantId", staffProtect(), this.controller.averageClinicians);
 
         /**
          * @swagger
@@ -1134,6 +1134,28 @@ class TenantRoutes {
          *         description: Validation error
          */
         this.router.get("/staff/team/:tenantId", adminProtect(), this.controller.getStaffsWithTeamAccess);
+
+        /**
+         * @swagger
+         * /api/v1/tenant/tenant/staff/team/{tenantId}:
+         *   get:
+         *     summary: Get staffs with team access for a tenant
+         *     tags: [Tenant]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         description: The ID of the tenant
+         *     responses:
+         *       200:
+         *         description: staffs fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/tenant/staff/team/:tenantId", staffProtect(), this.controller.getStaffsWithTeamAccess);
 
         /**
          * @swagger
@@ -1186,6 +1208,27 @@ class TenantRoutes {
 
         /**
          * @swagger
+         * /api/v1/tenant/tenant/{id}:
+         *   get:
+         *     summary: Get tenant by tenant id
+         *     tags: [Tenant]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The id of the tenant 
+         *     responses:
+         *       200:
+         *         description: tenant fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/tenant/:id", staffProtect(), this.controller.getTenant);
+
+        /**
+         * @swagger
          * /api/v1/tenant/staff/{tenantId}:
          *   get:
          *     summary: Gets tenant staffs by tenant id
@@ -1204,6 +1247,27 @@ class TenantRoutes {
          *         description: Validation error
          */
         this.router.get("/staff/:tenantId", adminProtect(), this.controller.getTenantStaffs);
+
+        /**
+         * @swagger
+         * /api/v1/tenant/tenant/staff/{tenantId}:
+         *   get:
+         *     summary: Gets tenant staffs by tenant id
+         *     tags: [Tenant]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The id of the tenant 
+         *     responses:
+         *       200:
+         *         description: tenant staffs fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/tenant/staff/:tenantId", staffProtect(), this.controller.getTenantStaffs);
 
     }
 
