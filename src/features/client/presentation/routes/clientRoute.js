@@ -341,6 +341,26 @@ class ClientRoutes {
          */
         this.router.post("/", adminProtect(), ClientDto.createClientDto, this.controller.createClientCandidate);
 
+        /**
+         * @swagger
+         * /api/v1/client/tenant:
+         *   post:
+         *     summary: Create a new client candidate
+         *     tags: [Clients]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/CreateClientDto'
+         *     responses:
+         *       201:
+         *         description: Client created successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/tenant", staffProtect(), ClientDto.createClientDto, this.controller.createClientCandidate);
+
        /**
          * @swagger
          * /api/v1/client/login:

@@ -70,7 +70,6 @@ class TemplateRenderer {
     }
 }
 
-// Export a singleton instance
 const templateRenderer = new TemplateRenderer();
 
 export default templateRenderer;
