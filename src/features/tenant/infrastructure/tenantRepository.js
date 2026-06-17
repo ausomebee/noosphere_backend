@@ -10,12 +10,17 @@ class TenantRepository extends BaseRepository {
     }
 
     async countAllTenants() {
-        return await this.model.count();
+        return await this.model.count({
+            where: {
+                isDeleted: false
+            }
+        });
     }
 
     async countPaidTenants() {
         return await this.model.count({
             where: {
+                isDeleted: false,
                 Subscription: {
                     some: { status: 'ACTIVE' }
                 }
@@ -25,7 +30,10 @@ class TenantRepository extends BaseRepository {
 
     async findAllAndPopulate(filter = {}) {
         return await this.model.findMany({
-            where: filter,
+            where: {
+                ...filter,
+                isDeleted: false
+            },
             include: {
                 BillingPlan: {
                     select: {
@@ -49,6 +57,7 @@ class TenantRepository extends BaseRepository {
         return await this.model.findMany({
             where: {
                 active: true,
+                isDeleted: false,
                 Subscription: {
                     some: { status: 'ACTIVE' }
                 }
