@@ -433,6 +433,29 @@ class ClientRoutes {
         this.router.put("/", adminProtect(), ClientDto.updateClientDto, this.controller.updateClient);
 
         /**
+         * @swagger
+         * /api/v1/client/tenant:
+         *   put:
+         *     summary: Update client details
+         *     tags:
+         *       - Clients
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateClientDto'
+         *     responses:
+         *       200:
+         *         description: Client updated successfully
+         *       400:
+         *         description: Invalid request body
+         *       404:
+         *         description: Client not found
+         */
+        this.router.put("/tenant", staffProtect(), ClientDto.updateClientDto, this.controller.updateClient);
+
+        /**
         * @swagger
         * /api/v1/client/tenant/{tenantId}:
         *   get:
