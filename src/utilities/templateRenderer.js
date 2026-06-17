@@ -1,6 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '.env' });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -9,6 +12,10 @@ class TemplateRenderer {
     constructor() {
         this.templatesDir = path.join(__dirname, '../templates/emails');
         this.templateCache = new Map();
+        this.clientUrl = process.env.CLIENT_URL || 'http://noospherehub.net';
+        this.controlPanelUrl = process.env.CONTROL_PANEL_URL || `${this.clientUrl}/control`;
+        this.tenantUrl = process.env.TENANT_URL || `${this.clientUrl}/tenant`;
+        this.clientPortalUrl = process.env.CLIENT_PORTAL_URL || `${this.clientUrl}/client`;
     }
 
     loadTemplate(templateName) {
@@ -35,7 +42,15 @@ class TemplateRenderer {
 
     render(templateName, variables = {}) {
         const template = this.loadTemplate(templateName);
-        return this.injectVariables(template, variables);
+        // Inject URL variables
+        const baseVariables = {
+            clientUrl: this.clientUrl,
+            controlPanelUrl: this.controlPanelUrl,
+            tenantUrl: this.tenantUrl,
+            clientPortalUrl: this.clientPortalUrl,
+            ...variables
+        };
+        return this.injectVariables(template, baseVariables);
     }
 
     injectVariables(template, variables) {
