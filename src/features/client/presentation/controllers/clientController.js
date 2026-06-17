@@ -33,7 +33,7 @@ class ClientController {
         const tenant = await this.tenantService.getTenant(req.body.tenantId);
 
         if (!tenant) {
-            res.status(500).json({ message: 'Failed to fetch tenant' });
+            return res.status(500).json({ message: 'Failed to fetch tenant' });
         }
 
         const candidate = await this.service.createClientCandidate(req.body, tenant);
@@ -46,7 +46,7 @@ class ClientController {
             const documentsData = new ClientDocuments({ ...field, tenantClientId: candidate.tenantClientId });
             const doc = await this.clientDocumentsService.createClientDocument(documentsData.createClientDocument);
             if (!doc) {
-                res.status(500).json({ message: 'Failed to update client' });
+                return res.status(500).json({ message: 'Failed to update client' });
             }
         }
 
@@ -61,14 +61,14 @@ class ClientController {
         const client = await this.service.updateClient(req.body);
 
         if (!client) {
-            res.status(500).json({ message: 'Failed to update client' });
+            return res.status(500).json({ message: 'Failed to update client' });
         }
 
         for (const field of req.body.documents || []) {
             const documentsData = new ClientDocuments({ ...field, tenantClientId: client.clientTenantId });
             const doc = await this.clientDocumentsService.createClientDocument(documentsData.createClientDocument);
             if (!doc) {
-                res.status(500).json({ message: 'Failed to update client' });
+                return res.status(500).json({ message: 'Failed to update client' });
             }
         }
 
@@ -83,7 +83,7 @@ class ClientController {
         const client = await this.service.updateClientPassword(req.body);
 
         if (!client) {
-            res.status(500).json({ message: 'Failed to update client password' });
+            return res.status(500).json({ message: 'Failed to update client password' });
         }
 
         return res.status(201).json({
@@ -100,7 +100,7 @@ class ClientController {
         });
 
         if (!client) {
-            res.status(500).json({ message: 'Failed to update client avatar' });
+            return res.status(500).json({ message: 'Failed to update client avatar' });
         }
 
         return res.status(201).json({
@@ -114,7 +114,7 @@ class ClientController {
         const clients = await this.service.getTenantClients(req.params.tenantId);
 
         if (!clients) {
-            res.status(500).json({ message: 'Failed to fetch clients' });
+            return res.status(500).json({ message: 'Failed to fetch clients' });
         }
 
         return res.status(201).json({
@@ -128,7 +128,7 @@ class ClientController {
         const clients = await this.service.getClientsByClinician(req.params.staffId, req.params.tenantId);
 
         if (!clients) {
-            res.status(500).json({ message: 'Failed to fetch clients' });
+            return res.status(500).json({ message: 'Failed to fetch clients' });
         }
 
         return res.status(201).json({
@@ -142,7 +142,7 @@ class ClientController {
         const client = await this.service.login({...req.body, subdomain: req.headers.host.split('.')[0]});
 
         if (!client) {
-            res.status(500).json({ message: 'Failed to login' });
+            return res.status(500).json({ message: 'Failed to login' });
         }
 
         const refreshToken = await this.refreshTokenService.createRefreshToken({
@@ -154,7 +154,7 @@ class ClientController {
         });
 
         if (!refreshToken) {
-            res.status(500).json({ message: 'Failed to create refresh token' });
+            return res.status(500).json({ message: 'Failed to create refresh token' });
         }
 
         return res.status(201).json({
@@ -168,7 +168,7 @@ class ClientController {
         const client = await this.service.updateTenantClient({...req.body, passwordChanged: true});
 
         if (!client) {
-            res.status(500).json({ message: 'Failed to reset password' });
+            return res.status(500).json({ message: 'Failed to reset password' });
         }
 
         return res.status(201).json({
@@ -182,7 +182,7 @@ class ClientController {
         const client = await this.service.getSingleClient(req.params.clientId);
 
         if (!client) {
-            res.status(500).json({ message: 'Failed to fetch client' });
+            return res.status(500).json({ message: 'Failed to fetch client' });
         }
 
         return res.status(201).json({
@@ -196,7 +196,7 @@ class ClientController {
         const client = await this.service.initiatePasswordReset(req.params.email);
 
         if (!client) {
-            res.status(500).json({ message: 'Failed to send email' });
+            return res.status(500).json({ message: 'Failed to send email' });
         }
 
         return res.status(201).json({
