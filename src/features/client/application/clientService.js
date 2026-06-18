@@ -92,7 +92,11 @@ class ClientService {
             throw new Error("Failed to send mail");
         }
 
-        return { ...newCandidate.pipelineItem, email: newCandidate.client.email, tenantClientId: newCandidate.clientTenant.id };
+        return {
+            ...(newCandidate.pipelineItem || {}),
+            email: newCandidate.client.email,
+            tenantClientId: newCandidate.clientTenant.id
+        };
     }
 
     async initiatePasswordReset(email) {

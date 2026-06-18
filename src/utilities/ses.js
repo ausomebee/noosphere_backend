@@ -11,33 +11,21 @@ class EmailService {
         });
     }
 
-    /**
-     * Sanitize header values to prevent header injection attacks
-     */
     sanitizeHeader(value) {
         if (!value) return '';
         return String(value).replace(/[\r\n]/g, '');
     }
 
-    /**
-     * Split base64 string into lines of specified length (RFC 2045 compliance)
-     */
     splitBase64(base64String, lineLength = 76) {
         const regex = new RegExp(`.{1,${lineLength}}`, 'g');
         return base64String.match(regex)?.join('\r\n') || '';
     }
 
-    /**
-     * Validate email address format
-     */
     validateEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
 
-    /**
-     * Validate array of email addresses
-     */
     validateEmails(emails) {
         if (!Array.isArray(emails) || emails.length === 0) {
             throw new Error('Email recipients must be a non-empty array');
@@ -49,7 +37,7 @@ class EmailService {
             }
         });
     }
-
+ 
     buildRawEmail({
         from,
         to,

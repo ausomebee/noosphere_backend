@@ -15,9 +15,7 @@ class SessionTypeServiceService {
             });
 
         if (exists) {
-            throw new Error(
-                "Service code already exists for this session type."
-            );
+            return exists;
         }
 
         const newRecord =

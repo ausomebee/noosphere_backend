@@ -341,6 +341,26 @@ class ClientRoutes {
          */
         this.router.post("/", adminProtect(), ClientDto.createClientDto, this.controller.createClientCandidate);
 
+        /**
+         * @swagger
+         * /api/v1/client/tenant:
+         *   post:
+         *     summary: Create a new client candidate
+         *     tags: [Clients]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/CreateClientDto'
+         *     responses:
+         *       201:
+         *         description: Client created successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/tenant",  ClientDto.createClientDto, this.controller.createClientCandidate);
+
        /**
          * @swagger
          * /api/v1/client/login:
@@ -413,6 +433,29 @@ class ClientRoutes {
         this.router.put("/", adminProtect(), ClientDto.updateClientDto, this.controller.updateClient);
 
         /**
+         * @swagger
+         * /api/v1/client/tenant:
+         *   put:
+         *     summary: Update client details
+         *     tags:
+         *       - Clients
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateClientDto'
+         *     responses:
+         *       200:
+         *         description: Client updated successfully
+         *       400:
+         *         description: Invalid request body
+         *       404:
+         *         description: Client not found
+         */
+        this.router.put("/tenant", staffProtect(), ClientDto.updateClientDto, this.controller.updateClient);
+
+        /**
         * @swagger
         * /api/v1/client/tenant/{tenantId}:
         *   get:
@@ -474,6 +517,27 @@ class ClientRoutes {
         *         description: Validation error
         */
         this.router.get("/client/:clientId", clientProtect, this.controller.getSingleClient);
+
+        /**
+        * @swagger
+        * /api/v1/client/tenant/client/{clientId}:
+        *   get:
+        *     summary: gets client clients
+        *     tags: [Clients]
+        *     parameters:
+        *       - in: path
+        *         name: clientId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the client
+        *     responses:
+        *       200:
+        *         description: client fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant/client/:clientId", staffProtect(), this.controller.getSingleClient);
 
         /**
          * @swagger
