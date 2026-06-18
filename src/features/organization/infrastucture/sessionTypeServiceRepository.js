@@ -9,6 +9,9 @@ class SessionTypeServiceRepository extends BaseRepository {
         return await this.model.findMany({
             where: query,
             include: populate,
+            orderBy: {
+                createdAt: "desc",
+            },
         });
     }
 }
