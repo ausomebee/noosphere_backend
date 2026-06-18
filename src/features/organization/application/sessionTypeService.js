@@ -58,6 +58,9 @@ class OrganizationSessionTypesService {
 
     async getTenantSessionTypes(tenantId) {
         const sessionTypes = await this.organizationSessionTypesRepository.findAllAndPopulate({ tenantId }, {
+            orderBy: {
+                createdAt: 'desc',
+            },
             sessionTypeServices: {
                 include: {
                     serviceCode: true
