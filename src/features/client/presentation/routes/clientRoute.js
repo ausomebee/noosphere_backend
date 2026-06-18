@@ -520,7 +520,7 @@ class ClientRoutes {
 
         /**
         * @swagger
-        * /api/v1/client/staff/client/{clientId}:
+        * /api/v1/client/tenant/client/{clientId}:
         *   get:
         *     summary: gets client clients
         *     tags: [Clients]
@@ -537,7 +537,7 @@ class ClientRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/staff/client/:clientId", staffProtect(), this.controller.getSingleClient);
+        this.router.get("/tenant/client/:clientId", staffProtect(), this.controller.getSingleClient);
 
         /**
          * @swagger
