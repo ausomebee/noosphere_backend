@@ -10,7 +10,7 @@ class SessionTypeServiceRepository extends BaseRepository {
             where: query,
             include: populate,
             orderBy: {
-                updatedAt: "desc",
+                createdAt: "desc",
             },
         });
     }
