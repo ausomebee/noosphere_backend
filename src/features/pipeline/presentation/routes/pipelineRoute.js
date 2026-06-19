@@ -1153,8 +1153,6 @@ class PipelineRoutes {
          */
         this.router.post("/item/document/:id", adminProtect(), this.S3Service.any(), this.controller.updateItemSentDocuments);
 
-        // ── Custom task routes ─────────────────────────────────────────────────
-
         /**
          * @swagger
          * /api/v1/pipeline/item/custom/task:
@@ -1259,8 +1257,6 @@ class PipelineRoutes {
          *         description: Validation error
          */
         this.router.delete("/item/custom/task/:id", adminProtect(), PipelineDto.getByIdDto, this.controller.deleteCustomTask);
-
-        // ── Custom document routes ─────────────────────────────────────────────
 
         /**
          * @swagger

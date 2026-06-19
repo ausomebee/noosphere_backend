@@ -231,7 +231,7 @@ model Tenant {
   id               String   @id @default(uuid())
   email            String   @unique
   phoneNumber      String   @unique
-  active           Boolean  @default(true)
+  active           Boolean  @default(false)
   isDeleted        Boolean  @default(false)
   subdomain        String   @unique
   companyName      String
