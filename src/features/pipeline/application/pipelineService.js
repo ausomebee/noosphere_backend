@@ -363,7 +363,7 @@ class PipelineService {
 
     async deleteStage(id) {
         const stage = await this.stageRepository.findOne({ id })
-        const items = await this.itemRepository.findAll({ pipelineStageId: stage.pipelineStageId })
+        const items = await this.itemRepository.findAll({ pipelineStageId: stage.id })
 
         if (stage.order === 1 && items.length > 0) {
             throw new Error("Kindly remove all items");
@@ -378,7 +378,7 @@ class PipelineService {
 
         if (items.length > 0) {
             const firstStage = await this.stageRepository.findFirst({ AND: [{ pipelineId: stage.pipelineId }, { order: 1 }] })
-            const update = await this.itemRepository.updateManyByPipelineStageId(stage.pipelineStageId, { pipelineStageId: firstStage.id })
+            const update = await this.itemRepository.updateManyByPipelineStageId(stage.id, { pipelineStageId: firstStage.id })
 
             if (update.count < 1) {
                 throw new Error("Failed to adjust order");
