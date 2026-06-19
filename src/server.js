@@ -86,6 +86,7 @@ import departmentMembersRoute from "./features/departmentAndTeams/presentation/r
 import notificationsRoute from "./features/notifications/presentation/routes/notificationRoutes.js";
 import messagesRoute from "./features/messaging/presentation/routes/messageRoutes.js";
 import tenantNotificationSettingsRoute from "./features/tenant/presentation/routes/tenantNotificationSettingsRoutes.js";
+import prospectRoute from "./features/prospect/presentation/routes/prospectRoutes.js";
 
 class App {
     constructor() {
@@ -282,6 +283,7 @@ class App {
         this.app.use("/api/v1/notifications", notificationsRoute);
         this.app.use("/api/v1/messages", messagesRoute);
         this.app.use("/api/v1/tenant/notification-settings", tenantNotificationSettingsRoute);
+        this.app.use("/api/v1/prospect", prospectRoute);
     }
 
     initializeErrorHandler() {
