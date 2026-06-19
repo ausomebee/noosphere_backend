@@ -179,6 +179,7 @@ class PipelineService {
                 select: {
                     companyName: true,
                     createdAt: true,
+                    active: false,
                     admin: {
                         select: {
                             firstName: true,

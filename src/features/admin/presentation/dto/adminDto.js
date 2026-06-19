@@ -47,12 +47,10 @@ class AdminDto {
                     "string.min": "Phone number must be at least 10 characters long",
                     "string.max": "Phone number must be at most 15 characters long"
                 }),
-            roleId: Joi.string().uuid().required().messages({
-                "string.empty": "Role ID is required",
+            roleId: Joi.string().uuid().optional().messages({
                 "string.guid": "Role ID must be a valid UUID",
             }),
-            departmentId: Joi.string().uuid().required().messages({
-                "string.empty": "Department ID is required",
+            departmentId: Joi.string().uuid().optional().messages({
                 "string.guid": "Department ID must be a valid UUID",
             }),
         });

@@ -125,7 +125,7 @@ model Admin {
   lastName              String   @default("hd")
   email                 String   @unique
   phoneNumber           String   @unique
-  roleId                String
+  roleId                String?
   superAdmin            Boolean  @default(false)
   active                Boolean  @default(true)
   isDeleted             Boolean  @default(false)
@@ -137,7 +137,7 @@ model Admin {
   authQuestion          String?
   auth2FADone           Boolean  @default(false)
 
-  roles               Role                 @relation("RoleAdmins", fields: [roleId], references: [id])
+  roles               Role?                @relation("RoleAdmins", fields: [roleId], references: [id])
   pipelines           Pipeline[]
   PipelineItem        PipelineItem[]
   TenantsAssigned     Tenant[]             @relation("AccountOfficer")
@@ -231,7 +231,7 @@ model Tenant {
   id               String   @id @default(uuid())
   email            String   @unique
   phoneNumber      String   @unique
-  active           Boolean  @default(true)
+  active           Boolean  @default(false)
   isDeleted        Boolean  @default(false)
   subdomain        String   @unique
   companyName      String

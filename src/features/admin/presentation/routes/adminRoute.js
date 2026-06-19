@@ -15,7 +15,6 @@ import { adminProtect } from "../../../../middleware/auth_handlers.js";
  *         - email
  *         - password
  *         - phoneNumber
- *         - roleId
  *       properties:
  *         firstName:
  *           type: string
