@@ -201,6 +201,26 @@ class RoleRoutes {
 
         /**
          * @swagger
+         * /api/v1/role/tenant:
+         *   patch:
+         *     summary: update an existing role
+         *     tags: [role]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/updateRole'
+         *     responses:
+         *       201:
+         *         description: Role updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/tenant", staffProtect(), RoleDto.updateRoleDto, this.controller.updateRole);
+
+        /**
+         * @swagger
          * /api/v1/role/:
          *   patch:
          *     summary: update an existing role
