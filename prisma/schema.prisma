@@ -599,11 +599,11 @@ model PipelineItem {
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
-  client                     Client?                     @relation(fields: [clientId], references: [id])
-  tenant                     Tenant?                     @relation(fields: [tenantId], references: [id])
-  pipelineStage              PipelineStage?              @relation(fields: [pipelineStageId], references: [id])
-  tenantStaff                TenantStaff?                @relation(fields: [assignToTenantStaff], references: [id])
-  admin                      Admin?                      @relation(fields: [assignToAdmin], references: [id])
+  client                     Client?                      @relation(fields: [clientId], references: [id])
+  tenant                     Tenant?                      @relation(fields: [tenantId], references: [id])
+  pipelineStage              PipelineStage?               @relation(fields: [pipelineStageId], references: [id])
+  tenantStaff                TenantStaff?                 @relation(fields: [assignToTenantStaff], references: [id])
+  admin                      Admin?                       @relation(fields: [assignToAdmin], references: [id])
   pipelineDoneTasks          PipelineDoneTask[]
   pipelineSubmittedDocuments PipelineSubmittedDocument[]
   customTasks                PipelineItemCustomTask[]
@@ -1097,6 +1097,9 @@ model SessionTypeService {
 
   serviceCode ServiceCodes             @relation(fields: [serviceCodeId], references: [id])
   sessionType OrganizationSessionTypes @relation(fields: [sessionTypeId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
 }
 
 model Appointment {
