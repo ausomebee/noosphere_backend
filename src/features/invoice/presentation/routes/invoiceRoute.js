@@ -360,6 +360,35 @@ class InvoiceRoutes {
 
         /**
          * @swagger
+         * /api/v1/invoice/control:
+         *   get:
+         *     summary: Retrieve all invoices
+         *     tags: [Invoice]
+         *     parameters:
+         *       - in: query
+         *         name: page
+         *         required: false
+         *         schema:
+         *           type: integer
+         *           default: 1
+         *         description: Page number for pagination
+         *       - in: query
+         *         name: pageSize
+         *         required: false
+         *         schema:
+         *           type: integer
+         *           default: 10
+         *         description: Number of invoices per page
+         *     responses:
+         *       200:
+         *         description: invoices retrieved successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.get("/control", adminProtect(), this.controller.getAllInvoices);
+
+        /**
+         * @swagger
          * /api/v1/invoice/tenants/{tenantId}/invoices:
          *   get:
          *     summary: Retrieve all invoices for a tenant
