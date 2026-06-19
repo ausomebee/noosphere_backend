@@ -161,6 +161,26 @@ class RoleRoutes {
 
         /**
          * @swagger
+         * /api/v1/role/tenant:
+         *   post:
+         *     summary: create a new role
+         *     tags: [role]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/CreateRole'
+         *     responses:
+         *       201:
+         *         description: Role created successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/tenant", staffProtect(), RoleDto.createRoleDto, this.controller.createRole);
+
+        /**
+         * @swagger
          * /api/v1/role/:
          *   post:
          *     summary: create a new role
