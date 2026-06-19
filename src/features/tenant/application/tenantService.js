@@ -3,6 +3,13 @@ import Tenant from '../domain/tenant.js';
 import argon2 from "argon2";
 import { seedTenantBillingDefaults } from './tenantOnboardingSeed.js';
 
+const escapeHtml = (value = '') => String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
 class TenantService {
     constructor({ tenantDeactivationRepository, tenantRepository, prisma, tokenService, roleRepository, staffRepository, pipelineRepository, itemRepository, generateCode, choiceRepository, authRepository, templateRenderer }) {
         this.tenantDeactivationRepository = tenantDeactivationRepository;
@@ -385,15 +392,27 @@ class TenantService {
             throw new Error("Tenant not found.");
         }
 
-        const attachments = data.attachments
-            ? [{
+        const attachments = [
+            {
+                filename: "Logowrap.png",
+                path: "Logowrap.png",
+                cid: "unique@image",
+                contentType: "image/png",
+            },
+            ...(data.attachments ? [{
                 filename: data.attachments.originalname,
                 content: data.attachments.buffer,
                 contentType: data.attachments.mimetype,
-            }]
-            : []
+            }] : [])
+        ];
 
-        const sendMail = await MailService.sendMail(tenant.email, data.header, data.body, null, attachments)
+        const html = await this.templateRenderer.render('contact-tenant.html', {
+            tenantName: escapeHtml(tenant.contactPerson || tenant.companyName),
+            heading: escapeHtml(data.header),
+            message: escapeHtml(data.body).replace(/\r?\n/g, '<br>')
+        });
+
+        const sendMail = await MailService.sendMail(tenant.email, data.header, data.body, html, attachments)
         if (!sendMail.success) {
             throw new Error("Failed to send mail");
         }
