@@ -12,10 +12,10 @@ class StaffDto {
             gender: Joi.string().optional(),
             npi: Joi.string().optional(),
             address: Joi.string().optional(),
-            city: Joi.string().required(),
-            state: Joi.string().required(),
-            zip: Joi.string().required(),
-            country: Joi.string().required(),
+            city: Joi.string().optional(),
+            state: Joi.string().optional(),
+            zip: Joi.string().optional(),
+            country: Joi.string().optional(),
             phoneNumber: Joi.string().min(1).required(),
             documents: Joi.array().items(
                 Joi.object({
