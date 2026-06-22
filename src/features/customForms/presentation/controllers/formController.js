@@ -103,8 +103,12 @@ class FormController {
         }
 
         const formFields = await this.formFieldService.getFormFields(form.id);
+        const duplicateName = await this.formService.getAvailableDuplicateName({
+            name: form.name,
+            tenantId: form.tenantId
+        });
 
-        const formData = new Form({ ...form, name: `${form.name} copy` });
+        const formData = new Form({ ...form, name: duplicateName });
         const newForm = await this.formService.createForm(formData.createForm);
 
         for (const field of formFields || []) {
@@ -117,7 +121,7 @@ class FormController {
         }
 
         return res.status(200).json({
-            message: "Form fetched successfully",
+            message: "Form duplicated successfully",
             status: "ok",
             data: newForm
         });
