@@ -5,7 +5,7 @@ class DeductionService {
 
     async createDeduction(data) {
         const exists = await this.deductionRepository.findFirstDynamic({
-            where: { name: data.name, tenantId: data.tenantId },
+            where: { name: data.name, tenantId: data.tenantId, isDeleted: false },
             select: { name: true }
         });
 
@@ -40,7 +40,22 @@ class DeductionService {
     }
 
     async getTenantDeductions(tenantId) {
-        return await this.deductionRepository.findAll({ tenantId });
+        return await this.deductionRepository.findAll({ tenantId, isDeleted: false });
+    }
+
+    async deleteDeduction({ id, tenantId }) {
+        const deduction = await this.deductionRepository.findFirstDynamic({
+            where: { id, tenantId, isDeleted: false }
+        });
+
+        if (!deduction) {
+            return null;
+        }
+
+        return await this.deductionRepository.update(id, {
+            isDeleted: true,
+            isActive: false
+        });
     }
 }
 

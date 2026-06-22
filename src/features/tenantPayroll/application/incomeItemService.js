@@ -5,7 +5,7 @@ class IncomeItemService {
 
     async createIncomeItem(data) {
         const exists = await this.incomeItemRepository.findFirstDynamic({
-            where: { name: data.name, tenantId: data.tenantId },
+            where: { name: data.name, tenantId: data.tenantId, isDeleted: false },
             select: { name: true }
         });
 
@@ -40,7 +40,22 @@ class IncomeItemService {
     }
 
     async getTenantIncomeItems(tenantId) {
-        return await this.incomeItemRepository.findAll({ tenantId });
+        return await this.incomeItemRepository.findAll({ tenantId, isDeleted: false });
+    }
+
+    async deleteIncomeItem({ id, tenantId }) {
+        const incomeItem = await this.incomeItemRepository.findFirstDynamic({
+            where: { id, tenantId, isDeleted: false }
+        });
+
+        if (!incomeItem) {
+            return null;
+        }
+
+        return await this.incomeItemRepository.update(id, {
+            isDeleted: true,
+            isActive: false
+        });
     }
 }
 

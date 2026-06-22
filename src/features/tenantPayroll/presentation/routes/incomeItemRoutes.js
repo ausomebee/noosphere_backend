@@ -143,6 +143,27 @@ class IncomeItemRoutes {
 
         /**
          * @swagger
+         * /api/v1/income-items/{id}:
+         *   delete:
+         *     summary: Soft-delete an income item
+         *     tags: [income-items]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *     responses:
+         *       200:
+         *         description: Income item deleted successfully
+         *       404:
+         *         description: Income item not found for the caller's tenant
+         */
+        this.router.delete("/:id", staffProtect(), this.controller.deleteIncomeItem);
+
+        /**
+         * @swagger
          * /api/v1/income-items/{id}/{active}:
          *   patch:
          *     summary: Activate or deactivate an income item

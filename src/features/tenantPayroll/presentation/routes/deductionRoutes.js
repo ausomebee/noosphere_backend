@@ -143,6 +143,27 @@ class DeductionRoutes {
 
         /**
          * @swagger
+         * /api/v1/deductions/{id}:
+         *   delete:
+         *     summary: Soft-delete a deduction
+         *     tags: [deductions]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *     responses:
+         *       200:
+         *         description: Deduction deleted successfully
+         *       404:
+         *         description: Deduction not found for the caller's tenant
+         */
+        this.router.delete("/:id", staffProtect(), this.controller.deleteDeduction);
+
+        /**
+         * @swagger
          * /api/v1/deductions/{id}/{active}:
          *   patch:
          *     summary: Activate or deactivate a deduction item
