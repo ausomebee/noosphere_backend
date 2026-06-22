@@ -38,8 +38,8 @@ class FormDto {
             }),
             tenantId: Joi.string().uuid().required(),
             name: Joi.string().min(2).max(150).optional(),
-            isDraft: Joi.boolean().default(false),
-            isTemplate: Joi.boolean().default(false),
+            isDraft: Joi.boolean().optional(),
+            isTemplate: Joi.boolean().optional(),
             formFields: Joi.array()
                 .items(
                     Joi.object({

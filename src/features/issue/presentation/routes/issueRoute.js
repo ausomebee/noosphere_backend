@@ -275,6 +275,26 @@ class IssueRoutes {
         this.router.post("/", adminProtect(), this.S3Service.single("attachment"), IssueDto.createIssueDto, this.controller.createIssue);
 
         /**
+         * @swagger
+         * /api/v1/issue/tenant:
+         *   post:
+         *     summary: Create issue
+         *     tags: [Issue]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         multipart/form-data:
+         *           schema:
+         *             $ref: '#/components/schemas/CreateIssueDto'
+         *     responses:
+         *       201:
+         *         description: Issue created successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.post("/tenant", staffProtect(), this.S3Service.single("attachment"), IssueDto.createIssueDto, this.controller.createIssue);
+
+        /**
         * @swagger
         * /api/v1/issue/{id}:
         *   get:
@@ -294,6 +314,27 @@ class IssueRoutes {
         *         description: Validation error
         */
         this.router.get("/:id", adminProtect(), IssueDto.checkIdDto, this.controller.getSingleIssue);
+
+        /**
+        * @swagger
+        * /api/v1/issue/tenant/{id}:
+        *   get:
+        *     summary: gets single issue
+        *     tags: [Issue]
+        *     parameters:
+        *       - in: path
+        *         name: id
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The ID of the issue
+        *     responses:
+        *       200:
+        *         description: issue fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant/:id", staffProtect(), IssueDto.checkIdDto, this.controller.getSingleIssue);
 
         /**
         * @swagger
