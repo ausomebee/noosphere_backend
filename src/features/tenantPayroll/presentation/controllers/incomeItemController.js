@@ -69,6 +69,19 @@ class IncomeItemController {
         });
     });
 
+    deleteIncomeItem = expressAsyncHandler(async (req, res) => {
+        const incomeItem = await this.service.deleteIncomeItem({
+            id: req.params.id,
+            tenantId: req.user.tenantId
+        });
+
+        if (!incomeItem) {
+            return res.status(404).json({ message: "Income item not found" });
+        }
+
+        return res.status(200).json({ message: "Income item deleted" });
+    });
+
     deactivateIncomeItem = expressAsyncHandler(async (req, res) => {
         const incomeItem = await this.service.updateIncomeItem({
             id: req.params.id,

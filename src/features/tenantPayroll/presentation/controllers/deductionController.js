@@ -69,6 +69,19 @@ class DeductionController {
         });
     });
 
+    deleteDeduction = expressAsyncHandler(async (req, res) => {
+        const deduction = await this.service.deleteDeduction({
+            id: req.params.id,
+            tenantId: req.user.tenantId
+        });
+
+        if (!deduction) {
+            return res.status(404).json({ message: "Deduction not found" });
+        }
+
+        return res.status(200).json({ message: "Deduction deleted" });
+    });
+
     deactivateDeduction = expressAsyncHandler(async (req, res) => {
         const deduction = await this.service.updateDeduction({
             id: req.params.id,
