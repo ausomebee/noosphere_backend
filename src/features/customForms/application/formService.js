@@ -5,7 +5,7 @@ class FormService {
 
     async createForm(data) {
         const formExists = await this.formRepository.findFirstDynamic({
-            where: { name: data.name },
+            where: { name: data.name, tenantId: data.tenantId },
             select: { name: true }
         });
 
@@ -20,6 +20,27 @@ class FormService {
         }
 
         return newForm;
+    }
+
+    async getAvailableDuplicateName({ name, tenantId }) {
+        const suffix = " copy";
+        let copyNumber = 1;
+
+        while (true) {
+            const numberedSuffix = copyNumber === 1 ? suffix : `${suffix} (${copyNumber})`;
+            const availableLength = 150 - numberedSuffix.length;
+            const candidate = `${name.slice(0, availableLength)}${numberedSuffix}`;
+            const formExists = await this.formRepository.findFirstDynamic({
+                where: { name: candidate, tenantId },
+                select: { id: true }
+            });
+
+            if (!formExists) {
+                return candidate;
+            }
+
+            copyNumber += 1;
+        }
     }
 
     async updateForm(data) {
