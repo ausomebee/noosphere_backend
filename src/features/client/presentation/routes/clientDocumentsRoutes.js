@@ -1,7 +1,7 @@
 import express from "express";
 import ClientDocumentsController from "../controllers/clientDocumentsController.js";
 import ClientDocumentsDto from "../dto/clientDocumentsDto.js";
-import { clientProtect(), staffProtect } from "../../../../middleware/auth_handlers.js";
+import { clientProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
