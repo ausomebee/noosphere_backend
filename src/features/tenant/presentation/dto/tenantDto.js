@@ -245,6 +245,7 @@ class TenantDto {
                     "string.empty": "Company name is required",
                     "string.max": "Company name must not exceed 255 characters",
                 }),
+            subdomain: Joi.string().trim(),
             companySize: Joi.string()
                 .trim()
                 .messages({
