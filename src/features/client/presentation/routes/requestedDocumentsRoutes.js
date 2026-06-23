@@ -1,7 +1,7 @@
 import express from "express";
 import ClientRequestedDocumentsController from "../controllers/clientRequestedDocumentsController.js";
 import ClientRequestedDocumentsDto from "../dto/clientRequestedDocumentsDto.js";
-import { clientProtect } from "../../../../middleware/auth_handlers.js";
+import { clientProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -80,7 +80,7 @@ class ClientRequestedDocumentsRoutes {
 		 */
 		this.router.post(
 			"/",
-			clientProtect,
+			clientProtect(),
 			ClientRequestedDocumentsDto.createRequestedDocumentDto,
 			this.controller.createRequestedDocument.bind(this.controller)
 		);
@@ -103,7 +103,7 @@ class ClientRequestedDocumentsRoutes {
 		 */
 		this.router.put(
 			"/",
-			clientProtect,
+			clientProtect(),
 			ClientRequestedDocumentsDto.updateRequestedDocumentDto,
 			this.controller.updateRequestedDocument.bind(this.controller)
 		);
@@ -126,7 +126,29 @@ class ClientRequestedDocumentsRoutes {
 		 */
 		this.router.get(
 			"/client/:tenantClientId",
-			clientProtect,
+			clientProtect(),
+			this.controller.getRequestedDocuments.bind(this.controller)
+		);
+
+		/**
+		 * @swagger
+		 * /api/v1/client-requested-documents/client/tenant/{tenantClientId}:
+		 *   get:
+		 *     summary: Get all requested documents for a tenant client
+		 *     tags: [client-requested-documents]
+		 *     parameters:
+		 *       - in: path
+		 *         name: tenantClientId
+		 *         required: true
+		 *         schema:
+		 *           type: string
+		 *     responses:
+		 *       200:
+		 *         description: List of requested documents
+		 */
+		this.router.get(
+			"/client/tenant/:tenantClientId",
+			staffProtect(),
 			this.controller.getRequestedDocuments.bind(this.controller)
 		);
 
@@ -148,7 +170,7 @@ class ClientRequestedDocumentsRoutes {
 		 */
 		this.router.get(
 			"/count/status/:tenantClientId",
-			clientProtect,
+			clientProtect(),
 			this.controller.countAllRequestedDocumentsByStatus.bind(this.controller)
 		);
 
@@ -170,7 +192,7 @@ class ClientRequestedDocumentsRoutes {
 		 */
 		this.router.get(
 			"/:id",
-			clientProtect,
+			clientProtect(),
 			this.controller.getSingleRequestedDocument.bind(this.controller)
 		);
 	}
