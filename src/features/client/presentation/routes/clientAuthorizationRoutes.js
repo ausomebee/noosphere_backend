@@ -1,7 +1,7 @@
 import express from "express";
 import ClientAuthorizationController from "../controllers/clientAuthorizationController.js";
 import ClientAuthorizationDto from "../dto/clientAuthorizationDto.js";
-import { clientProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
+import { clientProtect(), staffProtect } from "../../../../middleware/auth_handlers.js";
 /**
  * @swagger
  * tags:
@@ -128,7 +128,7 @@ class ClientAuthorizationRoutes {
          */
         this.router.post(
             "/",
-            clientProtect,
+            clientProtect(),
             ClientAuthorizationDto.createClientAuthorizationDto,
             this.controller.createClientAuthorization.bind(this.controller)
         );
@@ -157,7 +157,7 @@ class ClientAuthorizationRoutes {
          */
         this.router.put(
             "/:id",
-            clientProtect,
+            clientProtect(),
             ClientAuthorizationDto.updateClientAuthorizationDto,
             this.controller.updateClientAuthorization.bind(this.controller)
         );
@@ -188,7 +188,7 @@ class ClientAuthorizationRoutes {
          */
         this.router.get(
             "/single/:id",
-            clientProtect,
+            clientProtect(),
             this.controller.getSingleClientAuthorization.bind(this.controller)
         );
 
@@ -220,7 +220,7 @@ class ClientAuthorizationRoutes {
          */
         this.router.get(
             "/tenant-client/:tenantClientId",
-            clientProtect,
+            clientProtect(),
             this.controller.getClientAuthorizations.bind(this.controller)
         );
 
@@ -252,7 +252,7 @@ class ClientAuthorizationRoutes {
          */
         this.router.get(
             "/chart/:tenantClientId",
-            clientProtect,
+            clientProtect(),
             this.controller.getClientAuthorizationChart.bind(this.controller)
         );
 
@@ -279,7 +279,7 @@ class ClientAuthorizationRoutes {
          */
         this.router.get(
             "/services/tenant-client/:tenantClientId",
-            clientProtect,
+            clientProtect(),
             this.controller.getClientAuthorizationServices.bind(this.controller)
         );
 
@@ -374,7 +374,7 @@ class ClientAuthorizationRoutes {
          *       200:
          *         description: Client deactivated successfully
          */
-        this.router.patch("/:id/:active", clientProtect, this.controller.deactivateAuth);
+        this.router.patch("/:id/:active", clientProtect(), this.controller.deactivateAuth);
 
         /**
          * @swagger
@@ -397,7 +397,7 @@ class ClientAuthorizationRoutes {
          *       200:
          *         description: Client deactivated successfully
          */
-        this.router.patch("/:id/:delete", clientProtect, this.controller.deleteAuth);
+        this.router.patch("/:id/:delete", clientProtect(), this.controller.deleteAuth);
 
     }
 

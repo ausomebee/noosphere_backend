@@ -1,7 +1,7 @@
 import express from "express";
 import ClientController from "../controllers/clientController.js";
 import ClientDto from "../dto/clientDto.js";
-import { adminProtect, clientProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
+import { adminProtect, clientProtect(), staffProtect } from "../../../../middleware/auth_handlers.js";
 /**
  * @swagger
  * components:
@@ -516,7 +516,7 @@ class ClientRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.get("/client/:clientId", clientProtect, this.controller.getSingleClient);
+        this.router.get("/client/:clientId", clientProtect(), this.controller.getSingleClient);
 
         /**
         * @swagger
@@ -637,7 +637,7 @@ class ClientRoutes {
         *       200:
         *         description: Password updated successfully
         */
-        this.router.patch("/update-password", clientProtect, ClientDto.updatePasswordDto, this.controller.updateClientPassword);
+        this.router.patch("/update-password", clientProtect(), ClientDto.updatePasswordDto, this.controller.updateClientPassword);
 
         /**
          * @swagger
@@ -655,7 +655,7 @@ class ClientRoutes {
          *       200:
          *         description: Avatar updated successfully
          */
-        this.router.patch("/update-avatar", clientProtect, this.controller.updateClientAvatar);
+        this.router.patch("/update-avatar", clientProtect(), this.controller.updateClientAvatar);
 
     }
 

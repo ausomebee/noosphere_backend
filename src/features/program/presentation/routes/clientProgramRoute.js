@@ -51,7 +51,7 @@ class ClientProgramRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", clientProtect, ClientProgramDto.createClientProgramDto, this.controller.createClientProgram);
+        this.router.post("/", clientProtect(), ClientProgramDto.createClientProgramDto, this.controller.createClientProgram);
 
         /**
          * @swagger
@@ -72,7 +72,7 @@ class ClientProgramRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/:clientId", clientProtect, this.controller.getClientPrograms);
+        this.router.get("/:clientId", clientProtect(), this.controller.getClientPrograms);
 
         /**
          * @swagger
@@ -93,7 +93,7 @@ class ClientProgramRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/target/:clientId", clientProtect, this.controller.getClientProgramAndTraget);
+        this.router.get("/target/:clientId", clientProtect(), this.controller.getClientProgramAndTraget);
     }
 
     getRouter() {
