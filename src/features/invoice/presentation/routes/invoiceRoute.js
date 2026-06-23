@@ -732,6 +732,26 @@ class InvoiceRoutes {
 
         /**
          * @swagger
+         * /api/v1/invoice/invoice/management/days-before-due-date/admin:
+         *   patch:
+         *     summary: Update days before due date
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateDaysBeforeDueDateDto'
+         *     responses:
+         *       200:
+         *         description: daysBeforeDueDate updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/invoice/management/days-before-due-date/admin", adminProtect(), InvoiceDto.updateDaysBeforeDueDateDto, this.controller.updateInvoiceManagement);
+
+        /**
+         * @swagger
          * /api/v1/invoice/invoice/management/upcoming-invoice:
          *   patch:
          *     summary: Update upcoming invoice 
