@@ -283,8 +283,9 @@ class IssueController {
         if (!issue) return res.status(500).json({ message: 'Failed to update issue' });
 
         const issueData = new Issue({
+            tenantId: issue.tenantId,
             issueId: issue.id,
-            adminId: req.body.updatedBy,
+            adminId: req.user.type === "ADMIN" ? req.user.id : null,
             action: "updated an issue",
             reason: "to improve tracking",
             details: "updated an issue",

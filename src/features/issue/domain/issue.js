@@ -18,6 +18,7 @@ class Issue {
         action,
         reason,
         details,
+        feature,
         comment
     }) {
         this.id = id;
@@ -38,6 +39,7 @@ class Issue {
         this.details = details;
         this.reason = reason;
         this.action = action;
+        this.feature = feature;
         this.comment = comment;
     }
 
@@ -66,11 +68,13 @@ class Issue {
 
     get createLog() {
         return {
+            tenantId: this.tenantId,
             issueId: this.issueId,
             action: this.action,
             adminId: this.adminId,
             reason: this.reason,
-            details: this.details
+            details: this.details,
+            feature: this.feature
         }
     }
 
