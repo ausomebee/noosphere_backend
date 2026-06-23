@@ -772,6 +772,26 @@ class InvoiceRoutes {
 
         /**
          * @swagger
+         * /api/v1/invoice/invoice/management/upcoming-invoice/admin:
+         *   patch:
+         *     summary: Update upcoming invoice 
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateUpcomingInvoiceDto'
+         *     responses:
+         *       200:
+         *         description: upcomingInvoice updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/invoice/management/upcoming-invoice/admin", adminProtect(), InvoiceDto.updateUpcomingInvoiceDto, this.controller.updateInvoiceManagement);
+
+        /**
+         * @swagger
          * /api/v1/invoice/invoice/management/on-due-date:
          *   patch:
          *     summary: Update onDueDate flag
