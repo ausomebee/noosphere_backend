@@ -1,7 +1,7 @@
 import express from "express";
 import ClientController from "../controllers/clientController.js";
 import ClientDto from "../dto/clientDto.js";
-import { adminProtect, clientProtect(), staffProtect } from "../../../../middleware/auth_handlers.js";
+import { adminProtect, clientProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 /**
  * @swagger
  * components:
