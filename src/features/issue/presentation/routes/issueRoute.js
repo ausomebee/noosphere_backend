@@ -719,6 +719,28 @@ class IssueRoutes {
 
         /**
          * @swagger
+         * /api/v1/issue/issue/change-status/tenant:
+         *   patch:
+         *     summary: Change status of an issue
+         *     tags: [Issue]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/ChangeStatusDto'
+         *     responses:
+         *       200:
+         *         description: Status successfully changed
+         *       400:
+         *         description: Validation error
+         *       500:
+         *         description: Server error
+         */
+        this.router.patch("/issue/change-status/tenant", staffProtect(), IssueDto.changeStatusDto, this.controller.updateIssue);
+
+        /**
+         * @swagger
          * /api/v1/issue/issue/attachment:
          *   patch:
          *     summary: add attachment to issue
