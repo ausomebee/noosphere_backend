@@ -135,6 +135,31 @@ class ClientAuthorizationRoutes {
 
         /**
          * @swagger
+         * /api/v1/client-authorization/tenant:
+         *   post:
+         *     summary: Create a new client authorization
+         *     tags: [ClientAuthorization]
+         *     requestBody:
+         *       $ref: '#/components/requestBodies/CreateClientAuthorization'
+         *     responses:
+         *       201:
+         *         description: Client authorization created successfully
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/ClientAuthorization'
+         *       400:
+         *         description: Validation error or creation failure
+         */
+        this.router.post(
+            "/tenant",
+            staffProtect(),
+            ClientAuthorizationDto.createClientAuthorizationDto,
+            this.controller.createClientAuthorization.bind(this.controller)
+        );
+
+        /**
+         * @swagger
          * /api/v1/client-authorization/{id}:
          *   put:
          *     summary: Update an existing client authorization
