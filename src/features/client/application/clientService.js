@@ -6,6 +6,17 @@ import Client from "../domain/client.js";
 import argon2 from "argon2";
 import templateRenderer from "../../../utilities/templateRenderer.js";
 
+const buildClientLoginUrl = (baseUrl, subdomain) => {
+    const normalizedBaseUrl = (baseUrl || 'http://noospherehub.net').trim().replace(/\/+$/, '');
+    const url = new URL(/^[a-z][a-z\d+\-.]*:\/\//i.test(normalizedBaseUrl) ? normalizedBaseUrl : `https://${normalizedBaseUrl}`);
+
+    if (!['localhost', '127.0.0.1'].includes(url.hostname)) {
+        url.hostname = `www.${subdomain}.${url.hostname.replace(/^www\./, '')}`;
+    }
+
+    return `${url.origin}/client/intialLogin`;
+};
+
 class ClientService {
     constructor({ clientRepository, clientTenantRepository, generateCode, prisma, itemRepository }) {
         this.clientRepository = clientRepository;
@@ -74,12 +85,15 @@ class ClientService {
             }
         ]
 
+        const clientLoginUrl = buildClientLoginUrl(process.env.CLIENT_URL, tenant.subdomain);
+
         const html = templateRenderer.render('client-welcome.html', {
             preferredName: createData.preferredName,
             companyName: tenant.companyName,
             subdomain: tenant.subdomain,
             email: createData.email,
-            password: generatedPass
+            password: generatedPass,
+            clientLoginUrl
         });
         const sendMail = await emailService.sendTenantEmail({
             tenantSlug: tenant.subdomain,
