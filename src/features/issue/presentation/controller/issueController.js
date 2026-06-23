@@ -420,14 +420,18 @@ class IssueController {
             }
 
             if (notifType && notifTitle) {
-                const notif = await this.notificationService.createNotification({
-                    userId: issue.adminId,
-                    userType: "ADMIN",
-                    type: notifType,
-                    title: notifTitle,
-                    content: adminContent,
-                    isRead: false
-                });
+                let adminNotif = null;
+
+                if (issue.adminId) {
+                    adminNotif = await this.notificationService.createNotification({
+                        userId: issue.adminId,
+                        userType: "ADMIN",
+                        type: notifType,
+                        title: notifTitle,
+                        content: adminContent,
+                        isRead: false
+                    });
+                }
 
                 const superAdminNotif = await this.notificationService.createNotification({
                     userId: superAdmin.id,
@@ -438,7 +442,9 @@ class IssueController {
                     isRead: false
                 });
 
-                SocketService.emitToUser(notif.userId, notif.userType, notifType, notif);
+                if (adminNotif) {
+                    SocketService.emitToUser(adminNotif.userId, adminNotif.userType, notifType, adminNotif);
+                }
                 SocketService.emitToUser(superAdminNotif.userId, superAdminNotif.userType, notifType, superAdminNotif);
             }
         }
