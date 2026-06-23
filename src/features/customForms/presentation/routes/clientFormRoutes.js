@@ -56,6 +56,29 @@ class ClientFormRoutes {
 
         /**
          * @swagger
+         * /api/v1/client-forms/tenant/:
+         *   post:
+         *     summary: Create Client Form
+         *     tags: [client-forms]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/ClientFormDto'
+         *     responses:
+         *       201:
+         *         description: Client Form created successfully
+         */
+        this.router.post(
+            "/tenant/",
+            staffProtect(),
+            ClientFormDto.createClientFormDto,
+            this.controller.createClientForm
+        );
+
+        /**
+         * @swagger
          * /api/v1/client-forms/{tenantClientId}:
          *   get:
          *     summary: Get Client Forms
