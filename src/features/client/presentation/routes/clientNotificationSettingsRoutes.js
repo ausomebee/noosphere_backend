@@ -100,7 +100,7 @@ class ClientNotificationSettingsRoutes {
          */
         this.router.post(
             "/",
-            clientProtect,
+            clientProtect(),
             ClientNotificationSettingsDto.createNotificationSettingsDto,
             this.controller.createNotificationSettings
         );
@@ -130,7 +130,7 @@ class ClientNotificationSettingsRoutes {
          */
         this.router.put(
             "/:id",
-            clientProtect,
+            clientProtect(),
             this.controller.updateNotificationSettings
         );
 
@@ -153,7 +153,7 @@ class ClientNotificationSettingsRoutes {
          */
         this.router.get(
             "/single/:id",
-            clientProtect,
+            clientProtect(),
             this.controller.getSingleNotificationSettings
         );
 
@@ -176,7 +176,7 @@ class ClientNotificationSettingsRoutes {
          */
         this.router.get(
             "/:tenantClientId",
-            clientProtect,
+            clientProtect(),
             this.controller.getNotificationSettingsByClient
         );
     }

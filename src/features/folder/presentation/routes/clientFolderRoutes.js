@@ -58,7 +58,7 @@ class ClientFolderRoutes {
          */
         this.router.post(
             "/",
-            clientProtect,
+            clientProtect(),
             ClientFolderDto.createClientFolderDto,
             this.controller.createClientFolder
         );
@@ -81,7 +81,7 @@ class ClientFolderRoutes {
          */
         this.router.put(
             "/",
-            clientProtect,
+            clientProtect(),
             ClientFolderDto.updateClientFolderDto,
             this.controller.updateClientFolder
         );
@@ -105,7 +105,7 @@ class ClientFolderRoutes {
          */
         this.router.get(
             "/:id",
-            clientProtect,
+            clientProtect(),
             this.controller.getSingleClientFolder
         );
 
@@ -128,7 +128,7 @@ class ClientFolderRoutes {
          */
         this.router.get(
             "/tenant/:clientTenantId",
-            clientProtect,
+            clientProtect(),
             this.controller.getClientFolders
         );
     }

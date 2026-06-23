@@ -90,7 +90,7 @@ class ClientFilesRoutes {
          */
         this.router.post(
             "/",
-            clientProtect,
+            clientProtect(),
             ClientFilesDto.createClientFileDto,
             this.controller.createClientFile
         );
@@ -113,7 +113,7 @@ class ClientFilesRoutes {
          */
         this.router.put(
             "/",
-            clientProtect,
+            clientProtect(),
             ClientFilesDto.updateClientFileDto,
             this.controller.updateClientFile
         );
@@ -137,7 +137,7 @@ class ClientFilesRoutes {
          */
         this.router.get(
             "/:id",
-            clientProtect,
+            clientProtect(),
             this.controller.getSingleClientFile
         );
 
@@ -160,7 +160,7 @@ class ClientFilesRoutes {
          */
         this.router.get(
             "/recent/:clientTenantId",
-            clientProtect,
+            clientProtect(),
             this.controller.findRecentFilesByClientTenant
         );
 
@@ -183,7 +183,7 @@ class ClientFilesRoutes {
          */
         this.router.get(
             "/client/:clientTenantId",
-            clientProtect,
+            clientProtect(),
             this.controller.findFilesByClientTenant
         );
 
@@ -206,7 +206,7 @@ class ClientFilesRoutes {
          */
         this.router.get(
             "/folder/:folderId",
-            clientProtect,
+            clientProtect(),
             this.controller.getClientFiles
         );
     }
