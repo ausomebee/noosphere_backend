@@ -41,10 +41,6 @@ class ServerRequestController {
     getTenantRequests = expressAsyncHandler(async (req, res) => {
         const logs = await this.service.getTenantRequests(req.query);
 
-        if (!logs || logs.data.length === 0) {
-            return res.status(404).json({ message: 'No server request logs found for this tenant' });
-        }
-
         return res.status(200).json({
             message: "Server request logs fetched successfully",
             status: 'ok',
@@ -54,10 +50,6 @@ class ServerRequestController {
 
     getRequestsByDateRange = expressAsyncHandler(async (req, res) => {
         const logs = await this.service.getRequestsByDateRange(req.query);
-
-        if (!logs || logs.data.length === 0) {
-            return res.status(404).json({ message: 'No server request logs found in the given date range' });
-        }
 
         return res.status(200).json({
             message: "Server request logs fetched successfully",

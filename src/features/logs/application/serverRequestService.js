@@ -41,10 +41,6 @@ class ServerRequestService {
             statusCodes: data.statusCodes || [],
         });
 
-        if (!requests || requests.data.length === 0) {
-            throw new Error("No server request logs found for this tenant.");
-        }
-
         return requests;
     }
 
@@ -56,10 +52,6 @@ class ServerRequestService {
             page: parseInt(data.page) || 1,
             limit: parseInt(data.limit) || 20,
         });
-
-        if (!requests || requests.data.length === 0) {
-            throw new Error("No server request logs found for this tenant in the given date range.");
-        }
 
         return requests;
     }
