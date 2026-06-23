@@ -186,24 +186,6 @@ class FormRoutes {
 
         /**
          * @swagger
-         * /api/v1/forms/tenant/{tenantId}:
-         *   get:
-         *     summary: Get all forms for a tenant
-         *     tags: [forms]
-         *     parameters:
-         *       - in: path
-         *         name: tenantId
-         *         required: true
-         *         schema:
-         *           type: string
-         *     responses:
-         *       200:
-         *         description: List of tenant forms
-         */
-        this.router.get("/tenant/:tenantId", staffProtect(), this.controller.getTenantForms);
-
-        /**
-         * @swagger
          * /api/v1/forms/tenant/drafts/{tenantId}:
          *   get:
          *     summary: Get all drafts for a tenant
@@ -296,6 +278,24 @@ class FormRoutes {
          *         description: Form deleted successfully
          */
         this.router.patch("/:id/:delete", staffProtect(), this.controller.deactivateForm);
+
+        /**
+         * @swagger
+         * /api/v1/forms/tenant/{tenantId}:
+         *   get:
+         *     summary: Get all forms for a tenant
+         *     tags: [forms]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: List of tenant forms
+         */
+        this.router.get("/tenant/:tenantId", staffProtect(), this.controller.getTenantForms);
     }
 
     getRouter() {
