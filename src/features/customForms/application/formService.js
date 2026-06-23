@@ -4,14 +4,14 @@ class FormService {
     }
 
     async createForm(data) {
-        const formExists = await this.formRepository.findFirstDynamic({
-            where: { name: data.name, tenantId: data.tenantId },
-            select: { name: true }
-        });
+        // const formExists = await this.formRepository.findFirstDynamic({
+        //     where: { name: data.name, tenantId: data.tenantId },
+        //     select: { name: true }
+        // });
 
-        if (formExists) {
-            throw new Error("This form already exists.");
-        }
+        // if (formExists) {
+        //     throw new Error("This form already exists.");
+        // }
 
         const newForm = await this.formRepository.create(data);
 
