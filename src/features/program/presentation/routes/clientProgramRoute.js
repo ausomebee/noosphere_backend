@@ -1,7 +1,7 @@
 import express from "express";
 import ClientProgramController from "../controllers/clientProgramController.js";
 import ClientProgramDto from "../dto/clientProgramDto.js";
-import { clientProtect } from "../../../../middleware/auth_handlers.js";
+import { clientProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -73,6 +73,27 @@ class ClientProgramRoutes {
          *         description: Validation error
          */
         this.router.get("/:clientId", clientProtect(), this.controller.getClientPrograms);
+
+        /**
+         * @swagger
+         * /api/v1/client-programs/tenant/{clientId}:
+         *   get:
+         *     summary: Gets client programs
+         *     tags: [program]
+         *     parameters:
+         *       - in: path
+         *         name: clientId
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: The tenant ID of the Domain
+         *     responses:
+         *       200:
+         *         description: programs fetched successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.get("/tenant/:clientId", staffProtect(), this.controller.getClientPrograms);
 
         /**
          * @swagger

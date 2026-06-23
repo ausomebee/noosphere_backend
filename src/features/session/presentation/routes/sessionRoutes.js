@@ -1,7 +1,7 @@
 import express from "express";
 import SessionDto from "../dto/sessionDto.js";
 import SessionController from "../controllers/sessionController.js";
-import { staffProtect } from "../../../../middleware/auth_handlers.js";
+import { staffProtect, clientProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -579,6 +579,29 @@ class SessionRoutes {
 
         /**
          * @swagger
+         * /api/v1/sessions/client/overview/client/{clientId}:
+         *   get:
+         *     summary: Get client session overview
+         *     tags: [sessions]
+         *     parameters:
+         *       - in: path
+         *         name: clientId
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: client Id
+         *     responses:
+         *       200:
+         *         description: Session overview fetched successfully
+         */
+        this.router.get(
+            "/client/overview/client/:clientId",
+            clientProtect(),
+            this.controller.getClientSessionOverview
+        );
+
+        /**
+         * @swagger
          * /api/v1/sessions/client/overview-chart/{clientId}/{groupBy}:
          *   get:
          *     summary: Get client session overview chart
@@ -603,6 +626,35 @@ class SessionRoutes {
         this.router.get(
             "/client/overview-chart/:clientId/:groupBy",
             staffProtect(),
+            this.controller.clientOverviewGraph
+        );
+
+        /**
+         * @swagger
+         * /api/v1/sessions/client/overview-chart/client/{clientId}/{groupBy}:
+         *   get:
+         *     summary: Get client session overview chart
+         *     tags: [sessions]
+         *     parameters:
+         *       - in: path
+         *         name: clientId
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: client Id
+         *       - in: path
+         *         name: groupBy
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: group by (year, month)
+         *     responses:
+         *       200:
+         *         description: Session overview chart fetched successfully
+         */
+        this.router.get(
+            "/client/overview-chart/client/:clientId/:groupBy",
+            clientProtect(),
             this.controller.clientOverviewGraph
         );
     }
