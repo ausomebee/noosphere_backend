@@ -87,6 +87,29 @@ class ClientRequestedDocumentsRoutes {
 
 		/**
 		 * @swagger
+		 * /api/v1/client-requested-documents/tenant/:
+		 *   post:
+		 *     summary: Create client requested document
+		 *     tags: [client-requested-documents]
+		 *     requestBody:
+		 *       required: true
+		 *       content:
+		 *         application/json:
+		 *           schema:
+		 *             $ref: '#/components/schemas/ClientRequestedDocumentCreateDto'
+		 *     responses:
+		 *       201:
+		 *         description: Document request created successfully
+		 */
+		this.router.post(
+			"/tenant/",
+			staffProtect(),
+			ClientRequestedDocumentsDto.createRequestedDocumentDto,
+			this.controller.createRequestedDocument.bind(this.controller)
+		);
+
+		/**
+		 * @swagger
 		 * /api/v1/client-requested-documents/:
 		 *   put:
 		 *     summary: Update client requested document
@@ -104,6 +127,29 @@ class ClientRequestedDocumentsRoutes {
 		this.router.put(
 			"/",
 			clientProtect(),
+			ClientRequestedDocumentsDto.updateRequestedDocumentDto,
+			this.controller.updateRequestedDocument.bind(this.controller)
+		);
+
+		/**
+		 * @swagger
+		 * /api/v1/client-requested-documents/tenant/:
+		 *   put:
+		 *     summary: Update client requested document
+		 *     tags: [client-requested-documents]
+		 *     requestBody:
+		 *       required: true
+		 *       content:
+		 *         application/json:
+		 *           schema:
+		 *             $ref: '#/components/schemas/ClientRequestedDocumentUpdateDto'
+		 *     responses:
+		 *       200:
+		 *         description: Document request updated successfully
+		 */
+		this.router.put(
+			"/tenant/",
+			staffProtect(),
 			ClientRequestedDocumentsDto.updateRequestedDocumentDto,
 			this.controller.updateRequestedDocument.bind(this.controller)
 		);
