@@ -114,6 +114,7 @@ class TenantService {
             companySize: data.companySize || tenant.companySize,
             organizationType: data.organizationType || tenant.organizationType,
             location: data.location || tenant.location,
+            subdomain: data.subdomain || tenant.subdomain,
             leadSource: data.leadSource || tenant.leadSource,
             stage: data.stage || tenant.stage,
             website: data.website || tenant.website,
