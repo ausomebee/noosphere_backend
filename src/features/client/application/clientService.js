@@ -10,9 +10,7 @@ const buildClientLoginUrl = (baseUrl, subdomain) => {
     const normalizedBaseUrl = (baseUrl || 'http://noospherehub.net').trim().replace(/\/+$/, '');
     const url = new URL(/^[a-z][a-z\d+\-.]*:\/\//i.test(normalizedBaseUrl) ? normalizedBaseUrl : `https://${normalizedBaseUrl}`);
 
-    if (!['localhost', '127.0.0.1'].includes(url.hostname)) {
-        url.hostname = `www.${subdomain}.${url.hostname.replace(/^www\./, '')}`;
-    }
+    url.hostname = `www.${subdomain}.${url.hostname.replace(/^www\./, '')}`;
 
     return `${url.origin}/client/intialLogin`;
 };
