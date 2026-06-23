@@ -104,6 +104,22 @@ class TenantService {
             throw new Error("tenant not found");
         }
 
+        if (data.subdomain && data.subdomain !== tenant.subdomain) {
+            const tenantExists = await this.tenantRepository.findFirstDynamic({
+                where: {
+                    subdomain: data.subdomain,
+                    id: { not: data.id },
+                },
+                select: {
+                    subdomain: true,
+                },
+            });
+
+            if (tenantExists) {
+                throw new Error("Domain already exists");
+            }
+        }
+
         const update = await this.tenantRepository.update(data.id, {
             email: data.email || tenant.email,
             phoneNumber: data.phoneNumber || tenant.phoneNumber,
