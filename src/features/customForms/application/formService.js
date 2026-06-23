@@ -54,7 +54,8 @@ class FormService {
             name: data.name || form.name,
             tenantId: data.tenantId || form.tenantId,
             isDraft: data.isDraft ?? form.isDraft,
-            isTemplate: data.isTemplate ?? form.isTemplate
+            isTemplate: data.isTemplate ?? form.isTemplate,
+            isDeleted: data.isDeleted ?? form.isDeleted
         });
 
         if (!update) {
@@ -65,7 +66,10 @@ class FormService {
     }
 
     async getSingleForm(data) {
-        const form = await this.formRepository.findOne({ id: data.id });
+        const form = await this.formRepository.findFirst({
+            id: data.id,
+            isDeleted: false
+        });
 
         if (!form) {
             throw new Error("Form not found");
@@ -79,7 +83,8 @@ class FormService {
             AND: [
                 { tenantId: tenantId },
                 { isDraft: false },
-                { isTemplate: false }
+                { isTemplate: false },
+                { isDeleted: false }
             ]
         });
 
@@ -90,7 +95,8 @@ class FormService {
         const forms = await this.formRepository.findAll({
             AND: [
                 { tenantId: tenantId },
-                { isDraft: true }
+                { isDraft: true },
+                { isDeleted: false }
             ]
         });
 
@@ -101,7 +107,8 @@ class FormService {
         const forms = await this.formRepository.findAll({
             AND: [
                 { tenantId: tenantId },
-                { isTemplate: true }
+                { isTemplate: true },
+                { isDeleted: false }
             ]
         });
 
