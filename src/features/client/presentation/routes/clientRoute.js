@@ -339,7 +339,7 @@ class ClientRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", adminProtect(), ClientDto.createClientDto, this.controller.createClientCandidate);
+        this.router.post("/",  ClientDto.createClientDto, this.controller.createClientCandidate);
 
         /**
          * @swagger
@@ -359,7 +359,7 @@ class ClientRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/tenant",  ClientDto.createClientDto, this.controller.createClientCandidate);
+        this.router.post("/tenant", staffProtect(), ClientDto.createClientDto, this.controller.createClientCandidate);
 
        /**
          * @swagger
