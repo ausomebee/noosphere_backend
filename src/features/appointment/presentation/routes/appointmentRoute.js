@@ -1,7 +1,7 @@
 import express from "express";
 import AppointmentDto from "../dto/appointmentDto.js";
 import AppointmentController from "../controllers/appointmentController.js";
-import { staffProtect } from "../../../../middleware/auth_handlers.js";
+import { clientProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -611,6 +611,27 @@ class AppointmentRoutes {
         *         description: Validation error
         */
         this.router.get("/client/upcoming/:clientId", staffProtect(), this.controller.getClientUpcomingAppointments);
+
+        /**
+        * @swagger
+        * /api/v1/appointments/client/upcoming/client/{clientId}:
+        *   get:
+        *     summary: get client upcoming appointments
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: clientId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the client
+        *     responses:
+        *       200:
+        *         description: client appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/client/upcoming/client/:clientId", clientProtect(), this.controller.getClientUpcomingAppointments);
 
         /**
         * @swagger

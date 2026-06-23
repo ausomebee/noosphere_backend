@@ -1,7 +1,7 @@
 import express from "express";
 import NotificationController from "../controllers/notificationController.js";
 import NotificationDto from "../dtos/notificationDto.js";
-import { staffProtect } from "../../../../middleware/auth_handlers.js";
+import { clientProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -122,6 +122,35 @@ class NotificationRoutes {
             "/:id",
             staffProtect(),
             this.controller.getSingleNotification
+        );
+
+        /**
+         * @swagger
+         * /api/v1/notifications/user/client/{userId}/{userType}:
+         *   get:
+         *     summary: Get notifications for a user
+         *     tags: [notification]
+         *     parameters:
+         *       - in: path
+         *         name: userId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *       - in: path
+         *         name: userType
+         *         required: true
+         *         schema:
+         *           type: string
+         *           enum: [ADMIN, TENANT_STAFF, CLIENT]
+         *     responses:
+         *       200:
+         *         description: Notifications fetched successfully
+         */
+        this.router.get(
+            "/user/client/:userId/:userType",
+            clientProtect(),
+            this.controller.getNotificationsByUser
         );
 
         /**
