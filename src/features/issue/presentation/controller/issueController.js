@@ -309,7 +309,6 @@ class IssueController {
                 if (data.status === "RESOLVED") {
                     const resolvedOn = new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
 
-                    // Fetch tenant and assigned admin in parallel
                     const [tenant, assignedAdmin] = await Promise.all([
                         this.prisma.tenant.findUnique({ where: { id: issue.tenantId } }),
                         issue.adminId ? this.adminRepository.findOne({ where: { id: issue.adminId } }) : null,
@@ -323,7 +322,6 @@ class IssueController {
                         resolvedOn,
                     };
 
-                    // Email to tenant
                     if (tenant?.email) {
                         const tenantHtml = templateRenderer.render('issue-resolved-tenant', {
                             ...resolvedVars,
@@ -337,7 +335,6 @@ class IssueController {
                         );
                     }
 
-                    // Email to assigned admin
                     if (assignedAdmin?.email) {
                         const adminHtml = templateRenderer.render('issue-resolved-admin', {
                             ...resolvedVars,
