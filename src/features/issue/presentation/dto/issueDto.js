@@ -65,7 +65,7 @@ class IssueDto {
 
     static checkStatusDto = (req, res, next) => {
         const schema = Joi.object({
-            status: Joi.string().valid("all", "Resolved", "In Progress", "Not Started", "Unassigned"),
+            status: Joi.string().valid("all", "Resolved", "In Progress", "Not Started", "Unassigned", "withdrawn"),
         });
 
         Validator.validateRequest(req, next, schema, req.params);
@@ -182,7 +182,7 @@ class IssueDto {
                 "string.empty": "ID is required",
                 "string.guid": "ID must be a valid UUID"
             }),
-            status: Joi.string().valid("all", "Resolved", "In Progress", "Not Started", "Unassigned"),
+            status: Joi.string().valid("all", "Resolved", "In Progress", "Not Started", "Unassigned", "withdrawn"),
         });
 
         Validator.validateRequest(req, next, schema);
