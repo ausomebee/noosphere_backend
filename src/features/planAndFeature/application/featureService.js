@@ -189,7 +189,7 @@ class FeatureService {
 
         if (activeUsage) {
             const planNames = activeUsage.plans.map((plan) => plan.name).join(", ");
-            throw new Error(`Feature cannot be moved because it is used by active tenants on active plan(s): ${planNames}`);
+            throw new Error(`This feature cannot be removed because it is used in one or more plans`);
         }
 
         const extras = await this.featureGroupRepository.findFirst({
