@@ -14,15 +14,11 @@ class TenantStaffService {
 
     async createTenantStaff(data) {
         const staffExists = await this.staffRepository.findFirst({
-            OR: [{ email: data.email }, { phoneNumber: data.phoneNumber }],
+            email: data.email,
         });
 
         if (staffExists?.email === data.email) {
             throw new Error("This email is already taken.");
-        }
-
-        if (staffExists?.phoneNumber === data.phoneNumber) {
-            throw new Error("This phone number is already taken.");
         }
 
         const createStaffData = new TenantStaff(data);
