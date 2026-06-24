@@ -185,6 +185,13 @@ class FeatureService {
             throw new Error("Feature not found")
         }
 
+        const activeUsage = await this.featureRepository.findActivePlanUsage(feature.id);
+
+        if (activeUsage) {
+            const planNames = activeUsage.plans.map((plan) => plan.name).join(", ");
+            throw new Error(`Feature cannot be moved because it is used by active tenants on active plan(s): ${planNames}`);
+        }
+
         const extras = await this.featureGroupRepository.findFirst({
             name: "EXTRA FEATURES"
         });

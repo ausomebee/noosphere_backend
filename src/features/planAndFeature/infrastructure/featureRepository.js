@@ -12,6 +12,48 @@ class FeatureRepository extends BaseRepository {
         });
     }
 
+    async findActivePlanUsage(id) {
+        return await this.model.findFirst({
+            where: {
+                id,
+                plans: {
+                    some: {
+                        active: true,
+                        subscriptions: {
+                            some: {
+                                status: "ACTIVE",
+                                tenant: {
+                                    active: true,
+                                    isDeleted: false
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            select: {
+                plans: {
+                    where: {
+                        active: true,
+                        subscriptions: {
+                            some: {
+                                status: "ACTIVE",
+                                tenant: {
+                                    active: true,
+                                    isDeleted: false
+                                }
+                            }
+                        }
+                    },
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            }
+        });
+    }
+
     async moveToExtraFeatures(id, featureGroupId) {
         const feature = await this.model.findUnique({
             where: { id },
