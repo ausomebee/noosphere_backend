@@ -336,7 +336,7 @@ class FeatureRoutes {
         * @swagger
         * /api/v1/feature/feature:
         *   delete:
-        *     summary: Delete a feature 
+        *     summary: Move a feature to the extras group
         *     tags:
         *       - feature
         *     requestBody:
@@ -347,7 +347,7 @@ class FeatureRoutes {
         *             $ref: '#/components/schemas/deleteFeatureGroupDto'
         *     responses:
         *       200:
-        *         description: Successfully deleted feature
+        *         description: Successfully moved feature to extras group
         *       400:
         *         description: Validation error
         */

@@ -185,13 +185,28 @@ class FeatureService {
             throw new Error("Feature not found")
         }
 
-        const deleted = await this.featureRepository.delete(feature.id)
+        const extras = await this.featureGroupRepository.findFirstDynamic({
+            where: {
+                name: {
+                    equals: "EXTRA FEATURES",
+                    mode: "insensitive"
+                }
+            }
+        });
 
-        if (!deleted) {
-            throw new Error("Failed to delete .")
+        if (!extras) {
+            throw new Error("Extras group not found")
         }
 
-        return deleted;
+        const movedFeature = await this.featureRepository.update(feature.id, {
+            featureGroupId: extras.id
+        });
+
+        if (!movedFeature) {
+            throw new Error("Failed to move feature to extras group")
+        }
+
+        return movedFeature;
     }
 
 }
