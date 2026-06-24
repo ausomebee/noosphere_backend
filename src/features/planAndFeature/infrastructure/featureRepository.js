@@ -12,6 +12,39 @@ class FeatureRepository extends BaseRepository {
         });
     }
 
+    async moveToExtraFeatures(id, featureGroupId) {
+        const feature = await this.model.findUnique({
+            where: { id },
+            include: {
+                plans: {
+                    select: { id: true }
+                }
+            }
+        });
+
+        if (!feature) {
+            return null;
+        }
+
+        return await this.model.update({
+            where: { id },
+            data: {
+                featureGroupId,
+                plans: {
+                    disconnect: feature.plans
+                },
+                extraPlans: {
+                    connect: feature.plans
+                }
+            },
+            include: {
+                plans: true,
+                extraPlans: true,
+                featureGroup: true
+            }
+        });
+    }
+
     async findAllWithPlan() {
         return await this.model.findMany({
             where: {},
