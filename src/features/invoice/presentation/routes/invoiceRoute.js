@@ -910,6 +910,26 @@ class InvoiceRoutes {
          */
         this.router.patch("/invoice/management/reminder-email", staffProtect(), InvoiceDto.updateReminderEmailDto, this.controller.updateInvoiceManagement);
 
+        /**
+         * @swagger
+         * /api/v1/invoice/invoice/management/reminder-email/admin:
+         *   patch:
+         *     summary: Update reminder email configuration
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateReminderEmailDto'
+         *     responses:
+         *       200:
+         *         description: reminderEmail updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/invoice/management/reminder-email/admin", adminProtect(), InvoiceDto.updateReminderEmailDto, this.controller.updateInvoiceManagement);
+
     }
 
     getRouter() {
