@@ -147,11 +147,11 @@ class FeatureController {
         const feature = await this.service.deleteSingleFeature(req.body);
 
         if (!feature) {
-            res.status(500).json({ message: 'Failed to delete feature.' });
+            res.status(500).json({ message: 'Failed to move feature to extras group.' });
         }
 
         return res.status(201).json({
-            message: "feature deleted successfully",
+            message: "feature moved to extras group successfully",
             status: 'ok',
             data: feature
         });
