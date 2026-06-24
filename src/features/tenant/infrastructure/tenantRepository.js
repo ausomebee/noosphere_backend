@@ -12,6 +12,7 @@ class TenantRepository extends BaseRepository {
     async countAllTenants() {
         return await this.model.count({
             where: {
+                active: true,
                 isDeleted: false
             }
         });
