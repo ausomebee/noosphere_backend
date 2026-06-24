@@ -31,7 +31,7 @@ class StaffDto {
                     expiryDate: Joi.date().required(),
                     tenantStaffId: Joi.string().uuid().optional()
                 })
-            ).required(),
+            ).optional(),
             payroll: Joi.object({
                 paymentSchedule: Joi.string().min(1).required(),
                 ratePerHour: Joi.string().min(1).required(),

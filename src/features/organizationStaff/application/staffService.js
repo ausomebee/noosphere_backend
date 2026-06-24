@@ -33,7 +33,7 @@ class TenantStaffService {
                 const createDocumentData = new TenantStaffDocument({ ...d, tenantStaffId: staff.id });
                 const document = this.documentRepository.txCreate(createDocumentData.createTenantStaffDocuments, tx.tenantStaffDocuments);
             })
-            data.licenses.forEach((d) => {
+            (data.licenses ?? []).forEach((d) => {
                 const createLicenseData = new TenantStaffLicense({ ...d, tenantStaffId: staff.id });
                 const license = this.licenseRepository.txCreate(createLicenseData.createTenantStaffLicense, tx.tenantStaffLicenses);
             })
