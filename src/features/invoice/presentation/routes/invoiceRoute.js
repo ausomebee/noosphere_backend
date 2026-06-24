@@ -852,6 +852,26 @@ class InvoiceRoutes {
 
         /**
          * @swagger
+         * /api/v1/invoice/invoice/management/mark-over-due/admin:
+         *   patch:
+         *     summary: Update markOverDue value
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateMarkOverDueDto'
+         *     responses:
+         *       200:
+         *         description: markOverDue updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/invoice/management/mark-over-due/admin", adminProtect(), InvoiceDto.updateMarkOverDueDto, this.controller.updateInvoiceManagement);
+
+        /**
+         * @swagger
          * /api/v1/invoice/invoice/management/unpaid-reminder-times-before:
          *   patch:
          *     summary: Update unpaid reminder times before
