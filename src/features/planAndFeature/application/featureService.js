@@ -185,22 +185,18 @@ class FeatureService {
             throw new Error("Feature not found")
         }
 
-        const extras = await this.featureGroupRepository.findFirstDynamic({
-            where: {
-                name: {
-                    equals: "EXTRA FEATURES",
-                    mode: "insensitive"
-                }
-            }
+        const extras = await this.featureGroupRepository.findFirst({
+            name: "EXTRA FEATURES"
         });
 
         if (!extras) {
             throw new Error("Extras group not found")
         }
 
-        const movedFeature = await this.featureRepository.update(feature.id, {
-            featureGroupId: extras.id
-        });
+        const movedFeature = await this.featureRepository.moveToExtraFeatures(
+            feature.id,
+            extras.id
+        );
 
         if (!movedFeature) {
             throw new Error("Failed to move feature to extras group")
