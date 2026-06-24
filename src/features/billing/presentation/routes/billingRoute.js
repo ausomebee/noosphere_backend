@@ -713,27 +713,6 @@ class BillingRoutes {
         this.router.post("/payment", adminProtect(), BillingDto.createPaymentDto, this.controller.createPayment);
 
         /**
-        * @swagger
-        * /api/v1/billing/payment/{id}:
-        *   get:
-        *     summary: gets single payment
-        *     tags: [billing]
-        *     parameters:
-        *       - in: path
-        *         name: id
-        *         required: true
-        *         schema:
-        *           type: number
-        *         description: The ID of the payment
-        *     responses:
-        *       200:
-        *         description: Payment fetched successfully
-        *       400:
-        *         description: Validation error
-        */
-        this.router.get("/payment/:id", adminProtect(), BillingDto.checkIntIdDto, this.controller.getSinglePayment);
-
-        /**
          * @swagger
          * /api/v1/billing/allpayment/:
          *   get:
@@ -782,6 +761,27 @@ class BillingRoutes {
         *         description: Validation error
         */
         this.router.get("/payment/status/:status", adminProtect(), BillingDto.checkStatusDto, this.controller.getPaymentByStatus);
+
+        /**
+        * @swagger
+        * /api/v1/billing/payment/{id}:
+        *   get:
+        *     summary: gets single payment
+        *     tags: [billing]
+        *     parameters:
+        *       - in: path
+        *         name: id
+        *         required: true
+        *         schema:
+        *           type: number
+        *         description: The ID of the payment
+        *     responses:
+        *       200:
+        *         description: Payment fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/payment/:id", adminProtect(), BillingDto.checkIntIdDto, this.controller.getSinglePayment);
 
         /**
          * @swagger

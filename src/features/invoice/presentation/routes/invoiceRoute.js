@@ -309,27 +309,6 @@ class InvoiceRoutes {
         this.router.post("/", staffProtect(), InvoiceDto.createInvoiceDto, this.controller.createInvoice);
 
         /**
-        * @swagger
-        * /api/v1/invoice/{id}:
-        *   get:
-        *     summary: gets single invoice
-        *     tags: [Invoice]
-        *     parameters:
-        *       - in: path
-        *         name: id
-        *         required: true
-        *         schema:
-        *           type: string
-        *         description: The ID of the invoice
-        *     responses:
-        *       200:
-        *         description: Invoice fetched successfully
-        *       400:
-        *         description: Validation error
-        */
-        this.router.get("/:id", adminProtect(), InvoiceDto.checkIdDto, this.controller.getSingleInvoice);
-
-        /**
          * @swagger
          * /api/v1/invoice/:
          *   get:
@@ -689,6 +668,27 @@ class InvoiceRoutes {
          *         description: Validation error
          */
         this.router.get("/history/:tenantId", adminProtect(), this.controller.getInvoiceTokenHistory);
+
+        /**
+        * @swagger
+        * /api/v1/invoice/{id}:
+        *   get:
+        *     summary: gets single invoice
+        *     tags: [Invoice]
+        *     parameters:
+        *       - in: path
+        *         name: id
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The ID of the invoice
+        *     responses:
+        *       200:
+        *         description: Invoice fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/:id", adminProtect(), InvoiceDto.checkIdDto, this.controller.getSingleInvoice);
 
         /**
          * @swagger

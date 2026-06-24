@@ -319,7 +319,7 @@ model TenantStaff {
   zip      String?
   country  String?
 
-  phoneNumber  String   @unique
+  phoneNumber  String
   active       Boolean  @default(true)
   isDeleted    Boolean  @default(false)
   createdAt    DateTime @default(now())
