@@ -44,9 +44,7 @@ class TenantService {
             throw new Error("This phone number is already taken.");
         }
 
-        const generatedPass = this.generateCode.generateStrongPassword()
-        const hashedPass = await argon2.hash(generatedPass)
-        const createData = new Tenant({ ...data, password: hashedPass });
+        const createData = new Tenant(data);
 
         const newCandidate = await this.prisma.$transaction(async (tx) => {
             const tenant = await this.tenantRepository.txCreate(createData.createTenant, tx);
@@ -63,6 +61,30 @@ class TenantService {
             throw new Error("Failed to create candidate");
         }
 
+        return {...newCandidate.pipelineItem, companyName: data.companyName};
+    }
+
+    async sendTenantWelcomeEmail(tenant) {
+        const tenantStaff = await this.staffRepository.staffExistsWithRole(tenant.email);
+
+        if (!tenantStaff) {
+            throw new Error("Tenant staff not found.");
+        }
+
+        if (tenantStaff.password) {
+            return tenantStaff;
+        }
+
+        const generatedPass = this.generateCode.generateStrongPassword();
+        const hashedPass = await argon2.hash(generatedPass);
+        const updatedStaff = await this.staffRepository.update(tenantStaff.id, {
+            password: hashedPass,
+        });
+
+        if (!updatedStaff) {
+            throw new Error("Failed to set tenant password.");
+        }
+
         const attachments = [
             {
                 filename: "Logowrap.png",
@@ -70,21 +92,27 @@ class TenantService {
                 cid: "unique@image",
                 contentType: "Logowrap/png",
             }
-        ]
+        ];
 
         const html = await this.templateRenderer.render('tenant-welcome.html', {
-            companyName: data.companyName,
-            email: data.email,
+            companyName: tenant.companyName,
+            email: tenant.email,
             password: generatedPass
         });
 
-        const sendMail = await MailService.sendMail(data.email, "Welcome to Noosphere", null, html, attachments)
+        const sendMail = await MailService.sendMail(
+            tenant.email,
+            "Welcome to Noosphere",
+            null,
+            html,
+            attachments
+        );
 
         if (!sendMail.success) {
-            throw new Error("Failed to send mail");
+            throw new Error("Failed to send tenant welcome mail");
         }
 
-        return {...newCandidate.pipelineItem, companyName: data.companyName};
+        return updatedStaff;
     }
 
     async checkDomain(domain) {
@@ -490,6 +518,12 @@ class TenantService {
 
         if (!tenantStaff) {
             throw new Error("Staff not found.");
+        }
+
+        const tenant = await this.tenantRepository.findOne({ id: tenantStaff.tenantId });
+
+        if (!tenant?.active || tenant.isDeleted) {
+            throw new Error("Not Authorized: Tenant account is not active.");
         }
 
         if (!tenantStaff.password) {

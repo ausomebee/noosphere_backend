@@ -15,6 +15,7 @@ import PlanRepository from "../../../planAndFeature/infrastructure/planRepositio
 import PlanService from "../../../planAndFeature/application/planService.js";
 import InvoiceTokenRepository from "../../../invoice/infrastructure/invoiceTokenRepository.js";
 import TenantRepository from "../../../tenant/infrastructure/tenantRepository.js";
+import StaffRepository from "../../../tenant/infrastructure/staffRepository.js";
 import TenantService from "../../../tenant/application/tenantService.js";
 import AdminService from "../../../admin/application/adminService.js";
 import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
@@ -22,6 +23,7 @@ import NotificationService from "../../../notifications/application/notification
 import MailService from "../../../../utilities/nodemailer.js";
 import templateRenderer from "../../../../utilities/templateRenderer.js";
 import SocketService from "../../../../config/socket.js";
+import ReferralCodeGenerator from "../../../../utilities/generateCode.js";
 
 class BillingController {
     constructor() {
@@ -50,8 +52,13 @@ class BillingController {
         this.planService = new PlanService({ planRepository: this.planRepository, adminRepository: null });
 
         this.tenantRepository = new TenantRepository(this.prisma.tenant);
+        this.staffRepository = new StaffRepository(this.prisma.tenantStaff);
+        this.generateCode = new ReferralCodeGenerator(12);
         this.tenantService = new TenantService({
             tenantRepository: this.tenantRepository,
+            staffRepository: this.staffRepository,
+            generateCode: this.generateCode,
+            templateRenderer,
         });
 
         this.adminService = new AdminService();
@@ -379,8 +386,12 @@ class BillingController {
             res.status(500).json({ message: 'Failed to create payment' });
         }
         
-        if (payment.status === "FAILED") {
-            return res.status(400).json({ message: "Payment failed, please try again." });
+        if (payment.status !== "Successful") {
+            return res.status(400).json({
+                message: payment.status === "Failed"
+                    ? "Payment failed, please try again."
+                    : "Payment has not completed."
+            });
         }
         
         const subscriptionData = new Subscription({ ...req.body, status: "ACTIVE", startDate: payment.createdAt, paymentId: payment.id });
@@ -405,6 +416,8 @@ class BillingController {
         if (!tenant) {
             res.status(500).json({ message: 'Failed to update tenant.' });
         }
+
+        await this.tenantService.sendTenantWelcomeEmail(tenant);
 
         const superAdmin = await this.adminService.getSuperAdmin();
         if (!superAdmin) {
