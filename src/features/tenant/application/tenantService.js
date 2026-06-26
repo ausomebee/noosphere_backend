@@ -231,7 +231,8 @@ class TenantService {
 
         const tenantExists = await this.tenantRepository.findFirstDynamic({
             where: {
-                phoneNumber: data.phoneNumber
+                phoneNumber: data.phoneNumber,
+                isDeleted: false,
             },
             select: {
                 phoneNumber: true,
