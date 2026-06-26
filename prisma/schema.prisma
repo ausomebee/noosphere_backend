@@ -230,10 +230,10 @@ model RefreshTokens {
 model Tenant {
   id               String   @id @default(uuid())
   email            String
-  phoneNumber      String   @unique
+  phoneNumber      String
   active           Boolean  @default(false)
   isDeleted        Boolean  @default(false)
-  subdomain        String   @unique
+  subdomain        String
   companyName      String
   contactPerson    String
   companySize      String
@@ -1099,7 +1099,7 @@ model SessionTypeService {
   sessionType OrganizationSessionTypes @relation(fields: [sessionTypeId], references: [id])
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Appointment {
