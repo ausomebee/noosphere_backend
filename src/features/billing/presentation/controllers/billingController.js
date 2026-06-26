@@ -24,6 +24,7 @@ import MailService from "../../../../utilities/nodemailer.js";
 import templateRenderer from "../../../../utilities/templateRenderer.js";
 import SocketService from "../../../../config/socket.js";
 import ReferralCodeGenerator from "../../../../utilities/generateCode.js";
+import argon2 from "argon2";
 
 class BillingController {
     constructor() {
@@ -377,60 +378,106 @@ class BillingController {
     payPaymentLink = expressAsyncHandler(async (req, res) => {
         const paymentData = new Billing({ ...req.body, status: req.body.paymentStatus });
 
-        const paymentMethod = await this.service.createPaymentMethod(paymentData.createPaymentMethod);
-        if (!paymentMethod) {
-            res.status(500).json({ message: 'Failed to create payment method' });
-        }
-
-        const payment = await this.service.createPayment({ ...paymentData.createPayment, paymentMethodId: paymentMethod.id });
-        if (!payment) {
-            res.status(500).json({ message: 'Failed to create payment' });
-        }
-        
-        if (payment.status !== "Successful") {
-            return res.status(400).json({
-                message: payment.status === "Failed"
-                    ? "Payment failed, please try again."
-                    : "Payment has not completed."
+        const result = await this.prisma.$transaction(async (tx) => {
+            const paymentMethod = await tx.paymentMethod.create({
+                data: paymentData.createPaymentMethod,
             });
-        }
-        
-        const subscriptionData = new Subscription({ ...req.body, status: "ACTIVE", startDate: payment.createdAt, paymentId: payment.id });
-        const subscription = await this.subscriptionService.createSubscription(subscriptionData.createSubscription);
-        if (!subscription) {
-            res.status(500).json({ message: 'Failed to create subscription' });
-        }
 
-        const plan = await this.planService.getSingleBillingPlan({ id: req.body.planId });
+            const payment = await tx.payment.create({
+                data: {
+                    ...paymentData.createPayment,
+                    paymentMethodId: paymentMethod.id,
+                },
+            });
 
-        const invoice = await this.invoiceService.updateInvoice({ id: req.body.invoiceId, status: "Paid" });
-        const invoiceToken = await this.invoiceService.markLatestTokenAsUsed(req.body.invoiceId);
-        if (!invoice || !invoiceToken) {
-            res.status(500).json({ message: 'Failed to update invoice' });
-        }
+            if (payment.status !== "Successful") {
+                return { completed: false, payment };
+            }
 
-        const tenant = await this.tenantService.updateTenant({
-            id: req.body.tenantId,
-            active: true
-        });
+            const plan = await tx.billingPlan.findUnique({
+                where: { id: req.body.planId },
+            });
 
-        if (!tenant) {
-            res.status(500).json({ message: 'Failed to update tenant.' });
-        }
+            if (!plan) {
+                throw new Error("Plan not found");
+            }
 
-        await this.tenantService.sendTenantWelcomeEmail(tenant);
+            const subscriptionData = new Subscription({
+                ...req.body,
+                status: "ACTIVE",
+                startDate: payment.createdAt,
+                paymentId: payment.id,
+            });
 
-        const superAdmin = await this.adminService.getSuperAdmin();
-        if (!superAdmin) {
-            res.status(500).json({ message: 'Failed to fetch super admin.' });
-        }
+            const subscription = await tx.subscription.create({
+                data: subscriptionData.createSubscription,
+            });
 
-        const notif = await this.notificationService.createNotification({
-            userId: superAdmin.id,
-            userType: "ADMIN",
-            type: "Payment Made for Plan",
-            title: "Payment Made for Plan",
-            content: `
+            const invoice = await tx.invoice.update({
+                where: { id: req.body.invoiceId },
+                data: { status: "Paid" },
+            });
+
+            const latestToken = await tx.invoiceToken.findFirst({
+                where: { invoiceId: req.body.invoiceId },
+                orderBy: { createdAt: "desc" },
+            });
+
+            if (!latestToken) {
+                throw new Error("failed to update invoice token");
+            }
+
+            const invoiceToken = await tx.invoiceToken.update({
+                where: { id: latestToken.id },
+                data: { used: true },
+            });
+
+            const tenant = await tx.tenant.update({
+                where: { id: req.body.tenantId },
+                data: { active: true },
+            });
+
+            const tenantStaff = await tx.tenantStaff.findFirst({
+                where: {
+                    email: tenant.email,
+                    isDeleted: false,
+                    tenant: {
+                        isDeleted: false,
+                    },
+                },
+            });
+
+            if (!tenantStaff) {
+                throw new Error("Tenant staff not found.");
+            }
+
+            let welcomeEmail = null;
+
+            if (!tenantStaff.password) {
+                const generatedPass = this.generateCode.generateStrongPassword();
+                const hashedPass = await argon2.hash(generatedPass);
+
+                await tx.tenantStaff.update({
+                    where: { id: tenantStaff.id },
+                    data: { password: hashedPass },
+                });
+
+                welcomeEmail = {
+                    companyName: tenant.companyName,
+                    email: tenant.email,
+                    password: generatedPass,
+                };
+            }
+
+            const superAdmin = await tx.admin.findFirst({
+                where: { superAdmin: true },
+            });
+
+            if (!superAdmin) {
+                throw new Error("Admin not found");
+            }
+
+            const notificationContent = `
                 A payment has been recorded for tenant ${tenant.companyName}
 
                 Product: NooSphere ABA PMS
@@ -441,9 +488,42 @@ class BillingController {
                 Payment Method: ${req.body.cardType} ending in ${req.body.lastFourDigits}
                 Transaction ID: ${payment.id}
                 Purchase Date: ${payment.createdAt.toDateString()}
-            `,
-            isRead: false
-        });
+            `;
+
+            const notif = await tx.notification.create({
+                data: {
+                    userId: superAdmin.id,
+                    userType: "ADMIN",
+                    type: "Payment Made for Plan",
+                    title: "Payment Made for Plan",
+                    content: notificationContent,
+                    isRead: false,
+                },
+            });
+
+            return {
+                completed: true,
+                invoice,
+                invoiceToken,
+                notif,
+                payment,
+                paymentMethod,
+                plan,
+                subscription,
+                tenant,
+                welcomeEmail,
+            };
+        }, { timeout: 10_000 });
+
+        if (!result.completed) {
+            return res.status(400).json({
+                message: result.payment.status === "Failed"
+                    ? "Payment failed, please try again."
+                    : "Payment has not completed."
+            });
+        }
+
+        const { invoice, notif, payment, plan, tenant, welcomeEmail } = result;
 
         SocketService.emitToUser(notif.userId, notif.userType, "Payment Made for Plan", notif);
 
@@ -456,7 +536,23 @@ class BillingController {
             }
         ]
 
-        const html = templateRenderer.render('billing-payment-confirmation.html', {
+        if (welcomeEmail) {
+            const welcomeHtml = await templateRenderer.render('tenant-welcome.html', welcomeEmail);
+
+            const welcomeMail = await MailService.sendMail(
+                welcomeEmail.email,
+                "Welcome to Noosphere",
+                null,
+                welcomeHtml,
+                attachments
+            );
+
+            if (!welcomeMail.success) {
+                throw new Error("Failed to send tenant welcome mail");
+            }
+        }
+
+        const html = await templateRenderer.render('billing-payment-confirmation.html', {
             customerName: tenant.companyName,
             subscriptionPlan: plan.name,
             numberOfLicenses: req.body.numberOfLicenses,
