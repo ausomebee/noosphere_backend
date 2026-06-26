@@ -56,6 +56,7 @@ class BillingController {
         this.generateCode = new ReferralCodeGenerator(12);
         this.tenantService = new TenantService({
             tenantRepository: this.tenantRepository,
+            prisma: this.prisma,
             staffRepository: this.staffRepository,
             generateCode: this.generateCode,
             templateRenderer,
