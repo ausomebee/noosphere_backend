@@ -229,7 +229,7 @@ model RefreshTokens {
 
 model Tenant {
   id               String   @id @default(uuid())
-  email            String   @unique
+  email            String
   phoneNumber      String   @unique
   active           Boolean  @default(false)
   isDeleted        Boolean  @default(false)
@@ -306,7 +306,7 @@ model TenantDeactivation {
 model TenantStaff {
   id       String  @id @default(uuid())
   fullName String
-  email    String  @unique
+  email    String
   stage    String?
   roleId   String
   tenantId String
