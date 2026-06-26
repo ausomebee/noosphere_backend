@@ -29,6 +29,7 @@ class TenantService {
     async createCandidate(data) {
         const tenantExists = await this.tenantRepository.findFirstDynamic({
             where: {
+                isDeleted: false,
                 OR: [{ email: data.email }, { phoneNumber: data.phoneNumber }, { subdomain: data.subdomain }],
             },
             select: {
@@ -148,22 +149,39 @@ class TenantService {
             }
         }
 
-        const update = await this.tenantRepository.update(data.id, {
-            email: data.email || tenant.email,
-            phoneNumber: data.phoneNumber || tenant.phoneNumber,
-            active: data.active ?? tenant.active,
-            isDeleted: data.isDeleted ?? tenant.isDeleted,
-            companyName: data.companyName || tenant.companyName,
-            contactPerson: data.contactPerson || tenant.contactPerson,
-            companySize: data.companySize || tenant.companySize,
-            organizationType: data.organizationType || tenant.organizationType,
-            location: data.location || tenant.location,
-            subdomain: data.subdomain || tenant.subdomain,
-            leadSource: data.leadSource || tenant.leadSource,
-            stage: data.stage || tenant.stage,
-            website: data.website || tenant.website,
-            practiceNPI: data.practiceNPI || tenant.practiceNPI,
-            assignToAdmin: data.assignToAdmin || tenant.assignToAdmin,
+        const update = await this.prisma.$transaction(async (tx) => {
+            const updatedTenant = await tx.tenant.update({
+                where: { id: data.id },
+                data: {
+                    email: data.email || tenant.email,
+                    phoneNumber: data.phoneNumber || tenant.phoneNumber,
+                    active: data.active ?? tenant.active,
+                    isDeleted: data.isDeleted ?? tenant.isDeleted,
+                    companyName: data.companyName || tenant.companyName,
+                    contactPerson: data.contactPerson || tenant.contactPerson,
+                    companySize: data.companySize || tenant.companySize,
+                    organizationType: data.organizationType || tenant.organizationType,
+                    location: data.location || tenant.location,
+                    subdomain: data.subdomain || tenant.subdomain,
+                    leadSource: data.leadSource || tenant.leadSource,
+                    stage: data.stage || tenant.stage,
+                    website: data.website || tenant.website,
+                    practiceNPI: data.practiceNPI || tenant.practiceNPI,
+                    assignToAdmin: data.assignToAdmin || tenant.assignToAdmin,
+                }
+            });
+
+            if (data.isDeleted === true && tenant.isDeleted !== true) {
+                await tx.tenantStaff.updateMany({
+                    where: { tenantId: data.id },
+                    data: {
+                        isDeleted: true,
+                        active: false,
+                    },
+                });
+            }
+
+            return updatedTenant;
         });
 
         if (!update) {

@@ -12,7 +12,11 @@ class StaffRepository extends BaseRepository {
     async staffExistsWithRole(email) {
         return await this.model.findFirst({
             where: {
-                email
+                email,
+                isDeleted: false,
+                tenant: {
+                    isDeleted: false,
+                },
             },
             include: {
                 role: {
