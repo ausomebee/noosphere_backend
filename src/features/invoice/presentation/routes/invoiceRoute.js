@@ -786,7 +786,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/invoice/management/is-days-before-due-date", staffProtect(), InvoiceDto.updateIsDaysBeforeDueDateDto, this.controller.updateInvoiceManagement);
+        this.router.patch("/invoice/management/is-days-before-due-date", adminProtect(), InvoiceDto.updateIsDaysBeforeDueDateDto, this.controller.updateInvoiceManagement);
 
         /**
          * @swagger
