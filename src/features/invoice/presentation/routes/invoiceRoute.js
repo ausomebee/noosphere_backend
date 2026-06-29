@@ -886,7 +886,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/invoice/management/due-invoice", staffProtect(), InvoiceDto.updateDueInvoiceDto, this.controller.updateInvoiceManagement);
+        this.router.patch("/invoice/management/due-invoice", adminProtect(), InvoiceDto.updateDueInvoiceDto, this.controller.updateInvoiceManagement);
 
         /**
          * @swagger
