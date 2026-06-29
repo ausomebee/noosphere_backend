@@ -48,6 +48,7 @@ class InvoiceDto {
     static createInvoiceManagementDto = (req, res, next) => {
         const schema = Joi.object({
             onPlanPurchase: Joi.boolean().required(),
+            isDaysBeforeDueDate: Joi.boolean().required(),
             daysBeforeDueDate: Joi.number().integer().required(),
             upcomingInvoiceHeader: Joi.string().required(),
             upcomingInvoiceBody: Joi.string().required(),
@@ -87,6 +88,17 @@ class InvoiceDto {
                 "string.guid": "ID must be a valid UUID"
             }),
             daysBeforeDueDate: Joi.number().integer().required(),
+        });
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static updateIsDaysBeforeDueDateDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required().messages({
+                "string.empty": "ID is required",
+                "string.guid": "ID must be a valid UUID"
+            }),
+            isDaysBeforeDueDate: Joi.boolean().required(),
         });
         Validator.validateRequest(req, next, schema);
     };

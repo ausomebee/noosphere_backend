@@ -71,6 +71,7 @@ import { staffProtect, adminProtect } from "../../../../middleware/auth_handlers
  *       type: object
  *       required:
  *         - onPlanPurchase
+ *         - isDaysBeforeDueDate
  *         - daysBeforeDueDate
  *         - upcomingInvoiceHeader
  *         - upcomingInvoiceBody
@@ -83,6 +84,9 @@ import { staffProtect, adminProtect } from "../../../../middleware/auth_handlers
  *         - reminderEmail
  *       properties:
  *         onPlanPurchase:
+ *           type: boolean
+ *           example: true
+ *         isDaysBeforeDueDate:
  *           type: boolean
  *           example: true
  *         daysBeforeDueDate:
@@ -155,6 +159,20 @@ import { staffProtect, adminProtect } from "../../../../middleware/auth_handlers
  *         daysBeforeDueDate:
  *           type: integer
  *           example: 5
+
+ *     UpdateIsDaysBeforeDueDateDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - isDaysBeforeDueDate
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "550e8400-e29b-41d4-a716-446655440001"
+ *         isDaysBeforeDueDate:
+ *           type: boolean
+ *           example: true
 
  *     UpdateUpcomingInvoiceDto:
  *       type: object
@@ -749,6 +767,46 @@ class InvoiceRoutes {
          *         description: Validation error
          */
         this.router.patch("/invoice/management/days-before-due-date/admin", adminProtect(), InvoiceDto.updateDaysBeforeDueDateDto, this.controller.updateInvoiceManagement);
+
+        /**
+         * @swagger
+         * /api/v1/invoice/invoice/management/is-days-before-due-date:
+         *   patch:
+         *     summary: Enable or disable the days-before-due-date setting
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateIsDaysBeforeDueDateDto'
+         *     responses:
+         *       200:
+         *         description: isDaysBeforeDueDate updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/invoice/management/is-days-before-due-date", staffProtect(), InvoiceDto.updateIsDaysBeforeDueDateDto, this.controller.updateInvoiceManagement);
+
+        /**
+         * @swagger
+         * /api/v1/invoice/invoice/management/is-days-before-due-date/admin:
+         *   patch:
+         *     summary: Enable or disable the days-before-due-date setting as an admin
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateIsDaysBeforeDueDateDto'
+         *     responses:
+         *       200:
+         *         description: isDaysBeforeDueDate updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/invoice/management/is-days-before-due-date/admin", adminProtect(), InvoiceDto.updateIsDaysBeforeDueDateDto, this.controller.updateInvoiceManagement);
 
         /**
          * @swagger
