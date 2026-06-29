@@ -906,7 +906,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/invoice/management/mark-over-due", staffProtect(), InvoiceDto.updateMarkOverDueDto, this.controller.updateInvoiceManagement);
+        this.router.patch("/invoice/management/mark-over-due", adminProtect(), InvoiceDto.updateMarkOverDueDto, this.controller.updateInvoiceManagement);
 
         /**
          * @swagger
