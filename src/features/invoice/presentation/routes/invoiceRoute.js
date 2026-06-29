@@ -946,7 +946,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/invoice/management/unpaid-reminder-times-before", staffProtect(), InvoiceDto.updateUnpaidReminderTimesBeforeDto, this.controller.updateInvoiceManagement);
+        this.router.patch("/invoice/management/unpaid-reminder-times-before", adminProtect(), InvoiceDto.updateUnpaidReminderTimesBeforeDto, this.controller.updateInvoiceManagement);
 
         /**
          * @swagger
@@ -966,7 +966,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/invoice/management/attach-invoice-to-reminder", staffProtect(), InvoiceDto.updateAttachInvoiceToReminderDto, this.controller.updateInvoiceManagement);
+        this.router.patch("/invoice/management/attach-invoice-to-reminder", adminProtect(), InvoiceDto.updateAttachInvoiceToReminderDto, this.controller.updateInvoiceManagement);
 
         /**
          * @swagger
@@ -986,7 +986,7 @@ class InvoiceRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/invoice/management/reminder-email", staffProtect(), InvoiceDto.updateReminderEmailDto, this.controller.updateInvoiceManagement);
+        this.router.patch("/invoice/management/reminder-email", adminProtect(), InvoiceDto.updateReminderEmailDto, this.controller.updateInvoiceManagement);
 
         /**
          * @swagger
