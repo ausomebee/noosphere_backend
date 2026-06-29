@@ -496,6 +496,7 @@ class InvoiceService {
             const invoiceData = new Invoice(
                 {
                     "onPlanPurchase": true,
+                    "isDaysBeforeDueDate": true,
                     "daysBeforeDueDate": 5,
                     "upcomingInvoiceHeader": "Upcoming Invoice Reminder",
                     "upcomingInvoiceBody": "Hello, this is a reminder that your invoice is coming up soon.",
@@ -545,7 +546,8 @@ class InvoiceService {
 
         const update = await this.invoiceManagementRepository.update(data.id, {
             onPlanPurchase: data.onPlanPurchase ?? invoiceManagement.onPlanPurchase,
-            daysBeforeDueDate: data.daysBeforeDueDate || invoiceManagement.daysBeforeDueDate,
+            isDaysBeforeDueDate: data.isDaysBeforeDueDate ?? invoiceManagement.isDaysBeforeDueDate,
+            daysBeforeDueDate: data.daysBeforeDueDate ?? invoiceManagement.daysBeforeDueDate,
             upcomingInvoiceHeader: data.upcomingInvoiceHeader || invoiceManagement.upcomingInvoiceHeader,
             upcomingInvoiceBody: data.upcomingInvoiceBody || invoiceManagement.upcomingInvoiceBody,
             onDueDate: data.onDueDate ?? invoiceManagement.onDueDate,

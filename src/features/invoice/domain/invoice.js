@@ -1,6 +1,7 @@
 class Invoice {
     constructor({ id, tenantId,
         onPlanPurchase,
+        isDaysBeforeDueDate,
         daysBeforeDueDate,
         upcomingInvoiceHeader,
         upcomingInvoiceBody,
@@ -23,6 +24,7 @@ class Invoice {
         this.tenant = tenant;
         this.plan = plan;
         this.onPlanPurchase = onPlanPurchase;
+        this.isDaysBeforeDueDate = isDaysBeforeDueDate;
         this.daysBeforeDueDate = daysBeforeDueDate;
         this.upcomingInvoiceHeader = upcomingInvoiceHeader;
         this.upcomingInvoiceBody = upcomingInvoiceBody;
@@ -80,6 +82,7 @@ class Invoice {
     get createInvoiceManagement() {
         return {
             onPlanPurchase: this.onPlanPurchase,
+            isDaysBeforeDueDate: this.isDaysBeforeDueDate,
             daysBeforeDueDate: this.daysBeforeDueDate,
             upcomingInvoiceHeader: this.upcomingInvoiceHeader,
             upcomingInvoiceBody: this.upcomingInvoiceBody,

@@ -859,6 +859,7 @@ model PaymentMethod {
 model InvoiceManagement {
   id                        String  @id @default(uuid())
   onPlanPurchase            Boolean
+  isDaysBeforeDueDate       Boolean @default(true)
   daysBeforeDueDate         Int
   upcomingInvoiceHeader     String
   upcomingInvoiceBody       String
