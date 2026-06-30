@@ -466,6 +466,8 @@ class BillingController {
                     companyName: tenant.companyName,
                     email: tenant.email,
                     password: generatedPass,
+                    clientUrl: templateRenderer.buildTenantClientUrl(tenant.subdomain),
+                    subdomain: tenant.subdomain,
                 };
             }
 

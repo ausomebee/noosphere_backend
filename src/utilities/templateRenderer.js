@@ -18,21 +18,29 @@ class TemplateRenderer {
         this.clientPortalUrl = process.env.CLIENT_PORTAL_URL || `${this.clientUrl}/client`;
     }
 
+    buildTenantClientUrl(subdomain) {
+        const normalizedClientUrl = this.clientUrl.trim().replace(/\/+$/, '');
+        const url = new URL(/^[a-z][a-z\d+\-.]*:\/\//i.test(normalizedClientUrl)
+            ? normalizedClientUrl
+            : `https://${normalizedClientUrl}`);
+
+        url.hostname = `${subdomain}.${url.hostname.replace(/^www\./, '')}`;
+
+        return url.toString().replace(/\/$/, '');
+    }
+
     loadTemplate(templateName) {
         const cacheKey = templateName;
 
-        // Check cache first
         if (this.templateCache.has(cacheKey)) {
             return this.templateCache.get(cacheKey);
         }
 
-        // Add .html extension if not present
         const fileName = templateName.endsWith('.html') ? templateName : `${templateName}.html`;
         const templatePath = path.join(this.templatesDir, fileName);
 
         try {
             const templateContent = fs.readFileSync(templatePath, 'utf8');
-            // Cache the template
             this.templateCache.set(cacheKey, templateContent);
             return templateContent;
         } catch (error) {
