@@ -55,7 +55,10 @@ class DepartmentService {
     }
 
     async getDepartments(query = {}) {
-        const records = await this.departmentRepository.findAllAndPopulate(query,
+        const records = await this.departmentRepository.findAllAndPopulate({
+            ...query,
+            isDeleted: false
+        },
             {
                 teamLead: {
                     select: {
