@@ -126,13 +126,14 @@ class IssueRepository extends BaseRepository {
         });
     }
 
-    async totalCount() {
-        return await this.model.count();
+    async totalCount(where = {}) {
+        return await this.model.count({ where });
     }
 
-    async groupedCounts(by, count) {
+    async groupedCounts(by, count, where = {}) {
         return await this.model.groupBy({
             by: [by],
+            where,
             _count: count,
         });
     }

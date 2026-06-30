@@ -164,13 +164,21 @@ class IssueService {
     }
 
     async getAssigneePercentages() {
-        const totalCount = await this.issueRepository.totalCount();
+        const unresolvedFilter = {
+            status: { not: "Resolved" }
+        };
+
+        const totalCount = await this.issueRepository.totalCount(unresolvedFilter);
 
         if (totalCount === 0) {
             return [];
         }
 
-        const groupedCounts = await this.issueRepository.groupedCounts("adminId", { adminId: true, });
+        const groupedCounts = await this.issueRepository.groupedCounts(
+            "adminId",
+            { adminId: true },
+            unresolvedFilter
+        );
 
         const adminIds = groupedCounts.map(g => g.adminId).filter(id => id !== null);
 
