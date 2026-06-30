@@ -22,7 +22,7 @@ class StaffDto {
                     documentsUrl: Joi.object().required(),
                     tenantStaffId: Joi.string().uuid().optional()
                 })
-            ).required(),
+            ).optional(),
             licenses: Joi.array().items(
                 Joi.object({
                     licenseName: Joi.string().min(1).required(),
