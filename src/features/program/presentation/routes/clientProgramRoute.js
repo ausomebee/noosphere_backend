@@ -51,7 +51,7 @@ class ClientProgramRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", clientProtect(), ClientProgramDto.createClientProgramDto, this.controller.createClientProgram);
+        this.router.post("/", staffProtect(), ClientProgramDto.createClientProgramDto, this.controller.createClientProgram);
 
         /**
          * @swagger
