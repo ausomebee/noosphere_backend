@@ -309,7 +309,8 @@ class AdminService {
             const update = await this.repository.updateChoice(choiceExists.id, {
                 Authenticator2FA: data.Authenticator2FA,
                 securityQuestion: data.securityQuestion,
-                setForAll: data.setForAll
+                setForAll: data.setForAll,
+                isEnabled: data.isEnabled ?? choiceExists.isEnabled
             });
 
             if (!update) {

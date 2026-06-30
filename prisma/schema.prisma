@@ -755,6 +755,7 @@ model SuperAdminChoices {
   Authenticator2FA Boolean
   securityQuestion Boolean
   setForAll        Boolean
+  isEnabled        Boolean  @default(true)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }

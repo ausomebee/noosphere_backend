@@ -241,7 +241,8 @@ class AdminDto {
         const schema = Joi.object({
             Authenticator2FA: Joi.boolean().required(),
             securityQuestion: Joi.boolean().required(),
-            setForAll: Joi.boolean().required()
+            setForAll: Joi.boolean().required(),
+            isEnabled: Joi.boolean().optional()
         });
 
         Validator.validateRequest(req, next, schema);

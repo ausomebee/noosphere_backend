@@ -187,10 +187,15 @@ import { adminProtect } from "../../../../middleware/auth_handlers.js";
  *         setForAll:
  *           type: boolean
  *           description: Whether to apply the setting to all users.
+ *         isEnabled:
+ *           type: boolean
+ *           default: true
+ *           description: Whether the super admin choices are enabled.
  *       example:
  *         Authenticator2FA: true
  *         securityQuestion: false
  *         setForAll: true
+ *         isEnabled: true
  */
 
 class AdminRoutes {
@@ -378,6 +383,8 @@ class AdminRoutes {
          *                 securityQuestion:
          *                   type: boolean
          *                 setForAll:
+         *                   type: boolean
+         *                 isEnabled:
          *                   type: boolean
          *       400:
          *         description: Bad request

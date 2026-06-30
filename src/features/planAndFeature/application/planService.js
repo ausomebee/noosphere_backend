@@ -40,10 +40,16 @@ class PlanService {
 
     async updateBillingPlan(data) {
         if (typeof data.active === 'boolean') {
-            const superAdmin = await this.adminRepository.findFirst({ superAdmin: true })
+            const superAdmin = await this.adminRepository.findFirst({
+                where: { superAdmin: true, isDeleted: false }
+            })
 
             if (!superAdmin) {
                 throw new Error("Super admin not found")
+            }
+
+            if (!superAdmin.administratorPassword) {
+                throw new Error("Super admin administrator password is not configured")
             }
 
             if (!(await argon2.verify(superAdmin.administratorPassword, data.administratorPassword))) {
@@ -164,10 +170,16 @@ class PlanService {
     }
 
     async deleteBillingPlan(data) {
-        const superAdmin = await this.adminRepository.findFirst({ superAdmin: true })
+        const superAdmin = await this.adminRepository.findFirst({
+            where: { superAdmin: true, isDeleted: false }
+        })
 
         if (!superAdmin) {
             throw new Error("Super admin not found")
+        }
+
+        if (!superAdmin.administratorPassword) {
+            throw new Error("Super admin administrator password is not configured")
         }
 
         if (!(await argon2.verify(superAdmin.administratorPassword, data.administratorPassword))) {
