@@ -292,6 +292,10 @@ import { adminProtect, staffProtect } from "../../../../middleware/auth_handlers
  *         setForAll:
  *           type: boolean
  *           example: true
+ *         isEnabled:
+ *           type: boolean
+ *           default: true
+ *           example: true
  *         tenantId:
  *           type: string
  *           format: uuid
@@ -686,6 +690,40 @@ class TenantRoutes {
         this.router.patch("/tenantadminchoices", TenantDto.updateTenantAdminChoicesDto, this.controller.updateTenantAdminChoices);
 
         /**
+         * @swagger
+         * /api/v1/tenant/tenantadminchoices/enabled:
+         *   patch:
+         *     summary: Update whether tenant admin choices are enabled
+         *     tags: [choice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             required: [tenantId, isEnabled]
+         *             properties:
+         *               tenantId:
+         *                 type: string
+         *                 format: uuid
+         *               isEnabled:
+         *                 type: boolean
+         *     responses:
+         *       200:
+         *         description: Enabled status updated successfully
+         *       400:
+         *         description: Validation error
+         *       500:
+         *         description: Choices not found or update failed
+         */
+        this.router.patch(
+            "/tenantadminchoices/enabled",
+            adminProtect(),
+            TenantDto.updateTenantAdminChoicesEnabledDto,
+            this.controller.updateTenantAdminChoicesEnabled
+        );
+
+        /**
         * @swagger
         * /api/v1/tenant/getstaffbypaymentschedule/{tenantId}/{paymentSchedule}:
         *   get:
@@ -1009,6 +1047,8 @@ class TenantRoutes {
          *                 securityQuestion:
          *                   type: boolean
          *                 setForAll:
+         *                   type: boolean
+         *                 isEnabled:
          *                   type: boolean
          *       400:
          *         description: Bad request

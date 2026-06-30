@@ -594,7 +594,8 @@ class TenantService {
             const update = await this.choiceRepository.update(choiceExists.id, {
                 Authenticator2FA: data.Authenticator2FA,
                 securityQuestion: data.securityQuestion,
-                setForAll: data.setForAll
+                setForAll: data.setForAll,
+                isEnabled: data.isEnabled ?? choiceExists.isEnabled
             });
 
             if (!update) {
@@ -815,6 +816,7 @@ class TenantService {
                 Authenticator2FA: data.Authenticator2FA ?? false,
                 securityQuestion: data.securityQuestion ?? null,
                 setForAll: data.setForAll ?? false,
+                isEnabled: data.isEnabled ?? true,
             });
 
             if (!created) {
@@ -830,6 +832,7 @@ class TenantService {
                 Authenticator2FA: data.Authenticator2FA ?? tenantAdminChoices.Authenticator2FA,
                 securityQuestion: data.securityQuestion ?? tenantAdminChoices.securityQuestion,
                 setForAll: data.setForAll ?? tenantAdminChoices.setForAll,
+                isEnabled: data.isEnabled ?? tenantAdminChoices.isEnabled,
             }
         );
 
@@ -838,6 +841,27 @@ class TenantService {
         }
 
         return update;
+    }
+
+    async updateTenantAdminChoicesEnabled(data) {
+        const tenantAdminChoices = await this.choiceRepository.findOne({
+            tenantId: data.tenantId
+        });
+
+        if (!tenantAdminChoices) {
+            throw new Error("Tenant admin choices not found");
+        }
+
+        const updatedChoice = await this.choiceRepository.update(
+            tenantAdminChoices.id,
+            { isEnabled: data.isEnabled }
+        );
+
+        if (!updatedChoice) {
+            throw new Error("Failed to update tenant admin choices enabled status");
+        }
+
+        return updatedChoice;
     }
 
     async getStaffPayrollSummary(tenantId) {

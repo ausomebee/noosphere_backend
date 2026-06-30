@@ -248,6 +248,14 @@ class AdminDto {
         Validator.validateRequest(req, next, schema);
     };
 
+    static updateSuperAdminChoicesEnabledDto = (req, res, next) => {
+        const schema = Joi.object({
+            isEnabled: Joi.boolean().required()
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
     static forgotPasswordDto = (req, res, next) => {
         const schema = Joi.object({
             email: Joi.string()

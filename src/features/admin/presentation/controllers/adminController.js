@@ -135,6 +135,16 @@ class AdminController {
         });
     });
 
+    updateSuperAdminChoicesEnabled = expressAsyncHandler(async (req, res) => {
+        const choice = await this.service.updateSuperAdminChoicesEnabled(req.body);
+
+        return res.status(200).json({
+            message: "Super admin choices enabled status updated successfully",
+            status: 'ok',
+            data: choice
+        });
+    });
+
     forgotPassword = expressAsyncHandler(async (req, res) => {
         const mail = await this.service.forgotPassword(req.params);
 

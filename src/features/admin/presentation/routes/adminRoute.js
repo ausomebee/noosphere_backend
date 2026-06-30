@@ -366,6 +366,37 @@ class AdminRoutes {
 
         /**
          * @swagger
+         * /api/v1/admin/superadminchoices/enabled:
+         *   patch:
+         *     summary: Update whether super admin choices are enabled
+         *     tags: [choice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             required: [isEnabled]
+         *             properties:
+         *               isEnabled:
+         *                 type: boolean
+         *     responses:
+         *       200:
+         *         description: Enabled status updated successfully
+         *       400:
+         *         description: Validation error
+         *       500:
+         *         description: Choices not found or update failed
+         */
+        this.router.patch(
+            "/superadminchoices/enabled",
+            adminProtect({ superAdmin: true }),
+            AdminDto.updateSuperAdminChoicesEnabledDto,
+            this.controller.updateSuperAdminChoicesEnabled
+        );
+
+        /**
+         * @swagger
          * /api/v1/admin/superadminchoices:
          *   get:
          *     summary: Retrieve superadmin choices
