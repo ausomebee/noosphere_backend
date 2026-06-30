@@ -98,7 +98,9 @@ class TenantService {
         const html = await this.templateRenderer.render('tenant-welcome.html', {
             companyName: tenant.companyName,
             email: tenant.email,
-            password: generatedPass
+            password: generatedPass,
+            clientUrl: this.templateRenderer.buildTenantClientUrl(tenant.subdomain),
+            subdomain: tenant.subdomain
         });
 
         const sendMail = await MailService.sendMail(
@@ -520,7 +522,9 @@ class TenantService {
         const html = await this.templateRenderer.render('tenant-welcome-staff.html', {
             companyName: tenant.companyName,
             email: newStaff.email,
-            staffId: newStaff.id
+            staffId: newStaff.id,
+            clientUrl: this.templateRenderer.buildTenantClientUrl(tenant.subdomain),
+            subdomain: tenant.subdomain
         });
 
         const sendMail = await MailService.sendMail(data.email, "Welcome to Noosphere", null, html, attachments)
