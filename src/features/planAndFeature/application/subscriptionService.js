@@ -1,6 +1,7 @@
 class SubscriptionService {
-    constructor({ subscriptionRepository }) {
+    constructor({ subscriptionRepository, tenantRepository }) {
         this.subscriptionRepository = subscriptionRepository;
+        this.tenantRepository = tenantRepository;
     }
 
     async createSubscription(data) {
@@ -32,6 +33,20 @@ class SubscriptionService {
 
                 if (!update) {
                     throw new Error(`Failed to update Subscription with ID ${id}`);
+                }
+
+                if (update.status === "PAUSED") {
+                    if (!this.tenantRepository) {
+                        throw new Error("Tenant repository is required to pause a subscription");
+                    }
+
+                    const tenant = await this.tenantRepository.update(update.tenantId, {
+                        active: false,
+                    });
+
+                    if (!tenant) {
+                        throw new Error(`Failed to deactivate tenant with ID ${update.tenantId}`);
+                    }
                 }
 
                 return update;
