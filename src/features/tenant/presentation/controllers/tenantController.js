@@ -258,6 +258,16 @@ class TenantController {
         });
     });
 
+    updateTenantAdminChoicesEnabled = expressAsyncHandler(async (req, res) => {
+        const tenantAdminChoices = await this.service.updateTenantAdminChoicesEnabled(req.body);
+
+        return res.status(200).json({
+            message: "Tenant admin choices enabled status updated successfully",
+            status: 'ok',
+            data: tenantAdminChoices
+        });
+    });
+
     getStaffByPaymentSchedule = expressAsyncHandler(async (req, res) => {
         const staffs = await this.service.getStaffByPaymentSchedule(req.params.tenantId, req.params.paymentSchedule);
 

@@ -339,6 +339,24 @@ class AdminService {
         return choice;
     }
 
+    async updateSuperAdminChoicesEnabled(data) {
+        const choice = await this.repository.findFirstChoice({ where: {} });
+
+        if (!choice) {
+            throw new Error("Super admin choices not found");
+        }
+
+        const updatedChoice = await this.repository.updateChoice(choice.id, {
+            isEnabled: data.isEnabled
+        });
+
+        if (!updatedChoice) {
+            throw new Error("Failed to update super admin choices enabled status");
+        }
+
+        return updatedChoice;
+    }
+
     async forgotPassword(data) {
         const adminExists = await this.repository.findFirst({
             where: { email: data.email },
