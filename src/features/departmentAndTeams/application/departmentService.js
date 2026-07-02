@@ -5,7 +5,10 @@ class DepartmentService {
 
     async createDepartment(data) {
         const exists = await this.departmentRepository.findFirstDynamic({
-            where: { name: data.name },
+            where: {
+                name: data.name,
+                isDeleted: false
+            },
             select: { id: true }
         });
 
