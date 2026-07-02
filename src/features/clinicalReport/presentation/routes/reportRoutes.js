@@ -289,7 +289,7 @@ class ClinicalReportRoutes {
         *       404:
         *         description: Clinical report not found
         */
-        this.router.post(
+        this.router.patch(
             "/approve/:id",
             staffProtect(),
             this.controller.approveClinicalReport

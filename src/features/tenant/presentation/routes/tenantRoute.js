@@ -718,7 +718,7 @@ class TenantRoutes {
          */
         this.router.patch(
             "/tenantadminchoices/enabled",
-            adminProtect(),
+            staffProtect(),
             TenantDto.updateTenantAdminChoicesEnabledDto,
             this.controller.updateTenantAdminChoicesEnabled
         );

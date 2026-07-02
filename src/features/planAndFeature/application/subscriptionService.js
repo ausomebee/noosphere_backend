@@ -49,6 +49,20 @@ class SubscriptionService {
                     }
                 }
 
+                if (update.status === "ACTIVE") {
+                    if (!this.tenantRepository) {
+                        throw new Error("Tenant repository is required to resume a subscription");
+                    }
+
+                    const tenant = await this.tenantRepository.update(update.tenantId, {
+                        active: true,
+                    });
+
+                    if (!tenant) {
+                        throw new Error(`Failed to reactivate tenant with ID ${update.tenantId}`);
+                    }
+                }
+
                 return update;
             })
         );

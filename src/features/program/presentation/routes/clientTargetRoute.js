@@ -1,7 +1,7 @@
 import express from "express";
 import ClientTargetDto from "../dto/clientTargetDto.js";
 import ClientTargetController from "../controllers/clientTargetController.js";
-import { clientProtect } from "../../../../middleware/auth_handlers.js";
+import { clientProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -57,7 +57,7 @@ class ClientTargetRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/", clientProtect(), ClientTargetDto.createClientTargetDto, this.controller.createClientTarget);
+        this.router.post("/", staffProtect(), ClientTargetDto.createClientTargetDto, this.controller.createClientTarget);
 
         /**
          * @swagger

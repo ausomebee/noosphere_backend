@@ -128,7 +128,7 @@ class ClientAuthorizationRoutes {
          */
         this.router.post(
             "/",
-            clientProtect(),
+            staffProtect(),
             ClientAuthorizationDto.createClientAuthorizationDto,
             this.controller.createClientAuthorization.bind(this.controller)
         );

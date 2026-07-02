@@ -39,18 +39,11 @@ class ClinicalReportChangeRequestController {
             data.createChangeRequest
         );
 
-        let status, updated
-        if (data.approverId) {
-            status = "DRAFT"
-            updated = await this.reportService.updateReport(
-                { id: req.params.id, status: status }
-            );
-        } else {
-            status = "AWAITING_SIGNATURE"
-            updated = await this.reportService.updateReport(
-                { id: req.params.id, status: status }
-            );
-        }
+        const status = data.approverId ? "DRAFT" : "AWAITING_SIGNATURE";
+        const updated = await this.reportService.updateReport({
+            id: data.clinicalReportId,
+            status
+        });
 
         const history = new ClinicalReportHistory({
             clinicalReportId: updated.id,
