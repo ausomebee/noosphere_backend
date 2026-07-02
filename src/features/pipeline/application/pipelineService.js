@@ -179,7 +179,7 @@ class PipelineService {
             tenant: {
                 isDeleted: false,
                 Subscription: {
-                    some: {}
+                    none: {}
                 }
             }
         }, {
@@ -300,7 +300,7 @@ class PipelineService {
             id: id,
             tenant: {
                 Subscription: {
-                    some: {}
+                    none: {}
                 }
             }
         }, {
