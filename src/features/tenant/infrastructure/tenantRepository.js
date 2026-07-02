@@ -57,10 +57,9 @@ class TenantRepository extends BaseRepository {
     async findAllWithActiveSubscription() {
         return await this.model.findMany({
             where: {
-                active: true,
                 isDeleted: false,
                 Subscription: {
-                    some: { status: 'ACTIVE' }
+                    some: {}
                 }
             },
             include: {
