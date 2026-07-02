@@ -175,8 +175,12 @@ class PipelineService {
 
     async getItemByStageIdTenant(pipelineStageId) {
         const items = await this.itemRepository.findAllAndPopulate({
-            pipelineStageId: pipelineStageId, tenant: {
-                active: false, isDeleted: false
+            pipelineStageId: pipelineStageId,
+            tenant: {
+                isDeleted: false,
+                Subscription: {
+                    some: {}
+                }
             }
         }, {
             tenant: {
@@ -292,7 +296,14 @@ class PipelineService {
     }
 
     async getItemById(id) {
-        const item = await this.itemRepository.findOneAndPopulate({ id: id }, {
+        const item = await this.itemRepository.findOneAndPopulate({
+            id: id,
+            tenant: {
+                Subscription: {
+                    some: {}
+                }
+            }
+        }, {
             tenant: {
                 include: {
                     Subscription: {
