@@ -60,14 +60,10 @@ class MessageController {
         const { userId, userType } = req.params;
         const records = await this.service.getMessagesByUser(userId, userType);
 
-        if (!records || records.length === 0) {
-            return res.status(404).json({ message: "No messages found for this user" });
-        }
-
         return res.status(200).json({
             message: "Messages fetched successfully",
             status: "ok",
-            data: records
+            data: records ?? []
         });
     });
 
