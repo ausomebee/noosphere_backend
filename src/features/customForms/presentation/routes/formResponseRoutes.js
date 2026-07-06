@@ -94,6 +94,24 @@ class FormResponseRoutes {
 
         /**
          * @swagger
+         * /api/v1/form-responses/client:
+         *   post:
+         *     summary: Submit a new form response with its response fields
+         *     tags: [form-responses]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/FormResponseCreateDto'
+         *     responses:
+         *       201:
+         *         description: Form response created successfully
+         */
+        this.router.post("/client", clientProtect(), FormResponseDto.createFormResponseDto, this.controller.createFormResponse);
+
+        /**
+         * @swagger
          * /api/v1/form-responses/:
          *   put:
          *     summary: Update an existing form response and its response fields
