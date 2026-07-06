@@ -6,7 +6,7 @@ class InsuranceTypeDto {
         const schema = Joi.object({
             tenantId: Joi.string().uuid().required(),
             name: Joi.string().min(1).required(),
-            description: Joi.string().min(1).required(),
+            description: Joi.string().min(1).optional(),
         });
 
         Validator.validateRequest(req, next, schema);

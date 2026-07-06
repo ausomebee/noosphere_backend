@@ -21,7 +21,7 @@ class PayerDto {
                     Joi.object({
                         serviceCodeId: Joi.string().uuid().allow("").optional(),
                         code: Joi.string().required(),
-                        description: Joi.string().required(),
+                        description: Joi.string().optional(),
                         unitCurrency: Joi.string().length(3).required(),
                         ratePerUnit: Joi.number().required(),
                         roundingRuleId: Joi.string().uuid().required(),

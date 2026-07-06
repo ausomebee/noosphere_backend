@@ -7,7 +7,7 @@ class ServiceCodesDto {
             tenantId: Joi.string().uuid().required(),
             code: Joi.string().min(1).required(),
             description: Joi.string().min(1).required(),
-            modifiers: Joi.object().required(),
+            modifiers: Joi.object().optional(),
         });
 
         Validator.validateRequest(req, next, schema);
