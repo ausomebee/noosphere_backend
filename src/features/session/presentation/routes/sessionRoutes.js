@@ -342,6 +342,37 @@ class SessionRoutes {
 
         /**
          * @swagger
+         * /api/v1/sessions/performance/client/{targetId}/{clientId}:
+         *   get:
+         *     summary: Get client performance graph
+         *     tags: [sessions]
+         *     parameters:
+         *       - in: path
+         *         name: targetId
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         required: true
+         *         description: target ID
+         *       - in: path
+         *         name: clientId
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         required: true
+         *         description: client ID
+         *     responses:
+         *       200:
+         *         description: Session data fetched successfully
+         */
+        this.router.get(
+            "/performance/client/:targetId/:clientId",
+            clientProtect(),
+            this.controller.getTargetPerformanceGraph
+        );
+
+        /**
+         * @swagger
          * /api/v1/sessions/client/{clientId}:
          *   get:
          *     summary: Get client sessions
@@ -366,6 +397,30 @@ class SessionRoutes {
 
         /**
          * @swagger
+         * /api/v1/sessions/client/client/{clientId}:
+         *   get:
+         *     summary: Get client sessions
+         *     tags: [sessions]
+         *     parameters:
+         *       - in: path
+         *         name: clientId
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         required: true
+         *         description: Client ID
+         *     responses:
+         *       200:
+         *         description: Session data fetched successfully
+         */
+        this.router.get(
+            "/client/client/:clientId",
+            clientProtect(),
+            this.controller.getClientSessions
+        );
+
+        /**
+         * @swagger
          * /api/v1/sessions/client/awaiting-feedback/{clientId}:
          *   get:
          *     summary: Get client sessions awaiting feedback
@@ -385,6 +440,30 @@ class SessionRoutes {
         this.router.get(
             "/client/awaiting-feedback/:clientId",
             staffProtect(),
+            this.controller.getSessionsAwaitingApproval
+        );
+
+        /**
+         * @swagger
+         * /api/v1/sessions/client/awaiting-feedback/client/{clientId}:
+         *   get:
+         *     summary: Get client sessions awaiting feedback
+         *     tags: [sessions]
+         *     parameters:
+         *       - in: path
+         *         name: clientId
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         required: true
+         *         description: Client ID
+         *     responses:
+         *       200:
+         *         description: Session data fetched successfully
+         */
+        this.router.get(
+            "/client/awaiting-feedback/client/:clientId",
+            clientProtect(),
             this.controller.getSessionsAwaitingApproval
         );
 

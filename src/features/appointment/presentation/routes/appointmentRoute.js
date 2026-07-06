@@ -348,6 +348,27 @@ class AppointmentRoutes {
 
         /**
         * @swagger
+        * /api/v1/appointments/client/canceled/client/{clientId}:
+        *   get:
+        *     summary: get client canceled appointments
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: clientId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the client
+        *     responses:
+        *       200:
+        *         description: client appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/client/canceled/client/:clientId", clientProtect(), this.controller.getClientCanceledAppointments);
+
+        /**
+        * @swagger
         * /api/v1/appointments/staff/canceled/{staffId}:
         *   get:
         *     summary: get staff canceled appointments
