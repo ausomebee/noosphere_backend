@@ -1,7 +1,7 @@
 import express from "express";
 import MessageController from "../controllers/messageController.js";
 import MessageDto from "../dtos/messageDto.js";
-import { staffProtect } from "../../../../middleware/auth_handlers.js";
+import { clientProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
