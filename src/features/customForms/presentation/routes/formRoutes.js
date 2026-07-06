@@ -168,6 +168,24 @@ class FormRoutes {
 
         /**
          * @swagger
+         * /api/v1/forms/client:
+         *   post:
+         *     summary: Create a new form along with its fields
+         *     tags: [forms]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/FormCreateDto'
+         *     responses:
+         *       201:
+         *         description: Form created successfully
+         */
+        this.router.post("/client", clientProtect(), FormDto.createFormDto, this.controller.createForm);
+
+        /**
+         * @swagger
          * /api/v1/forms/:
          *   put:
          *     summary: Update a form and its fields
