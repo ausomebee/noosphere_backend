@@ -1,6 +1,6 @@
 import express from "express";
 import S3Service from "../../../../utilities/s3.js";
-import { staffProtect } from "../../../../middleware/auth_handlers.js";
+import { adminProtect, clientProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 
 class ImageRoutes {
   constructor() {
@@ -55,6 +55,98 @@ class ImageRoutes {
      *         description: Server error during upload
      */
     this.router.post("/upload", staffProtect(), this.S3Service.array("images", 10), this.uploadImages.bind(this));
+
+    /**
+     * @swagger
+     * /api/v1/images/admin/upload:
+     *   post:
+     *     summary: Upload multiple images to S3
+     *     tags: [Images]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         multipart/form-data:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               images:
+     *                 type: array
+     *                 items:
+     *                   type: string
+     *                   format: binary
+     *             required:
+     *               - images
+     *     responses:
+     *       201:
+     *         description: Images uploaded successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                 data:
+     *                   type: array
+     *                   items:
+     *                     type: object
+     *                     properties:
+     *                       filename:
+     *                         type: string
+     *                       url:
+     *                         type: string
+     *       400:
+     *         description: No images provided or validation error
+     *       500:
+     *         description: Server error during upload
+     */
+    this.router.post("/admin/upload", adminProtect(), this.S3Service.array("images", 10), this.uploadImages.bind(this));
+
+    /**
+     * @swagger
+     * /api/v1/images/client/upload:
+     *   post:
+     *     summary: Upload multiple images to S3
+     *     tags: [Images]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         multipart/form-data:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               images:
+     *                 type: array
+     *                 items:
+     *                   type: string
+     *                   format: binary
+     *             required:
+     *               - images
+     *     responses:
+     *       201:
+     *         description: Images uploaded successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                 data:
+     *                   type: array
+     *                   items:
+     *                     type: object
+     *                     properties:
+     *                       filename:
+     *                         type: string
+     *                       url:
+     *                         type: string
+     *       400:
+     *         description: No images provided or validation error
+     *       500:
+     *         description: Server error during upload
+     */
+    this.router.post("/client/upload", clientProtect(), this.S3Service.array("images", 10), this.uploadImages.bind(this));
   }
 
   async uploadImages(req, res) {

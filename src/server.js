@@ -87,6 +87,7 @@ import notificationsRoute from "./features/notifications/presentation/routes/not
 import messagesRoute from "./features/messaging/presentation/routes/messageRoutes.js";
 import tenantNotificationSettingsRoute from "./features/tenant/presentation/routes/tenantNotificationSettingsRoutes.js";
 import prospectRoute from "./features/prospect/presentation/routes/prospectRoutes.js";
+import cronScheduler from "./cron/scheduler.js";
 
 class App {
     constructor() {
@@ -296,6 +297,7 @@ class App {
 
             socketService.init(this.server);
             console.log("✅ WebSocket initialized");
+            cronScheduler.start();
         });
     }
 }

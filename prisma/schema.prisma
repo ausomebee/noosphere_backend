@@ -369,14 +369,14 @@ model Teams {
   id         String   @id @default(uuid())
   name       String
   tenantId   String
-  teamLeadId String
+  teamLeadId String?
   isDeleted  Boolean  @default(false)
   isActive   Boolean  @default(true)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   tenant      Tenant        @relation("tenantTeam", fields: [tenantId], references: [id])
-  teamLead    TenantStaff   @relation("TeamLead", fields: [teamLeadId], references: [id])
+  teamLead    TenantStaff?   @relation("TeamLead", fields: [teamLeadId], references: [id])
   teamMembers TeamMembers[]
 }
 
@@ -691,10 +691,11 @@ model Subscription {
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
 
-  tenant  Tenant      @relation(fields: [tenantId], references: [id])
-  payment Payment     @relation(fields: [paymentId], references: [id])
-  plan    BillingPlan @relation(fields: [planId], references: [id])
-  Logs    Logs[]
+  tenant   Tenant      @relation(fields: [tenantId], references: [id])
+  payment  Payment     @relation(fields: [paymentId], references: [id])
+  plan     BillingPlan @relation(fields: [planId], references: [id])
+  Logs     Logs[]
+  invoices Invoice[]
 }
 
 model BillingPlan {
@@ -826,11 +827,17 @@ model Invoice {
   quantity         Int
   total            Int
   billingFrequency incoiceBillingFrequency
+  subscriptionId   String?
+  billingPeriodEnd DateTime?
+  emailedAt        DateTime?
 
   tenant        Tenant?        @relation(fields: [tenantId], references: [id])
   plan          BillingPlan?   @relation(fields: [planId], references: [id])
+  subscription  Subscription?  @relation(fields: [subscriptionId], references: [id])
   Payment       Payment[]
   invoiceTokens InvoiceToken[]
+
+  @@unique([subscriptionId, billingPeriodEnd])
 }
 
 model InvoiceToken {

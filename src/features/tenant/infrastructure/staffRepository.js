@@ -34,7 +34,9 @@ class StaffRepository extends BaseRepository {
             where: {
                 tenantId,
                 role: {
-                    dataAccessLevel: 'TEAM',
+                    dataAccessLevel: {
+                        in: ['TEAM', 'GLOBAL'],
+                    },
                 },
                 isDeleted: false,
             },
