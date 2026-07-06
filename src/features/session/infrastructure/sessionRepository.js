@@ -107,7 +107,7 @@ class SessionRepository extends BaseRepository {
     }
 
     async avgSessionDuration(id) {
-        return await this.prisma.$queryRaw`
+        const result = await this.prisma.$queryRaw`
         SELECT 
             AVG(EXTRACT(EPOCH FROM (s."endTime" - s."startTime"))) AS avg_seconds
         FROM "Session" s
@@ -117,6 +117,8 @@ class SessionRepository extends BaseRepository {
             AND s."startTime" IS NOT NULL
             AND s."endTime" > s."startTime"
         `;
+
+        return Number(result[0]?.avg_seconds ?? 0);
     }
 
     async getSessionCounts({ clientId, groupBy = "month" }) {

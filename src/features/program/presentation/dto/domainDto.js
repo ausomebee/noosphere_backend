@@ -5,7 +5,7 @@ class DomainDto {
     static createDomainDto = (req, res, next) => {
         const schema = Joi.object({
             name: Joi.string().trim().min(1).max(255).required(),
-            description: Joi.string().trim().min(1).max(5000).required(),
+            description: Joi.string().trim().min(1).max(5000).optional(),
             tenantId: Joi.string().uuid().required(),
             domainType: Joi.string()
                 .valid('SKILL_ACQUISITION', 'BEHAVIOR_REDUCTION')

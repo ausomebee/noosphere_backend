@@ -114,7 +114,7 @@ class TargetDto {
 
         const schema = Joi.object({
             name: Joi.string().trim().min(1).max(255).required(),
-            description: Joi.string().trim().min(1).max(5000).required(),
+            description: Joi.string().trim().min(1).max(5000).optional(),
             clientId: Joi.string().uuid().required(),
             programId: Joi.string().uuid().optional(),
             sd: Joi.string().trim().min(1).max(255).required(),
@@ -127,7 +127,7 @@ class TargetDto {
             numberOfTasks: Joi.number().integer().min(1).max(100000).optional(),
             taskSteps: jsonOptional,
             initialStatus: Joi.string().trim().min(1).max(255).required(),
-            notes: Joi.string().trim().max(5000).required(),
+            notes: Joi.string().trim().max(5000).optional(),
             masteryMetric: Joi.string().trim().min(1).max(255).required(),
             masteryCriteria: jsonRequired.required(),
             id: Joi.forbidden(),
