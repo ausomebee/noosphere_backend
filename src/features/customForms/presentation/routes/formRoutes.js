@@ -258,6 +258,24 @@ class FormRoutes {
 
         /**
          * @swagger
+         * /api/v1/forms/client/{id}:
+         *   get:
+         *     summary: Get a single form with its fields
+         *     tags: [forms]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: Form fetched successfully
+         */
+        this.router.get("/client/:id", clientProtect(), this.controller.getSingleForm);
+
+        /**
+         * @swagger
          * /api/v1/forms/duplicate/{id}:
          *   post:
          *     summary: duplicate form 
