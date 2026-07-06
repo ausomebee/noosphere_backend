@@ -274,7 +274,7 @@ class ClinicalReportRoutes {
         /**
         * @swagger
         * /api/v1/clinical-reports/approve/{id}:
-        *   post:
+        *   patch:
         *     summary: approve clinical report 
         *     tags: [clinical-reports]
         *     parameters:
