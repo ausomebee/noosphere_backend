@@ -60,14 +60,10 @@ class NotificationController {
         const { userId, userType } = req.params;
         const records = await this.service.getNotificationsByUser(userId, userType);
 
-        if (!records || records.length === 0) {
-            return res.status(404).json({ message: "No notifications found for this user" });
-        }
-
         return res.status(200).json({
             message: "Notifications fetched successfully",
             status: "ok",
-            data: records
+            data: records ?? []
         });
     });
 
