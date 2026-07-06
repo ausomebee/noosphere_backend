@@ -124,6 +124,11 @@ const clientProtectMiddleware = asyncHandler(async (req, res, next) => {
         return next(new Error("Not Authorized: Invalid or expired token"));
     }
 
+    if (!decoded.id) {
+        res.status(401);
+        return next(new Error("Not Authorized: Invalid token payload"));
+    }
+
     const clientTenant = await prisma.clientTenant.findUnique({
         where: { id: decoded.id },
         select: {

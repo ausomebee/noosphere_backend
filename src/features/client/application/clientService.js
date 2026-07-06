@@ -308,7 +308,7 @@ class ClientService {
         }
 
         const claims = {
-            id: client.tenantLinks.id,
+            id: client.tenantLinks[0].id,
         }
 
         const { tenantLinks, ...clientData } = client;
