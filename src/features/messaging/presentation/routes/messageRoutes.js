@@ -156,6 +156,35 @@ class MessageRoutes {
 
         /**
          * @swagger
+         * /api/v1/messages/user/client/{userId}/{userType}:
+         *   get:
+         *     summary: Get messages for a user
+         *     tags: [message]
+         *     parameters:
+         *       - in: path
+         *         name: userId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *       - in: path
+         *         name: userType
+         *         required: true
+         *         schema:
+         *           type: string
+         *           enum: [ADMIN, TENANT_STAFF, CLIENT]
+         *     responses:
+         *       200:
+         *         description: Messages fetched successfully
+         */
+        this.router.get(
+            "/user/client/:userId/:userType",
+            clientProtect(),
+            this.controller.getMessagesByUser
+        );
+
+        /**
+         * @swagger
          * /api/v1/messages/read/{id}:
          *   patch:
          *     summary: Mark a message as read
