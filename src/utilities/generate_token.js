@@ -15,9 +15,9 @@ class TokenService {
         );
     }
 
-    static generatePaymentToken(claims) {
+    static generatePaymentToken(claims, expiresIn = process.env.ACCESS_TOKEN_EXPIRE || "1d") {
         return jwt.sign(claims, process.env.ACCESS_TOKEN_SECRET || "secret", {
-            expiresIn: process.env.ACCESS_TOKEN_EXPIRE || "1d",
+            expiresIn,
         });
     }
 

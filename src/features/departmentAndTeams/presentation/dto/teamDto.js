@@ -12,7 +12,7 @@ class TeamsDto {
                 .required(),
             teamLeadId: Joi.string()
                 .uuid()
-                .required(),
+                .optional(),
             members: Joi.array()
                 .items(Joi.string().uuid())
                 .optional()

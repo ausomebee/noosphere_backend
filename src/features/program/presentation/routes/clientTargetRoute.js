@@ -89,7 +89,7 @@ class ClientTargetRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/:targetId/client/:clientId", clientProtect(), this.controller.getAllClientTargets);
+        this.router.get("/:targetId/client/:clientId", staffProtect(), this.controller.getAllClientTargets);
 
     }
 
