@@ -595,6 +595,13 @@ class ClinicalReportController {
             .toLowerCase();
     }
 
+    async buildSignatureLink(report) {
+        const token = await this.token.generateClinicalReportToken(report.id, this.prisma);
+        const tenantClientUrl = templateRenderer.buildTenantClientUrl(report.tenant.subdomain);
+
+        return `${tenantClientUrl}/tenant/report/client-view/${token}`;
+    }
+
     previewPdf = expressAsyncHandler(async (req, res) => {
         const { reportId } = req.params;
 
@@ -669,7 +676,7 @@ class ClinicalReportController {
         });
         await this.historyService.createHistory(createHistory);
 
-        const signatureLink = `http://${report.tenant.subdomain}.noospherehub.net/${await this.token.generateClinicalReportToken(report.id, this.prisma)}`
+        const signatureLink = await this.buildSignatureLink(report);
 
         const html = templateRenderer.render('clinical-report-updated.html', {
             firstName: report.client.client.firstName,
@@ -699,7 +706,7 @@ class ClinicalReportController {
     nudgeClient = expressAsyncHandler(async (req, res) => {
         const report = await this.reportService.getReportForExport(req.params.id);
 
-        const signatureLink = `http://${report.tenant.subdomain}.noospherehub.net/${await this.token.generateClinicalReportToken(report.id, this.prisma)}`
+        const signatureLink = await this.buildSignatureLink(report);
 
         const html = templateRenderer.render('clinical-report-reminder.html', {
             firstName: report.client.client.firstName,
@@ -738,7 +745,7 @@ class ClinicalReportController {
         });
         await this.historyService.createHistory(createHistory);
 
-        const signatureLink = `http://${report.tenant.subdomain}.noospherehub.net/${await this.token.generateClinicalReportToken(report.id, this.prisma)}`
+        const signatureLink = await this.buildSignatureLink(report);
 
         const html = `
             <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
