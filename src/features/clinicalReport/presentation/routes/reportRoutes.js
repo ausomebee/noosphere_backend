@@ -1,7 +1,7 @@
 import express from "express";
 import ClinicalReportController from "../controllers/reportController.js";
 import ClinicalReportDto from "../dto/reportDto.js";
-import { staffProtect } from "../../../../middleware/auth_handlers.js";
+import { clientProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -550,7 +550,7 @@ class ClinicalReportRoutes {
          */
         this.router.patch(
             "/submit-signature",
-            staffProtect(),
+            clientProtect(),
             this.controller.submitSignature
         );
     }
