@@ -503,10 +503,7 @@ class ClinicalReportController {
                 sections: report.clinicalReportSections
             });
 
-            const viewToken = await this.token.generateClinicalReportToken(
-                report.id,
-                this.prisma
-            );
+            const viewLink = await this.buildSignatureLink(report);
 
             const html = templateRenderer.render('clinical-report-signed.html', {
                 firstName: report.client.client.firstName,
@@ -516,7 +513,7 @@ class ClinicalReportController {
                     month: 'long',
                     day: 'numeric'
                 }),
-                viewToken: viewToken,
+                viewToken: viewLink,
                 companyName: report.tenant.companyName
             });
 
@@ -527,7 +524,7 @@ class ClinicalReportController {
 
                 Your clinical report has been completed and signed. Please find the attached PDF document.
 
-                You can also view your report online at: ${viewToken}
+                You can also view your report online at: ${viewLink}
 
                 Report Details:
                 - Title: ${report.title}
@@ -543,7 +540,7 @@ class ClinicalReportController {
                 to: [report.client.client.email],
                 subject: `Your Clinical Report - ${report.title}`,
                 text: emailText,
-                html: emailHtml,
+                html: html,
                 attachmentBuffer: pdfBuffer,
                 attachmentName: `${this.sanitizeFilename(report.title)}.pdf`,
                 replyTo: report.tenant.email
