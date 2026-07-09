@@ -297,7 +297,7 @@ class ClinicalReportRoutes {
         /**
         * @swagger
         * /api/v1/clinical-reports/resubmit/{id}:
-        *   post:
+        *   patch:
         *     summary: resubmit clinical report 
         *     tags: [clinical-reports]
         *     parameters:
@@ -312,7 +312,7 @@ class ClinicalReportRoutes {
         *       404:
         *         description: Clinical report not found
         */
-        this.router.post(
+        this.router.patch(
             "/resubmit/:id",
             staffProtect(),
             this.controller.resubmitForSignature
