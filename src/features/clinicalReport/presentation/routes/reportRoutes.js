@@ -438,7 +438,6 @@ class ClinicalReportRoutes {
          */
         this.router.get(
             "/:id",
-            staffProtect(),
             this.controller.getSingleReport
         );
 
