@@ -550,7 +550,6 @@ class ClinicalReportRoutes {
          */
         this.router.patch(
             "/submit-signature",
-            clientProtect(),
             this.controller.submitSignature
         );
     }
