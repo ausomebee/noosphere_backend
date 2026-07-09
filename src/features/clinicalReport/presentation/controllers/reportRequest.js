@@ -39,10 +39,10 @@ class ClinicalReportChangeRequestController {
             data.createChangeRequest
         );
 
-        const status = record.approverId ? "DRAFT" : "AWAITING_SIGNATURE";
+        // const status = record.approverId ? "DRAFT" : "AWAITING_SIGNATURE";
         const updated = await this.reportService.updateReport({
             id: record.clinicalReportId,
-            status
+            status: "CHANGES_REQUESTED"
         });
 
         const history = new ClinicalReportHistory({
