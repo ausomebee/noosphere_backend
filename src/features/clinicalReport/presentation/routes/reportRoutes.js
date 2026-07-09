@@ -267,7 +267,6 @@ class ClinicalReportRoutes {
          */
         this.router.post(
             "/validate/:token",
-            staffProtect(),
             this.controller.validateReportToken
         );
 
