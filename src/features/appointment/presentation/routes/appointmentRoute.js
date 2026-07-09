@@ -545,6 +545,28 @@ class AppointmentRoutes {
 
         /**
         * @swagger
+        * /api/v1/appointments/reschedule/client:
+        *   patch:
+        *     summary: reschedule appointment
+        *     tags: [appointments]
+        *     requestBody:
+        *       required: true
+        *       content:
+        *         application/json:
+        *           schema:
+        *             $ref: '#/components/schemas/AppointmentUpdateDto'
+        *     responses:
+        *       200:
+        *         description: Appointment updated successfully
+        *       400:
+        *         description: Validation error
+        *       404:
+        *         description: Appointment not found
+        */
+        this.router.patch("/reschedule/client", clientProtect(), AppointmentDto.updateAppointmentDto, this.controller.updateAppointment);
+
+        /**
+        * @swagger
         * /api/v1/appointments/tenant/upcoming/{tenantId}:
         *   get:
         *     summary: get tenant upcoming appointments
