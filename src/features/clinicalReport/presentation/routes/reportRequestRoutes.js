@@ -73,7 +73,6 @@ class ClinicalReportChangeRequestRoutes {
          */
         this.router.post(
             "/",
-            staffProtect(),
             ClinicalReportChangeRequestDto.createChangeRequestDto,
             this.controller.createChangeRequest
         );
