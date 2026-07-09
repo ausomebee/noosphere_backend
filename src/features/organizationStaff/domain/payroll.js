@@ -27,12 +27,8 @@ class TenantStaffPayroll {
             ratePerHour: this.ratePerHour,
             tenantStaffId: this.tenantStaffId,
             minimumHours: this.minimumHours,
-            incomeItems: {
-                connect: this.otherPays
-            },
-            deductions: {
-                connect: this.deductions
-            },
+            ...(Array.isArray(this.otherPays) ? { incomeItems: { connect: this.otherPays } } : {}),
+            ...(Array.isArray(this.deductions) ? { deductions: { connect: this.deductions } } : {}),
         };
     }
 }

@@ -25,14 +25,14 @@ class TenantStaffService {
 
         const newStaff = await this.prisma.$transaction(async (tx) => {
             const staff = await this.staffRepository.txCreate(createStaffData.createTenantStaff, tx.tenantStaff);
-            data.documents.forEach((d) => {
+            await Promise.all((data.documents ?? []).map((d) => {
                 const createDocumentData = new TenantStaffDocument({ ...d, tenantStaffId: staff.id });
-                const document = this.documentRepository.txCreate(createDocumentData.createTenantStaffDocuments, tx.tenantStaffDocuments);
-            })
-            (data.licenses ?? []).forEach((d) => {
+                return this.documentRepository.txCreate(createDocumentData.createTenantStaffDocuments, tx.tenantStaffDocuments);
+            }));
+            await Promise.all((data.licenses ?? []).map((d) => {
                 const createLicenseData = new TenantStaffLicense({ ...d, tenantStaffId: staff.id });
-                const license = this.licenseRepository.txCreate(createLicenseData.createTenantStaffLicense, tx.tenantStaffLicenses);
-            })
+                return this.licenseRepository.txCreate(createLicenseData.createTenantStaffLicense, tx.tenantStaffLicenses);
+            }));
             const createPayrollData = new TenantStaffPayroll({ ...data.payroll, tenantStaffId: staff.id });
             const payroll = await this.payrollRepository.txCreate(createPayrollData.createTenantStaffPayroll, tx.tenantStaffPayroll);
 
