@@ -15,6 +15,24 @@ class RoleController {
         });
     }
 
+    updateRoleData = async (data) => {
+        const roleData = new Role(data);
+        const updatedRole = await this.service.updateRole(roleData.updateRole);
+
+        if (Array.isArray(data.moduleAccesses)) {
+            for (const access of data.moduleAccesses) {
+                await this.roleModuleAccessService.upsertRoleModuleAccess({
+                    id: access.id,
+                    roleId: updatedRole.id,
+                    module: access.module,
+                    permissions: access.permissions
+                });
+            }
+        }
+
+        return updatedRole;
+    };
+
     createAdminRole = expressAsyncHandler(async (req, res) => {
         const roleData = new Role(req.body);
         const role = await this.service.createAdminRole(roleData.adminCreateRole);
@@ -90,7 +108,15 @@ class RoleController {
     });
 
     createTenantRole = expressAsyncHandler(async (req, res) => {
-        console.log(req.body)
+        if (req.body.id) {
+            const updatedRole = await this.updateRoleData(req.body);
+            return res.status(200).json({
+                message: "Role and module accesses updated successfully",
+                status: "ok",
+                data: updatedRole
+            });
+        }
+
         const roleData = new Role(req.body);
         const role = await this.service.createTenantRole(roleData.tenantCreateRole);
 
@@ -106,7 +132,15 @@ class RoleController {
     });
 
     createRole = expressAsyncHandler(async (req, res) => {
-        console.log("Request body for creating role:", JSON.stringify(req.body));
+        if (req.body.id) {
+            const updatedRole = await this.updateRoleData(req.body);
+            return res.status(200).json({
+                message: "Role and module accesses updated successfully",
+                status: "ok",
+                data: updatedRole
+            });
+        }
+
         const roleData = new Role(req.body);
         const role = await this.service.createRole(roleData.createRole);
 
@@ -131,30 +165,10 @@ class RoleController {
 
     updateRole = expressAsyncHandler(async (req, res) => {
         const data = req.body;
-        const roleData = new Role(data);
-
-        const updatedRole = await this.service.updateRole(roleData.updateRole);
+        const updatedRole = await this.updateRoleData(data);
 
         if (!updatedRole) {
             return res.status(500).json({ message: "Failed to update role" });
-        }
-
-        if (Array.isArray(data.moduleAccesses) && data.moduleAccesses.length > 0) {
-            for (const access of data.moduleAccesses) {
-                if (access.id) {
-                    await this.roleModuleAccessService.updateRoleModuleAccess({
-                        id: access.id,
-                        permissions: access.permissions,
-                        module: access.module
-                    });
-                } else {
-                    await this.roleModuleAccessService.createRoleModuleAccess({
-                        roleId: updatedRole.id,
-                        module: access.module,
-                        permissions: access.permissions
-                    });
-                }
-            }
         }
 
         return res.status(200).json({
