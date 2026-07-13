@@ -4,10 +4,6 @@ import TenantStaffPayroll from '../domain/payroll.js';
 import TenantStaff from '../domain/staff.js';
 import MailService from '../../../utilities/nodemailer.js';
 import templateRenderer from '../../../utilities/templateRenderer.js';
-import ReferralCodeGenerator from '../../../utilities/generateCode.js';
-import argon2 from 'argon2';
-
-const passwordGenerator = new ReferralCodeGenerator(12);
 
 class TenantStaffService {
     constructor({ staffRepository, prisma, documentRepository, licenseRepository, payrollRepository }) {
@@ -35,9 +31,7 @@ class TenantStaffService {
             throw new Error("This email is already taken.");
         }
 
-        const generatedPass = passwordGenerator.generateStrongPassword();
-        const hashedPass = await argon2.hash(generatedPass);
-        const createStaffData = new TenantStaff({ ...data, password: hashedPass });
+        const createStaffData = new TenantStaff(data);
 
         const newStaff = await this.prisma.$transaction(async (tx) => {
             const staff = await this.staffRepository.txCreate(createStaffData.createTenantStaff, tx.tenantStaff);
@@ -71,7 +65,6 @@ class TenantStaffService {
         const html = templateRenderer.render('tenant-welcome-staff.html', {
             companyName: tenant.companyName,
             email: newStaff.staff.email,
-            password: generatedPass,
             staffId: newStaff.staff.id,
             clientUrl: templateRenderer.buildTenantClientUrl(tenant.subdomain),
             subdomain: tenant.subdomain
