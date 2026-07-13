@@ -318,6 +318,25 @@ class RoleRoutes {
         
         /**
          * @swagger
+         * /api/v1/role/deactivate/tenant/{id}:
+         *   patch:
+         *     summary: deactivate a role by ID
+         *     tags: [role]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *           description: ID of the role
+         *     responses:
+         *       200:
+         *         description: Role deactivated successfully
+         */
+        this.router.patch("/deactivate/tenant/:id", staffProtect(), this.controller.deactivateRole);
+
+        /**
+         * @swagger
          * /api/v1/role/deactivate/{id}:
          *   patch:
          *     summary: deactivate a role by ID
