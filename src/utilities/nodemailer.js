@@ -28,7 +28,10 @@ class MailService {
       }
       return { success: true, messageId: info.messageId };
     } catch (error) {
-      return "Failed to send email: " + error.message;
+      return {
+        success: false,
+        error: error.message,
+      };
     }
   }
 }
