@@ -502,7 +502,9 @@ class TenantService {
             throw new Error("Staff already exists.");
         }
 
-        const createData = new Tenant(data);
+        const generatedPass = this.generateCode.generateStrongPassword();
+        const hashedPass = await argon2.hash(generatedPass);
+        const createData = new Tenant({ ...data, password: hashedPass });
 
         const newStaff = await this.staffRepository.create(createData.createTenantStaff);
 
@@ -522,6 +524,7 @@ class TenantService {
         const html = await this.templateRenderer.render('tenant-welcome-staff.html', {
             companyName: tenant.companyName,
             email: newStaff.email,
+            password: generatedPass,
             staffId: newStaff.id,
             clientUrl: this.templateRenderer.buildTenantClientUrl(tenant.subdomain),
             subdomain: tenant.subdomain
