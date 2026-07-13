@@ -280,7 +280,7 @@ class RoleRoutes {
         
         /**
          * @swagger
-         * /api/v1/role/tenant{id}:
+         * /api/v1/role/tenant/{id}:
          *   get:
          *     summary: fetch a role by ID
          *     tags: [role]
