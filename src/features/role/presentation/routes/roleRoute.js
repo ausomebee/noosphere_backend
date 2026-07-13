@@ -332,6 +332,8 @@ class RoleRoutes {
          *     responses:
          *       200:
          *         description: Role deactivated successfully
+         *       403:
+         *         description: The default tenant Admin role cannot be deactivated
          */
         this.router.patch("/deactivate/tenant/:id", staffProtect(), this.controller.deactivateRole);
 
