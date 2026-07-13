@@ -110,7 +110,7 @@
         .login-button {
             display: inline-block;
             background-color: #004ABA;
-            color: white;
+            color: #FFFFFF !important;
             text-decoration: none;
             padding: 14px 32px;
             border-radius: 25px;
@@ -224,8 +224,7 @@
             </div>
             <h1 class="welcome-title">Welcome to Noosphere!</h1>
             <p class="welcome-text">
-                Your company account <span class="company-name">{{companyName}}</span> has been created on<br>
-                Noosphere, and you've been designated as the administrator.
+                Your staff account for <span class="company-name">{{companyName}}</span> has been created on Noosphere.
             </p>
             <p class="instruction-text">
                 Use the credentials below to log in and complete your setup:
@@ -234,13 +233,16 @@
                 <div class="credential-row">
                     <span class="credential-label">Email: {{email}}</span>
                 </div>
+                <div class="credential-row">
+                    <span class="credential-label">Temporary password: {{password}}</span>
+                </div>
             </div>
-            <a href="{{clientUrl}}/tenant/auth/staff/onboarding/{{email}}/{{staffId}}" class="login-button">Login to my account</a>
+            <a href="{{clientUrl}}/tenant/auth/staff/onboarding/{{email}}/{{staffId}}" class="login-button" style="color: #FFFFFF !important;">Login to my account</a>
             <div class="info-box">
                 <p class="info-title">Once you're in, you'll be prompted to:</p>
                 <ol class="info-list">
-                    <li class="info-item">Set a new password.</li>
-                    <li class="info-item">Configure 2-factor authentication for your and your organization.</li>
+                    <li class="info-item">Replace your temporary password with a new password.</li>
+                    <li class="info-item">Configure 2-factor authentication for your account.</li>
                 </ol>
             </div>
             <div class="footer">
