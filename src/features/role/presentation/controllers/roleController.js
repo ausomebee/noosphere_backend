@@ -61,7 +61,8 @@ class RoleController {
     deactivateRole = expressAsyncHandler(async (req, res) => {
         const role = await this.service.updateRole({
             id: req.params.id,
-            isActive: false
+            isActive: false,
+            actorTenantId: req.user?.tenantId
         });
 
         if (!role) {

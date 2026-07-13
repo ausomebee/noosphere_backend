@@ -5,6 +5,13 @@ class RoleService {
         this.repository = new RoleRepository()
     }
 
+    isProtectedTenantAdminRole(role) {
+        return role.name?.trim().toLowerCase() === "admin" &&
+            role.systemModule === "TENANT" &&
+            role.dataAccessLevel === "GLOBAL" &&
+            Boolean(role.createdByTenantId);
+    }
+
     async createAdminRole(data) {
         const roleExist = await this.repository.findFirst({
             where: {
@@ -46,6 +53,28 @@ class RoleService {
 
         if (!role) {
             throw new Error("Role not found.");
+        }
+
+        if (data.actorTenantId && role.createdByTenantId !== data.actorTenantId) {
+            throw new Error("Forbidden: You cannot modify a role belonging to another tenant.");
+        }
+
+        if (this.isProtectedTenantAdminRole(role)) {
+            if (data.isActive === false) {
+                throw new Error("Forbidden: The default tenant Admin role cannot be deactivated or deleted.");
+            }
+
+            if (data.name && data.name.trim().toLowerCase() !== "admin") {
+                throw new Error("Forbidden: The default tenant Admin role cannot be renamed.");
+            }
+
+            if (data.systemModule && data.systemModule !== "TENANT") {
+                throw new Error("Forbidden: The default tenant Admin role cannot change its system module.");
+            }
+
+            if (data.dataAccessLevel && data.dataAccessLevel !== "GLOBAL") {
+                throw new Error("Forbidden: The default tenant Admin role must retain global data access.");
+            }
         }
 
         const updatedRole = await this.repository.update(data.id, {
