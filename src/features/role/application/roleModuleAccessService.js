@@ -40,6 +40,31 @@ class RoleModuleAccessService {
         return update;
     }
 
+    async upsertRoleModuleAccess(data) {
+        let access = null;
+
+        if (data.id) {
+            access = await this.roleModuleAccessRepository.findOne({ id: data.id });
+        } else if (data.roleId && data.module) {
+            access = await this.roleModuleAccessRepository.findFirstDynamic({
+                where: { roleId: data.roleId, module: data.module }
+            });
+        }
+
+        if (access) {
+            return await this.roleModuleAccessRepository.update(access.id, {
+                module: data.module ?? access.module,
+                permissions: data.permissions ?? access.permissions
+            });
+        }
+
+        return await this.createRoleModuleAccess({
+            roleId: data.roleId,
+            module: data.module,
+            permissions: data.permissions
+        });
+    }
+
     async getSingleRoleModuleAccess(id) {
         const access = await this.roleModuleAccessRepository.findOne({ id });
 
