@@ -91,7 +91,7 @@ class TenantService {
                 filename: "Logowrap.png",
                 path: "Logowrap.png",
                 cid: "unique@image",
-                contentType: "Logowrap/png",
+                contentType: "image/png",
             }
         ];
 
@@ -285,7 +285,7 @@ class TenantService {
                 filename: "Logowrap.png",
                 path: "Logowrap.png",
                 cid: "unique@image",
-                contentType: "Logowrap/png",
+                contentType: "image/png",
             }
         ]
 
@@ -515,7 +515,7 @@ class TenantService {
                 filename: "Logowrap.png",
                 path: "Logowrap.png",
                 cid: "unique@image",
-                contentType: "Logowrap/png",
+                contentType: "image/png",
             }
         ]
 
@@ -527,10 +527,10 @@ class TenantService {
             subdomain: tenant.subdomain
         });
 
-        const sendMail = await MailService.sendMail(data.email, "Welcome to Noosphere", null, html, attachments)
+        const sendMail = await MailService.sendMail(newStaff.email, "Welcome to Noosphere", null, html, attachments)
 
         if (!sendMail.success) {
-            throw new Error("Failed to send mail");
+            throw new Error(`Failed to send staff welcome email: ${sendMail.error}`);
         }
 
         return newStaff;

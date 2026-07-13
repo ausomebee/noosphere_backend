@@ -2,6 +2,8 @@ import TenantStaffDocument from '../domain/document.js';
 import TenantStaffLicense from '../domain/license.js';
 import TenantStaffPayroll from '../domain/payroll.js';
 import TenantStaff from '../domain/staff.js';
+import MailService from '../../../utilities/nodemailer.js';
+import templateRenderer from '../../../utilities/templateRenderer.js';
 
 class TenantStaffService {
     constructor({ staffRepository, prisma, documentRepository, licenseRepository, payrollRepository }) {
@@ -13,6 +15,14 @@ class TenantStaffService {
     }
 
     async createTenantStaff(data) {
+        const tenant = await this.prisma.tenant.findUnique({
+            where: { id: data.tenantId }
+        });
+
+        if (!tenant) {
+            throw new Error("Tenant not found.");
+        }
+
         const staffExists = await this.staffRepository.findFirst({
             email: data.email,
         });
@@ -41,6 +51,35 @@ class TenantStaffService {
 
         if (!newStaff) {
             throw new Error("Failed to create candidate");
+        }
+
+        const attachments = [
+            {
+                filename: "Logowrap.png",
+                path: "Logowrap.png",
+                cid: "unique@image",
+                contentType: "image/png",
+            }
+        ];
+
+        const html = templateRenderer.render('tenant-welcome-staff.html', {
+            companyName: tenant.companyName,
+            email: newStaff.staff.email,
+            staffId: newStaff.staff.id,
+            clientUrl: templateRenderer.buildTenantClientUrl(tenant.subdomain),
+            subdomain: tenant.subdomain
+        });
+
+        const sendMail = await MailService.sendMail(
+            newStaff.staff.email,
+            "Welcome to Noosphere",
+            null,
+            html,
+            attachments
+        );
+
+        if (!sendMail.success) {
+            throw new Error(`Failed to send staff welcome email: ${sendMail.error}`);
         }
 
         return newStaff.staff;
