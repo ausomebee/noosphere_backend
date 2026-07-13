@@ -15,9 +15,6 @@ class RoleDto {
 
     static createRoleDto = (req, res, next) => {
         const schema = Joi.object({
-            id: Joi.string().uuid().optional().messages({
-                "string.guid": "Role ID must be a valid UUID",
-            }),
             name: Joi.string()
                 .trim()
                 .max(20)
@@ -45,7 +42,6 @@ class RoleDto {
             moduleAccesses: Joi.array()
                 .items(
                     Joi.object({
-                        id: Joi.string().uuid().optional().allow(null, ''),
                         module: Joi.string()
                             .required()
                             .messages({
@@ -93,12 +89,9 @@ class RoleDto {
             moduleAccesses: Joi.array()
                 .items(
                     Joi.object({
-                        id: Joi.string().uuid().empty('').allow(null).optional(),
-                        module: Joi.string().when('id', {
-                            is: Joi.string().uuid().required(),
-                            then: Joi.optional(),
-                            otherwise: Joi.required()
-                        })
+                        id: Joi.string().uuid().optional().allow(null, ''),
+                        module: Joi.string()
+                            .optional()
                             .messages({
                                 "string.empty": "Module is required"
                             }),

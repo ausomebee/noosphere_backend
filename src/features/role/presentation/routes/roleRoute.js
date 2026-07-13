@@ -280,6 +280,25 @@ class RoleRoutes {
         
         /**
          * @swagger
+         * /api/v1/role/tenant/{id}:
+         *   get:
+         *     summary: fetch a role by ID
+         *     tags: [role]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *           description: ID of the role
+         *     responses:
+         *       200:
+         *         description: Role fetched successfully
+         */
+        this.router.get("/tenant/:id", staffProtect(), this.controller.getRole);
+
+        /**
+         * @swagger
          * /api/v1/role/{id}:
          *   get:
          *     summary: fetch a role by ID
