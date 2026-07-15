@@ -573,22 +573,8 @@ class TenantService {
         const choiceExists = await this.choiceRepository.findFirst({ tenantId: data.tenantId });
 
         if (choiceExists) {
-            if (data.setForAll && choiceExists && choiceExists.Authenticator2FA !== data.Authenticator2FA && choiceExists.securityQuestion !== data.securityQuestion) {
-                const reset = this.staffRepository.updateAll(data.tenantId, {
-                    authType: data.Authenticator2FA ? "AUTHENTICATOR" : "SECRETMESSAGE",
-                    authQuestion: null,
-                    auth2FADone: false
-                })
-
-                if (!reset) {
-                    throw new Error("Failed to reset all");
-                }
-
-                const deleted = this.authRepository.deleteMany({ module: "TENANT" })
-
-                if (!deleted) {
-                    throw new Error("Failed to delete auth");
-                }
+            if (this.shouldResetTenantStaffChoices(choiceExists, data)) {
+                await this.resetTenantStaffChoices(data);
             }
 
             const update = await this.choiceRepository.update(choiceExists.id, {
@@ -612,6 +598,38 @@ class TenantService {
         }
 
         return newChoice;
+    }
+
+    shouldResetTenantStaffChoices(currentChoices, nextChoices) {
+        return nextChoices.setForAll && (
+            currentChoices.Authenticator2FA !== nextChoices.Authenticator2FA ||
+            currentChoices.securityQuestion !== nextChoices.securityQuestion
+        );
+    }
+
+    async resetTenantStaffChoices(data) {
+        const staffs = await this.staffRepository.findAll({ tenantId: data.tenantId });
+        const reset = await this.staffRepository.updateAll(data.tenantId, {
+            authType: data.Authenticator2FA ? "AUTHENTICATOR" : "SECRETMESSAGE",
+            authQuestion: null,
+            auth2FADone: false
+        });
+
+        if (!reset) {
+            throw new Error("Failed to reset all tenant staff choices");
+        }
+
+        const staffIds = staffs.map((staff) => staff.id);
+        if (staffIds.length > 0) {
+            const deleted = await this.authRepository.deleteMany({
+                module: "TENANT",
+                userId: { in: staffIds }
+            });
+
+            if (!deleted) {
+                throw new Error("Failed to delete tenant staff auth");
+            }
+        }
     }
 
     async getChoices(tenantId) {
@@ -824,6 +842,10 @@ class TenantService {
             }
 
             return created;
+        }
+
+        if (this.shouldResetTenantStaffChoices(tenantAdminChoices, data)) {
+            await this.resetTenantStaffChoices(data);
         }
 
         const update = await this.choiceRepository.update(

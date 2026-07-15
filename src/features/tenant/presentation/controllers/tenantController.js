@@ -51,7 +51,7 @@ class TenantController {
             itemRepository: this.itemRepository,
             generateCode: this.generateCode,
             choiceRepository: this.choiceRepository,
-            authRepository: this.prisma.authenticator,
+            authRepository: this.authRepository,
             tokenService: this.token
         });
         this.clientRepository = new ClientRepository(this.prisma.client);
