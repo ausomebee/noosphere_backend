@@ -108,6 +108,52 @@ class TeamsRoutes {
 
         /**
          * @swagger
+         * /api/v1/organization/teams/tenant:
+         *   post:
+         *     summary: Create a new team
+         *     tags: [organization]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/TeamsCreateDto'
+         *     responses:
+         *       201:
+         *         description: Team created successfully
+         */
+        this.router.post(
+            "/tenant",
+            staffProtect(),
+            TeamsDto.createTeamDto,
+            this.controller.createTeam
+        );
+
+        /**
+         * @swagger
+         * /api/v1/organization/teams/tenant:
+         *   put:
+         *     summary: Update a team
+         *     tags: [organization]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/TeamsUpdateDto'
+         *     responses:
+         *       200:
+         *         description: Team updated successfully
+         */
+        this.router.put(
+            "/tenant",
+            staffProtect(),
+            TeamsDto.updateTeamDto,
+            this.controller.updateTeam
+        );
+
+        /**
+         * @swagger
          * /api/v1/organization/teams/{id}:
          *   get:
          *     summary: Get a single team
