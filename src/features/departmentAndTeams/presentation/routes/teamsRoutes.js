@@ -108,25 +108,48 @@ class TeamsRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/teams/{id}:
-         *   get:
-         *     summary: Get a single team
+         * /api/v1/organization/teams/tenant:
+         *   post:
+         *     summary: Create a new team
          *     tags: [organization]
-         *     parameters:
-         *       - in: path
-         *         name: id
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Team ID
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/TeamsCreateDto'
+         *     responses:
+         *       201:
+         *         description: Team created successfully
+         */
+        this.router.post(
+            "/tenant",
+            staffProtect(),
+            TeamsDto.createTeamDto,
+            this.controller.createTeam
+        );
+
+        /**
+         * @swagger
+         * /api/v1/organization/teams/tenant:
+         *   put:
+         *     summary: Update a team
+         *     tags: [organization]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/TeamsUpdateDto'
          *     responses:
          *       200:
-         *         description: Team fetched successfully
+         *         description: Team updated successfully
          */
-        this.router.get(
-            "/:id",
-            adminProtect(),
-            this.controller.getSingleTeam
+        this.router.put(
+            "/tenant",
+            staffProtect(),
+            TeamsDto.updateTeamDto,
+            this.controller.updateTeam
         );
 
         /**
@@ -175,6 +198,29 @@ class TeamsRoutes {
             "/tenant",
             staffProtect(),
             this.controller.getTeams
+        );
+
+        /**
+         * @swagger
+         * /api/v1/organization/teams/{id}:
+         *   get:
+         *     summary: Get a single team
+         *     tags: [organization]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: Team ID
+         *     responses:
+         *       200:
+         *         description: Team fetched successfully
+         */
+        this.router.get(
+            "/:id",
+            adminProtect(),
+            this.controller.getSingleTeam
         );
 
         /**
