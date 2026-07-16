@@ -154,29 +154,6 @@ class TeamsRoutes {
 
         /**
          * @swagger
-         * /api/v1/organization/teams/{id}:
-         *   get:
-         *     summary: Get a single team
-         *     tags: [organization]
-         *     parameters:
-         *       - in: path
-         *         name: id
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Team ID
-         *     responses:
-         *       200:
-         *         description: Team fetched successfully
-         */
-        this.router.get(
-            "/:id",
-            adminProtect(),
-            this.controller.getSingleTeam
-        );
-
-        /**
-         * @swagger
          * /api/v1/organization/teams:
          *   get:
          *     summary: Get all teams (optionally filtered by query)
@@ -221,6 +198,29 @@ class TeamsRoutes {
             "/tenant",
             staffProtect(),
             this.controller.getTeams
+        );
+
+        /**
+         * @swagger
+         * /api/v1/organization/teams/{id}:
+         *   get:
+         *     summary: Get a single team
+         *     tags: [organization]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: Team ID
+         *     responses:
+         *       200:
+         *         description: Team fetched successfully
+         */
+        this.router.get(
+            "/:id",
+            adminProtect(),
+            this.controller.getSingleTeam
         );
 
         /**
