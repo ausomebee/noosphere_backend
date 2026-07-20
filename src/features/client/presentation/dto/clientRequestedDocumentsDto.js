@@ -6,7 +6,7 @@ class ClientRequestedDocumentsDto {
         const schema = Joi.object({
             tenantClientId: Joi.string().uuid().required(),
             name: Joi.string().min(2).max(150).required(),
-            description: Joi.string().min(2).max(300).required(),
+            description: Joi.string().min(2).max(300).optional(),
             allowMultiple: Joi.boolean().default(false),
             dueDate: Joi.date().required(),
             isDeleted: Joi.boolean().default(false)
