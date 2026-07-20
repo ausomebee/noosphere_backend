@@ -585,6 +585,29 @@ class ClientRoutes {
         */
         this.router.get("/clinician/:staffId/:tenantId", adminProtect(), this.controller.getClientsByClinician);
 
+         /**
+         * @swagger
+         * /api/v1/client/clinician/tenant/{staffId}/{tenantId}:
+         *   get:
+         *     summary: gets clients by clinician
+         *     tags: [Clients]
+         *     parameters:
+         *       - in: path
+         *         name: staffId
+         *         required: true
+         *         schema:
+         *           type: string
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+        *       200:
+        *         description: clients fetched successfully
+        */
+        this.router.get("/clinician/tenant/:staffId/:tenantId", staffProtect(), this.controller.getClientsByClinician);
+
         /**
          * @swagger
          * /api/v1/client/portal-access:
