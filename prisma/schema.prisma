@@ -519,7 +519,7 @@ model ClientRequestedDocuments {
   id             String                @id @default(uuid())
   tenantClientId String
   name           String
-  description    String
+  description    String?
   allowMultiple  Boolean
   status         DocumentRequestStatus @default(PENDING)
   dueDate        DateTime
