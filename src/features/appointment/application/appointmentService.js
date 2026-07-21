@@ -391,7 +391,9 @@ class AppointmentService {
             }
 
             const update = await this.appointmentRepository.update(obj.id, {
+                rescheduled: false,
                 rescheduleAccepted: true,
+                rescheduleRejected: false,
             });
 
             if (!update) {
@@ -411,8 +413,13 @@ class AppointmentService {
             }
 
             const update = await this.appointmentRepository.update(obj.id, {
+                rescheduled: false,
+                rescheduleAccepted: false,
                 rescheduleRejected: true,
-                isCanceled: true
+                isCanceled: false,
+                date: appointment.previousDate || appointment.date,
+                startTime: appointment.previousStartTime || appointment.startTime,
+                endTime: appointment.previousEndTime || appointment.endTime,
             });
 
             if (!update) {

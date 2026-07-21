@@ -76,6 +76,24 @@ class RoleController {
         });
     });
 
+    activateRole = expressAsyncHandler(async (req, res) => {
+        const role = await this.service.updateRole({
+            id: req.params.id,
+            isActive: true,
+            actorTenantId: req.user?.tenantId
+        });
+
+        if (!role) {
+            return res.status(500).json({ message: 'Failed to activate role' });
+        }
+
+        return res.status(200).json({
+            message: "Role activated successfully",
+            status: 'ok',
+            data: role
+        });
+    });
+
     getRolesByModule = expressAsyncHandler(async (req, res) => {
         const roles = await this.service.getRolesByModule(req.params.systemModule, req.params.tenantId);
 

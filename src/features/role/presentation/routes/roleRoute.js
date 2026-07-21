@@ -356,6 +356,46 @@ class RoleRoutes {
          */
         this.router.patch("/deactivate/:id", adminProtect(), this.controller.deactivateRole);
 
+        /**
+         * @swagger
+         * /api/v1/role/activate/tenant/{id}:
+         *   patch:
+         *     summary: activate a tenant role by ID
+         *     tags: [role]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *           description: ID of the role
+         *     responses:
+         *       200:
+         *         description: Role activated successfully
+         *       403:
+         *         description: The role belongs to another tenant
+         */
+        this.router.patch("/activate/tenant/:id", staffProtect(), this.controller.activateRole);
+
+        /**
+         * @swagger
+         * /api/v1/role/activate/{id}:
+         *   patch:
+         *     summary: activate a role by ID
+         *     tags: [role]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *           description: ID of the role
+         *     responses:
+         *       200:
+         *         description: Role activated successfully
+         */
+        this.router.patch("/activate/:id", adminProtect(), this.controller.activateRole);
+
          /**
          * @swagger
          * /api/v1/role/module/{systemModule}/{tenantId}:
