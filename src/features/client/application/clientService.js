@@ -217,8 +217,11 @@ class ClientService {
         return clients;
     }
 
-    async getTenantClients(tenantId) {
-        const clients = await this.clientTenantRepository.findAllAndPopulate({ tenantId }, { client: { include: { payer: true } }, clinicians: true });
+    async getTenantClients(tenantId, actor) {
+        const clients = await this.clientTenantRepository.findAllAndPopulate(
+            await this.buildClientAccessWhere({ tenantId }, actor),
+            { client: { include: { payer: true } }, clinicians: true }
+        );
         if (!clients) {
             throw new Error("clients not found")
         }
@@ -226,11 +229,9 @@ class ClientService {
         return clients;
     }
 
-    async getSingleClient(clientId) {
+    async getSingleClient(clientId, actor) {
         const client = await this.clientTenantRepository.findFirstDynamic({
-            where: {
-                clientId: clientId
-            },
+            where: await this.buildClientAccessWhere({ clientId }, actor),
             include: {
                 client: {
                     include: { payer: true }
@@ -244,6 +245,109 @@ class ClientService {
         }
 
         return client;
+    }
+
+    /**
+     * Produces the ClientTenant filter implied by the authenticated user's role.
+     * GLOBAL sees every record in the requested tenant; INDIVIDUAL sees their own
+     * assignments; TEAM additionally sees assignments belonging to their team.
+     */
+    async buildClientAccessWhere(baseWhere, actor) {
+        if (!actor) {
+            return { AND: [baseWhere, { id: { in: [] } }] };
+        }
+
+        if (actor.type === "CLIENT") {
+            return {
+                AND: [
+                    baseWhere,
+                    { clientId: actor.clientId },
+                    { tenantId: actor.tenantId },
+                ],
+            };
+        }
+
+        const level = actor.superAdmin ? "GLOBAL" : actor.role?.dataAccessLevel;
+        if (level === "GLOBAL") return baseWhere;
+
+        if (actor.type === "STAFF") {
+            const staffIds = await this.getAccessibleStaffIds(actor, level);
+            return {
+                AND: [
+                    baseWhere,
+                    { tenantId: actor.tenantId },
+                    {
+                        OR: [
+                            { createdBy: { in: staffIds } },
+                            { clinicians: { some: { id: { in: staffIds } } } },
+                        ],
+                    },
+                ],
+            };
+        }
+
+        if (actor.type === "ADMIN") {
+            const tenantIds = await this.getAccessibleTenantIds(actor, level);
+            return { AND: [baseWhere, { tenantId: { in: tenantIds } }] };
+        }
+
+        return { AND: [baseWhere, { id: { in: [] } }] };
+    }
+
+    async getAccessibleStaffIds(actor, level) {
+        if (level !== "TEAM") return [actor.id];
+
+        const teams = await this.prisma.teams.findMany({
+            where: {
+                tenantId: actor.tenantId,
+                isActive: true,
+                isDeleted: false,
+                OR: [
+                    { teamLeadId: actor.id },
+                    { teamMembers: { some: { staffId: actor.id } } },
+                ],
+            },
+            select: {
+                teamLeadId: true,
+                teamMembers: { select: { staffId: true } },
+            },
+        });
+
+        return [...new Set([actor.id, ...teams.flatMap((team) => [
+            team.teamLeadId,
+            ...team.teamMembers.map((member) => member.staffId),
+        ].filter(Boolean))])];
+    }
+
+    async getAccessibleTenantIds(actor, level) {
+        let adminIds = [actor.id];
+
+        if (level === "TEAM") {
+            const departments = await this.prisma.department.findMany({
+                where: {
+                    isActive: true,
+                    isDeleted: false,
+                    OR: [
+                        { teamLeadId: actor.id },
+                        { departmentMembers: { some: { adminId: actor.id } } },
+                    ],
+                },
+                select: {
+                    teamLeadId: true,
+                    departmentMembers: { select: { adminId: true } },
+                },
+            });
+            adminIds = [...new Set([actor.id, ...departments.flatMap((department) => [
+                department.teamLeadId,
+                ...department.departmentMembers.map((member) => member.adminId),
+            ])])];
+        }
+
+        const tenants = await this.prisma.tenant.findMany({
+            where: { assignToAdmin: { in: adminIds }, isDeleted: false },
+            select: { id: true },
+        });
+        return tenants.map((tenant) => tenant.id);
     }
 
     async updateTenantClient(data) {
