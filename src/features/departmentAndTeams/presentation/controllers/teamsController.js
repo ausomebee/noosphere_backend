@@ -102,7 +102,10 @@ class TeamsController {
             }
 
             for (const staffId of membersToRemove) {
-                await this.teamMembersService.removeTeamMember(staffId);
+                const membership = existingMembers.find(
+                    (member) => member.staffId === staffId
+                );
+                await this.teamMembersService.removeTeamMember(membership.id);
             }
         }
 
