@@ -109,8 +109,12 @@ class RoleController {
     });
 
     createTenantRole = expressAsyncHandler(async (req, res) => {
-        console.log(req.body)
-        const roleData = new Role(req.body);
+        const roleData = new Role({
+            ...req.body,
+            createdByTenantId: req.user.tenantId,
+            createdByAdminId: null,
+            systemModule: "TENANT",
+        });
         const role = await this.service.createTenantRole(roleData.tenantCreateRole);
 
         if (!role) {
@@ -125,8 +129,21 @@ class RoleController {
     });
 
     createRole = expressAsyncHandler(async (req, res) => {
-        console.log("Request body for creating role:", JSON.stringify(req.body));
-        const roleData = new Role(req.body);
+        const isTenantRole = req.user?.type === "STAFF";
+        const roleData = new Role({
+            ...req.body,
+            ...(isTenantRole
+                ? {
+                    createdByTenantId: req.user.tenantId,
+                    createdByAdminId: null,
+                    systemModule: "TENANT",
+                }
+                : {
+                    createdByAdminId: req.user.id,
+                    createdByTenantId: null,
+                    systemModule: "ADMIN",
+                }),
+        });
         const role = await this.service.createRole(roleData.createRole);
 
         if (!role) {
