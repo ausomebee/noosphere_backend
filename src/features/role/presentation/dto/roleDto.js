@@ -24,9 +24,11 @@ class RoleDto {
                     "string.max": "Name must not exceed 20 characters",
                 }),
             dataAccessLevel: Joi.string()
+                .valid("GLOBAL", "INDIVIDUAL", "TEAM")
                 .required()
                 .messages({
-                    "string.empty": "Data access level is required"
+                    "string.empty": "Data access level is required",
+                    "any.only": "Data access level must be GLOBAL, INDIVIDUAL, or TEAM"
                 }),
             systemModule: Joi.string()
                 .optional()
@@ -82,9 +84,11 @@ class RoleDto {
                     "string.max": "Name must not exceed 20 characters",
                 }),
             dataAccessLevel: Joi.string()
+                .valid("GLOBAL", "INDIVIDUAL", "TEAM")
                 .required()
                 .messages({
-                    "string.empty": "Data access level is required"
+                    "string.empty": "Data access level is required",
+                    "any.only": "Data access level must be GLOBAL, INDIVIDUAL, or TEAM"
                 }),
             moduleAccesses: Joi.array()
                 .items(
