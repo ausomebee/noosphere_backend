@@ -25,14 +25,16 @@ class TeamMembersService {
         return newRecord;
     }
 
-    async removeTeamMember(staffId) {
-        const record = await this.teamMembersRepository.findOne({ staffId });
+    async removeTeamMember(id) {
+        // `id` is the TeamMembers record ID. A staff member can belong to more
+        // than one team, so staffId cannot be used as a unique lookup key.
+        const record = await this.teamMembersRepository.findOne({ id });
 
         if (!record) {
             throw new Error("Team Member not found");
         }
 
-        return await this.teamMembersRepository.delete(record.id);
+        return await this.teamMembersRepository.delete(id);
     }
 
     async getTeamMembers(teamId) {
