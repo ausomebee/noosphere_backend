@@ -92,11 +92,26 @@ class TenantStaffService {
             throw new Error("staff not found");
         }
 
+        if (data.roleId && data.roleId !== staff.roleId) {
+            const role = await this.prisma.role.findFirst({
+                where: {
+                    id: data.roleId,
+                    createdByTenantId: staff.tenantId,
+                    isActive: true,
+                },
+                select: { id: true },
+            });
+
+            if (!role) {
+                throw new Error("Role not found or does not belong to this tenant.");
+            }
+        }
+
         const update = await this.staffRepository.update(data.id, {
             fullName: data.fullName || staff.fullName,
             email: data.email || staff.email,
             stage: data.stage || staff.stage,
-            roleId: data.roleId || staff.roleId,
+            roleId: data.roleId ?? staff.roleId,
             tenantId: data.tenantId || staff.tenantId,
             dob: data.dob || staff.dob,
             gender: data.gender || staff.gender,
@@ -197,7 +212,10 @@ class TenantStaffService {
             throw new Error("Failed to update staff");
         }
 
-        return update;
+        return await this.staffRepository.findFirstDynamic({
+            where: { id: update.id },
+            include: { role: true },
+        });
     }
 
     async getTenantStaffs(tenantId) {
