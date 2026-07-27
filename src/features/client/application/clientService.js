@@ -252,6 +252,17 @@ class ClientService {
      * GLOBAL sees every record in the requested tenant; INDIVIDUAL sees their own
      * assignments; TEAM additionally sees assignments belonging to their team.
      */
+    resolveDataAccessLevel(actor) {
+        if (!actor) return null;
+
+        if (actor.superAdmin) return "GLOBAL";
+
+        const roles = Array.isArray(actor.role) ? actor.role : [actor.role].filter(Boolean);
+        if (roles.some((role) => role?.dataAccessLevel === "GLOBAL")) return "GLOBAL";
+
+        return roles[0]?.dataAccessLevel ?? null;
+    }
+
     async buildClientAccessWhere(baseWhere, actor) {
         if (!actor) {
             return { AND: [baseWhere, { id: { in: [] } }] };
@@ -267,7 +278,7 @@ class ClientService {
             };
         }
 
-        const level = actor.superAdmin ? "GLOBAL" : actor.role?.dataAccessLevel;
+        const level = this.resolveDataAccessLevel(actor);
         if (level === "GLOBAL") return baseWhere;
 
         if (actor.type === "STAFF") {
