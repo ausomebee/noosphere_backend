@@ -309,14 +309,44 @@ class ClientService {
             },
             select: {
                 teamLeadId: true,
-                teamMembers: { select: { staffId: true } },
+                teamLead: {
+                    select: {
+                        role: {
+                            select: { dataAccessLevel: true },
+                        },
+                    },
+                },
+                teamMembers: {
+                    select: {
+                        staffId: true,
+                        staff: {
+                            select: {
+                                role: {
+                                    select: { dataAccessLevel: true },
+                                },
+                            },
+                        },
+                    },
+                },
             },
         });
 
-        return [...new Set([actor.id, ...teams.flatMap((team) => [
-            team.teamLeadId,
-            ...team.teamMembers.map((member) => member.staffId),
-        ].filter(Boolean))])];
+        const staffIds = [actor.id];
+
+        for (const team of teams) {
+            if (team.teamLeadId && team.teamLead?.role?.dataAccessLevel !== "GLOBAL") {
+                staffIds.push(team.teamLeadId);
+            }
+
+            for (const member of team.teamMembers || []) {
+                const accessLevel = member.staff?.role?.dataAccessLevel;
+                if (member.staffId && accessLevel !== "GLOBAL") {
+                    staffIds.push(member.staffId);
+                }
+            }
+        }
+
+        return [...new Set(staffIds)];
     }
 
     async getAccessibleTenantIds(actor, level) {
