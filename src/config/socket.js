@@ -112,7 +112,13 @@ class SocketService {
         if (!this.io) throw new Error("Socket.IO not initialized");
 
         const room = `${userType}_${userId}`;
+        const legacyStaffRoom = userType === "TENANT_STAFF" ? `STAFF_${userId}` : null;
+
         this.io.to(room).emit(event, payload);
+
+        if (legacyStaffRoom) {
+            this.io.to(legacyStaffRoom).emit(event, payload);
+        }
     }
 
     getIO() {
