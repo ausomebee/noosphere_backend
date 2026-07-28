@@ -6,6 +6,9 @@ import Appointment from "../../domain/appointment.js";
 import AppointmentServiceRepository from "../../infrastructure/appointmentServiceRepository.js";
 import AppointmentServiceService from "../../application/appointmentServiceService.js";
 import AppointmentServiceDomain from "../../domain/appointmentService.js";
+import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
+import NotificationService from "../../../notifications/application/notificationsService.js";
+import SocketService from "../../../../config/socket.js";
 
 class AppointmentController {
     constructor() {
@@ -14,6 +17,8 @@ class AppointmentController {
         this.service = new AppointmentService({ appointmentRepository: this.appointmentRepository });
         this.appointmentServiceRepository = new AppointmentServiceRepository(this.prisma.appointmentService, this.prisma);
         this.appointmentServiceService = new AppointmentServiceService({ appointmentServiceRepository: this.appointmentServiceRepository });
+        this.notificationRepository = new NotificationsRepository(this.prisma.notification);
+        this.notificationService = new NotificationService({ notificationRepository: this.notificationRepository });
     }
 
     createAppointment = expressAsyncHandler(async (req, res) => {
@@ -32,6 +37,42 @@ class AppointmentController {
             if (!newAs) {
                 return res.status(500).json({ message: "Failed to create appointment service" });
             }
+        }
+
+        try {
+            const notificationPayload = {
+                userId: data.clientId,
+                userType: "CLIENT",
+                type: "Appointment Created",
+                title: "Appointment Created",
+                content: `Your appointment has been created for ${data.date || "the selected date"}.`,
+                isRead: false,
+            };
+
+            const clientNotification = await this.notificationService.createNotification(notificationPayload);
+            SocketService.emitToUser(clientNotification.userId, clientNotification.userType, "newNotification", {
+                notification: clientNotification,
+            });
+
+            const clinicianIds = Array.isArray(data.clinicians) ? data.clinicians : [];
+            for (const clinicianId of clinicianIds) {
+                if (!clinicianId) continue;
+
+                const clinicianNotification = await this.notificationService.createNotification({
+                    userId: clinicianId,
+                    userType: "TENANT_STAFF",
+                    type: "Appointment Created",
+                    title: "Appointment Created",
+                    content: `A new appointment has been created for ${data.clientName || "the selected client"}.`,
+                    isRead: false,
+                });
+
+                SocketService.emitToUser(clinicianNotification.userId, clinicianNotification.userType, "newNotification", {
+                    notification: clinicianNotification,
+                });
+            }
+        } catch (notificationError) {
+            console.error("Appointment notification failed:", notificationError);
         }
 
         return res.status(201).json({
