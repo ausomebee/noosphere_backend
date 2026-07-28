@@ -3,8 +3,21 @@ class NotificationService {
         this.notificationRepository = notificationRepository;
     }
 
+    normalizeUserType(userType) {
+        if (userType === "STAFF") {
+            return "TENANT_STAFF";
+        }
+
+        return userType;
+    }
+
     async createNotification(data) {
-        const newNotification = await this.notificationRepository.create(data);
+        const normalizedData = {
+            ...data,
+            userType: this.normalizeUserType(data.userType)
+        };
+
+        const newNotification = await this.notificationRepository.create(normalizedData);
 
         if (!newNotification) {
             throw new Error("Failed to create notification.");
@@ -44,8 +57,10 @@ class NotificationService {
     }
 
     async getNotificationsByUser(userId, userType) {
+        const normalizedUserType = this.normalizeUserType(userType);
+
         const records = await this.notificationRepository.findAllAndPopulate(
-            { userId, userType },
+            { userId, userType: normalizedUserType },
             {}
         );
 
