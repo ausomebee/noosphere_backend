@@ -10,7 +10,7 @@ import NotificationsRepository from "../../../notifications/infrastructure/notif
 import NotificationService from "../../../notifications/application/notificationsService.js";
 import SocketService from "../../../../config/socket.js";
 
-class AppointmentController {
+export class AppointmentController {
     constructor() {
         this.prisma = prismaService.getClient();
         this.appointmentRepository = new AppointmentRepository(this.prisma.appointment, this.prisma);
@@ -19,6 +19,33 @@ class AppointmentController {
         this.appointmentServiceService = new AppointmentServiceService({ appointmentServiceRepository: this.appointmentServiceRepository });
         this.notificationRepository = new NotificationsRepository(this.prisma.notification);
         this.notificationService = new NotificationService({ notificationRepository: this.notificationRepository });
+    }
+
+    resolveClinicianIds(clinicians) {
+        if (!Array.isArray(clinicians)) {
+            return [];
+        }
+
+        return clinicians
+            .map((clinician) => {
+                if (!clinician) {
+                    return null;
+                }
+
+                if (typeof clinician === "string") {
+                    return clinician;
+                }
+
+                if (typeof clinician === "object") {
+                    if (typeof clinician.id === "string") return clinician.id;
+                    if (typeof clinician.userId === "string") return clinician.userId;
+                    if (typeof clinician.tenantStaffId === "string") return clinician.tenantStaffId;
+                    if (typeof clinician.clinicianId === "string") return clinician.clinicianId;
+                }
+
+                return null;
+            })
+            .filter(Boolean);
     }
 
     createAppointment = expressAsyncHandler(async (req, res) => {
@@ -54,7 +81,7 @@ class AppointmentController {
                 notification: clientNotification,
             });
 
-            const clinicianIds = Array.isArray(data.clinicians) ? data.clinicians : [];
+            const clinicianIds = this.resolveClinicianIds(data.clinicians);
             for (const clinicianId of clinicianIds) {
                 if (!clinicianId) continue;
 
