@@ -13,6 +13,7 @@ import templateRenderer from "../../../../utilities/templateRenderer.js";
 import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
 import NotificationService from "../../../notifications/application/notificationsService.js";
 import SocketService from "../../../../config/socket.js";
+import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
 
 class IssueController {
     constructor() {
@@ -26,6 +27,34 @@ class IssueController {
         this.adminRepository = new AdminRepository(this.prisma.admin);
         this.notificationRepository = new NotificationsRepository(this.prisma.notification);
         this.notificationService = new NotificationService({ notificationRepository: this.notificationRepository });
+    }
+
+    async getIssueAdminRecipients(includeAssignedAdminId = null) {
+        const admins = await this.prisma.admin.findMany({
+            where: {
+                active: true,
+                isDeleted: false,
+                OR: [
+                    { superAdmin: true },
+                    { roles: { roleModuleAccesses: { some: { module: "ISSUE_MANAGEMENT" } } } },
+                    ...(includeAssignedAdminId ? [{ id: includeAssignedAdminId }] : []),
+                ],
+            },
+            select: { id: true },
+        });
+        return admins.map((admin) => ({ userId: admin.id, userType: "ADMIN" }));
+    }
+
+    async notifyIssue({ recipients, type, title, content, issue, metadata = {} }) {
+        return this.notificationService.dispatch({
+            recipients,
+            type,
+            title,
+            content,
+            entityType: NotificationEntityType.ISSUE,
+            entityId: issue.id,
+            metadata: { tenantId: issue.tenantId, ...metadata },
+        }, SocketService.emitToUser.bind(SocketService));
     }
 
     createIssue = expressAsyncHandler(async (req, res) => {
@@ -46,19 +75,65 @@ class IssueController {
         }
 
         const submittedOn = new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+        const issueTenant = await this.prisma.tenant.findUnique({
+            where: { id: issue.tenantId },
+            select: { email: true, companyName: true },
+        });
+
+        await this.notifyIssue({
+            recipients: await this.getIssueAdminRecipients(issue.adminId),
+            type: NotificationType.ISSUE_SUBMITTED,
+            title: "Issue Submitted",
+            content: "A support request has been submitted. Click here to view details.",
+            issue,
+            metadata: { category: issue.category, priority: issue.priority, submittedOn },
+        });
+
+        if (issue.adminId) {
+            const tenantStaff = await this.prisma.tenantStaff.findMany({
+                where: { tenantId: issue.tenantId, isDeleted: false, active: true },
+                select: { id: true },
+            });
+            const assignedAdmin = await this.prisma.admin.findUnique({ where: { id: issue.adminId }, select: { firstName: true, lastName: true } });
+            const assigneeName = assignedAdmin ? `${assignedAdmin.firstName} ${assignedAdmin.lastName}` : "an admin";
+            await this.notifyIssue({
+                recipients: await this.getIssueAdminRecipients(issue.adminId),
+                type: NotificationType.ISSUE_ASSIGNED,
+                title: "Issue Assigned",
+                content: `A support request has been assigned to ${assigneeName}. Click here to view details.`,
+                issue,
+                metadata: { assignedAdminId: issue.adminId },
+            });
+            await this.notifyIssue({
+                recipients: [{ userId: issue.adminId, userType: "ADMIN" }],
+                type: NotificationType.ISSUE_ASSIGNED_ADMIN,
+                title: "Issue Assigned",
+                content: "A support request has been assigned to you. Please review.",
+                issue,
+                metadata: { assignedAdminId: issue.adminId },
+            });
+            await this.notifyIssue({
+                recipients: tenantStaff.map((staff) => ({ userId: staff.id, userType: "TENANT_STAFF" })),
+                type: NotificationType.ISSUE_ASSIGNED,
+                title: "Support Request Assigned",
+                content: `Your support request is now being handled by ${assigneeName}.`,
+                issue,
+                metadata: { assignedAdminId: issue.adminId },
+            });
+        }
 
         // Email to tenant
-        if (data.tenantEmail) {
+        if (data.tenantEmail || issueTenant?.email) {
             const tenantHtml = templateRenderer.render('issue-submitted-tenant', {
                 ticketId: data.ticketId || issue.id,
-                tenantName: data.tenantName || 'Valued Customer',
+                tenantName: data.tenantName || issueTenant?.companyName || 'Valued Customer',
                 subject: data.subject || 'N/A',
                 category: data.category || 'N/A',
                 priority: data.priority || 'N/A',
                 submittedOn,
             });
             await MailService.sendMail(
-                data.tenantEmail,
+                data.tenantEmail || issueTenant.email,
                 `Support Ticket Received – #${data.ticketId || issue.id}`,
                 `Your support request has been successfully submitted.`,
                 tenantHtml
@@ -279,6 +354,7 @@ class IssueController {
             attachments: [{ key: req.file.key, location: req.file.location }]
         } : req.body;
 
+        const previousIssue = await this.issueRepository.findOne({ id: data.id });
         const issue = await this.service.updateIssue(data);
         if (!issue) return res.status(500).json({ message: 'Failed to update issue' });
 
@@ -301,18 +377,18 @@ class IssueController {
 
             let notifType, notifTitle, adminContent, superAdminContent;
 
-            if (data.status) {
-                notifType = "Issue Status Updated";
-                notifTitle = "Issue Status Updated";
+            if (data.status === "RESOLVED" || data.status === "Resolved") {
+                notifType = NotificationType.ISSUE_RESOLVED;
+                notifTitle = "Issue Resolved";
                 adminContent = `Your support ticket #${issue.id} status has been changed to ${data.status}. Click here to view details.`;
                 superAdminContent = `Issue #${issue.id} status was updated to ${data.status}. Click here to view details.`;
 
-                if (data.status === "RESOLVED") {
+                if (data.status === "RESOLVED" || data.status === "Resolved") {
                     const resolvedOn = new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
 
                     const [tenant, assignedAdmin] = await Promise.all([
                         this.prisma.tenant.findUnique({ where: { id: issue.tenantId } }),
-                        issue.adminId ? this.adminRepository.findOne({ where: { id: issue.adminId } }) : null,
+                        issue.adminId ? this.adminRepository.findOne({ id: issue.adminId }) : null,
                     ]);
 
                     const resolvedVars = {
@@ -366,24 +442,30 @@ class IssueController {
                     }
                 }
 
+            } else if (data.status === "IN_PROGRESS" || data.status === "In Progress") {
+                notifType = NotificationType.ISSUE_IN_PROGRESS;
+                notifTitle = "Issue In Progress";
+                adminContent = `Support ticket #${issue.id} has been marked as in progress.`;
+                superAdminContent = `Support ticket #${issue.id} has been marked as in progress.`;
             } else if (data.priority) {
-                notifType = "Issue Priority Updated";
-                notifTitle = "Issue Priority Updated";
+                notifType = NotificationType.ISSUE_PRIORITY_CHANGED;
+                notifTitle = "Issue Priority Changed";
                 adminContent = `The priority of your support ticket #${issue.id} has been changed to ${data.priority}. Click here to view details.`;
                 superAdminContent = `Issue #${issue.id} priority was updated to ${data.priority}. Click here to view details.`;
             } else if (data.category) {
-                notifType = "Issue Category Updated";
-                notifTitle = "Issue Category Updated";
+                notifType = NotificationType.ISSUE_CATEGORY_CHANGED;
+                notifTitle = "Issue Category Changed";
                 adminContent = `Your support ticket #${issue.id} has been recategorised to ${data.category}. Click here to view details.`;
                 superAdminContent = `Issue #${issue.id} category was updated to ${data.category}. Click here to view details.`;
             } else if (data.adminId) {
-                notifType = "Issue Reassigned";
-                notifTitle = "Issue Reassigned";
+                const isReassignment = Boolean(previousIssue?.adminId && previousIssue.adminId !== data.adminId);
+                notifType = isReassignment ? NotificationType.ISSUE_REASSIGNED : NotificationType.ISSUE_ASSIGNED;
+                notifTitle = isReassignment ? "Issue Reassigned" : "Issue Assigned";
                 adminContent = `Support ticket #${issue.id} has been assigned to you. Click here to view details.`;
                 superAdminContent = `Issue #${issue.id} has been reassigned to a new admin. Click here to view details.`;
 
                 // Email to assigned admin
-                const assignedAdmin = await this.adminRepository.findOne({ where: { id: data.adminId } });
+                const assignedAdmin = await this.adminRepository.findOne({ id: data.adminId });
                 if (assignedAdmin?.email) {
                     const assignedHtml = templateRenderer.render('issue-assigned-admin', {
                         ticketId: issue.id,
@@ -417,6 +499,20 @@ class IssueController {
                         superAdminAssignHtml
                     );
                 }
+
+                const tenant = await this.prisma.tenant.findUnique({
+                    where: { id: issue.tenantId },
+                    select: { email: true, companyName: true },
+                });
+                if (tenant?.email) {
+                    const assigneeName = assignedAdmin ? `${assignedAdmin.firstName} ${assignedAdmin.lastName}` : "a support specialist";
+                    await MailService.sendMail(
+                        tenant.email,
+                        `Support Ticket Assigned – #${issue.id}`,
+                        `Your support request is now being handled by ${assigneeName}.`,
+                        `<p>Hello ${tenant.companyName},</p><p>Your support request is now being handled by ${assigneeName}.</p><p>Ticket ID: #${issue.id}<br>Subject: ${issue.title}</p><p>Best regards,<br>NooSphere Support Team</p>`
+                    );
+                }
             }
 
             if (notifType && notifTitle) {
@@ -429,6 +525,9 @@ class IssueController {
                         type: notifType,
                         title: notifTitle,
                         content: adminContent,
+                        entityType: NotificationEntityType.ISSUE,
+                        entityId: issue.id,
+                        metadata: { tenantId: issue.tenantId },
                         isRead: false
                     });
                 }
@@ -439,13 +538,53 @@ class IssueController {
                     type: notifType,
                     title: notifTitle,
                     content: superAdminContent,
+                    entityType: NotificationEntityType.ISSUE,
+                    entityId: issue.id,
+                    metadata: { tenantId: issue.tenantId },
                     isRead: false
                 });
 
                 if (adminNotif) {
-                    SocketService.emitToUser(adminNotif.userId, adminNotif.userType, notifType, adminNotif);
+                    SocketService.emitToUser(adminNotif.userId, adminNotif.userType, "newNotification", { notification: adminNotif });
                 }
-                SocketService.emitToUser(superAdminNotif.userId, superAdminNotif.userType, notifType, superAdminNotif);
+                SocketService.emitToUser(superAdminNotif.userId, superAdminNotif.userType, "newNotification", { notification: superAdminNotif });
+            }
+
+            if (data.adminId && issue.adminId) {
+                await this.notifyIssue({
+                    recipients: [{ userId: issue.adminId, userType: "ADMIN" }],
+                    type: NotificationType.ISSUE_ASSIGNED_ADMIN,
+                    title: "Issue Assigned",
+                    content: "A support request has been assigned to you. Please review.",
+                    issue,
+                    metadata: { assignedAdminId: issue.adminId },
+                });
+
+                if (previousIssue?.adminId && previousIssue.adminId !== issue.adminId) {
+                    await this.notifyIssue({
+                        recipients: [{ userId: previousIssue.adminId, userType: "ADMIN" }],
+                        type: NotificationType.ISSUE_REASSIGNED,
+                        title: "Issue Reassigned",
+                        content: `Support ticket #${issue.id} has been assigned to a new admin.`,
+                        issue,
+                        metadata: { previousAdminId: previousIssue.adminId, assignedAdminId: issue.adminId },
+                    });
+                }
+            }
+
+            if (data.status === "RESOLVED" || data.status === "Resolved") {
+                const tenantStaff = await this.prisma.tenantStaff.findMany({
+                    where: { tenantId: issue.tenantId, isDeleted: false, active: true },
+                    select: { id: true },
+                });
+                await this.notifyIssue({
+                    recipients: tenantStaff.map((staff) => ({ userId: staff.id, userType: "TENANT_STAFF" })),
+                    type: NotificationType.ISSUE_RESOLVED,
+                    title: "Issue Resolved",
+                    content: `Your support ticket #${issue.id} has been resolved.`,
+                    issue,
+                    metadata: { status: issue.status },
+                });
             }
         }
 

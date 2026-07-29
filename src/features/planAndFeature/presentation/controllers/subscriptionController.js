@@ -12,6 +12,7 @@ import SocketService from "../../../../config/socket.js";
 import MailService from "../../../../utilities/nodemailer.js";
 import TenantRepository from "../../../tenant/infrastructure/tenantRepository.js";
 import TenantService from "../../../tenant/application/tenantService.js";
+import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
 
 class SubscriptionController {
     constructor() {
@@ -59,29 +60,33 @@ class SubscriptionController {
             const isCancelled = req.body.status === "CANCELLED";
             const isPaused = req.body.status === "PAUSED";
             const isActive = req.body.status === "ACTIVE";
+            const isAutoRenewed = isActive && subscription.autoRenew === true;
 
-            if (isCancelled || isPaused) {
+            if (isCancelled || isPaused || isAutoRenewed) {
                 const superAdmin = await this.adminService.getSuperAdmin();
                 if (!superAdmin) {
                     throw new Error('Failed to fetch super admin.');
                 }
 
-                const notif = await this.notificationService.createNotification({
-                    userId: superAdmin.id,
-                    userType: "ADMIN",
-                    type: `Subscription ${subscription.status}`,
-                    title: `Subscription ${subscription.status}`,
-                    content: `
-                        A subscription has been ${subscription.status.toLowerCase()} on NooSphere. Click here to view details
-                    `,
-                    isRead: false
-                });
-
-                SocketService.emitToUser(notif.userId, notif.userType, `Subscription ${subscription.status}`, notif);
+                const type = isCancelled
+                    ? NotificationType.SUBSCRIPTION_CANCELLED
+                    : isPaused
+                        ? NotificationType.SUBSCRIPTION_PAUSED
+                        : NotificationType.SUBSCRIPTION_AUTO_RENEWED;
+                const action = isCancelled ? "cancelled" : isPaused ? "paused" : "renewed";
+                await this.notificationService.dispatch({
+                    recipients: [{ userId: superAdmin.id, userType: "ADMIN" }],
+                    type,
+                    title: `Subscription ${action.charAt(0).toUpperCase()}${action.slice(1)}`,
+                    content: `A subscription for tenant ${subscription.tenantId} has been ${action}. Click here to view details.`,
+                    entityType: NotificationEntityType.SUBSCRIPTION,
+                    entityId: subscription.id,
+                    metadata: { tenantId: subscription.tenantId, planId: subscription.planId, status: subscription.status },
+                }, SocketService.emitToUser.bind(SocketService));
             }
 
-            const shouldSendTenantEmail = isCancelled
-                || (req.body.mailNotification === true && (isPaused || isActive));
+            const shouldSendTenantEmail = isCancelled || isAutoRenewed
+                || (req.body.mailNotification === true && isPaused);
 
             if (!shouldSendTenantEmail) {
                 continue;

@@ -246,7 +246,7 @@ class AdminService {
 
     async getSuperAdmin(data) {
         const admin = await this.repository.findFirst({
-            superAdmin: true
+            where: { superAdmin: true, isDeleted: false, active: true }
         });
 
         if (!admin) {

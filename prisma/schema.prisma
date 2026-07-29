@@ -119,6 +119,16 @@ enum UserType {
   CLIENT
 }
 
+enum NotificationEntityType {
+  APPOINTMENT
+  ISSUE
+  SUBSCRIPTION
+  INVOICE
+  PAYMENT
+  TENANT
+  PLAN
+}
+
 model Admin {
   id                    String   @id @default(uuid())
   firstName             String   @default("jhc")
@@ -376,7 +386,7 @@ model Teams {
   updatedAt  DateTime @updatedAt
 
   tenant      Tenant        @relation("tenantTeam", fields: [tenantId], references: [id])
-  teamLead    TenantStaff?   @relation("TeamLead", fields: [teamLeadId], references: [id])
+  teamLead    TenantStaff?  @relation("TeamLead", fields: [teamLeadId], references: [id])
   teamMembers TeamMembers[]
 }
 
@@ -1682,14 +1692,19 @@ model Message {
 }
 
 model Notification {
-  id        String   @id @default(uuid())
-  userId    String
-  userType  UserType
-  type      String
-  title     String
-  content   String
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id         String                  @id @default(uuid())
+  userId     String
+  userType   UserType
+  type       String
+  title      String
+  content    String
+  entityType NotificationEntityType?
+  entityId   String?
+  metadata   Json?
+  isRead     Boolean                 @default(false)
+  createdAt  DateTime                @default(now())
+
+  @@index([entityType, entityId])
 }
 
 model ServerRequest {

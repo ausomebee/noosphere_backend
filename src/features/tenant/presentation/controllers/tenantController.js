@@ -26,6 +26,7 @@ import NotificationsRepository from "../../../notifications/infrastructure/notif
 import NotificationService from "../../../notifications/application/notificationsService.js";
 import SocketService from "../../../../config/socket.js";
 import templateRenderer from "../../../../utilities/templateRenderer.js";
+import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
 
 class TenantController {
     constructor() {
@@ -67,6 +68,21 @@ class TenantController {
         this.notificationService = new NotificationService({ notificationRepository: this.notificationRepository });
     }
 
+    async notifySuperAdmin(type, title, content, tenant, metadata = {}) {
+        const superAdmin = await this.adminService.getSuperAdmin();
+        if (!superAdmin) return [];
+
+        return this.notificationService.dispatch({
+            recipients: [{ userId: superAdmin.id, userType: "ADMIN" }],
+            type,
+            title,
+            content,
+            entityType: NotificationEntityType.TENANT,
+            entityId: tenant.id,
+            metadata: { tenantName: tenant.companyName, ...metadata },
+        }, SocketService.emitToUser.bind(SocketService));
+    }
+
     createCandidate = expressAsyncHandler(async (req, res) => {
         const tenant = await this.service.createCandidate(req.body);
 
@@ -75,6 +91,12 @@ class TenantController {
         }
 
         const superAdmin = await this.adminService.getSuperAdmin();
+        await this.notifySuperAdmin(
+            NotificationType.TENANT_CREATED,
+            "Tenant Created",
+            `A new tenant ${tenant.companyName} has been created on NooSphere. Click here to view details.`,
+            tenant
+        );
         if (superAdmin?.email) {
             const html = templateRenderer.render('tenant-created-superadmin', {
                 companyName: tenant.companyName || 'N/A',
@@ -462,6 +484,13 @@ class TenantController {
 
         if (req.body.active === false) {
             const superAdmin = await this.adminService.getSuperAdmin();
+            await this.notifySuperAdmin(
+                NotificationType.TENANT_DEACTIVATED,
+                "Tenant Deactivated",
+                `A tenant ${tenant.companyName} has been deactivated on NooSphere. Click here to view details.`,
+                tenant,
+                { reason: req.body.reason || null }
+            );
             if (superAdmin?.email) {
                 const html = templateRenderer.render('tenant-deactivated-superadmin', {
                     companyName: tenant.companyName || 'N/A',
