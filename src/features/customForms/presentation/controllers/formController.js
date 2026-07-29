@@ -6,6 +6,11 @@ import FormService from "../../application/formService.js";
 import FormFieldService from "../../application/formFieldService.js";
 import Form from "../../domain/form.js";
 import FormField from "../../domain/formFields.js";
+import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
+import NotificationService from "../../../notifications/application/notificationsService.js";
+import SocketService from "../../../../config/socket.js";
+import MailService from "../../../../utilities/nodemailer.js";
+import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
 
 class FormController {
     constructor() {
@@ -16,6 +21,7 @@ class FormController {
 
         this.formService = new FormService({ formRepository });
         this.formFieldService = new FormFieldService({ formFieldRepository });
+        this.notificationService = new NotificationService({ notificationRepository: new NotificationsRepository(this.prisma.notification) });
     }
 
     createForm = expressAsyncHandler(async (req, res) => {
@@ -34,6 +40,22 @@ class FormController {
 
             if (!formField) {
                 return res.status(500).json({ message: "Failed to create form field" });
+            }
+        }
+
+        if (form.tenantClientId) {
+            const clientTenant = await this.prisma.clientTenant.findUnique({ where: { id: form.tenantClientId }, include: { client: { select: { id: true, email: true } } } });
+            if (clientTenant) {
+                await this.notificationService.dispatch({
+                    recipients: [{ userId: clientTenant.client.id, userType: "CLIENT" }],
+                    type: NotificationType.FORM_CREATED,
+                    title: "Form Requested",
+                    content: "Your provider has requested information from you. Please complete this form.",
+                    entityType: NotificationEntityType.FORM,
+                    entityId: form.id,
+                    metadata: { tenantId: form.tenantId, tenantClientId: form.tenantClientId },
+                }, SocketService.emitToUser.bind(SocketService));
+                await MailService.sendMail(clientTenant.client.email, "Form Requested", "Your provider has requested information from you. Please complete this form.");
             }
         }
 

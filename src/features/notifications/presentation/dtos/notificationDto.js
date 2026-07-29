@@ -20,7 +20,7 @@ class NotificationDto {
                 .min(1)
                 .required(),
             entityType: Joi.string()
-                .valid("APPOINTMENT", "ISSUE", "SUBSCRIPTION", "INVOICE", "PAYMENT", "TENANT", "PLAN")
+                .valid("APPOINTMENT", "ISSUE", "SUBSCRIPTION", "INVOICE", "PAYMENT", "TENANT", "PLAN", "CLIENT", "DOCUMENT_REQUEST", "FORM", "AUTHORIZATION", "CLINICAL_REPORT", "LICENSE", "TIMESHEET", "PAYER", "PAYROLL")
                 .optional(),
             entityId: Joi.string()
                 .optional(),

@@ -10,6 +10,10 @@ import ClientFormRepository from "../../infrastructure/clientFormRepository.js";
 import ClientFormService from "../../application/clientFormService.js";
 import FormFieldsRepository from "../../infrastructure/formFieldsRepository.js";
 import FormFieldService from "../../application/formFieldService.js";
+import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
+import NotificationService from "../../../notifications/application/notificationsService.js";
+import SocketService from "../../../../config/socket.js";
+import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
 
 class FormResponseController {
     constructor() {
@@ -26,6 +30,7 @@ class FormResponseController {
 
         const formFieldRepository = new FormFieldsRepository(this.prisma.formFields);
         this.formFieldService = new FormFieldService({ formFieldRepository });
+        this.notificationService = new NotificationService({ notificationRepository: new NotificationsRepository(this.prisma.notification) });
     }
 
     createFormResponse = expressAsyncHandler(async (req, res) => {
@@ -48,6 +53,18 @@ class FormResponseController {
         }
 
         const clientForm = await this.clientFormService.updateClientForm({ formId: data.formId, tenantClientId: data.submittedBy, status: "FILLED" });
+        const clientTenant = data.submittedBy ? await this.prisma.clientTenant.findUnique({ where: { id: data.submittedBy }, include: { clinicians: { select: { id: true } } } }) : null;
+        if (clientTenant) {
+            await this.notificationService.dispatch({
+                recipients: clientTenant.clinicians.map((clinician) => ({ userId: clinician.id, userType: "TENANT_STAFF" })),
+                type: NotificationType.FORM_FILLED,
+                title: "Form Completed",
+                content: "A client has completed a form.",
+                entityType: NotificationEntityType.FORM,
+                entityId: data.formId,
+                metadata: { tenantId: response.tenantId, tenantClientId: data.submittedBy, formResponseId: response.id },
+            }, SocketService.emitToUser.bind(SocketService));
+        }
 
         return res.status(201).json({
             message: "Form response created successfully",
