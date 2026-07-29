@@ -19,6 +19,13 @@ class NotificationDto {
             content: Joi.string()
                 .min(1)
                 .required(),
+            entityType: Joi.string()
+                .valid("APPOINTMENT", "ISSUE", "SUBSCRIPTION", "INVOICE", "PAYMENT", "TENANT", "PLAN")
+                .optional(),
+            entityId: Joi.string()
+                .optional(),
+            metadata: Joi.object()
+                .optional(),
         });
 
         Validator.validateRequest(req, next, schema);

@@ -6,6 +6,10 @@ import AdminRepository from "../../../admin/infrastructure/adminRepository.js";
 import AdminService from "../../../admin/application/adminService.js";
 import MailService from "../../../../utilities/nodemailer.js";
 import templateRenderer from "../../../../utilities/templateRenderer.js";
+import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
+import NotificationService from "../../../notifications/application/notificationsService.js";
+import SocketService from "../../../../config/socket.js";
+import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
 
 class PlanController {
     constructor() {
@@ -14,6 +18,23 @@ class PlanController {
         this.adminRepository = new AdminRepository(this.prisma.admin);
         this.service = new PlanService({ planRepository: this.planRepository, adminRepository: this.adminRepository });
         this.adminService = new AdminService();
+        this.notificationRepository = new NotificationsRepository(this.prisma.notification);
+        this.notificationService = new NotificationService({ notificationRepository: this.notificationRepository });
+    }
+
+    async notifySuperAdmin(type, title, content, plan, metadata = {}) {
+        const superAdmin = await this.adminService.getSuperAdmin();
+        if (!superAdmin) return [];
+
+        return this.notificationService.dispatch({
+            recipients: [{ userId: superAdmin.id, userType: "ADMIN" }],
+            type,
+            title,
+            content,
+            entityType: NotificationEntityType.PLAN,
+            entityId: plan.id,
+            metadata: { planName: plan.name, ...metadata },
+        }, SocketService.emitToUser.bind(SocketService));
     }
 
     createBillingPlan = expressAsyncHandler(async (req, res) => {
@@ -24,6 +45,12 @@ class PlanController {
         }
 
         const superAdmin = await this.adminService.getSuperAdmin();
+        await this.notifySuperAdmin(
+            NotificationType.PLAN_CREATED,
+            "Plan Created",
+            "A plan has been created on NooSphere. Click here to view details.",
+            billingPlan
+        );
         if (superAdmin?.email) {
             const html = templateRenderer.render('plan-created-superadmin', {
                 planName: billingPlan.name || 'N/A',
@@ -52,6 +79,12 @@ class PlanController {
 
         if (req.body.active === false) {
             const superAdmin = await this.adminService.getSuperAdmin();
+            await this.notifySuperAdmin(
+                NotificationType.PLAN_DEACTIVATED,
+                "Plan Deactivated",
+                "A plan has been deactivated on NooSphere. Click here to view details.",
+                billingPlan
+            );
             if (superAdmin?.email) {
                 const html = templateRenderer.render('plan-deactivated-superadmin', {
                     planName: billingPlan.name || 'N/A',
@@ -149,6 +182,12 @@ class PlanController {
         }
 
         const superAdmin = await this.adminService.getSuperAdmin();
+        await this.notifySuperAdmin(
+            NotificationType.PLAN_DELETED,
+            "Plan Deleted",
+            "A plan has been deleted on NooSphere.",
+            billingPlan
+        );
         if (superAdmin?.email) {
             const html = templateRenderer.render('plan-deleted-superadmin', {});
             await MailService.sendMail(

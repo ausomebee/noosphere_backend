@@ -25,6 +25,7 @@ import templateRenderer from "../../../../utilities/templateRenderer.js";
 import SocketService from "../../../../config/socket.js";
 import ReferralCodeGenerator from "../../../../utilities/generateCode.js";
 import argon2 from "argon2";
+import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
 
 class BillingController {
     constructor() {
@@ -496,9 +497,18 @@ class BillingController {
                 data: {
                     userId: superAdmin.id,
                     userType: "ADMIN",
-                    type: "Payment Made for Plan",
+                    type: NotificationType.PAYMENT_MADE_FOR_PLAN,
                     title: "Payment Made for Plan",
                     content: notificationContent,
+                    entityType: NotificationEntityType.PAYMENT,
+                    entityId: String(payment.id),
+                    metadata: {
+                        tenantId: tenant.id,
+                        invoiceId: invoice.id,
+                        subscriptionId: subscription.id,
+                        planId: plan.id,
+                        transactionId: payment.transactionId || payment.transactionRef || String(payment.id),
+                    },
                     isRead: false,
                 },
             });
@@ -527,7 +537,21 @@ class BillingController {
 
         const { invoice, notif, payment, plan, tenant, welcomeEmail } = result;
 
-        SocketService.emitToUser(notif.userId, notif.userType, "Payment Made for Plan", notif);
+        SocketService.emitToUser(notif.userId, notif.userType, "newNotification", { notification: notif });
+
+        const tenantRecipients = await this.prisma.tenantStaff.findMany({
+            where: { tenantId: tenant.id, isDeleted: false, active: true },
+            select: { id: true },
+        });
+        await this.notificationService.dispatch({
+            recipients: tenantRecipients.map((staff) => ({ userId: staff.id, userType: "TENANT_STAFF" })),
+            type: NotificationType.PRODUCT_ACCESS,
+            title: "Product Access Activated",
+            content: `Your access to ${plan.name} is active.`,
+            entityType: NotificationEntityType.SUBSCRIPTION,
+            entityId: result.subscription.id,
+            metadata: { tenantId: tenant.id, planId: plan.id, paymentId: payment.id },
+        }, SocketService.emitToUser.bind(SocketService));
 
         const attachments = [
             {

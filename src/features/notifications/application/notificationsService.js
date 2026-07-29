@@ -26,6 +26,33 @@ class NotificationService {
         return newNotification;
     }
 
+    async dispatch({ recipients, type, title, content, entityType, entityId, metadata = null }, emit) {
+        const uniqueRecipients = [...new Map(
+            recipients
+                .filter((recipient) => recipient?.userId && recipient?.userType)
+                .map((recipient) => [`${recipient.userType}:${recipient.userId}`, recipient])
+        ).values()];
+
+        const notifications = await Promise.all(uniqueRecipients.map(async (recipient) => {
+            const notification = await this.createNotification({
+                userId: recipient.userId,
+                userType: recipient.userType,
+                type,
+                title,
+                content: typeof content === "function" ? content(recipient) : content,
+                entityType,
+                entityId: String(entityId),
+                metadata,
+                isRead: false,
+            });
+
+            emit?.(notification.userId, notification.userType, "newNotification", { notification });
+            return notification;
+        }));
+
+        return notifications;
+    }
+
     async updateNotification(data) {
         const record = await this.notificationRepository.findOne({ id: data.id });
 
