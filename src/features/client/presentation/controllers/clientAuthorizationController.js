@@ -6,6 +6,11 @@ import ClientAuthorizationServiceRepository from "../../infrastructure/clientAut
 import ClientAuthorizationServiceService from "../../application/clientAuthorizationServiceService.js";
 import ClientAuthorizationServiceDomain from "../../domain/clientAuthorizationService.js";
 import ClientAuthorization from "../../domain/clientAuthorization.js";
+import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
+import NotificationService from "../../../notifications/application/notificationsService.js";
+import SocketService from "../../../../config/socket.js";
+import MailService from "../../../../utilities/nodemailer.js";
+import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
 
 class ClientAuthorizationController {
     constructor() {
@@ -18,6 +23,7 @@ class ClientAuthorizationController {
         this.clientAuthorizationServiceService = new ClientAuthorizationServiceService({
             clientAuthorizationServiceRepository: this.clientAuthorizationServiceRepository
         });
+        this.notificationService = new NotificationService({ notificationRepository: new NotificationsRepository(this.prisma.notification) });
     }
 
     async createClientAuthorization(req, res) {
@@ -34,6 +40,23 @@ class ClientAuthorizationController {
                 if (!newSc) {
                     return res.status(500).json({ message: "Failed to create client authorization service" });
                 }
+            }
+
+            const clientTenant = await this.prisma.clientTenant.findUnique({
+                where: { id: auth.tenantClientId },
+                include: { client: { select: { id: true, email: true } }, clinicians: { select: { id: true } } },
+            });
+            if (clientTenant) {
+                await this.notificationService.dispatch({
+                    recipients: clientTenant.clinicians.map((clinician) => ({ userId: clinician.id, userType: "TENANT_STAFF" })),
+                    type: NotificationType.AUTHORIZATION_CREATION,
+                    title: "Authorization Created",
+                    content: "A new authorization has been created for a client.",
+                    entityType: NotificationEntityType.AUTHORIZATION,
+                    entityId: auth.id,
+                    metadata: { tenantId: clientTenant.tenantId, tenantClientId: auth.tenantClientId, endDate: auth.endDate },
+                }, SocketService.emitToUser.bind(SocketService));
+                await MailService.sendMail(clientTenant.client.email, "Authorization Created", "A new authorization has been created for your services.");
             }
 
             return res.status(201).json({

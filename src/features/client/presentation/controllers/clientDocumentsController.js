@@ -2,18 +2,40 @@ import prismaService from "../../../../config/prisma.js";
 import ClientDocumentsService from "../../application/clientDocumentsService.js";
 import ClientDocumentsRepository from "../../infrastructure/clientDocumentsRepository.js";
 import expressAsyncHandler from "express-async-handler";
+import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
+import NotificationService from "../../../notifications/application/notificationsService.js";
+import SocketService from "../../../../config/socket.js";
+import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
 
 class ClientDocumentsController {
     constructor() {
         this.prisma = prismaService.getClient();
         this.clientDocumentsRepository = new ClientDocumentsRepository(this.prisma.clientDocuments);
         this.clientDocumentsService = new ClientDocumentsService({ clientDocumentsRepository: this.clientDocumentsRepository });
+        this.notificationService = new NotificationService({ notificationRepository: new NotificationsRepository(this.prisma.notification) });
     }
 
     async createClientDocument(req, res) {
         try {
             const data = req.body;
             const doc = await this.clientDocumentsService.createClientDocument(data);
+            if (doc.requestId) {
+                const request = await this.prisma.clientRequestedDocuments.findUnique({
+                    where: { id: doc.requestId },
+                    include: { tenantClient: { include: { clinicians: { select: { id: true } } } } },
+                });
+                if (request) {
+                    await this.notificationService.dispatch({
+                        recipients: request.tenantClient.clinicians.map((clinician) => ({ userId: clinician.id, userType: "TENANT_STAFF" })),
+                        type: NotificationType.DOCUMENT_REQUEST_COMPLETED,
+                        title: "Document Request Completed",
+                        content: "A client has returned a requested document.",
+                        entityType: NotificationEntityType.DOCUMENT_REQUEST,
+                        entityId: request.id,
+                        metadata: { tenantId: request.tenantClient.tenantId, tenantClientId: request.tenantClientId, documentId: doc.id },
+                    }, SocketService.emitToUser.bind(SocketService));
+                }
+            }
 
             return res.status(201).json({
                 message: "Client document created successfully",

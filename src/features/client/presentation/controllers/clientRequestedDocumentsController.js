@@ -1,6 +1,11 @@
 import prismaService from "../../../../config/prisma.js";
 import ClientRequestedDocumentsService from "../../application/clientRequestedDocumentsService.js";
 import ClientRequestedDocumentsRepository from "../../infrastructure/clientRequestedDocumentsRepository.js";
+import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
+import NotificationService from "../../../notifications/application/notificationsService.js";
+import SocketService from "../../../../config/socket.js";
+import MailService from "../../../../utilities/nodemailer.js";
+import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
 
 class ClientRequestedDocumentsController {
     constructor() {
@@ -11,12 +16,29 @@ class ClientRequestedDocumentsController {
         this.clientRequestedDocumentsService = new ClientRequestedDocumentsService({
             clientRequestedDocumentsRepository: this.clientRequestedDocumentsRepository,
         });
+        this.notificationService = new NotificationService({ notificationRepository: new NotificationsRepository(this.prisma.notification) });
     }
 
     async createRequestedDocument(req, res) {
         try {
             const data = req.body;
             const request = await this.clientRequestedDocumentsService.createRequestedDocument(data);
+            const clientTenant = await this.prisma.clientTenant.findUnique({
+                where: { id: request.tenantClientId },
+                include: { client: { select: { id: true, email: true, firstName: true } } },
+            });
+            if (clientTenant) {
+                await this.notificationService.dispatch({
+                    recipients: [{ userId: clientTenant.client.id, userType: "CLIENT" }],
+                    type: NotificationType.DOCUMENT_REQUEST_CREATED,
+                    title: "Document Request",
+                    content: "Your provider has requested documents from you. Please respond.",
+                    entityType: NotificationEntityType.DOCUMENT_REQUEST,
+                    entityId: request.id,
+                    metadata: { tenantId: clientTenant.tenantId, tenantClientId: clientTenant.id, dueDate: request.dueDate },
+                }, SocketService.emitToUser.bind(SocketService));
+                await MailService.sendMail(clientTenant.client.email, "Document Request", "Your provider has requested documents from you. Please respond.");
+            }
 
             return res.status(201).json({
                 message: "Requested document created successfully",

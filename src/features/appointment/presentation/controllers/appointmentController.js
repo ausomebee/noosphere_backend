@@ -9,6 +9,7 @@ import AppointmentServiceDomain from "../../domain/appointmentService.js";
 import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
 import NotificationService from "../../../notifications/application/notificationsService.js";
 import SocketService from "../../../../config/socket.js";
+import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
 
 export class AppointmentController {
     constructor() {
@@ -19,6 +20,39 @@ export class AppointmentController {
         this.appointmentServiceService = new AppointmentServiceService({ appointmentServiceRepository: this.appointmentServiceRepository });
         this.notificationRepository = new NotificationsRepository(this.prisma.notification);
         this.notificationService = new NotificationService({ notificationRepository: this.notificationRepository });
+    }
+
+    async notifyAppointment({ appointment, type, title, staffContent, clientContent, metadata = {} }) {
+        const fullAppointment = await this.prisma.appointment.findUnique({
+            where: { id: appointment.id },
+            include: { clinicians: { select: { id: true } }, client: { select: { id: true } } },
+        });
+        if (!fullAppointment) return [];
+
+        const recipients = fullAppointment.clinicians.map((clinician) => ({ userId: clinician.id, userType: "TENANT_STAFF" }));
+        const notifications = await this.notificationService.dispatch({
+            recipients,
+            type,
+            title,
+            content: staffContent,
+            entityType: NotificationEntityType.APPOINTMENT,
+            entityId: appointment.id,
+            metadata: { tenantId: appointment.tenantId, clientId: appointment.clientId, ...metadata },
+        }, SocketService.emitToUser.bind(SocketService));
+
+        if (clientContent) {
+            await this.notificationService.dispatch({
+                recipients: [{ userId: fullAppointment.client.id, userType: "CLIENT" }],
+                type,
+                title,
+                content: clientContent,
+                entityType: NotificationEntityType.APPOINTMENT,
+                entityId: appointment.id,
+                metadata: { tenantId: appointment.tenantId, clientId: appointment.clientId, ...metadata },
+            }, SocketService.emitToUser.bind(SocketService));
+        }
+
+        return notifications;
     }
 
     resolveClinicianIds(clinicians) {
@@ -110,10 +144,34 @@ export class AppointmentController {
     });
 
     updateAppointment = expressAsyncHandler(async (req, res) => {
+        const previous = await this.prisma.appointment.findUnique({ where: { id: req.body.id } });
         const appointment = await this.service.updateAppointment(req.body);
 
         if (!appointment) {
             return res.status(500).json({ message: "Failed to update appointment" });
+        }
+
+        if (req.body.isCanceled === true && !previous?.isCanceled) {
+            await this.notifyAppointment({
+                appointment,
+                type: NotificationType.CANCELLED_APPOINTMENT,
+                title: "Appointment Cancelled",
+                staffContent: `Your appointment has been cancelled${appointment.reasonForCancel ? `: ${appointment.reasonForCancel}` : "."}`,
+                clientContent: "Your appointment has been cancelled.",
+                metadata: { reason: appointment.reasonForCancel || null },
+            });
+        } else if (req.body.rescheduled === true && !previous?.rescheduled) {
+            const clientRequested = Boolean(req.body.reasonForReschedule && !req.user?.type?.includes("TENANT"));
+            await this.notifyAppointment({
+                appointment,
+                type: clientRequested ? NotificationType.NEW_RESCHEDULE_REQUEST : NotificationType.RESCHEDULED_APPOINTMENT,
+                title: clientRequested ? "New Reschedule Request" : "Appointment Rescheduled",
+                staffContent: clientRequested
+                    ? "A client requested to reschedule an appointment."
+                    : "An appointment has been rescheduled.",
+                clientContent: clientRequested ? null : "Your appointment has been rescheduled.",
+                metadata: { previousDate: appointment.previousDate || null, reason: appointment.reasonForReschedule || null },
+            });
         }
 
         return res.status(201).json({
