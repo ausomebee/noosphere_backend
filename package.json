@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "server": "nodemon src/server.js",
+    "start:worker": "node src/cronWorker.js",
+    "worker": "nodemon src/cronWorker.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "npx prisma migrate deploy && npx prisma db seed"
   },

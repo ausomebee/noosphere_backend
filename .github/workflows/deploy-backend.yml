@@ -156,6 +156,7 @@ jobs:
             fi
 
             pm2 reload noosphere-backend || pm2 start src/server.js --name noosphere-backend
+            pm2 reload noosphere-worker || pm2 start src/cronWorker.js --name noosphere-worker
             pm2 save
 
             echo "✅ Deployment completed"
