@@ -3,6 +3,7 @@ import ClientRequestedDocumentsService from "../../application/clientRequestedDo
 import ClientRequestedDocumentsRepository from "../../infrastructure/clientRequestedDocumentsRepository.js";
 import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
 import NotificationService from "../../../notifications/application/notificationsService.js";
+import ClientNotificationEmitter from "../../application/clientNotificationEmitter.js";
 import SocketService from "../../../../config/socket.js";
 import MailService from "../../../../utilities/nodemailer.js";
 import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
@@ -17,6 +18,10 @@ class ClientRequestedDocumentsController {
             clientRequestedDocumentsRepository: this.clientRequestedDocumentsRepository,
         });
         this.notificationService = new NotificationService({ notificationRepository: new NotificationsRepository(this.prisma.notification) });
+        this.clientNotificationEmitter = new ClientNotificationEmitter({
+            prisma: this.prisma,
+            notificationService: this.notificationService,
+        });
     }
 
     async createRequestedDocument(req, res) {
@@ -28,6 +33,17 @@ class ClientRequestedDocumentsController {
                 include: { client: { select: { id: true, email: true, firstName: true } } },
             });
             if (clientTenant) {
+                await this.clientNotificationEmitter.emit({
+                    clientId: clientTenant.client.id,
+                    tenantId: clientTenant.tenantId,
+                    type: NotificationType.DOCUMENT_REQUESTED,
+                    title: "Document Requested",
+                    content: "Your provider has requested documents from you. Please respond.",
+                    entityType: NotificationEntityType.DOCUMENT_REQUEST,
+                    entityId: request.id,
+                    metadata: { dueDate: request.dueDate },
+                });
+
                 await this.notificationService.dispatch({
                     recipients: [{ userId: clientTenant.client.id, userType: "CLIENT" }],
                     type: NotificationType.DOCUMENT_REQUEST_CREATED,

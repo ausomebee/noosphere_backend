@@ -8,6 +8,7 @@ import AppointmentServiceService from "../../application/appointmentServiceServi
 import AppointmentServiceDomain from "../../domain/appointmentService.js";
 import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
 import NotificationService from "../../../notifications/application/notificationsService.js";
+import ClientNotificationEmitter from "../../../client/application/clientNotificationEmitter.js";
 import SocketService from "../../../../config/socket.js";
 import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
 
@@ -20,6 +21,10 @@ export class AppointmentController {
         this.appointmentServiceService = new AppointmentServiceService({ appointmentServiceRepository: this.appointmentServiceRepository });
         this.notificationRepository = new NotificationsRepository(this.prisma.notification);
         this.notificationService = new NotificationService({ notificationRepository: this.notificationRepository });
+        this.clientNotificationEmitter = new ClientNotificationEmitter({
+            prisma: this.prisma,
+            notificationService: this.notificationService,
+        });
     }
 
     async notifyAppointment({ appointment, type, title, staffContent, clientContent, metadata = {} }) {
@@ -41,15 +46,21 @@ export class AppointmentController {
         }, SocketService.emitToUser.bind(SocketService));
 
         if (clientContent) {
-            await this.notificationService.dispatch({
-                recipients: [{ userId: fullAppointment.client.id, userType: "CLIENT" }],
-                type,
+            const clientEventMap = {
+                [NotificationType.RESCHEDULED_APPOINTMENT]: NotificationType.APPOINTMENT_RESCHEDULED,
+                [NotificationType.CANCELLED_APPOINTMENT]: NotificationType.APPOINTMENT_CANCELLED,
+            };
+
+            await this.clientNotificationEmitter.emit({
+                clientId: appointment.clientId,
+                tenantId: appointment.tenantId,
+                type: clientEventMap[type] || type,
                 title,
                 content: clientContent,
                 entityType: NotificationEntityType.APPOINTMENT,
                 entityId: appointment.id,
-                metadata: { tenantId: appointment.tenantId, clientId: appointment.clientId, ...metadata },
-            }, SocketService.emitToUser.bind(SocketService));
+                metadata,
+            });
         }
 
         return notifications;
@@ -101,18 +112,19 @@ export class AppointmentController {
         }
 
         try {
-            const notificationPayload = {
-                userId: data.clientId,
-                userType: "CLIENT",
-                type: "Appointment Created",
-                title: "Appointment Created",
-                content: `Your appointment has been created for ${data.date || "the selected date"}.`,
-                isRead: false,
-            };
-
-            const clientNotification = await this.notificationService.createNotification(notificationPayload);
-            SocketService.emitToUser(clientNotification.userId, clientNotification.userType, "newNotification", {
-                notification: clientNotification,
+            await this.clientNotificationEmitter.emit({
+                clientId: data.clientId,
+                tenantId: data.tenantId,
+                type: NotificationType.APPOINTMENT_SCHEDULED,
+                title: "Appointment Scheduled",
+                content: `Your appointment has been scheduled for ${data.date || "the selected date"}.`,
+                entityType: NotificationEntityType.APPOINTMENT,
+                entityId: appointment.id,
+                metadata: {
+                    date: data.date || null,
+                    startTime: data.startTime || null,
+                    endTime: data.endTime || null,
+                },
             });
 
             const clinicianIds = this.resolveClinicianIds(data.clinicians);
