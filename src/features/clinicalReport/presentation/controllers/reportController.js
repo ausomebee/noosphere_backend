@@ -18,6 +18,10 @@ import ClinicalReportVersionService from "../../application/clinicalReportVersio
 import S3Service from "../../../../utilities/s3.js";
 import ClinicalReportVersion from "../../domain/clinicalReportVersion.js";
 import templateRenderer from "../../../../utilities/templateRenderer.js";
+import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
+import NotificationService from "../../../notifications/application/notificationsService.js";
+import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
+import ClientNotificationEmitter from "../../../client/application/clientNotificationEmitter.js";
 
 class ClinicalReportController {
     constructor() {
@@ -45,6 +49,14 @@ class ClinicalReportController {
 
         this.versionService = new ClinicalReportVersionService({
             repository: this.versionRepository
+        });
+
+        this.notificationService = new NotificationService({
+            notificationRepository: new NotificationsRepository(this.prisma.notification),
+        });
+        this.clientNotificationEmitter = new ClientNotificationEmitter({
+            prisma: this.prisma,
+            notificationService: this.notificationService,
         });
 
         this.token = TokenService;
@@ -599,6 +611,22 @@ class ClinicalReportController {
         return `${tenantClientUrl}/tenant/report/client-view/${token}`;
     }
 
+    async emitSignatureRequestedNotification(report, signatureLink) {
+        return this.clientNotificationEmitter.emit({
+            clientId: report.client.client.id,
+            tenantId: report.tenant.id,
+            type: NotificationType.SIGNATURE_REQUESTED,
+            title: "Signature Requested",
+            content: "A clinical report is ready for your review and signature.",
+            entityType: NotificationEntityType.CLINICAL_REPORT,
+            entityId: report.id,
+            metadata: {
+                reportTitle: report.title,
+                signatureLink,
+            },
+        });
+    }
+
     previewPdf = expressAsyncHandler(async (req, res) => {
         const { reportId } = req.params;
 
@@ -674,6 +702,7 @@ class ClinicalReportController {
         await this.historyService.createHistory(createHistory);
 
         const signatureLink = await this.buildSignatureLink(report);
+        await this.emitSignatureRequestedNotification(report, signatureLink);
 
         const html = templateRenderer.render('clinical-report-updated.html', {
             firstName: report.client.client.firstName,
@@ -704,6 +733,7 @@ class ClinicalReportController {
         const report = await this.reportService.getReportForExport(req.params.id);
 
         const signatureLink = await this.buildSignatureLink(report);
+        await this.emitSignatureRequestedNotification(report, signatureLink);
 
         const html = templateRenderer.render('clinical-report-reminder.html', {
             firstName: report.client.client.firstName,
@@ -743,6 +773,7 @@ class ClinicalReportController {
         await this.historyService.createHistory(createHistory);
 
         const signatureLink = await this.buildSignatureLink(report);
+        await this.emitSignatureRequestedNotification(report, signatureLink);
 
         const html = `
             <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
