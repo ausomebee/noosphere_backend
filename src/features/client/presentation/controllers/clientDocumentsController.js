@@ -24,12 +24,12 @@ class ClientDocumentsController {
                     where: { id: doc.requestId },
                     include: { tenantClient: { include: { clinicians: { select: { id: true } } } } },
                 });
-                if (request) {
+                if (request?.tenantClient?.clinicians?.length) {
                     await this.notificationService.dispatch({
                         recipients: request.tenantClient.clinicians.map((clinician) => ({ userId: clinician.id, userType: "TENANT_STAFF" })),
                         type: NotificationType.DOCUMENT_REQUEST_COMPLETED,
                         title: "Document Request Completed",
-                        content: "A client has returned a requested document.",
+                        content: "A client has completed a document request.",
                         entityType: NotificationEntityType.DOCUMENT_REQUEST,
                         entityId: request.id,
                         metadata: { tenantId: request.tenantClient.tenantId, tenantClientId: request.tenantClientId, documentId: doc.id },
