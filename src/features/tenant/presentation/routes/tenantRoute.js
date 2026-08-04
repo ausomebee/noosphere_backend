@@ -426,6 +426,27 @@ class TenantRoutes {
 
         /**
          * @swagger
+         * /api/v1/tenant/change-password/tenant:
+         *   patch:
+         *     summary: Update tenant staff password
+         *     description: Update the password of a staff.
+         *     tags: [Tenant]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/TenantUpdatePassword'
+         *     responses:
+         *       201:
+         *         description: Tenant staff password updated successfully
+         *       400:
+         *         description: Bad request
+         */
+        this.router.patch("/change-password/tenant", staffProtect(), TenantDto.updatePasswordDto, this.controller.updateStaffPassword);
+
+        /**
+         * @swagger
          * /api/v1/tenant/change-password:
          *   patch:
          *     summary: Update tenant staff password
