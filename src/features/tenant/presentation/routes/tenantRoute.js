@@ -745,6 +745,62 @@ class TenantRoutes {
         );
 
         /**
+         * @swagger
+         * /api/v1/tenant/staff/tenant/{staffId}/reset-2fa:
+         *   post:
+         *     summary: Reset a tenant staff's 2FA configuration
+         *     tags: [Tenant]
+         *     parameters:
+         *       - in: path
+         *         name: staffId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *     responses:
+         *       200:
+         *         description: Tenant staff 2FA reset successfully
+         *       400:
+         *         description: Validation error
+         *       404:
+         *         description: Staff not found
+         */
+        this.router.post(
+            "/staff/tenant/:staffId/reset-2fa",
+            staffProtect(),
+            TenantDto.resetTenantStaff2FADto,
+            this.controller.resetTenantStaff2FA
+        );
+
+        /**
+         * @swagger
+         * /api/v1/tenant/staff/{staffId}/reset-2fa:
+         *   post:
+         *     summary: Reset a tenant staff's 2FA configuration
+         *     tags: [Tenant]
+         *     parameters:
+         *       - in: path
+         *         name: staffId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *     responses:
+         *       200:
+         *         description: Tenant staff 2FA reset successfully
+         *       400:
+         *         description: Validation error
+         *       404:
+         *         description: Staff not found
+         */
+        this.router.post(
+            "/staff/:staffId/reset-2fa",
+            adminProtect(),
+            TenantDto.resetTenantStaff2FADto,
+            this.controller.resetTenantStaff2FA
+        );
+
+        /**
         * @swagger
         * /api/v1/tenant/getstaffbypaymentschedule/{tenantId}/{paymentSchedule}:
         *   get:

@@ -657,38 +657,6 @@ class ClinicalReportController {
         res.send(pdfBuffer);
     });
 
-    // submitSignature = expressAsyncHandler(async (req, res) => {
-    //     const section = await this.sectionService.updateSection(req.body)
-
-    //     const report = await this.reportService.getReportForExport(section.clinicalReportId); 
-
-    //     const updated = await this.reportService.updateReport({ id: report.id, status: "SIGNED" });
-
-    //     const pdfBuffer = await this.generateClinicalReportPdf({
-    //         report,
-    //         sections: report.clinicalReportSections
-    //     });
-
-    //     const sendMail = await emailService.sendTenantEmailWithAttachment({
-    //         tenantSlug: report.tenant.subdomain,
-    //         to: [report.client.client.email],
-    //         subject: "Clinical Report",
-    //         text: "Please find the attached clinical report.",
-    //         html: `<p>Please find the attached clinical report.</p> ${await this.token.generateClinicalReportToken(report.id, this.prisma)}`,
-    //         attachmentBuffer: pdfBuffer,
-    //         attachmentName: "clinical-report.pdf"
-    //     });
-
-    //     if (!sendMail.messageId) {
-    //         throw new Error("Failed to send mail");
-    //     }
-
-    //     return res.status(200).json({
-    //         status: "ok",
-    //         message: "Client nudged successfully"
-    //     });
-    // });
-
     resubmitForSignature = expressAsyncHandler(async (req, res) => {
         const report = await this.reportService.getReportForExport(req.params.id);
 
