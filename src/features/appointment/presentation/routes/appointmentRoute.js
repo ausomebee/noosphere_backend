@@ -747,6 +747,27 @@ class AppointmentRoutes {
 
         /**
         * @swagger
+        * /api/v1/appointments/client/rescheduled/client/tenant/{clientId}:
+        *   get:
+        *     summary: get client rescheduled appointments request
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: clientId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the client
+        *     responses:
+        *       200:
+        *         description: client appointments fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/client/rescheduled/client/tenant/:clientId", staffProtect(), this.controller.getClientRescheduledAppointments);
+
+        /**
+        * @swagger
         * /api/v1/appointments/client/rescheduled/client/{clientId}:
         *   get:
         *     summary: get client rescheduled appointments request
