@@ -655,6 +655,16 @@ class TenantController {
         });
     });
 
+    resetTenantStaff2FA = expressAsyncHandler(async (req, res) => {
+        const result = await this.service.resetTenantStaff2FA(req.params.staffId);
+
+        return res.status(200).json({
+            message: "Tenant staff 2FA reset successfully",
+            status: 'ok',
+            data: result,
+        });
+    });
+
     updateStaff = expressAsyncHandler(async (req, res) => {
         const updated = await this.service.updateStaff(req.body);
 

@@ -756,6 +756,34 @@ class TenantService {
         return true;
     }
 
+    async resetTenantStaff2FA(staffId) {
+        const staff = await this.staffRepository.findOne({ id: staffId });
+
+        if (!staff) {
+            throw new Error("Staff not found.");
+        }
+
+        const updated = await this.staffRepository.update(staffId, {
+            authType: null,
+            authQuestion: null,
+            auth2FADone: false,
+        });
+
+        if (!updated) {
+            throw new Error("Failed to reset tenant staff 2FA.");
+        }
+
+        const deletedAuth = await this.authRepository.deleteMany({
+            userId: staffId,
+            module: "TENANT",
+        });
+
+        return {
+            staff: updated,
+            deletedAuthRecords: deletedAuth?.count ?? 0,
+        };
+    }
+
     async updateStaff(data) {
         const staff = await this.staffRepository.findOne({ id: data.id })
 

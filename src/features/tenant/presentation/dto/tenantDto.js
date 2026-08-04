@@ -415,6 +415,17 @@ class TenantDto {
         Validator.validateRequest(req, next, schema);
     };
 
+    static resetTenantStaff2FADto = (req, res, next) => {
+        const schema = Joi.object({
+            staffId: Joi.string().uuid().required().messages({
+                "string.empty": "Staff ID is required",
+                "string.guid": "Staff ID must be a valid UUID",
+            }),
+        });
+
+        Validator.validateRequest(req, next, schema, req.params);
+    };
+
     static forgotPasswordDto = (req, res, next) => {
         const schema = Joi.object({
             email: Joi.string()
