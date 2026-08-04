@@ -763,7 +763,17 @@ class TenantService {
             throw new Error("Staff not found.");
         }
 
+        const tenant = await this.tenantRepository.findOne({ id: staff.tenantId });
+
+        if (!tenant) {
+            throw new Error("Tenant not found.");
+        }
+
+        const generatedPass = this.generateCode.generateStrongPassword();
+        const hashedPass = await argon2.hash(generatedPass);
+
         const updated = await this.staffRepository.update(staffId, {
+            password: hashedPass,
             authType: null,
             authQuestion: null,
             auth2FADone: false,
@@ -778,9 +788,40 @@ class TenantService {
             module: "TENANT",
         });
 
+        const attachments = [
+            {
+                filename: "Logowrap.png",
+                path: "Logowrap.png",
+                cid: "unique@image",
+                contentType: "image/png",
+            }
+        ];
+
+        const html = await this.templateRenderer.render('tenant-staff-reset.html', {
+            companyName: tenant.companyName,
+            email: updated.email,
+            password: generatedPass,
+            staffId: updated.id,
+            clientUrl: this.templateRenderer.buildTenantClientUrl(tenant.subdomain),
+            subdomain: tenant.subdomain
+        });
+
+        const sendMail = await MailService.sendMail(
+            updated.email,
+            "Your Noosphere account has been reset",
+            null,
+            html,
+            attachments
+        );
+
+        if (!sendMail.success) {
+            throw new Error(`Failed to send staff reset email: ${sendMail.error}`);
+        }
+
         return {
             staff: updated,
             deletedAuthRecords: deletedAuth?.count ?? 0,
+            emailSent: true,
         };
     }
 

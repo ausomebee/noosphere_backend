@@ -747,7 +747,7 @@ class TenantRoutes {
         /**
          * @swagger
          * /api/v1/tenant/staff/tenant/{staffId}/reset-2fa:
-         *   post:
+         *   patch:
          *     summary: Reset a tenant staff's 2FA configuration
          *     tags: [Tenant]
          *     parameters:
@@ -765,7 +765,7 @@ class TenantRoutes {
          *       404:
          *         description: Staff not found
          */
-        this.router.post(
+        this.router.patch(
             "/staff/tenant/:staffId/reset-2fa",
             staffProtect(),
             TenantDto.resetTenantStaff2FADto,
@@ -775,7 +775,7 @@ class TenantRoutes {
         /**
          * @swagger
          * /api/v1/tenant/staff/{staffId}/reset-2fa:
-         *   post:
+         *   patch:
          *     summary: Reset a tenant staff's 2FA configuration
          *     tags: [Tenant]
          *     parameters:
@@ -793,7 +793,7 @@ class TenantRoutes {
          *       404:
          *         description: Staff not found
          */
-        this.router.post(
+        this.router.patch(
             "/staff/:staffId/reset-2fa",
             adminProtect(),
             TenantDto.resetTenantStaff2FADto,
