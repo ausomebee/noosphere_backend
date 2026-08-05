@@ -187,29 +187,33 @@ export class AppointmentController {
                     notification: clinicianNotification,
                 });
 
-                const staffEmail = await this.prisma.tenantStaff.findUnique({
-                    where: { id: clinicianId },
-                    select: { email: true, firstName: true, lastName: true },
-                });
-
-                if (staffEmail?.email) {
-                    const staffRecipientName = [staffEmail.firstName, staffEmail.lastName].filter(Boolean).join(" ") || "there";
-                    const staffTemplate = templateRenderer.render("appointment-scheduled.html", {
-                        recipientName: staffRecipientName,
-                        clientName,
-                        companyName,
-                        subdomain: tenantSlug,
-                        appointmentDate,
-                        appointmentTime,
+                try {
+                    const staffEmail = await this.prisma.tenantStaff.findUnique({
+                        where: { id: clinicianId },
+                        select: { email: true, fullName: true },
                     });
 
-                    await emailService.sendTenantEmail({
-                        tenantSlug,
-                        to: [staffEmail.email],
-                        subject: "New Appointment Assigned",
-                        html: staffTemplate,
-                        text: `Hello ${staffRecipientName}, a new appointment has been created for ${clientName} on ${appointmentDate} at ${appointmentTime}.`,
-                    });
+                    if (staffEmail?.email) {
+                        const staffRecipientName = staffEmail.fullName || "there";
+                        const staffTemplate = templateRenderer.render("appointment-scheduled.html", {
+                            recipientName: staffRecipientName,
+                            clientName,
+                            companyName,
+                            subdomain: tenantSlug,
+                            appointmentDate,
+                            appointmentTime,
+                        });
+
+                        await emailService.sendTenantEmail({
+                            tenantSlug,
+                            to: [staffEmail.email],
+                            subject: "New Appointment Assigned",
+                            html: staffTemplate,
+                            text: `Hello ${staffRecipientName}, a new appointment has been created for ${clientName} on ${appointmentDate} at ${appointmentTime}.`,
+                        });
+                    }
+                } catch (staffEmailError) {
+                    console.error(`Failed to send appointment email to clinician ${clinicianId}:`, staffEmailError);
                 }
             }
         } catch (notificationError) {
