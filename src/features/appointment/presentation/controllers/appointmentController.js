@@ -10,6 +10,7 @@ import NotificationsRepository from "../../../notifications/infrastructure/notif
 import NotificationService from "../../../notifications/application/notificationsService.js";
 import ClientNotificationEmitter from "../../../client/application/clientNotificationEmitter.js";
 import SocketService from "../../../../config/socket.js";
+import MailService from "../../../../utilities/nodemailer.js";
 import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
 
 export class AppointmentController {
@@ -112,12 +113,26 @@ export class AppointmentController {
         }
 
         try {
+            const clientEmail = data.clientEmail || null;
+            const clientName = data.clientName || "the selected client";
+            const appointmentDate = data.date || "the selected date";
+            const appointmentTime = data.startTime || "the selected time";
+
+            if (clientEmail) {
+                await MailService.sendMail(
+                    clientEmail,
+                    "Appointment Scheduled",
+                    `Your appointment has been scheduled for ${appointmentDate} at ${appointmentTime}.`,
+                    `<p>Hello ${clientName},</p><p>Your appointment has been scheduled for <strong>${appointmentDate}</strong> at <strong>${appointmentTime}</strong>.</p><p>Thank you.</p>`
+                );
+            }
+
             await this.clientNotificationEmitter.emit({
                 clientId: data.clientId,
                 tenantId: data.tenantId,
                 type: NotificationType.APPOINTMENT_SCHEDULED,
                 title: "Appointment Scheduled",
-                content: `Your appointment has been scheduled for ${data.date || "the selected date"}.`,
+                content: `Your appointment has been scheduled for ${appointmentDate}.`,
                 entityType: NotificationEntityType.APPOINTMENT,
                 entityId: appointment.id,
                 metadata: {
@@ -134,15 +149,29 @@ export class AppointmentController {
                 const clinicianNotification = await this.notificationService.createNotification({
                     userId: clinicianId,
                     userType: "TENANT_STAFF",
-                    type: "Appointment Created",
+                    type: NotificationType.APPOINTMENT_SCHEDULED,
                     title: "Appointment Created",
-                    content: `A new appointment has been created for ${data.clientName || "the selected client"}.`,
+                    content: `A new appointment has been created for ${clientName}.`,
                     isRead: false,
                 });
 
                 SocketService.emitToUser(clinicianNotification.userId, clinicianNotification.userType, "newNotification", {
                     notification: clinicianNotification,
                 });
+
+                const staffEmail = await this.prisma.tenantStaff.findUnique({
+                    where: { id: clinicianId },
+                    select: { email: true },
+                });
+
+                if (staffEmail?.email) {
+                    await MailService.sendMail(
+                        staffEmail.email,
+                        "New Appointment Assigned",
+                        `A new appointment has been created for ${clientName} on ${appointmentDate} at ${appointmentTime}.`,
+                        `<p>Hello,</p><p>A new appointment has been created for <strong>${clientName}</strong> on <strong>${appointmentDate}</strong> at <strong>${appointmentTime}</strong>.</p><p>Thank you.</p>`
+                    );
+                }
             }
         } catch (notificationError) {
             console.error("Appointment notification failed:", notificationError);
