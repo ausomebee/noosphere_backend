@@ -95,6 +95,33 @@ export class AppointmentController {
             .filter(Boolean);
     }
 
+    async sendAppointmentEmail({ tenantSlug, to, subject, html, text }) {
+        if (!Array.isArray(to) || to.length === 0) {
+            return { delivered: false, reason: "No recipients" };
+        }
+
+        try {
+            await emailService.sendTenantEmail({
+                tenantSlug,
+                to,
+                subject,
+                html,
+                text,
+            });
+
+            return { delivered: true };
+        } catch (error) {
+            console.error("Appointment email processing failed:", {
+                error: error?.message || error,
+                subject,
+                to,
+                tenantSlug,
+            });
+
+            return { delivered: false, reason: error?.message || error };
+        }
+    }
+
     createAppointment = expressAsyncHandler(async (req, res) => {
         const data = req.body;
         const appointmentData = new Appointment(data);
@@ -169,8 +196,27 @@ export class AppointmentController {
             const persistedClientId = appointment.clientId || data.clientId || persistedClient?.id || null;
             const persistedTenantId = appointment.tenantId || data.tenantId || tenant?.id || null;
 
+            try {
+                await this.clientNotificationEmitter.emit({
+                    clientId: persistedClientId,
+                    tenantId: persistedTenantId,
+                    type: NotificationType.APPOINTMENT_SCHEDULED,
+                    title: "Appointment Scheduled",
+                    content: `Your appointment has been scheduled for ${appointmentDate}.`,
+                    entityType: NotificationEntityType.APPOINTMENT,
+                    entityId: appointment.id,
+                    metadata: {
+                        date: appointmentWithRelations?.date || data.date || null,
+                        startTime: appointmentWithRelations?.startTime || data.startTime || null,
+                        endTime: appointmentWithRelations?.endTime || data.endTime || null,
+                    },
+                });
+            } catch (clientNotificationError) {
+                console.error("Appointment client notification failed:", clientNotificationError);
+            }
+
             if (clientEmail) {
-                await emailService.sendTenantEmail({
+                await this.sendAppointmentEmail({
                     tenantSlug,
                     to: [clientEmail],
                     subject: "Appointment Scheduled",
@@ -179,65 +225,54 @@ export class AppointmentController {
                 });
             }
 
-            await this.clientNotificationEmitter.emit({
-                clientId: persistedClientId,
-                tenantId: persistedTenantId,
-                type: NotificationType.APPOINTMENT_SCHEDULED,
-                title: "Appointment Scheduled",
-                content: `Your appointment has been scheduled for ${appointmentDate}.`,
-                entityType: NotificationEntityType.APPOINTMENT,
-                entityId: appointment.id,
-                metadata: {
-                    date: appointmentWithRelations?.date || data.date || null,
-                    startTime: appointmentWithRelations?.startTime || data.startTime || null,
-                    endTime: appointmentWithRelations?.endTime || data.endTime || null,
-                },
-            });
-
             const clinicianIds = clinicians.map((clinician) => clinician.id).filter(Boolean);
             for (const clinicianId of clinicianIds) {
                 if (!clinicianId) continue;
 
-                const clinicianNotification = await this.notificationService.createNotification({
-                    userId: clinicianId,
-                    userType: "TENANT_STAFF",
-                    type: NotificationType.APPOINTMENT_SCHEDULED,
-                    title: "Appointment Created",
-                    content: `${clientName} has an appointment with you.`,
-                    isRead: false,
-                });
-
-                SocketService.emitToUser(clinicianNotification.userId, clinicianNotification.userType, "newNotification", {
-                    notification: clinicianNotification,
-                });
-
-                const staffEmail = await this.prisma.tenantStaff.findUnique({
-                    where: { id: clinicianId },
-                    select: { email: true, firstName: true, lastName: true, fullName: true },
-                });
-
-                if (staffEmail?.email) {
-                    const staffRecipientName = staffEmail.fullName || [staffEmail.firstName, staffEmail.lastName].filter(Boolean).join(" ") || "there";
-                    const staffTemplate = templateRenderer.render("appointment-scheduled.html", {
-                        recipientName: staffRecipientName,
-                        clientName,
-                        staffSummary: clientName,
-                        companyName,
-                        subdomain: tenantSlug,
-                        appointmentDate,
-                        appointmentTime,
-                        relationshipText: `${clientName} has an appointment with you.`,
-                        messageTitle: "New Appointment Assigned",
-                        recipientLabel: "Staff",
+                try {
+                    const clinicianNotification = await this.notificationService.createNotification({
+                        userId: clinicianId,
+                        userType: "TENANT_STAFF",
+                        type: NotificationType.APPOINTMENT_SCHEDULED,
+                        title: "Appointment Created",
+                        content: `${clientName} has an appointment with you.`,
+                        isRead: false,
                     });
 
-                    await emailService.sendTenantEmail({
-                        tenantSlug,
-                        to: [staffEmail.email],
-                        subject: "New Appointment Assigned",
-                        html: staffTemplate,
-                        text: `Hello ${staffRecipientName}, ${clientName} has an appointment with you on ${appointmentDate} at ${appointmentTime}.`,
+                    SocketService.emitToUser(clinicianNotification.userId, clinicianNotification.userType, "newNotification", {
+                        notification: clinicianNotification,
                     });
+
+                    const staffEmail = await this.prisma.tenantStaff.findUnique({
+                        where: { id: clinicianId },
+                        select: { email: true, firstName: true, lastName: true, fullName: true },
+                    });
+
+                    if (staffEmail?.email) {
+                        const staffRecipientName = staffEmail.fullName || [staffEmail.firstName, staffEmail.lastName].filter(Boolean).join(" ") || "there";
+                        const staffTemplate = templateRenderer.render("appointment-scheduled.html", {
+                            recipientName: staffRecipientName,
+                            clientName,
+                            staffSummary: clientName,
+                            companyName,
+                            subdomain: tenantSlug,
+                            appointmentDate,
+                            appointmentTime,
+                            relationshipText: `${clientName} has an appointment with you.`,
+                            messageTitle: "New Appointment Assigned",
+                            recipientLabel: "Staff",
+                        });
+
+                        await this.sendAppointmentEmail({
+                            tenantSlug,
+                            to: [staffEmail.email],
+                            subject: "New Appointment Assigned",
+                            html: staffTemplate,
+                            text: `Hello ${staffRecipientName}, ${clientName} has an appointment with you on ${appointmentDate} at ${appointmentTime}.`,
+                        });
+                    }
+                } catch (staffNotificationError) {
+                    console.error("Appointment staff notification/email processing failed:", staffNotificationError);
                 }
             }
         } catch (notificationError) {
