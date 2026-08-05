@@ -131,9 +131,13 @@ export class AppointmentController {
                 },
             });
 
-            const persistedClient = appointmentWithRelations?.client;
-            const tenant = appointmentWithRelations?.tenant;
-            const clinicians = appointmentWithRelations?.clinicians || [];
+            if (!appointmentWithRelations) {
+                throw new Error("Appointment not found after creation");
+            }
+
+            const persistedClient = appointmentWithRelations.client;
+            const tenant = appointmentWithRelations.tenant;
+            const clinicians = appointmentWithRelations.clinicians || [];
             const clientName = persistedClient
                 ? [persistedClient.firstName, persistedClient.lastName].filter(Boolean).join(" ") || persistedClient.preferredName || "the selected client"
                 : data.clientName || "the selected client";
@@ -187,7 +191,7 @@ export class AppointmentController {
                 },
             });
 
-            const clinicianIds = this.resolveClinicianIds(data.clinicians);
+            const clinicianIds = clinicians.map((clinician) => clinician.id).filter(Boolean);
             for (const clinicianId of clinicianIds) {
                 if (!clinicianId) continue;
 
