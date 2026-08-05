@@ -95,33 +95,6 @@ export class AppointmentController {
             .filter(Boolean);
     }
 
-    async sendAppointmentEmail({ tenantSlug, to, subject, html, text }) {
-        if (!Array.isArray(to) || to.length === 0) {
-            return { delivered: false, reason: "No recipients" };
-        }
-
-        try {
-            await emailService.sendTenantEmail({
-                tenantSlug,
-                to,
-                subject,
-                html,
-                text,
-            });
-
-            return { delivered: true };
-        } catch (error) {
-            console.error("Appointment email processing failed:", {
-                error: error?.message || error,
-                subject,
-                to,
-                tenantSlug,
-            });
-
-            return { delivered: false, reason: error?.message || error };
-        }
-    }
-
     createAppointment = expressAsyncHandler(async (req, res) => {
         const data = req.body;
         const appointmentData = new Appointment(data);
@@ -146,25 +119,11 @@ export class AppointmentController {
                 include: {
                     client: true,
                     tenant: true,
-                    clinicians: {
-                        select: {
-                            id: true,
-                            firstName: true,
-                            lastName: true,
-                            fullName: true,
-                            email: true,
-                        },
-                    },
                 },
             });
 
-            if (!appointmentWithRelations) {
-                throw new Error("Appointment not found after creation");
-            }
-
-            const persistedClient = appointmentWithRelations.client;
-            const tenant = appointmentWithRelations.tenant;
-            const clinicians = appointmentWithRelations.clinicians || [];
+            const persistedClient = appointmentWithRelations?.client;
+            const tenant = appointmentWithRelations?.tenant;
             const clientName = persistedClient
                 ? [persistedClient.firstName, persistedClient.lastName].filter(Boolean).join(" ") || persistedClient.preferredName || "the selected client"
                 : data.clientName || "the selected client";
@@ -176,47 +135,18 @@ export class AppointmentController {
                 .join(" - ") || "the selected time";
             const tenantSlug = tenant?.subdomain || "noosphere";
             const companyName = tenant?.companyName || "NooSphere";
-            const staffDisplayNames = clinicians
-                .map((clinician) => clinician.fullName || [clinician.firstName, clinician.lastName].filter(Boolean).join(" ")).filter(Boolean);
-            const staffSummary = staffDisplayNames.length > 0 ? staffDisplayNames.join(", ") : "the assigned staff";
 
             const clientTemplate = templateRenderer.render("appointment-scheduled.html", {
                 recipientName,
                 clientName,
-                staffSummary,
                 companyName,
                 subdomain: tenantSlug,
                 appointmentDate,
                 appointmentTime,
-                relationshipText: `You have an appointment with ${companyName}.`,
-                messageTitle: "Appointment Scheduled",
-                recipientLabel: "Client",
             });
 
-            const persistedClientId = appointment.clientId || data.clientId || persistedClient?.id || null;
-            const persistedTenantId = appointment.tenantId || data.tenantId || tenant?.id || null;
-
-            try {
-                await this.clientNotificationEmitter.emit({
-                    clientId: persistedClientId,
-                    tenantId: persistedTenantId,
-                    type: NotificationType.APPOINTMENT_SCHEDULED,
-                    title: "Appointment Scheduled",
-                    content: `Your appointment has been scheduled for ${appointmentDate}.`,
-                    entityType: NotificationEntityType.APPOINTMENT,
-                    entityId: appointment.id,
-                    metadata: {
-                        date: appointmentWithRelations?.date || data.date || null,
-                        startTime: appointmentWithRelations?.startTime || data.startTime || null,
-                        endTime: appointmentWithRelations?.endTime || data.endTime || null,
-                    },
-                });
-            } catch (clientNotificationError) {
-                console.error("Appointment client notification failed:", clientNotificationError);
-            }
-
             if (clientEmail) {
-                await this.sendAppointmentEmail({
+                await emailService.sendTenantEmail({
                     tenantSlug,
                     to: [clientEmail],
                     subject: "Appointment Scheduled",
@@ -225,54 +155,61 @@ export class AppointmentController {
                 });
             }
 
-            const clinicianIds = clinicians.map((clinician) => clinician.id).filter(Boolean);
+            await this.clientNotificationEmitter.emit({
+                clientId: data.clientId,
+                tenantId: data.tenantId,
+                type: NotificationType.APPOINTMENT_SCHEDULED,
+                title: "Appointment Scheduled",
+                content: `Your appointment has been scheduled for ${appointmentDate}.`,
+                entityType: NotificationEntityType.APPOINTMENT,
+                entityId: appointment.id,
+                metadata: {
+                    date: data.date || null,
+                    startTime: data.startTime || null,
+                    endTime: data.endTime || null,
+                },
+            });
+
+            const clinicianIds = this.resolveClinicianIds(data.clinicians);
             for (const clinicianId of clinicianIds) {
                 if (!clinicianId) continue;
 
-                try {
-                    const clinicianNotification = await this.notificationService.createNotification({
-                        userId: clinicianId,
-                        userType: "TENANT_STAFF",
-                        type: NotificationType.APPOINTMENT_SCHEDULED,
-                        title: "Appointment Created",
-                        content: `${clientName} has an appointment with you.`,
-                        isRead: false,
+                const clinicianNotification = await this.notificationService.createNotification({
+                    userId: clinicianId,
+                    userType: "TENANT_STAFF",
+                    type: NotificationType.APPOINTMENT_SCHEDULED,
+                    title: "Appointment Created",
+                    content: `A new appointment has been created for ${clientName}.`,
+                    isRead: false,
+                });
+
+                SocketService.emitToUser(clinicianNotification.userId, clinicianNotification.userType, "newNotification", {
+                    notification: clinicianNotification,
+                });
+
+                const staffEmail = await this.prisma.tenantStaff.findUnique({
+                    where: { id: clinicianId },
+                    select: { email: true, firstName: true, lastName: true },
+                });
+
+                if (staffEmail?.email) {
+                    const staffRecipientName = [staffEmail.firstName, staffEmail.lastName].filter(Boolean).join(" ") || "there";
+                    const staffTemplate = templateRenderer.render("appointment-scheduled.html", {
+                        recipientName: staffRecipientName,
+                        clientName,
+                        companyName,
+                        subdomain: tenantSlug,
+                        appointmentDate,
+                        appointmentTime,
                     });
 
-                    SocketService.emitToUser(clinicianNotification.userId, clinicianNotification.userType, "newNotification", {
-                        notification: clinicianNotification,
+                    await emailService.sendTenantEmail({
+                        tenantSlug,
+                        to: [staffEmail.email],
+                        subject: "New Appointment Assigned",
+                        html: staffTemplate,
+                        text: `Hello ${staffRecipientName}, a new appointment has been created for ${clientName} on ${appointmentDate} at ${appointmentTime}.`,
                     });
-
-                    const staffEmail = await this.prisma.tenantStaff.findUnique({
-                        where: { id: clinicianId },
-                        select: { email: true, firstName: true, lastName: true, fullName: true },
-                    });
-
-                    if (staffEmail?.email) {
-                        const staffRecipientName = staffEmail.fullName || [staffEmail.firstName, staffEmail.lastName].filter(Boolean).join(" ") || "there";
-                        const staffTemplate = templateRenderer.render("appointment-scheduled.html", {
-                            recipientName: staffRecipientName,
-                            clientName,
-                            staffSummary: clientName,
-                            companyName,
-                            subdomain: tenantSlug,
-                            appointmentDate,
-                            appointmentTime,
-                            relationshipText: `${clientName} has an appointment with you.`,
-                            messageTitle: "New Appointment Assigned",
-                            recipientLabel: "Staff",
-                        });
-
-                        await this.sendAppointmentEmail({
-                            tenantSlug,
-                            to: [staffEmail.email],
-                            subject: "New Appointment Assigned",
-                            html: staffTemplate,
-                            text: `Hello ${staffRecipientName}, ${clientName} has an appointment with you on ${appointmentDate} at ${appointmentTime}.`,
-                        });
-                    }
-                } catch (staffNotificationError) {
-                    console.error("Appointment staff notification/email processing failed:", staffNotificationError);
                 }
             }
         } catch (notificationError) {
