@@ -10,7 +10,8 @@ import NotificationsRepository from "../../../notifications/infrastructure/notif
 import NotificationService from "../../../notifications/application/notificationsService.js";
 import ClientNotificationEmitter from "../../../client/application/clientNotificationEmitter.js";
 import SocketService from "../../../../config/socket.js";
-import MailService from "../../../../utilities/nodemailer.js";
+import emailService from "../../../../utilities/ses.js";
+import templateRenderer from "../../../../utilities/templateRenderer.js";
 import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
 
 export class AppointmentController {
@@ -113,18 +114,45 @@ export class AppointmentController {
         }
 
         try {
-            const clientEmail = data.clientEmail || null;
-            const clientName = data.clientName || "the selected client";
-            const appointmentDate = data.date || "the selected date";
-            const appointmentTime = data.startTime || "the selected time";
+            const appointmentWithRelations = await this.prisma.appointment.findUnique({
+                where: { id: appointment.id },
+                include: {
+                    client: true,
+                    tenant: true,
+                },
+            });
+
+            const persistedClient = appointmentWithRelations?.client;
+            const tenant = appointmentWithRelations?.tenant;
+            const clientName = persistedClient
+                ? [persistedClient.firstName, persistedClient.lastName].filter(Boolean).join(" ") || persistedClient.preferredName || "the selected client"
+                : data.clientName || "the selected client";
+            const clientEmail = persistedClient?.email || data.clientEmail || null;
+            const recipientName = persistedClient?.preferredName || persistedClient?.firstName || clientName;
+            const appointmentDate = appointmentWithRelations?.date || data.date || "the selected date";
+            const appointmentTime = [appointmentWithRelations?.startTime || data.startTime, appointmentWithRelations?.endTime || data.endTime]
+                .filter(Boolean)
+                .join(" - ") || "the selected time";
+            const tenantSlug = tenant?.subdomain || "noosphere";
+            const companyName = tenant?.companyName || "NooSphere";
+
+            const clientTemplate = templateRenderer.render("appointment-scheduled.html", {
+                recipientName,
+                clientName,
+                companyName,
+                subdomain: tenantSlug,
+                appointmentDate,
+                appointmentTime,
+            });
 
             if (clientEmail) {
-                await MailService.sendMail(
-                    clientEmail,
-                    "Appointment Scheduled",
-                    `Your appointment has been scheduled for ${appointmentDate} at ${appointmentTime}.`,
-                    `<p>Hello ${clientName},</p><p>Your appointment has been scheduled for <strong>${appointmentDate}</strong> at <strong>${appointmentTime}</strong>.</p><p>Thank you.</p>`
-                );
+                await emailService.sendTenantEmail({
+                    tenantSlug,
+                    to: [clientEmail],
+                    subject: "Appointment Scheduled",
+                    html: clientTemplate,
+                    text: `Hello ${recipientName}, your appointment has been scheduled for ${appointmentDate} at ${appointmentTime}.`,
+                });
             }
 
             await this.clientNotificationEmitter.emit({
@@ -161,16 +189,27 @@ export class AppointmentController {
 
                 const staffEmail = await this.prisma.tenantStaff.findUnique({
                     where: { id: clinicianId },
-                    select: { email: true },
+                    select: { email: true, firstName: true, lastName: true },
                 });
 
                 if (staffEmail?.email) {
-                    await MailService.sendMail(
-                        staffEmail.email,
-                        "New Appointment Assigned",
-                        `A new appointment has been created for ${clientName} on ${appointmentDate} at ${appointmentTime}.`,
-                        `<p>Hello,</p><p>A new appointment has been created for <strong>${clientName}</strong> on <strong>${appointmentDate}</strong> at <strong>${appointmentTime}</strong>.</p><p>Thank you.</p>`
-                    );
+                    const staffRecipientName = [staffEmail.firstName, staffEmail.lastName].filter(Boolean).join(" ") || "there";
+                    const staffTemplate = templateRenderer.render("appointment-scheduled.html", {
+                        recipientName: staffRecipientName,
+                        clientName,
+                        companyName,
+                        subdomain: tenantSlug,
+                        appointmentDate,
+                        appointmentTime,
+                    });
+
+                    await emailService.sendTenantEmail({
+                        tenantSlug,
+                        to: [staffEmail.email],
+                        subject: "New Appointment Assigned",
+                        html: staffTemplate,
+                        text: `Hello ${staffRecipientName}, a new appointment has been created for ${clientName} on ${appointmentDate} at ${appointmentTime}.`,
+                    });
                 }
             }
         } catch (notificationError) {
