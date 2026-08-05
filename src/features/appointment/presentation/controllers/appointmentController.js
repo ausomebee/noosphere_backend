@@ -119,11 +119,21 @@ export class AppointmentController {
                 include: {
                     client: true,
                     tenant: true,
+                    clinicians: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            fullName: true,
+                            email: true,
+                        },
+                    },
                 },
             });
 
             const persistedClient = appointmentWithRelations?.client;
             const tenant = appointmentWithRelations?.tenant;
+            const clinicians = appointmentWithRelations?.clinicians || [];
             const clientName = persistedClient
                 ? [persistedClient.firstName, persistedClient.lastName].filter(Boolean).join(" ") || persistedClient.preferredName || "the selected client"
                 : data.clientName || "the selected client";
@@ -135,14 +145,21 @@ export class AppointmentController {
                 .join(" - ") || "the selected time";
             const tenantSlug = tenant?.subdomain || "noosphere";
             const companyName = tenant?.companyName || "NooSphere";
+            const staffDisplayNames = clinicians
+                .map((clinician) => clinician.fullName || [clinician.firstName, clinician.lastName].filter(Boolean).join(" ")).filter(Boolean);
+            const staffSummary = staffDisplayNames.length > 0 ? staffDisplayNames.join(", ") : "the assigned staff";
 
             const clientTemplate = templateRenderer.render("appointment-scheduled.html", {
                 recipientName,
                 clientName,
+                staffSummary,
                 companyName,
                 subdomain: tenantSlug,
                 appointmentDate,
                 appointmentTime,
+                relationshipText: `You have an appointment with ${companyName}.`,
+                messageTitle: "Appointment Scheduled",
+                recipientLabel: "Client",
             });
 
             if (clientEmail) {
@@ -179,7 +196,7 @@ export class AppointmentController {
                     userType: "TENANT_STAFF",
                     type: NotificationType.APPOINTMENT_SCHEDULED,
                     title: "Appointment Created",
-                    content: `A new appointment has been created for ${clientName}.`,
+                    content: `${clientName} has an appointment with you.`,
                     isRead: false,
                 });
 
@@ -189,18 +206,22 @@ export class AppointmentController {
 
                 const staffEmail = await this.prisma.tenantStaff.findUnique({
                     where: { id: clinicianId },
-                    select: { email: true, firstName: true, lastName: true },
+                    select: { email: true, firstName: true, lastName: true, fullName: true },
                 });
 
                 if (staffEmail?.email) {
-                    const staffRecipientName = [staffEmail.firstName, staffEmail.lastName].filter(Boolean).join(" ") || "there";
+                    const staffRecipientName = staffEmail.fullName || [staffEmail.firstName, staffEmail.lastName].filter(Boolean).join(" ") || "there";
                     const staffTemplate = templateRenderer.render("appointment-scheduled.html", {
                         recipientName: staffRecipientName,
                         clientName,
+                        staffSummary: clientName,
                         companyName,
                         subdomain: tenantSlug,
                         appointmentDate,
                         appointmentTime,
+                        relationshipText: `${clientName} has an appointment with you.`,
+                        messageTitle: "New Appointment Assigned",
+                        recipientLabel: "Staff",
                     });
 
                     await emailService.sendTenantEmail({
@@ -208,7 +229,7 @@ export class AppointmentController {
                         to: [staffEmail.email],
                         subject: "New Appointment Assigned",
                         html: staffTemplate,
-                        text: `Hello ${staffRecipientName}, a new appointment has been created for ${clientName} on ${appointmentDate} at ${appointmentTime}.`,
+                        text: `Hello ${staffRecipientName}, ${clientName} has an appointment with you on ${appointmentDate} at ${appointmentTime}.`,
                     });
                 }
             }
