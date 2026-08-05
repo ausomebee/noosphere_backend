@@ -42,12 +42,9 @@ class Appointment {
     }
 
     get createAppointment() {
-        return {
+        const payload = {
             clientId: this.clientId,
             sessionId: this.sessionId,
-            clinicians: {
-                connect: this.clinicians
-            },
             date: this.date,
             isRecurring: this.isRecurring,
             startTime: this.startTime,
@@ -61,6 +58,35 @@ class Appointment {
             tenantId: this.tenantId,
             rescheduled: this.rescheduled
         };
+
+        const connectedClinicians = Array.isArray(this.clinicians)
+            ? this.clinicians
+                .map((clinician) => {
+                    if (!clinician) return null;
+
+                    if (typeof clinician === "string") {
+                        return { id: clinician };
+                    }
+
+                    if (typeof clinician === "object") {
+                        if (typeof clinician.id === "string") return { id: clinician.id };
+                        if (typeof clinician.userId === "string") return { id: clinician.userId };
+                        if (typeof clinician.tenantStaffId === "string") return { id: clinician.tenantStaffId };
+                        if (typeof clinician.clinicianId === "string") return { id: clinician.clinicianId };
+                    }
+
+                    return null;
+                })
+                .filter(Boolean)
+            : [];
+
+        if (connectedClinicians.length > 0) {
+            payload.clinicians = {
+                connect: connectedClinicians
+            };
+        }
+
+        return payload;
     }
 }
 

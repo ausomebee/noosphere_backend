@@ -166,6 +166,9 @@ export class AppointmentController {
                 recipientLabel: "Client",
             });
 
+            const persistedClientId = appointment.clientId || data.clientId || persistedClient?.id || null;
+            const persistedTenantId = appointment.tenantId || data.tenantId || tenant?.id || null;
+
             if (clientEmail) {
                 await emailService.sendTenantEmail({
                     tenantSlug,
@@ -177,17 +180,17 @@ export class AppointmentController {
             }
 
             await this.clientNotificationEmitter.emit({
-                clientId: data.clientId,
-                tenantId: data.tenantId,
+                clientId: persistedClientId,
+                tenantId: persistedTenantId,
                 type: NotificationType.APPOINTMENT_SCHEDULED,
                 title: "Appointment Scheduled",
                 content: `Your appointment has been scheduled for ${appointmentDate}.`,
                 entityType: NotificationEntityType.APPOINTMENT,
                 entityId: appointment.id,
                 metadata: {
-                    date: data.date || null,
-                    startTime: data.startTime || null,
-                    endTime: data.endTime || null,
+                    date: appointmentWithRelations?.date || data.date || null,
+                    startTime: appointmentWithRelations?.startTime || data.startTime || null,
+                    endTime: appointmentWithRelations?.endTime || data.endTime || null,
                 },
             });
 
