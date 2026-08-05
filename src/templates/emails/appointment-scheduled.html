@@ -3,24 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Appointment Scheduled</title>
+    <title>{{messageTitle}}</title>
   </head>
-  <body style="margin:0;padding:0;background-color:#f5f5f5;font-family:Arial,sans-serif;color:#1f2937;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f5f5f5;padding:24px 0;">
+  <body style="margin:0;padding:0;background-color:#f3f4f6;font-family:Arial,Helvetica,sans-serif;color:#111827;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f4f6;padding:24px 0;">
       <tr>
         <td align="center">
-          <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:8px;overflow:hidden;">
+          <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(17,24,39,0.08);">
             <tr>
-              <td style="background:linear-gradient(90deg,#8B5CF6 0%,#EC4899 50%,#EF4444 100%);padding:24px;text-align:center;color:#ffffff;font-size:24px;font-weight:bold;">
-                Appointment Scheduled
+              <td style="background:linear-gradient(90deg,#8B5CF6 0%,#EC4899 50%,#EF4444 100%);padding:28px 32px;text-align:left;">
+                <div style="font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:rgba(255,255,255,0.85);margin-bottom:8px;">NooSphere</div>
+                <div style="font-size:24px;font-weight:700;color:#ffffff;">{{messageTitle}}</div>
               </td>
             </tr>
             <tr>
-              <td style="padding:32px 40px;">
-                <p style="margin:0 0 12px 0;font-size:16px;line-height:1.6;">Hello {{recipientName}},</p>
-                <p style="margin:0 0 12px 0;font-size:16px;line-height:1.6;">Your appointment with {{clientName}} has been scheduled for <strong>{{appointmentDate}}</strong> at <strong>{{appointmentTime}}</strong>.</p>
-                <p style="margin:0 0 12px 0;font-size:16px;line-height:1.6;">Thank you for choosing {{companyName}}.</p>
-                <p style="margin:0;font-size:14px;line-height:1.6;color:#6b7280;">If you need help, please contact us at <a href="mailto:{{subdomain}}.noospherehub.net" style="color:#2563eb;text-decoration:none;">{{subdomain}}.noospherehub.net</a>.</p>
+              <td style="padding:32px 40px 24px 40px;">
+                <p style="margin:0 0 12px 0;font-size:16px;line-height:1.7;color:#374151;">Hello {{recipientName}},</p>
+                <p style="margin:0 0 12px 0;font-size:16px;line-height:1.7;color:#374151;">{{relationshipText}}</p>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;margin:16px 0;">
+                  <tr>
+                    <td style="padding:20px 24px;">
+                      <div style="font-size:13px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#6b7280;margin-bottom:8px;">Appointment Details</div>
+                      <div style="font-size:15px;line-height:1.6;color:#111827;">
+                        <strong>With:</strong> {{staffSummary}}<br/>
+                        <strong>Date:</strong> {{appointmentDate}}<br/>
+                        <strong>Time:</strong> {{appointmentTime}}
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+                <p style="margin:0 0 16px 0;font-size:15px;line-height:1.7;color:#374151;">Thank you for choosing {{companyName}}.</p>
+                <p style="margin:0;font-size:14px;line-height:1.7;color:#6b7280;">If you need help, please contact us at <a href="mailto:{{subdomain}}.noospherehub.net" style="color:#2563eb;text-decoration:none;">{{subdomain}}.noospherehub.net</a>.</p>
               </td>
             </tr>
           </table>
