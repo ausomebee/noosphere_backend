@@ -213,7 +213,7 @@ export class AppointmentController {
                 }
             }
         } catch (notificationError) {
-            console.error("Appointment notification failed:", notificationError);
+            console.error("Appointment notification/email processing failed:", notificationError);
         }
 
         return res.status(201).json({
