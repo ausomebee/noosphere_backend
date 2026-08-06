@@ -68,6 +68,48 @@ export class AppointmentController {
         return notifications;
     }
 
+    formatAppointmentDate(rawDate) {
+        if (!rawDate) return "the selected date";
+
+        const parsed = new Date(rawDate);
+        if (Number.isNaN(parsed.getTime())) return rawDate;
+
+        return parsed.toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        });
+    }
+
+    formatAppointmentTime(startTime, endTime) {
+        const formatOne = (time) => {
+            if (!time) return null;
+
+            const match = String(time).match(/^(\d{1,2}):(\d{2})/);
+            if (!match) return time;
+
+            let hours = parseInt(match[1], 10);
+            const minutes = match[2];
+            const period = hours >= 12 ? "PM" : "AM";
+            hours = hours % 12 || 12;
+
+            return `${hours}:${minutes} ${period}`;
+        };
+
+        return [formatOne(startTime), formatOne(endTime)].filter(Boolean).join(" - ") || "the selected time";
+    }
+
+    formatClinicianNames(clinicians) {
+        const names = Array.isArray(clinicians) ? clinicians.map((c) => c?.fullName).filter(Boolean) : [];
+
+        if (names.length === 0) return "your clinician";
+        if (names.length === 1) return names[0];
+        if (names.length === 2) return names.join(" and ");
+
+        return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
+    }
+
     resolveClinicianIds(clinicians) {
         if (!Array.isArray(clinicians)) {
             return [];
@@ -119,6 +161,8 @@ export class AppointmentController {
                 include: {
                     client: true,
                     tenant: true,
+                    clinicians: { select: { id: true, fullName: true } },
+                    session: { select: { name: true } },
                 },
             });
 
@@ -129,29 +173,36 @@ export class AppointmentController {
                 : data.clientName || "the selected client";
             const clientEmail = persistedClient?.email || data.clientEmail || null;
             const recipientName = persistedClient?.preferredName || persistedClient?.firstName || clientName;
-            const appointmentDate = appointmentWithRelations?.date || data.date || "the selected date";
-            const appointmentTime = [appointmentWithRelations?.startTime || data.startTime, appointmentWithRelations?.endTime || data.endTime]
-                .filter(Boolean)
-                .join(" - ") || "the selected time";
+            const appointmentDate = this.formatAppointmentDate(appointmentWithRelations?.date || data.date);
+            const appointmentTime = this.formatAppointmentTime(
+                appointmentWithRelations?.startTime || data.startTime,
+                appointmentWithRelations?.endTime || data.endTime
+            );
             const tenantSlug = tenant?.subdomain || "noosphere";
             const companyName = tenant?.companyName || "NooSphere";
+            const sessionType = appointmentWithRelations?.session?.name || "Appointment";
+            const serviceLocation = appointmentWithRelations?.serviceLocation || data.serviceLocation || "To be confirmed";
+            const clinicianNames = this.formatClinicianNames(appointmentWithRelations?.clinicians);
 
-            const clientTemplate = templateRenderer.render("appointment-scheduled.html", {
+            const clientTemplate = templateRenderer.render("appointment-scheduled-client.html", {
                 recipientName,
                 clientName,
+                clinicianNames,
                 companyName,
                 subdomain: tenantSlug,
                 appointmentDate,
                 appointmentTime,
+                sessionType,
+                serviceLocation,
             });
 
             if (clientEmail) {
                 await emailService.sendTenantEmail({
                     tenantSlug,
                     to: [clientEmail],
-                    subject: "Appointment Scheduled",
+                    subject: `Your appointment with ${clinicianNames} is confirmed`,
                     html: clientTemplate,
-                    text: `Hello ${recipientName}, your appointment has been scheduled for ${appointmentDate} at ${appointmentTime}.`,
+                    text: `Hello ${recipientName}, you have an upcoming appointment with ${clinicianNames} on ${appointmentDate} at ${appointmentTime}.`,
                 });
             }
 
@@ -195,19 +246,21 @@ export class AppointmentController {
 
                     if (staffEmail?.email) {
                         const staffRecipientName = staffEmail.fullName || "there";
-                        const staffTemplate = templateRenderer.render("appointment-scheduled.html", {
+                        const staffTemplate = templateRenderer.render("appointment-scheduled-staff.html", {
                             recipientName: staffRecipientName,
                             clientName,
                             companyName,
                             subdomain: tenantSlug,
                             appointmentDate,
                             appointmentTime,
+                            sessionType,
+                            serviceLocation,
                         });
 
                         await emailService.sendTenantEmail({
                             tenantSlug,
                             to: [staffEmail.email],
-                            subject: "New Appointment Assigned",
+                            subject: `New Appointment: ${clientName}`,
                             html: staffTemplate,
                             text: `Hello ${staffRecipientName}, a new appointment has been created for ${clientName} on ${appointmentDate} at ${appointmentTime}.`,
                         });
