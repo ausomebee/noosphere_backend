@@ -206,6 +206,31 @@ class MessageRoutes {
             staffProtect(),
             this.controller.markAsRead
         );
+
+         /**
+         * @swagger
+         * /api/v1/messages/read/client/{id}:
+         *   patch:
+         *     summary: Mark a message as read
+         *     tags: [message]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         description: Message ID
+         *     responses:
+         *       200:
+         *         description: Message marked as read
+         */
+        this.router.patch(
+            "/read/client/:id",
+            clientProtect(),
+            this.controller.markAsRead
+        );
+
     }
 
     getRouter() {

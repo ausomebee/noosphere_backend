@@ -104,6 +104,47 @@ class AppointmentDto {
 
         Validator.validateRequest(req, next, schema);
     };
+
+    static rescheduleRequestDto = (req, res, next) => {
+        const schema = Joi.object({
+            id: Joi.string().uuid().required(),
+            tenantId: Joi.string().uuid().required(),
+            date: Joi.string()
+                .pattern(/^\d{4}-\d{2}-\d{2}$/)
+                .required()
+                .messages({
+                    "string.pattern.base": `"date" must be in YYYY-MM-DD format`
+                }),
+            startTime: Joi.string()
+                .pattern(/^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/)
+                .required()
+                .messages({
+                    "string.pattern.base": "startTime must be in HH:mm or HH:mm:ss format",
+                }),
+            endTime: Joi.string()
+                .pattern(/^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/)
+                .required()
+                .messages({
+                    "string.pattern.base": "endTime must be in HH:mm or HH:mm:ss format",
+                }),
+            reasonForReschedule: Joi.string().allow(null, ''),
+        });
+
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static rescheduleDecisionDto = (req, res, next) => {
+        const schema = Joi.array()
+            .items(
+                Joi.object({
+                    id: Joi.string().uuid().required(),
+                })
+            )
+            .min(1)
+            .required();
+
+        Validator.validateRequest(req, next, schema);
+    };
 }
 
 export default AppointmentDto;
