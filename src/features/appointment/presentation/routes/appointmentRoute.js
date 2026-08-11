@@ -671,6 +671,27 @@ class AppointmentRoutes {
 
         /**
         * @swagger
+        * /api/v1/appointments/client/{id}:
+        *   get:
+        *     summary: get a single appointment for the authenticated client
+        *     tags: [appointments]
+        *     parameters:
+        *       - in: path
+        *         name: id
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The Id of the appointment
+        *     responses:
+        *       200:
+        *         description: appointment fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/client/:id", clientProtect(), this.controller.getAppointment);
+
+        /**
+        * @swagger
         * /api/v1/appointments/{id}:
         *   get:
         *     summary: get appointment

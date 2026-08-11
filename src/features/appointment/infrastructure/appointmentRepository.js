@@ -152,7 +152,7 @@ class AppointmentRepository {
                     }
                 }
             },
-            orderBy: { date: "asc" }
+            orderBy: [{ date: "desc" }, { startTime: "desc" }, { endTime: "desc" }]
         });
 
         return appointments;

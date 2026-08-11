@@ -9,7 +9,8 @@
     "start:worker": "node src/cronWorker.js",
     "worker": "nodemon src/cronWorker.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "npx prisma migrate deploy && npx prisma db seed"
+    "postinstall": "npx prisma generate",
+    "deploy": "npx prisma generate && npx prisma migrate deploy && npx prisma db seed"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

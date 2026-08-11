@@ -179,15 +179,25 @@ class AppointmentService {
             }
         }
 
-        const result = Object.values(grouped).sort(
-            (a, b) => new Date(a.date) - new Date(b.date)
-        );
+        const result = Object.values(grouped).sort((a, b) => {
+            const dateCompare = b.date.localeCompare(a.date);
+            if (dateCompare !== 0) return dateCompare;
+
+            const startCompare = (b.startTime || "").localeCompare(a.startTime || "");
+            if (startCompare !== 0) return startCompare;
+
+            return (b.endTime || "").localeCompare(a.endTime || "");
+        });
 
         for (const item of result) {
             item.relatedAppointments.sort((a, b) => {
-                const d = new Date(a.date) - new Date(b.date);
-                if (d !== 0) return d;
-                return a.startTime.localeCompare(b.startTime);
+                const dateCompare = b.date.localeCompare(a.date);
+                if (dateCompare !== 0) return dateCompare;
+
+                const startCompare = (b.startTime || "").localeCompare(a.startTime || "");
+                if (startCompare !== 0) return startCompare;
+
+                return (b.endTime || "").localeCompare(a.endTime || "");
             });
         }
 
@@ -306,15 +316,25 @@ class AppointmentService {
             }
         }
 
-        const result = Object.values(grouped).sort(
-            (a, b) => new Date(a.date) - new Date(b.date)
-        );
+        const result = Object.values(grouped).sort((a, b) => {
+            const dateCompare = b.date.localeCompare(a.date);
+            if (dateCompare !== 0) return dateCompare;
+
+            const startCompare = (b.startTime || "").localeCompare(a.startTime || "");
+            if (startCompare !== 0) return startCompare;
+
+            return (b.endTime || "").localeCompare(a.endTime || "");
+        });
 
         for (const item of result) {
             item.relatedAppointments.sort((a, b) => {
-                const d = new Date(a.date) - new Date(b.date);
-                if (d !== 0) return d;
-                return a.startTime.localeCompare(b.startTime);
+                const dateCompare = b.date.localeCompare(a.date);
+                if (dateCompare !== 0) return dateCompare;
+
+                const startCompare = (b.startTime || "").localeCompare(a.startTime || "");
+                if (startCompare !== 0) return startCompare;
+
+                return (b.endTime || "").localeCompare(a.endTime || "");
             });
         }
 
