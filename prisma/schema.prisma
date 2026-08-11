@@ -1131,6 +1131,12 @@ model SessionTypeService {
   updatedAt DateTime @default(now()) @updatedAt
 }
 
+enum RescheduleRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
 model Appointment {
   id                       String    @id @default(uuid())
   clientId                 String
@@ -1168,6 +1174,32 @@ model Appointment {
   clinicians          TenantStaff[]            @relation("AppointmentClinicians")
   sessions            Session[]
   appointmentServices AppointmentService[]
+
+  rescheduleRequests      AppointmentRescheduleRequest[] @relation("AppointmentRescheduleRequests")
+  rescheduleRequestResult AppointmentRescheduleRequest?  @relation("RescheduleRequestNewAppointment")
+}
+
+model AppointmentRescheduleRequest {
+  id                  String                  @id @default(uuid())
+  appointmentId       String
+  tenantId            String
+  clientId            String
+  date                String
+  startTime           String
+  endTime             String
+  reasonForReschedule String?
+  requestedByType     String
+  requestedById       String?
+  status              RescheduleRequestStatus @default(PENDING)
+  respondedByType     String?
+  respondedById       String?
+  respondedAt         DateTime?
+  newAppointmentId    String?                 @unique
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @default(now()) @updatedAt
+
+  appointment    Appointment  @relation("AppointmentRescheduleRequests", fields: [appointmentId], references: [id])
+  newAppointment Appointment? @relation("RescheduleRequestNewAppointment", fields: [newAppointmentId], references: [id])
 }
 
 model AppointmentService {

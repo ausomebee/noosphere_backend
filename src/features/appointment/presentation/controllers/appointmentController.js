@@ -6,6 +6,7 @@ import Appointment from "../../domain/appointment.js";
 import AppointmentServiceRepository from "../../infrastructure/appointmentServiceRepository.js";
 import AppointmentServiceService from "../../application/appointmentServiceService.js";
 import AppointmentServiceDomain from "../../domain/appointmentService.js";
+import AppointmentRescheduleRequestRepository from "../../infrastructure/appointmentRescheduleRequestRepository.js";
 import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
 import NotificationService from "../../../notifications/application/notificationsService.js";
 import ClientNotificationEmitter from "../../../client/application/clientNotificationEmitter.js";
@@ -18,8 +19,13 @@ export class AppointmentController {
     constructor() {
         this.prisma = prismaService.getClient();
         this.appointmentRepository = new AppointmentRepository(this.prisma.appointment, this.prisma);
-        this.service = new AppointmentService({ appointmentRepository: this.appointmentRepository });
         this.appointmentServiceRepository = new AppointmentServiceRepository(this.prisma.appointmentService, this.prisma);
+        this.appointmentRescheduleRequestRepository = new AppointmentRescheduleRequestRepository(this.prisma.appointmentRescheduleRequest, this.prisma);
+        this.service = new AppointmentService({
+            appointmentRepository: this.appointmentRepository,
+            appointmentRescheduleRequestRepository: this.appointmentRescheduleRequestRepository,
+            appointmentServiceRepository: this.appointmentServiceRepository,
+        });
         this.appointmentServiceService = new AppointmentServiceService({ appointmentServiceRepository: this.appointmentServiceRepository });
         this.notificationRepository = new NotificationsRepository(this.prisma.notification);
         this.notificationService = new NotificationService({ notificationRepository: this.notificationRepository });
@@ -477,7 +483,12 @@ export class AppointmentController {
     });
 
     acceptRescheduleAppointment = expressAsyncHandler(async (req, res) => {
-        const appointments = await this.service.acceptRescheduleAppointment(req.body);
+        const responder = {
+            respondedByType: req.user?.type || null,
+            respondedById: req.user?.id || null,
+        };
+        const requests = req.body.map((obj) => ({ ...obj, ...responder }));
+        const appointments = await this.service.acceptRescheduleAppointment(requests);
 
         if (!appointments) {
             res.status(500).json({ message: 'Failed to fetch appointments' });
@@ -491,24 +502,59 @@ export class AppointmentController {
     });
 
     rescheduleAppointment = expressAsyncHandler(async (req, res) => {
-        const appointments = await this.service.updateAppointment({
-            id: req.params.id,
-            rescheduled: true
+        const requestedByType = req.user?.type || "STAFF";
+        const requestedById = req.user?.id || null;
+        const clientRequested = requestedByType === "CLIENT";
+
+        const { request, appointment } = await this.service.requestReschedule({
+            appointmentId: req.body.id,
+            tenantId: req.body.tenantId,
+            date: req.body.date,
+            startTime: req.body.startTime,
+            endTime: req.body.endTime,
+            reasonForReschedule: req.body.reasonForReschedule,
+            requestedByType,
+            requestedById,
         });
 
-        if (!appointments) {
-            res.status(500).json({ message: 'Failed to fetch appointments' });
+        if (!request) {
+            return res.status(500).json({ message: "Failed to create reschedule request" });
+        }
+
+        try {
+            await this.notifyAppointment({
+                appointment,
+                type: clientRequested ? NotificationType.NEW_RESCHEDULE_REQUEST : NotificationType.RESCHEDULED_APPOINTMENT,
+                title: clientRequested ? "New Reschedule Request" : "Appointment Rescheduled",
+                staffContent: clientRequested
+                    ? "A client requested to reschedule an appointment."
+                    : "An appointment has been rescheduled.",
+                clientContent: clientRequested ? null : "Your appointment has been rescheduled.",
+                metadata: {
+                    proposedDate: request.date,
+                    proposedStartTime: request.startTime,
+                    proposedEndTime: request.endTime,
+                    reason: request.reasonForReschedule || null,
+                },
+            });
+        } catch (notificationError) {
+            console.error("Reschedule notification processing failed:", notificationError);
         }
 
         return res.status(201).json({
-            message: "appointments fetched successfully",
+            message: "Reschedule request submitted successfully",
             status: 'ok',
-            data: appointments
+            data: request
         });
     });
 
     rejectRescheduleAppointment = expressAsyncHandler(async (req, res) => {
-        const appointments = await this.service.rejectRescheduleAppointment(req.body);
+        const responder = {
+            respondedByType: req.user?.type || null,
+            respondedById: req.user?.id || null,
+        };
+        const requests = req.body.map((obj) => ({ ...obj, ...responder }));
+        const appointments = await this.service.rejectRescheduleAppointment(requests);
 
         if (!appointments) {
             res.status(500).json({ message: 'Failed to fetch appointments' });

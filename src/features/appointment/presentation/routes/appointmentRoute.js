@@ -162,6 +162,35 @@ import { clientProtect, staffProtect } from "../../../../middleware/auth_handler
  *           type: boolean
  *           description: Apply this update to all recurring appointments
  *           example: false
+ *
+ *     RescheduleRequestDto:
+ *       type: object
+ *       required:
+ *         - id
+ *         - tenantId
+ *         - date
+ *         - startTime
+ *         - endTime
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           description: Unique appointment identifier to request a reschedule for
+ *         tenantId:
+ *           type: string
+ *           format: uuid
+ *         date:
+ *           type: string
+ *           description: Proposed new date (YYYY-MM-DD)
+ *         startTime:
+ *           type: string
+ *           description: Proposed new start time (HH:mm)
+ *         endTime:
+ *           type: string
+ *           description: Proposed new end time (HH:mm)
+ *         reasonForReschedule:
+ *           type: string
+ *           description: Reason for the reschedule request
  */
 
 class AppointmentRoutes {
@@ -475,7 +504,7 @@ class AppointmentRoutes {
          *                 id:
          *                   type: string
          *                   format: uuid
-         *                   description: Appointment ID to reject reschedule for
+         *                   description: Reschedule request ID to accept
          *             example:
          *               - id: "550e8400-e29b-41d4-a716-446655440000"
          *               - id: "550e8400-e29b-41d4-a716-446655440111"
@@ -487,7 +516,7 @@ class AppointmentRoutes {
          *       404:
          *         description: Appointment not found
          */
-        this.router.patch("/accept-reschedule", staffProtect(), this.controller.acceptRescheduleAppointment);
+        this.router.patch("/accept-reschedule", staffProtect(), AppointmentDto.rescheduleDecisionDto, this.controller.acceptRescheduleAppointment);
 
         /**
          * @swagger
@@ -507,7 +536,7 @@ class AppointmentRoutes {
          *                 id:
          *                   type: string
          *                   format: uuid
-         *                   description: Appointment ID to reject reschedule for
+         *                   description: Reschedule request ID to reject
          *             example:
          *               - id: "550e8400-e29b-41d4-a716-446655440000"
          *               - id: "550e8400-e29b-41d4-a716-446655440111"
@@ -519,51 +548,51 @@ class AppointmentRoutes {
          *       404:
          *         description: Appointment not found
          */
-        this.router.patch("/reject-reschedule", staffProtect(), this.controller.rejectRescheduleAppointment);
+        this.router.patch("/reject-reschedule", staffProtect(), AppointmentDto.rescheduleDecisionDto, this.controller.rejectRescheduleAppointment);
 
         /**
         * @swagger
         * /api/v1/appointments/reschedule:
         *   patch:
-        *     summary: reschedule appointment
+        *     summary: create a reschedule request for an appointment (staff)
         *     tags: [appointments]
         *     requestBody:
         *       required: true
         *       content:
         *         application/json:
         *           schema:
-        *             $ref: '#/components/schemas/AppointmentUpdateDto'
+        *             $ref: '#/components/schemas/RescheduleRequestDto'
         *     responses:
-        *       200:
-        *         description: Appointment updated successfully
+        *       201:
+        *         description: Reschedule request submitted successfully
         *       400:
         *         description: Validation error
         *       404:
         *         description: Appointment not found
         */
-        this.router.patch("/reschedule", staffProtect(), AppointmentDto.updateAppointmentDto, this.controller.updateAppointment);
+        this.router.patch("/reschedule", staffProtect(), AppointmentDto.rescheduleRequestDto, this.controller.rescheduleAppointment);
 
         /**
         * @swagger
         * /api/v1/appointments/reschedule/client:
         *   patch:
-        *     summary: reschedule appointment
+        *     summary: create a reschedule request for an appointment (client)
         *     tags: [appointments]
         *     requestBody:
         *       required: true
         *       content:
         *         application/json:
         *           schema:
-        *             $ref: '#/components/schemas/AppointmentUpdateDto'
+        *             $ref: '#/components/schemas/RescheduleRequestDto'
         *     responses:
-        *       200:
-        *         description: Appointment updated successfully
+        *       201:
+        *         description: Reschedule request submitted successfully
         *       400:
         *         description: Validation error
         *       404:
         *         description: Appointment not found
         */
-        this.router.patch("/reschedule/client", clientProtect(), AppointmentDto.updateAppointmentDto, this.controller.updateAppointment);
+        this.router.patch("/reschedule/client", clientProtect(), AppointmentDto.rescheduleRequestDto, this.controller.rescheduleAppointment);
 
         /**
         * @swagger
