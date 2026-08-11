@@ -55,7 +55,8 @@ class AppointmentRepository {
     async findAllAndPopulate(query, populate) {
         return await this.model.findMany({
             where: query,
-            include: populate
+            include: populate,
+            orderBy: [{ date: "asc" }, { startTime: "asc" }]
         });
     }
 
@@ -329,9 +330,10 @@ class AppointmentRepository {
                 relatedTo: true,
                 relatedFrom: true
             },
-            orderBy: {
-                date: 'desc'
-            }
+            orderBy: [
+                { date: 'asc' },
+                { startTime: 'asc' }
+            ]
         });
 
         // Expand recurring appointments
@@ -367,11 +369,11 @@ class AppointmentRepository {
             }
         }
 
-        // Sort by date and time (most recent first)
+        // Sort by date and time (soonest first)
         expandedAppointments.sort((a, b) => {
-            const dateCompare = b.date.localeCompare(a.date);
+            const dateCompare = a.date.localeCompare(b.date);
             if (dateCompare !== 0) return dateCompare;
-            return b.startTime.localeCompare(a.startTime);
+            return a.startTime.localeCompare(b.startTime);
         });
 
         // Limit results

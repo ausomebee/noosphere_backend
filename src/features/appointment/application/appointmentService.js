@@ -772,7 +772,7 @@ class AppointmentService {
             .sort((a, b) => {
                 const aDate = new Date(`${a.date}T${a.startTime}:00`);
                 const bDate = new Date(`${b.date}T${b.startTime}:00`);
-                return bDate - aDate;
+                return aDate - bDate;
             });
     }
 
@@ -836,7 +836,7 @@ class AppointmentService {
             .sort((a, b) => {
                 const aDate = new Date(`${a.date}T${a.startTime}:00`);
                 const bDate = new Date(`${b.date}T${b.startTime}:00`);
-                return bDate - aDate;
+                return aDate - bDate;
             });
     }
 
@@ -901,7 +901,7 @@ class AppointmentService {
             .sort((a, b) => {
                 const aDate = new Date(`${a.date}T${a.startTime}:00`);
                 const bDate = new Date(`${b.date}T${b.startTime}:00`);
-                return bDate - aDate;
+                return aDate - bDate;
             });
     }
 
