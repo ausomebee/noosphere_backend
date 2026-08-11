@@ -467,7 +467,7 @@ class AppointmentRoutes {
 
         /**
        * @swagger
-       * /api/v1/appointments/client/{clientId}:
+       * /api/v1/appointments/client/appointments/{clientId}:
        *   get:
        *     summary: get client appointments
        *     tags: [appointments]
@@ -484,7 +484,7 @@ class AppointmentRoutes {
        *       400:
        *         description: Validation error
        */
-        this.router.get("/client/:clientId", staffProtect(), this.controller.getClientAppointments);
+        this.router.get("/client/appointments/:clientId", staffProtect(), this.controller.getClientAppointments);
 
         /**
          * @swagger
@@ -836,27 +836,6 @@ class AppointmentRoutes {
         *         description: Validation error
         */
         this.router.get("/client/rescheduled/client/:clientId", clientProtect(), this.controller.getClientRescheduledAppointments);
-
-        /**
-        * @swagger
-        * /api/v1/appointments/client/past/{clientId}:
-        *   get:
-        *     summary: get client past appointments
-        *     tags: [appointments]
-        *     parameters:
-        *       - in: path
-        *         name: clientId
-        *         required: true
-        *         schema:
-        *           type: string
-        *         description: The Id of the client
-        *     responses:
-        *       200:
-        *         description: client appointments fetched successfully
-        *       400:
-        *         description: Validation error
-        */
-        this.router.get("/client/past/:clientId", staffProtect(), this.controller.getClientPastAppointments);
 
         /**
         * @swagger
