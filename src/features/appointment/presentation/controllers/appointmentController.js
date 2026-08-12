@@ -237,6 +237,15 @@ export class AppointmentController {
                     type: NotificationType.APPOINTMENT_SCHEDULED,
                     title: "Appointment Created",
                     content: `A new appointment has been created for ${clientName}.`,
+                    entityType: NotificationEntityType.APPOINTMENT,
+                    entityId: appointment.id,
+                    metadata: {
+                        tenantId: data.tenantId || null,
+                        clientId: data.clientId || null,
+                        date: data.date || null,
+                        startTime: data.startTime || null,
+                        endTime: data.endTime || null,
+                    },
                     isRead: false,
                 });
 
