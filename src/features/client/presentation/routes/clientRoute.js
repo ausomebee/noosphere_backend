@@ -628,6 +628,29 @@ class ClientRoutes {
 
         /**
         * @swagger
+        * /api/v1/client/tenant/{clientTenantId}/{active}:
+        *   patch:
+        *     summary: deactivate or activate a client
+        *     tags: [Clients]
+        *     parameters:
+        *       - in: path
+        *         name: clientTenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *       - in: path
+        *         name: active
+        *         required: true
+        *         schema:
+        *           type: boolean
+        *     responses:
+        *       200:
+        *         description: Client deactivated successfully
+        */
+        this.router.patch("/tenant/:clientTenantId/:active", staffProtect(), this.controller.deactivateClient);
+
+        /**
+        * @swagger
         * /api/v1/client/{clientTenantId}/{active}:
         *   patch:
         *     summary: deactivate or activate a client
