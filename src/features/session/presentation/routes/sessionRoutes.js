@@ -259,6 +259,29 @@ class SessionRoutes {
 
         /**
          * @swagger
+         * /api/v1/sessions/client/{id}:
+         *   get:
+         *     summary: Get a single session
+         *     tags: [sessions]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: Session ID
+         *     responses:
+         *       200:
+         *         description: Session fetched successfully
+         */
+        this.router.get(
+            "/client/:id",
+            clientProtect(),
+            this.controller.getSingleSession
+        );
+
+        /**
+         * @swagger
          * /api/v1/sessions/{id}:
          *   get:
          *     summary: Get a single session
