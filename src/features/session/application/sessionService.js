@@ -137,6 +137,17 @@ class SessionService {
                         select: {
                             fullName: true,
                         },
+                    },
+                    serviceLocation: true,
+                    appointmentServices: {
+                        select: {
+                            serviceCode: {
+                                select: {
+                                    code: true,
+                                    description: true
+                                }
+                            }
+                        }
                     }
                 },
             },
