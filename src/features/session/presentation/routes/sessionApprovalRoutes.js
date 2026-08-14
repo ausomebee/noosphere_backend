@@ -1,7 +1,7 @@
 import express from "express";
 import SessionApprovalController from "../controllers/sessionApprovalController.js";
 import SessionApprovalDto from "../dto/sessionApprovalDto.js";
-import { staffProtect } from "../../../../middleware/auth_handlers.js";
+import { clientProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
@@ -62,6 +62,52 @@ class SessionApprovalRoutes {
     }
 
     initializeRoutes() {
+        /**
+         * @swagger
+         * /api/v1/sessions-approval/client:
+         *   post:
+         *     summary: Create a session approval
+         *     tags: [sessions]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/SessionApprovalCreateDto'
+         *     responses:
+         *       201:
+         *         description: Session approval created successfully
+         */
+        this.router.post(
+            "/client",
+            clientProtect(),
+            SessionApprovalDto.createSessionApprovalDto,
+            this.controller.createSessionApproval
+        );
+
+        /**
+         * @swagger
+         * /api/v1/sessions-approval/client:
+         *   put:
+         *     summary: Update a session approval
+         *     tags: [sessions]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/SessionApprovalUpdateDto'
+         *     responses:
+         *       200:
+         *         description: Session approval updated successfully
+         */
+        this.router.put(
+            "/client",
+            clientProtect(),
+            SessionApprovalDto.updateSessionApprovalDto,
+            this.controller.updateSessionApproval
+        );
+
         /**
          * @swagger
          * /api/v1/sessions-approval:

@@ -182,7 +182,7 @@ class ClientAuthorizationRoutes {
          */
         this.router.put(
             "/:id",
-            clientProtect(),
+            staffProtect(),
             ClientAuthorizationDto.updateClientAuthorizationDto,
             this.controller.updateClientAuthorization.bind(this.controller)
         );
@@ -431,7 +431,7 @@ class ClientAuthorizationRoutes {
          *       200:
          *         description: Client deactivated successfully
          */
-        this.router.patch("/:id/:active", clientProtect(), this.controller.deactivateAuth);
+        this.router.patch("/:id/:active", staffProtect(), this.controller.deactivateAuth);
 
         /**
          * @swagger
@@ -454,7 +454,7 @@ class ClientAuthorizationRoutes {
          *       200:
          *         description: Client deactivated successfully
          */
-        this.router.patch("/:id/:delete", clientProtect(), this.controller.deleteAuth);
+        this.router.patch("/:id/:delete", staffProtect(), this.controller.deleteAuth);
 
     }
 
