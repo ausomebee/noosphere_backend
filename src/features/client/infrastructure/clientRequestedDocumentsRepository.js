@@ -29,7 +29,8 @@ class ClientRequestedDocumentsRepository extends BaseRepository {
 
         const overdueCount = await this.model.count({
             where: {
-                tenantClientId:clientTenantId,
+                tenantClientId: clientTenantId,
+                status: "PENDING",
                 dueDate: {
                     lt: now,
                 },

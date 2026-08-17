@@ -20,8 +20,9 @@ class ClientDocumentsController {
             const data = req.body;
             const doc = await this.clientDocumentsService.createClientDocument(data);
             if (doc.requestId) {
-                const request = await this.prisma.clientRequestedDocuments.findUnique({
+                const request = await this.prisma.clientRequestedDocuments.update({
                     where: { id: doc.requestId },
+                    data: { status: "UPLOADED" },
                     include: { tenantClient: { include: { clinicians: { select: { id: true } } } } },
                 });
                 if (request?.tenantClient?.clinicians?.length) {
