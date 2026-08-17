@@ -16,6 +16,8 @@ class OrganizationSessionTypesDto {
             service: Joi.array()
                 .required(),
             staffRolesAllowed: Joi.array()
+                .items(Joi.string())
+                .min(1)
                 .required(),
             locationsAllowed: Joi.array()
                 .required(),
