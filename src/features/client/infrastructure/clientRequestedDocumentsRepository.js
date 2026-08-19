@@ -14,7 +14,9 @@ class ClientRequestedDocumentsRepository extends BaseRepository {
             by: ["status"],
             _count: { _all: true },
             where: {
-                tenantClientId: clientTenantId
+                tenantClientId: clientTenantId,
+                isDeleted: false,
+                status: { not: "CANCELLED" }
             }
         });
 
@@ -30,6 +32,7 @@ class ClientRequestedDocumentsRepository extends BaseRepository {
         const overdueCount = await this.model.count({
             where: {
                 tenantClientId: clientTenantId,
+                isDeleted: false,
                 status: "PENDING",
                 dueDate: {
                     lt: now,
