@@ -241,6 +241,50 @@ class ClientRequestedDocumentsRoutes {
 			clientProtect(),
 			this.controller.getSingleRequestedDocument.bind(this.controller)
 		);
+
+		/**
+		 * @swagger
+		 * /api/v1/client-requested-documents/nudge/{id}:
+		 *   post:
+		 *     summary: Nudge a client to respond to a document request
+		 *     tags: [client-requested-documents]
+		 *     parameters:
+		 *       - in: path
+		 *         name: id
+		 *         required: true
+		 *         schema:
+		 *           type: string
+		 *     responses:
+		 *       200:
+		 *         description: Client nudged successfully
+		 */
+		this.router.post(
+			"/nudge/:id",
+			staffProtect(),
+			this.controller.nudgeClient.bind(this.controller)
+		);
+
+		/**
+		 * @swagger
+		 * /api/v1/client-requested-documents/{id}/cancel:
+		 *   patch:
+		 *     summary: Cancel a client requested document
+		 *     tags: [client-requested-documents]
+		 *     parameters:
+		 *       - in: path
+		 *         name: id
+		 *         required: true
+		 *         schema:
+		 *           type: string
+		 *     responses:
+		 *       200:
+		 *         description: Document request cancelled successfully
+		 */
+		this.router.patch(
+			"/:id/cancel",
+			staffProtect(),
+			this.controller.cancelRequestedDocument.bind(this.controller)
+		);
 	}
 
 	getRouter() {

@@ -44,6 +44,29 @@ class ClientRequestedDocumentsService {
         return update;
     }
 
+    async cancelRequestedDocument(data) {
+        const request = await this.clientRequestedDocumentsRepository.findOne({ id: data.id });
+
+        if (!request) {
+            throw new Error("Requested Document not found");
+        }
+
+        if (request.status === "CANCELLED" || request.isDeleted) {
+            return request;
+        }
+
+        const cancelledRequest = await this.clientRequestedDocumentsRepository.update(data.id, {
+            status: "CANCELLED",
+            isDeleted: true,
+        });
+
+        if (!cancelledRequest) {
+            throw new Error("Failed to cancel Requested Document");
+        }
+
+        return cancelledRequest;
+    }
+
     async countAllRequestedDocumentsByStatus(clientTenantId) {
         const request =
             await this.clientRequestedDocumentsRepository

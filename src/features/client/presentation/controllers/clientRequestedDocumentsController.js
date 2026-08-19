@@ -6,6 +6,8 @@ import NotificationService from "../../../notifications/application/notification
 import ClientNotificationEmitter from "../../application/clientNotificationEmitter.js";
 import SocketService from "../../../../config/socket.js";
 import MailService from "../../../../utilities/nodemailer.js";
+import emailService from "../../../../utilities/ses.js";
+import templateRenderer from "../../../../utilities/templateRenderer.js";
 import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
 
 class ClientRequestedDocumentsController {
@@ -67,6 +69,70 @@ class ClientRequestedDocumentsController {
         }
     }
 
+    async nudgeClient(req, res) {
+        try {
+            const { id } = req.params;
+
+            const request = await this.prisma.clientRequestedDocuments.findUnique({
+                where: { id },
+                include: {
+                    tenantClient: {
+                        include: {
+                            client: { select: { id: true, email: true, firstName: true } },
+                            tenant: { select: { id: true, subdomain: true, companyName: true, email: true } },
+                        },
+                    },
+                },
+            });
+
+            if (!request) {
+                return res.status(404).json({ message: "Requested document not found" });
+            }
+
+            const { client, tenant } = request.tenantClient;
+
+            await this.clientNotificationEmitter.emit({
+                clientId: client.id,
+                tenantId: tenant.id,
+                type: NotificationType.DOCUMENT_REQUEST_NUDGE,
+                title: "Document Request Reminder",
+                content: `Reminder: please submit "${request.name}" as requested by your provider.`,
+                entityType: NotificationEntityType.DOCUMENT_REQUEST,
+                entityId: request.id,
+                metadata: { dueDate: request.dueDate },
+            });
+
+            const html = templateRenderer.render("document-request-nudge.html", {
+                firstName: client.firstName,
+                documentName: request.name,
+                dueDate: new Date(request.dueDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
+                companyName: tenant.companyName,
+                tenantEmail: tenant.email,
+                clientPortalUrl: templateRenderer.buildTenantClientUrl(tenant.subdomain),
+            });
+
+            const sendMail = await emailService.sendTenantEmail({
+                tenantSlug: tenant.subdomain,
+                to: [client.email],
+                subject: "Document Request Reminder",
+                html,
+            });
+
+            if (!sendMail?.messageId) {
+                return res.status(500).json({ message: "Failed to send reminder email" });
+            }
+
+            return res.status(200).json({
+                status: "ok",
+                message: "Client nudged successfully",
+            });
+        } catch (error) {
+            return res.status(400).json({
+                message: error.message || "Failed to nudge client",
+            });
+        }
+    }
+
     async updateRequestedDocument(req, res) {
         try {
             const data = {
@@ -83,6 +149,23 @@ class ClientRequestedDocumentsController {
         } catch (error) {
             return res.status(400).json({
                 message: error.message || "Failed to update requested document",
+            });
+        }
+    }
+
+    async cancelRequestedDocument(req, res) {
+        try {
+            const id = req.params.id;
+            const cancelled = await this.clientRequestedDocumentsService.cancelRequestedDocument({ id });
+
+            return res.status(200).json({
+                message: "Requested document cancelled successfully",
+                data: cancelled,
+            });
+        } catch (error) {
+            const statusCode = error.message === "Requested Document not found" ? 404 : 400;
+            return res.status(statusCode).json({
+                message: error.message || "Failed to cancel requested document",
             });
         }
     }
