@@ -1,10 +1,38 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg'
 
+const createdAtModels = new Set([
+    'Admin', 'Auth', 'Department', 'Role', 'RefreshTokens', 'Tenant', 'TenantStaff',
+    'TenantNotificationSettings', 'Teams', 'TenantStaffDocuments', 'Client', 'ClientTenant',
+    'ClientDocuments', 'ClientRequestedDocuments', 'ClientNotificationSettings', 'Pipeline',
+    'PipelineStage', 'PipelineItem', 'PipelineDoneTask', 'PipelineItemCustomTask',
+    'PipelineItemCustomDocument', 'Subscription', 'BillingPlan', 'Feature', 'FeatureGroup',
+    'SuperAdminChoices', 'TenantAdminChoices', 'Payment', 'Logs', 'Invoice', 'InvoiceToken',
+    'PaymentMethod', 'Issue', 'IssueComment', 'Domain', 'Program', 'Target', 'ClientProgram',
+    'ClientTarget', 'ClientTargetDataCollection', 'OrganizationDocuments', 'SessionTypeService',
+    'AppointmentRescheduleRequest', 'Forms', 'ClientForm', 'Session', 'SessionData',
+    'SessionApproval', 'TimesheetHistory', 'SessionUpdateRequest', 'ClientFolder', 'ClientFiles',
+    'ClinicalReportTemplates', 'ClinicalReport', 'ClinicalReportHistory',
+    'ClinicalReportChangeRequest', 'ClinicalReportVersion', 'TenantGeneralSettings',
+    'TenantAdditionalSecurityQuestions', 'Message', 'Notification', 'ServerRequest'
+]);
+
 class PrismaService {
     constructor() {
         this.adapter = new PrismaPg({ connectionString: `${process.env.DATABASE_URL}` })
-        this.prisma = new PrismaClient({ adapter: this.adapter });
+        this.prisma = new PrismaClient({ adapter: this.adapter }).$extends({
+            query: {
+                $allModels: {
+                    async findMany({ model, args, query }) {
+                        if (!args.orderBy && createdAtModels.has(model)) {
+                            args.orderBy = { createdAt: 'desc' };
+                        }
+
+                        return query(args);
+                    }
+                }
+            }
+        });
     }
 
     async connect() {
