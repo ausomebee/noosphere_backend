@@ -907,7 +907,8 @@ class ClinicalReportController {
     getClientReportsByStatus = expressAsyncHandler(async (req, res) => {
         const reports = await this.reportService.getClientReportsByStatus(
             req.params.clientTenantId,
-            req.params.status
+            req.params.status,
+            req.user.id
         );
 
         return res.status(200).json({
