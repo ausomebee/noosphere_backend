@@ -39,10 +39,15 @@ class ClinicalReportChangeRequestController {
             data.createChangeRequest
         );
 
-        // const status = record.approverId ? "DRAFT" : "AWAITING_SIGNATURE";
+        if (!record) {
+            return res
+                .status(500)
+                .json({ message: "Failed to create report change request" });
+        }
+
         const updated = await this.reportService.updateReport({
             id: record.clinicalReportId,
-            status: "CHANGES_REQUESTED"
+            status: record.approverId ? "DRAFT" : "CHANGES_REQUESTED"
         });
 
         const history = new ClinicalReportHistory({
@@ -52,12 +57,6 @@ class ClinicalReportChangeRequestController {
         });
 
         await this.historyService.createHistory(history.createHistory);
-
-        if (!record) {
-            return res
-                .status(500)
-                .json({ message: "Failed to create report change request" });
-        }
 
         return res.status(201).json({
             message: "Report change request created successfully",
