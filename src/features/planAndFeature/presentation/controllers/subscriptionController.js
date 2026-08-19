@@ -297,6 +297,7 @@ class SubscriptionController {
             userAgent: req.headers["user-agent"] || null,
             outcome: "SUCCESS",
             accessedBy: req.user?.name || null,
+            location: req.originalUrl || req.url || null,
         })));
 
         return res.status(201).json({
