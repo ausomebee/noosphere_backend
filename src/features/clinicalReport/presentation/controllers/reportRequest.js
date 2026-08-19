@@ -8,6 +8,10 @@ import ClinicalReportRepository from "../../infrastructure/reportRepository.js";
 import ClinicalReportHistory from "../../domain/reportHistory.js";
 import ClinicalReportHistoryService from "../../application/reportHistoryService.js";
 import ClinicalReportHistoryRepository from "../../infrastructure/reportHistoryRepository.js";
+import ClinicalReportNotificationService from "../../application/clinicalReportNotificationService.js";
+import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
+import NotificationService from "../../../notifications/application/notificationsService.js";
+import { NotificationType } from "../../../notifications/domain/notificationTypes.js";
 
 class ClinicalReportChangeRequestController {
     constructor() {
@@ -29,6 +33,14 @@ class ClinicalReportChangeRequestController {
             repository: new ClinicalReportHistoryRepository(
                 this.prisma.clinicalReportHistory
             )
+        });
+
+        this.notificationService = new NotificationService({
+            notificationRepository: new NotificationsRepository(this.prisma.notification)
+        });
+        this.reportNotificationService = new ClinicalReportNotificationService({
+            prisma: this.prisma,
+            notificationService: this.notificationService
         });
 
     }
@@ -57,6 +69,24 @@ class ClinicalReportChangeRequestController {
         });
 
         await this.historyService.createHistory(history.createHistory);
+
+        await this.reportNotificationService.notifyStaff({
+            report: await this.reportService.getReportForExport(updated.id),
+            staffId: updated.creatorId,
+            type: record.approverId
+                ? NotificationType.REPORT_CHANGE_REQUESTED_BY_SUPERVISOR
+                : NotificationType.CLIENT_REPORT_CHANGE_REQUEST,
+            title: record.approverId
+                ? "Approver requested clinical report changes"
+                : "Client requested clinical report changes",
+            content: record.approverId
+                ? `The approver returned "${updated.title}" for changes: ${record.description}`
+                : `The client returned "${updated.title}" for changes: ${record.description}`,
+            subject: record.approverId
+                ? `Changes requested by approver: ${updated.title}`
+                : `Changes requested by client: ${updated.title}`,
+            metadata: { changeRequestId: record.id }
+        });
 
         return res.status(201).json({
             message: "Report change request created successfully",

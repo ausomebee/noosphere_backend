@@ -195,9 +195,20 @@
     },
  
     "REPORT_APPROVAL_REQUEST_TO_SUPERVISOR": {
-      "channels": ["in_app"],
+      "channels": ["in_app", "email"],
+      "emailTemplate": "reportApprovalRequestToSupervisor",
       "conditions": {
         "userType": ["SUPER_ADMIN", "CLINICIAN"],
+        "configurable": true,
+        "settingsPath": "Notification Settings / Clients"
+      }
+    },
+
+    "REPORT_CHANGE_REQUESTED_BY_SUPERVISOR": {
+      "channels": ["in_app", "email"],
+      "emailTemplate": "reportChangeRequestedBySupervisor",
+      "conditions": {
+        "userType": ["CLINICIAN"],
         "configurable": true,
         "settingsPath": "Notification Settings / Clients"
       }
