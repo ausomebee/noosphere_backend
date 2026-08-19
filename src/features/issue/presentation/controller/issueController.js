@@ -368,7 +368,13 @@ class IssueController {
             feature: "Issue Management"
         });
 
-        const log = await this.logService.createLog(issueData.createLog);
+        const log = await this.logService.createLog({
+            ...issueData.createLog,
+            ipAddress: req.ip || null,
+            userAgent: req.headers["user-agent"] || null,
+            outcome: "SUCCESS",
+            accessedBy: req.user?.id || issue.adminLoggedById || null,
+        });
         if (!log) return res.status(500).json({ message: 'Failed to log issue' });
 
         if (data.status || data.category || data.priority || data.adminId) {
@@ -604,7 +610,14 @@ class IssueController {
 
         const issueData = new Issue({ issueId: comment.issueId, adminId: comment.adminId, action: "added a comment", reason: "to improve tracking", details: "commented on an issue", feature: "Issue Management" });
 
-        const log = await this.logService.createLog(issueData.createLog);
+        const log = await this.logService.createLog({
+            ...issueData.createLog,
+            tenantId: comment.tenantId || null,
+            ipAddress: req.ip || null,
+            userAgent: req.headers["user-agent"] || null,
+            outcome: "SUCCESS",
+            accessedBy: req.user?.id || comment.adminId || null,
+        });
 
         if (!log) {
             res.status(500).json({ message: 'Failed to log issue' });
