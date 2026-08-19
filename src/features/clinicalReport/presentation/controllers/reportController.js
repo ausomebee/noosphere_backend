@@ -22,6 +22,7 @@ import NotificationsRepository from "../../../notifications/infrastructure/notif
 import NotificationService from "../../../notifications/application/notificationsService.js";
 import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
 import ClientNotificationEmitter from "../../../client/application/clientNotificationEmitter.js";
+import ClinicalReportNotificationService from "../../application/clinicalReportNotificationService.js";
 
 class ClinicalReportController {
     constructor() {
@@ -55,6 +56,10 @@ class ClinicalReportController {
             notificationRepository: new NotificationsRepository(this.prisma.notification),
         });
         this.clientNotificationEmitter = new ClientNotificationEmitter({
+            prisma: this.prisma,
+            notificationService: this.notificationService,
+        });
+        this.reportNotificationService = new ClinicalReportNotificationService({
             prisma: this.prisma,
             notificationService: this.notificationService,
         });
@@ -95,6 +100,9 @@ class ClinicalReportController {
                 createdBy: report.creatorId
             });
             await this.historyService.createHistory(submittedHistory);
+
+            const reportForNotification = await this.reportService.getReportForExport(report.id);
+            await this.notifyApproverReportSubmitted(reportForNotification);
         }
 
         return res.status(201).json({
@@ -130,6 +138,11 @@ class ClinicalReportController {
         });
         await this.historyService.createHistory(history);
 
+        if (updated.status === "SUBMITTED") {
+            const reportForNotification = await this.reportService.getReportForExport(updated.id);
+            await this.notifyApproverReportSubmitted(reportForNotification);
+        }
+
         return res.status(200).json({
             status: "ok",
             message: "Clinical report updated successfully",
@@ -151,7 +164,7 @@ class ClinicalReportController {
 
     updateReportStatus = expressAsyncHandler(async (req, res) => {
         const updated = await this.reportService.updateReport(
-            { id: req.params.id, status: req.query.status }
+            { id: req.params.id, status: req.params.status }
         );
 
         const history = new ClinicalReportHistory({
@@ -160,6 +173,11 @@ class ClinicalReportController {
             createdBy: updated.creatorId
         });
         await this.historyService.createHistory(history);
+
+        if (updated.status === "SUBMITTED") {
+            const reportForNotification = await this.reportService.getReportForExport(updated.id);
+            await this.notifyApproverReportSubmitted(reportForNotification);
+        }
 
         return res.status(200).json({
             status: "ok",
@@ -499,6 +517,17 @@ class ClinicalReportController {
         });
     }
 
+    async notifyApproverReportSubmitted(report) {
+        return this.reportNotificationService.notifyStaff({
+            report,
+            staffId: report.approverId,
+            type: NotificationType.REPORT_APPROVAL_REQUEST_TO_SUPERVISOR,
+            title: "Clinical report submitted for approval",
+            content: `${report.creator?.fullName || "A staff member"} submitted "${report.title}" for your approval.`,
+            subject: `Clinical report approval requested: ${report.title}`
+        });
+    }
+
     submitSignature = expressAsyncHandler(async (req, res) => {
         try {
             const section = await this.sectionService.updateSection(req.body);
@@ -508,6 +537,15 @@ class ClinicalReportController {
             const updated = await this.reportService.updateReport({
                 id: report.id,
                 status: "SIGNED"
+            });
+
+            await this.reportNotificationService.notifyStaff({
+                report,
+                staffId: report.creatorId,
+                type: NotificationType.CLIENT_REPORT_SIGNED,
+                title: "Client signed clinical report",
+                content: `${report.client.client.firstName} signed "${report.title}".`,
+                subject: `Client signed clinical report: ${report.title}`
             });
 
             const pdfBuffer = await this.pdfGenerator.generatePdf({
@@ -670,6 +708,8 @@ class ClinicalReportController {
         });
         await this.historyService.createHistory(createHistory);
 
+        await this.notifyApproverReportSubmitted(report);
+
         const signatureLink = await this.buildSignatureLink(report);
         await this.emitSignatureRequestedNotification(report, signatureLink);
 
@@ -740,6 +780,15 @@ class ClinicalReportController {
             createdBy: updated.creatorId
         });
         await this.historyService.createHistory(createHistory);
+
+        await this.reportNotificationService.notifyStaff({
+            report,
+            staffId: report.creatorId,
+            type: NotificationType.REPORT_APPROVED_BY_SUPERVISOR,
+            title: "Clinical report approved",
+            content: `The approver approved "${report.title}". It is awaiting the client's signature.`,
+            subject: `Clinical report approved: ${report.title}`
+        });
 
         const signatureLink = await this.buildSignatureLink(report);
         await this.emitSignatureRequestedNotification(report, signatureLink);
