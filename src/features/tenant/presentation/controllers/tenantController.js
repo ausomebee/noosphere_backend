@@ -562,6 +562,7 @@ class TenantController {
             userAgent: req.headers["user-agent"] || null,
             outcome: "SUCCESS",
             accessedBy: staff.fullName,
+            location: req.originalUrl || req.url || null,
         });
 
         if (!log) {

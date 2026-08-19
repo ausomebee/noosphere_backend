@@ -374,6 +374,7 @@ class IssueController {
             userAgent: req.headers["user-agent"] || null,
             outcome: "SUCCESS",
             accessedBy: req.user?.name || null,
+            location: req.originalUrl || req.url || null,
         });
         if (!log) return res.status(500).json({ message: 'Failed to log issue' });
 
@@ -617,6 +618,7 @@ class IssueController {
             userAgent: req.headers["user-agent"] || null,
             outcome: "SUCCESS",
             accessedBy: req.user?.name || null,
+            location: req.originalUrl || req.url || null,
         });
 
         if (!log) {
