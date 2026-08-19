@@ -526,7 +526,8 @@ class ClinicalReportController {
                     day: 'numeric'
                 }),
                 viewToken: viewLink,
-                companyName: report.tenant.companyName
+                companyName: report.tenant.companyName,
+                tenantEmail: report.tenant.email
             });
 
             const emailText = `

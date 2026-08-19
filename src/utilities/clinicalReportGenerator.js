@@ -73,79 +73,256 @@ class ClinicalReportPdfGenerator {
     }
 
     renderDocument(doc, report, sections) {
-        // Page 1: Header and Client Information
         this.renderHeader(doc, report);
         this.renderDocumentTitle(doc, report.title || 'Behaviour Intervention Plan');
 
-        // Render each section
-        sections.forEach((section, index) => {
-            if (section.section === 'Client Information') {
-                this.renderClientInformation(doc, section.content, report);
-            } else if (section.section === 'Assessments') {
-                this.renderAssessments(doc, section.content);
+        [...sections]
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            .forEach((section) => {
+                if (section.content != null) {
+                    this.renderCompleteSection(doc, section.section, section.content);
+                }
+            });
+    }
+
+    renderCompleteSection(doc, title, content) {
+        if (content == null || (typeof content === 'object' && !Object.keys(content).length)) {
+            return;
+        }
+
+        this.renderSectionHeader(doc, title);
+
+        if (Array.isArray(content)) {
+            content.forEach((entry, index) => {
+                if (index > 0) {
+                    doc.moveDown(0.8);
+                }
+                this.renderValue(doc, entry, index + 1);
+            });
+            return;
+        }
+
+        this.renderValue(doc, content);
+    }
+
+    renderValue(doc, value, entryNumber = null) {
+        if (Array.isArray(value)) {
+            value.forEach((entry, index) => {
+                if (index > 0) {
+                    doc.moveDown(0.5);
+                }
+                this.renderValue(doc, entry, index + 1);
+            });
+            return;
+        }
+
+        if (!value || typeof value !== 'object') {
+            this.renderParagraph(doc, entryNumber ? `Entry ${entryNumber}` : 'Value', value);
+            return;
+        }
+
+        if (entryNumber) {
+            this.renderEntryHeader(doc, `Entry ${entryNumber}`);
+        }
+
+        Object.entries(value).forEach(([key, fieldValue]) => {
+            if (fieldValue == null || fieldValue === '') {
+                return;
             }
-            // Add more section handlers as needed
+
+            const label = this.formatLabel(key);
+            if (Array.isArray(fieldValue)) {
+                this.renderEntryHeader(doc, label);
+                fieldValue.forEach((entry, index) => {
+                    this.renderValue(doc, entry, index + 1);
+                });
+            } else if (fieldValue && typeof fieldValue === 'object') {
+                this.renderEntryHeader(doc, label);
+                this.renderValue(doc, fieldValue);
+            } else if (this.isRichText(fieldValue) || String(fieldValue).length > 110) {
+                this.renderParagraph(doc, label, fieldValue);
+            } else {
+                this.renderAlignedField(doc, label, this.formatDisplayValue(fieldValue));
+            }
         });
     }
 
-    renderHeader(doc, report) {
-        const y = this.margin.top - 30;
+    renderEntryHeader(doc, title) {
+        this.ensureSpace(doc, 28);
+        doc.moveDown(0.25);
+        doc.roundedRect(this.margin.left, doc.y, this.contentWidth, 20, 3)
+            .fillColor('#EEF4F8')
+            .fill();
+        doc.fillColor(this.colors.secondary)
+            .font('Helvetica-Bold')
+            .fontSize(9)
+            .text(title.toUpperCase(), this.margin.left + 8, doc.y + 6, {
+                width: this.contentWidth - 16
+            });
+        doc.y += 26;
+    }
 
-        // "Confidential" text centered at top
-        doc.fontSize(10)
-            .fillColor(this.colors.confidential)
+    renderAlignedField(doc, label, value) {
+        const rowHeight = 18;
+        this.ensureSpace(doc, rowHeight);
+
+        const y = doc.y;
+        const labelWidth = 155;
+        doc.roundedRect(this.margin.left, y - 2, this.contentWidth, rowHeight, 2)
+            .fillColor('#FAFBFC')
+            .fill();
+        doc.fillColor(this.colors.label)
+            .font('Helvetica-Bold')
+            .fontSize(8)
+            .text(`${label}:`, this.margin.left + 7, y + 3, { width: labelWidth - 7 });
+        doc.fillColor(this.colors.text)
             .font('Helvetica')
-            .text('Confidential', this.margin.left, y, {
-                width: this.contentWidth,
+            .fontSize(9)
+            .text(value || 'N/A', this.margin.left + labelWidth, y + 2, {
+                width: this.contentWidth - labelWidth - 7,
+                lineBreak: false
+            });
+        doc.y = y + rowHeight + 2;
+    }
+
+    ensureSpace(doc, height) {
+        const bottom = this.pageHeight - this.margin.bottom - 12;
+        if (doc.y + height > bottom) {
+            doc.addPage();
+        }
+    }
+
+    isRichText(value) {
+        return typeof value === 'string' && /<\/?[a-z][^>]*>/i.test(value);
+    }
+
+    formatLabel(key) {
+        return key
+            .replace(/([a-z])([A-Z])/g, '$1 $2')
+            .replace(/[-_]+/g, ' ')
+            .replace(/\s+/g, ' ')
+            .replace(/^./, (letter) => letter.toUpperCase());
+    }
+
+    formatDisplayValue(value) {
+        if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+        if (Array.isArray(value)) return value.map((entry) => this.formatDisplayValue(entry)).join(', ');
+        return this.formatCategory(String(value));
+    }
+
+    renderHeader(doc, report) {
+        const y = this.margin.top - 34;
+        const tenant = report.tenant || {};
+        const clientName = this.getClientFullName(report);
+        const companyName = tenant.companyName || 'NooSphere Clinical Services';
+        const location = tenant.location || {};
+        const address = [location.address, location.city, location.stateProvince, location.country]
+            .filter(Boolean)
+            .join(', ');
+        const rightX = this.margin.left + this.contentWidth * 0.57;
+        const rightWidth = this.contentWidth * 0.43 - 18;
+        const headerHeight = 92;
+
+        doc.roundedRect(this.margin.left, y, this.contentWidth, headerHeight, 7)
+            .fillColor('#163B4D')
+            .fill();
+        doc.rect(this.margin.left, y + headerHeight - 5, this.contentWidth, 5)
+            .fillColor('#5BB7B0')
+            .fill();
+
+        doc.roundedRect(this.margin.left + 18, y + 18, 48, 48, 10)
+            .fillColor('#5BB7B0')
+            .fill();
+        doc.fillColor('#FFFFFF')
+            .font('Helvetica-Bold')
+            .fontSize(16)
+            .text(this.getInitials(companyName), this.margin.left + 18, y + 34, {
+                width: 48,
                 align: 'center'
             });
 
-        // Client name on left
-        const clientName = this.getClientFullName(report);
-        doc.fontSize(10)
-            .fillColor(this.colors.primary)
+        doc.fillColor('#FFFFFF')
             .font('Helvetica-Bold')
-            .text(`Client Name ${clientName}`, this.margin.left, y + 25);
-
-        // Company info on right
-        const rightX = this.pageWidth - this.margin.right - 200;
-        const tenant = report.tenant;
-
-        doc.fontSize(10)
-            .fillColor(this.colors.primary)
-            .font('Helvetica-Bold')
-            .text('Tenant Company', rightX, y + 25, { width: 120 });
-
-        doc.fontSize(8)
-            .fillColor(this.colors.text)
+            .fontSize(16)
+            .text(companyName, this.margin.left + 84, y + 20, {
+                width: rightX - this.margin.left - 98,
+                lineBreak: false
+            });
+        doc.fillColor('#B9D5D9')
             .font('Helvetica')
-            .text(tenant?.email || 'email@example.com', rightX, y + 40, { width: 120 });
-
-        if (tenant?.phoneNumber) {
-            doc.text(`+${tenant.phoneNumber}`, rightX, y + 52, { width: 120 });
-        }
-
-        // Address
-        if (tenant?.location) {
-            const loc = tenant.location;
-            const address = `${loc.address || ''}, ${loc.city || ''}, ${loc.stateProvince || ''}, ${loc.country || ''}`;
-            doc.fontSize(7)
-                .text(address, rightX, y + 64, { width: 120 });
-        }
-
-        // Logo placeholder (you can add actual logo loading here)
-        const logoX = this.pageWidth - this.margin.right - 50;
-        doc.circle(logoX + 20, y + 50, 20)
-            .fillColor('#E8F4F8')
-            .fill();
-        doc.fillColor(this.colors.primary)
             .fontSize(8)
-            .text('ABA', logoX + 10, y + 45);
-        doc.fontSize(6)
-            .text('PRACTICE', logoX + 5, y + 55);
+            .text('BEHAVIOUR HEALTH AND CLINICAL SERVICES', this.margin.left + 84, y + 45, {
+                characterSpacing: 1.2,
+                width: rightX - this.margin.left - 98
+            });
+        doc.fillColor('#DCEDEF')
+            .font('Helvetica')
+            .fontSize(7)
+            .text('CONFIDENTIAL CLINICAL DOCUMENT', this.margin.left + 84, y + 65, {
+                characterSpacing: 0.8,
+                width: 220
+            });
 
-        // Reset position for content
-        doc.y = y + 110;
+        doc.fillColor('#B9D5D9')
+            .font('Helvetica-Bold')
+            .fontSize(8)
+            .text('CONTACT', rightX, y + 18, { width: rightWidth });
+        doc.fillColor('#FFFFFF')
+            .font('Helvetica')
+            .fontSize(8)
+            .text(tenant.email || 'Email unavailable', rightX, y + 29, { width: rightWidth });
+        if (tenant.phoneNumber) {
+            doc.text(`+${tenant.phoneNumber}`, rightX, y + 41, { width: rightWidth });
+        }
+        if (address) {
+            doc.fillColor('#DCEDEF').fontSize(7.5).text(address, rightX, y + 58, { width: rightWidth, height: 20 });
+        }
+
+        const metaY = y + headerHeight + 14;
+        doc.roundedRect(this.margin.left, metaY, this.contentWidth, 38, 4)
+            .fillColor('#EEF6F7')
+            .fill();
+        doc.fillColor('#52717B')
+            .font('Helvetica-Bold')
+            .fontSize(7)
+            .text('PREPARED FOR', this.margin.left + 12, metaY + 8);
+        doc.fillColor('#163B4D')
+            .font('Helvetica-Bold')
+            .fontSize(10)
+            .text(clientName, this.margin.left + 12, metaY + 19, { width: 175, lineBreak: false });
+        doc.fillColor('#52717B')
+            .font('Helvetica-Bold')
+            .fontSize(7)
+            .text('REPORT STATUS', this.margin.left + 210, metaY + 8);
+        doc.fillColor('#163B4D')
+            .font('Helvetica')
+            .fontSize(9)
+            .text(this.formatCategory(report.status || 'Clinical Report'), this.margin.left + 210, metaY + 19, { width: 110, lineBreak: false });
+        doc.fillColor('#52717B')
+            .font('Helvetica-Bold')
+            .fontSize(7)
+            .text('DATE', this.margin.left + 350, metaY + 8);
+        doc.fillColor('#163B4D')
+            .font('Helvetica')
+            .fontSize(9)
+            .text(format(new Date(report.createdAt || Date.now()), 'dd MMM yyyy'), this.margin.left + 350, metaY + 19, { width: 90, lineBreak: false });
+
+        doc.moveTo(this.margin.left, metaY + 52)
+            .lineTo(this.margin.left + this.contentWidth, metaY + 52)
+            .lineWidth(1)
+            .strokeColor('#C7D8DE')
+            .stroke();
+
+        doc.y = metaY + 62;
+    }
+
+    getInitials(name) {
+        return name
+            .split(/\s+/)
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((part) => part.charAt(0).toUpperCase())
+            .join('') || 'NC';
     }
 
     renderDocumentTitle(doc, title) {
@@ -161,28 +338,22 @@ class ClinicalReportPdfGenerator {
     }
 
     renderSectionHeader(doc, title) {
-        // Add some space before section
-        if (doc.y > 150) {
-            doc.moveDown(1);
-        }
-
-        doc.fontSize(this.fonts.heading2.size)
+        this.ensureSpace(doc, 38);
+        doc.moveDown(0.8);
+        doc.roundedRect(this.margin.left, doc.y, this.contentWidth, 28, 4)
             .fillColor(this.colors.primary)
-            .font(this.fonts.heading2.font)
-            .text(title.toUpperCase(), {
-                continued: false
+            .fill();
+        doc.fontSize(12)
+            .fillColor('#FFFFFF')
+            .font('Helvetica-Bold')
+            .text(title.toUpperCase(), this.margin.left + 10, doc.y + 8, {
+                width: this.contentWidth - 20,
+                lineBreak: false
             });
-        doc.moveDown(0.5);
+        doc.y += 36;
     }
 
     renderField(doc, label, value, options = {}) {
-        const y = doc.y;
-
-        // Check if we need a new page
-        if (y > this.pageHeight - this.margin.bottom - 50) {
-            doc.addPage();
-        }
-
         // Render label
         doc.fontSize(this.fonts.label.size)
             .fillColor(this.colors.label)
@@ -205,14 +376,8 @@ class ClinicalReportPdfGenerator {
     }
 
     renderParagraph(doc, label, content) {
-        const y = doc.y;
+        this.ensureSpace(doc, 42);
 
-        // Check if we need a new page
-        if (y > this.pageHeight - this.margin.bottom - 100) {
-            doc.addPage();
-        }
-
-        // Render label
         doc.fontSize(this.fonts.label.size)
             .fillColor(this.colors.label)
             .font(this.fonts.label.font)
@@ -306,15 +471,14 @@ class ClinicalReportPdfGenerator {
     }
 
     renderAssessments(doc, content) {
-        if (!content.items || content.items.length === 0) {
+        const assessments = Array.isArray(content) ? content : (content.items || []);
+        if (assessments.length === 0) {
             return;
         }
 
-        // Start assessments on a new page
-        doc.addPage();
         this.renderSectionHeader(doc, 'Assessments');
 
-        content.items.forEach((assessment, index) => {
+        assessments.forEach((assessment, index) => {
             if (index > 0) {
                 doc.moveDown(1.5);
                 // Check if we need a new page
@@ -330,7 +494,7 @@ class ClinicalReportPdfGenerator {
             // Date
             if (assessment.date) {
                 this.renderField(doc, 'Date',
-                    format(new Date(assessment.date), 'dd MMMM yyyy'));
+                    this.isValidDate(assessment.date) ? format(new Date(assessment.date), 'dd MMMM yyyy') : assessment.date);
             }
 
             // Administered by
@@ -340,7 +504,7 @@ class ClinicalReportPdfGenerator {
 
             // Methods used
             if (assessment.methodsUsed) {
-                this.renderParagraph(doc, 'Methods Used', assessment.methodsUsed);
+                this.renderField(doc, 'Methods Used', this.formatList(assessment.methodsUsed));
             }
 
             // Method notes
@@ -377,6 +541,552 @@ class ClinicalReportPdfGenerator {
         });
     }
 
+    renderTargetBehaviours(doc, content) {
+        const items = Array.isArray(content) ? content : [];
+        if (items.length === 0) return;
+
+        this.renderSectionHeader(doc, 'Target Behaviours');
+
+        items.forEach((behaviour, index) => {
+            if (index > 0) {
+                doc.moveDown(1.5);
+                if (doc.y > this.pageHeight - this.margin.bottom - 200) {
+                    doc.addPage();
+                }
+            }
+
+            this.renderField(doc, 'Name', behaviour.name || 'N/A');
+            this.renderField(doc, 'Category', this.formatCategory(behaviour.category));
+            if (behaviour.categoryOther) {
+                this.renderField(doc, 'Category (Other)', behaviour.categoryOther);
+            }
+
+            if (behaviour.operationalDefinition) {
+                this.renderParagraph(doc, 'Operational Definition', behaviour.operationalDefinition);
+            }
+
+            this.renderField(doc, 'Direction', this.formatCategory(behaviour.direction));
+            this.renderField(doc, 'Function of Behavior', this.formatCategory(behaviour.functionOfBehavior));
+            if (behaviour.functionOther) {
+                this.renderField(doc, 'Function (Other)', behaviour.functionOther);
+            }
+
+            if (behaviour.antecedentConsequence) {
+                this.renderParagraph(doc, 'Antecedent / Consequence', behaviour.antecedentConsequence);
+            }
+
+            if (behaviour.baselineDescription) {
+                this.renderParagraph(doc, 'Baseline Description', behaviour.baselineDescription);
+            }
+
+            this.renderField(doc, 'Measurement Method', this.formatCategory(behaviour.measurementMethod));
+            if (behaviour.measurementMethodOther) {
+                this.renderField(doc, 'Measurement Method (Other)', behaviour.measurementMethodOther);
+            }
+
+            if (behaviour.graphReference) {
+                this.renderField(doc, 'Graph Reference', behaviour.graphReference);
+            }
+
+            if (behaviour.settingsContext) {
+                this.renderField(doc, 'Settings / Context', this.formatCategory(behaviour.settingsContext));
+            }
+            if (behaviour.settingsContextOther) {
+                this.renderField(doc, 'Settings / Context (Other)', behaviour.settingsContextOther);
+            }
+
+            this.renderField(doc, 'Priority', this.formatCategory(behaviour.priority));
+        });
+    }
+
+    renderBehaviourStrategies(doc, content) {
+        const items = Array.isArray(content) ? content : [];
+        if (items.length === 0) return;
+
+        this.renderSectionHeader(doc, 'Behaviour Strategies');
+
+        items.forEach((strategy, index) => {
+            if (index > 0) {
+                doc.moveDown(1.5);
+                if (doc.y > this.pageHeight - this.margin.bottom - 200) {
+                    doc.addPage();
+                }
+            }
+
+            this.renderField(doc, 'Strategy Type', this.formatCategory(strategy.strategyType || strategy.strategyName));
+            if (strategy.customStrategyType) {
+                this.renderField(doc, 'Custom Strategy Type', strategy.customStrategyType);
+            }
+
+            this.renderField(doc, 'Target Behaviors', this.formatList(strategy.targetBehaviors));
+            this.renderField(doc, 'Function Addressed', this.formatCategory(strategy.functionAddressed));
+
+            if (strategy.replacementBehavior) {
+                this.renderField(doc, 'Replacement Behavior', strategy.replacementBehavior);
+            }
+            if (strategy.strategyDescription) {
+                this.renderParagraph(doc, 'Strategy Description', strategy.strategyDescription);
+            }
+            if (strategy.whenToUse) {
+                this.renderParagraph(doc, 'When to Use', strategy.whenToUse);
+            }
+
+            this.renderField(doc, 'Responsible Staff', this.formatList(strategy.responsibleStaff));
+            this.renderField(doc, 'Fidelity Requirements', this.formatCategory(strategy.fidelityRequirements));
+            if (strategy.customFidelityRequirement) {
+                this.renderField(doc, 'Custom Fidelity Requirement', strategy.customFidelityRequirement);
+            }
+
+            this.renderField(doc, 'Data Collected', this.formatList(strategy.dataCollected));
+            if (strategy.customDataCollected) {
+                this.renderField(doc, 'Custom Data Collected', this.formatList(strategy.customDataCollected));
+            }
+        });
+    }
+
+    renderCrisisSafety(doc, content) {
+        const items = Array.isArray(content) ? content : [];
+        if (items.length === 0) return;
+
+        this.renderSectionHeader(doc, 'Crisis & Safety');
+
+        items.forEach((crisis, index) => {
+            if (index > 0) {
+                doc.moveDown(1.5);
+                if (doc.y > this.pageHeight - this.margin.bottom - 200) {
+                    doc.addPage();
+                }
+            }
+
+            this.renderField(doc, 'Crisis Type', this.formatCategory(crisis.crisisType));
+            if (crisis.crisisTypeOther) {
+                this.renderField(doc, 'Crisis Type (Other)', crisis.crisisTypeOther);
+            }
+            if (crisis.descriptionOfCrisisBehavior) {
+                this.renderParagraph(doc, 'Description of Crisis Behavior', crisis.descriptionOfCrisisBehavior);
+            }
+            if (crisis.earlyWarningSigns) {
+                this.renderField(doc, 'Early Warning Signs', crisis.earlyWarningSigns);
+            }
+            if (crisis.knownTriggers) {
+                this.renderField(doc, 'Known Triggers', crisis.knownTriggers);
+            }
+
+            this.renderField(doc, 'Risk Level', this.formatCategory(crisis.riskLevel));
+            if (crisis.crisisActivationCriteria) {
+                this.renderField(doc, 'Crisis Activation Criteria', this.formatCategory(crisis.crisisActivationCriteria));
+            }
+            if (crisis.immediateResponseProcedures) {
+                this.renderParagraph(doc, 'Immediate Response Procedures', crisis.immediateResponseProcedures);
+            }
+
+            this.renderField(doc, 'De-escalation Techniques', this.formatList(crisis.deescalationTechniques));
+            if (crisis.deescalationTechniquesOther) {
+                this.renderField(doc, 'De-escalation Techniques (Other)', crisis.deescalationTechniquesOther);
+            }
+
+            this.renderField(doc, 'Physical Intervention Permitted', this.formatCategory(crisis.physicalInterventionPermitted));
+            if (crisis.staffAuthorizedToIntervene) {
+                this.renderField(doc, 'Staff Authorized to Intervene', this.formatCategory(crisis.staffAuthorizedToIntervene));
+            }
+            if (crisis.staffAuthorizedOther) {
+                this.renderField(doc, 'Staff Authorized (Other)', crisis.staffAuthorizedOther);
+            }
+            if (crisis.environmentalSafetyActions) {
+                this.renderField(doc, 'Environmental Safety Actions', crisis.environmentalSafetyActions);
+            }
+
+            this.renderField(doc, 'Emergency Services Involvement', this.formatCategory(crisis.emergencyServicesInvolvement));
+            if (crisis.emergencyContactInstructions) {
+                this.renderParagraph(doc, 'Emergency Contact Instructions', crisis.emergencyContactInstructions);
+            }
+            if (crisis.postCrisisProcedure) {
+                this.renderField(doc, 'Post Crisis Procedure', crisis.postCrisisProcedure);
+            }
+
+            this.renderField(doc, 'Incident Documentation Required', crisis.incidentDocumentationRequired === 'yes' ? 'Yes' : 'No');
+            this.renderField(doc, 'Review Schedule', this.formatCategory(crisis.reviewSchedule));
+
+            if (crisis.additionalNotes) {
+                this.renderParagraph(doc, 'Additional Notes', crisis.additionalNotes);
+            }
+        });
+    }
+
+    renderGoalsTargets(doc, content) {
+        if (!content || Object.keys(content).length === 0) return;
+
+        this.renderSectionHeader(doc, 'Goals & Targets');
+
+        if (content.goalStatement) {
+            this.renderParagraph(doc, 'Goal Statement', content.goalStatement);
+        }
+        if (content.goalDomain) {
+            this.renderField(doc, 'Goal Domain', this.formatCategory(content.goalDomain));
+        }
+        if (content.goalDomainOther) {
+            this.renderField(doc, 'Goal Domain (Other)', content.goalDomainOther);
+        }
+        if (content.baselineLevel) {
+            this.renderField(doc, 'Baseline Level', content.baselineLevel);
+        }
+        if (content.goalTimeframe) {
+            this.renderField(doc, 'Goal Timeframe', this.formatCategory(content.goalTimeframe));
+        }
+        if (content.measurementMethod) {
+            this.renderField(doc, 'Measurement Method', this.formatCategory(content.measurementMethod));
+        }
+        if (content.measurementMethodOther) {
+            this.renderField(doc, 'Measurement Method (Other)', content.measurementMethodOther);
+        }
+
+        if (content.targetStatement) {
+            doc.moveDown(0.5);
+            this.renderParagraph(doc, 'Target Statement', content.targetStatement);
+        }
+        if (content.targetType) {
+            this.renderField(doc, 'Target Type', this.formatCategory(content.targetType));
+        }
+        if (content.baselineLevelReference) {
+            this.renderField(doc, 'Baseline Level Reference', content.baselineLevelReference);
+        }
+        if (content.masteryCriteria) {
+            this.renderField(doc, 'Mastery Criteria', content.masteryCriteria);
+        }
+        if (content.reviewTimeframe) {
+            this.renderField(doc, 'Review Timeframe', this.formatCategory(content.reviewTimeframe));
+        }
+        if (content.targetStatus) {
+            this.renderField(doc, 'Target Status', this.formatCategory(content.targetStatus));
+        }
+        if (content.discontinuationCriteria) {
+            this.renderField(doc, 'Discontinuation Criteria', content.discontinuationCriteria);
+        }
+    }
+
+    renderMonitoringData(doc, content) {
+        if (!content || Object.keys(content).length === 0) return;
+
+        this.renderSectionHeader(doc, 'Monitoring Data');
+
+        if (content.dataCollectionOverview) {
+            this.renderParagraph(doc, 'Data Collection Overview', content.dataCollectionOverview);
+        }
+        if (content.behaviorsTargetsMonitored) {
+            this.renderField(doc, 'Behaviors / Targets Monitored', content.behaviorsTargetsMonitored);
+        }
+        if (content.measurementMethods) {
+            this.renderField(doc, 'Measurement Methods', this.formatCategory(content.measurementMethods));
+        }
+        if (content.measurementMethodsOther) {
+            this.renderField(doc, 'Measurement Methods (Other)', content.measurementMethodsOther);
+        }
+        if (content.dataCollectionFrequency) {
+            this.renderField(doc, 'Data Collection Frequency', this.formatCategory(content.dataCollectionFrequency));
+        }
+        if (content.whoCollectsData) {
+            this.renderField(doc, 'Who Collects Data', content.whoCollectsData);
+        }
+        if (content.dataRecordingTools) {
+            this.renderField(doc, 'Data Recording Tools', this.formatCategory(content.dataRecordingTools));
+        }
+        if (content.dataRecordingToolsOther) {
+            this.renderField(doc, 'Data Recording Tools (Other)', content.dataRecordingToolsOther);
+        }
+        if (content.dataReviewFrequency) {
+            this.renderField(doc, 'Data Review Frequency', this.formatCategory(content.dataReviewFrequency));
+        }
+        if (content.dataStorageLocation) {
+            this.renderField(doc, 'Data Storage Location', this.formatCategory(content.dataStorageLocation));
+        }
+        if (content.dataStorageLocationOther) {
+            this.renderField(doc, 'Data Storage Location (Other)', content.dataStorageLocationOther);
+        }
+        if (content.progressReportingMethods) {
+            this.renderField(doc, 'Progress Reporting Methods', this.formatCategory(content.progressReportingMethods));
+        }
+        if (content.supportingDataAttachments) {
+            this.renderField(doc, 'Supporting Data Attachments', content.supportingDataAttachments);
+        }
+        if (content.supportingDataDescription) {
+            this.renderParagraph(doc, 'Supporting Data Description', content.supportingDataDescription);
+        }
+        if (content.dataInterpretation) {
+            this.renderParagraph(doc, 'Data Interpretation', content.dataInterpretation);
+        }
+        if (content.dataLimitationsNotes) {
+            this.renderParagraph(doc, 'Data Limitations Notes', content.dataLimitationsNotes);
+        }
+    }
+
+    renderImplementationNotes(doc, content) {
+        if (!content || Object.keys(content).length === 0) return;
+
+        this.renderSectionHeader(doc, 'Implementation Notes');
+
+        if (content.implementationOverview) {
+            this.renderParagraph(doc, 'Implementation Overview', content.implementationOverview);
+        }
+        if (content.serviceSettings) {
+            this.renderField(doc, 'Service Settings', this.formatCategory(content.serviceSettings));
+        }
+        if (content.sessionStructure) {
+            this.renderField(doc, 'Session Structure', content.sessionStructure);
+        }
+        if (content.staffRolesResponsibilities) {
+            this.renderField(doc, 'Staff Roles & Responsibilities', content.staffRolesResponsibilities);
+        }
+        if (content.caregiverInvolvement) {
+            this.renderField(doc, 'Caregiver Involvement', this.formatCategory(content.caregiverInvolvement));
+        }
+        if (content.caregiverTrainingDetails) {
+            this.renderField(doc, 'Caregiver Training Details', content.caregiverTrainingDetails);
+        }
+        if (content.materialsRequired) {
+            this.renderField(doc, 'Materials Required', content.materialsRequired);
+        }
+        if (content.environmentalConsiderations) {
+            this.renderField(doc, 'Environmental Considerations', content.environmentalConsiderations);
+        }
+        if (content.coordinationWithProviders) {
+            this.renderField(doc, 'Coordination With Providers', this.formatCategory(content.coordinationWithProviders));
+        }
+        if (content.coordinationWithProvidersOther) {
+            this.renderField(doc, 'Coordination With Providers (Other)', content.coordinationWithProvidersOther);
+        }
+        if (content.implementationConstraints) {
+            this.renderField(doc, 'Implementation Constraints', content.implementationConstraints);
+        }
+        if (content.fidelityMonitoringInPlace) {
+            this.renderField(doc, 'Fidelity Monitoring In Place', content.fidelityMonitoringInPlace === 'yes' ? 'Yes' : 'No');
+        }
+        if (content.fidelityMonitoringNotes) {
+            this.renderParagraph(doc, 'Fidelity Monitoring Notes', content.fidelityMonitoringNotes);
+        }
+    }
+
+    renderGeneralization(doc, content) {
+        if (!content || Object.keys(content).length === 0) return;
+
+        this.renderSectionHeader(doc, 'Generalization');
+
+        if (content.targetBehaviors) {
+            this.renderField(doc, 'Target Behaviors', this.formatList(content.targetBehaviors));
+        }
+        if (content.generalizationApproach) {
+            this.renderField(doc, 'Generalization Approach', this.formatCategory(content.generalizationApproach));
+        }
+        if (content.generalizationApproachOther) {
+            this.renderField(doc, 'Generalization Approach (Other)', content.generalizationApproachOther);
+        }
+        if (content.generalizationDescription) {
+            this.renderParagraph(doc, 'Generalization Description', content.generalizationDescription);
+        }
+        if (content.settingsForGeneralization) {
+            this.renderField(doc, 'Settings For Generalization', content.settingsForGeneralization);
+        }
+        if (content.settingsForGeneralizationOther) {
+            this.renderField(doc, 'Settings For Generalization (Other)', content.settingsForGeneralizationOther);
+        }
+        if (content.peopleInvolvedInGeneralization) {
+            this.renderField(doc, 'People Involved', this.formatCategory(content.peopleInvolvedInGeneralization));
+        }
+        if (content.peopleInvolvedOther) {
+            this.renderField(doc, 'People Involved (Other)', content.peopleInvolvedOther);
+        }
+        if (content.materialsVariationPlan) {
+            this.renderField(doc, 'Materials Variation Plan', content.materialsVariationPlan);
+        }
+        if (content.maintenancePlan) {
+            this.renderField(doc, 'Maintenance Plan', content.maintenancePlan);
+        }
+        if (content.maintenanceSchedule) {
+            this.renderField(doc, 'Maintenance Schedule', this.formatCategory(content.maintenanceSchedule));
+        }
+        if (content.fadingPlan) {
+            this.renderField(doc, 'Fading Plan', content.fadingPlan);
+        }
+        if (content.criteriaForMaintenanceSuccess) {
+            this.renderField(doc, 'Criteria For Maintenance Success', content.criteriaForMaintenanceSuccess);
+        }
+        if (content.generalizationMaintenanceNotes) {
+            this.renderParagraph(doc, 'Generalization / Maintenance Notes', content.generalizationMaintenanceNotes);
+        }
+    }
+
+    renderReview(doc, content) {
+        if (!content || Object.keys(content).length === 0) return;
+
+        this.renderSectionHeader(doc, 'Review');
+
+        if (content.reviewType) {
+            this.renderField(doc, 'Review Type', this.formatCategory(content.reviewType));
+        }
+        if (content.reviewDate) {
+            this.renderField(doc, 'Review Date',
+                this.isValidDate(content.reviewDate) ? format(new Date(content.reviewDate), 'dd MMMM yyyy') : content.reviewDate);
+        }
+        if (content.reviewedBy) {
+            this.renderField(doc, 'Reviewed By', content.reviewedBy);
+        }
+        if (content.summaryOfProgress) {
+            this.renderParagraph(doc, 'Summary of Progress', content.summaryOfProgress);
+        }
+        if (content.progressDetermination) {
+            this.renderField(doc, 'Progress Determination', this.formatCategory(content.progressDetermination));
+        }
+        if (content.decisionOutcome) {
+            this.renderField(doc, 'Decision Outcome', this.formatCategory(content.decisionOutcome));
+        }
+        if (content.rationaleForDecision) {
+            this.renderParagraph(doc, 'Rationale For Decision', content.rationaleForDecision);
+        }
+        if (content.changesRecommended) {
+            this.renderParagraph(doc, 'Changes Recommended', content.changesRecommended);
+        }
+        if (content.nextReviewTimeline) {
+            this.renderField(doc, 'Next Review Timeline', this.formatCategory(content.nextReviewTimeline));
+        }
+
+        const services = Array.isArray(content.items) ? content.items : [];
+        services.forEach((service, index) => {
+            doc.moveDown(1);
+            if (doc.y > this.pageHeight - this.margin.bottom - 150) {
+                doc.addPage();
+            }
+
+            this.renderField(doc, `Service Recommendation ${index + 1}`, service.serviceRecommendation || 'N/A');
+            if (service.descriptionOfServices) {
+                this.renderParagraph(doc, 'Description of Services', service.descriptionOfServices);
+            }
+            if (service.numberOfHoursRequested) {
+                this.renderField(doc, 'Number of Hours Requested', service.numberOfHoursRequested);
+            }
+            if (service.durationOfService) {
+                this.renderField(doc, 'Duration of Service', service.durationOfService);
+            }
+            if (service.location) {
+                this.renderField(doc, 'Location', this.formatCategory(service.location));
+            }
+            if (service.locationOther) {
+                this.renderField(doc, 'Location (Other)', service.locationOther);
+            }
+        });
+    }
+
+    renderDischarge(doc, content) {
+        if (!content || Object.keys(content).length === 0) return;
+
+        this.renderSectionHeader(doc, 'Discharge');
+
+        if (content.dischargeReason) {
+            this.renderField(doc, 'Discharge Reason', content.dischargeReason);
+        }
+        if (content.dischargeDate) {
+            this.renderField(doc, 'Discharge Date',
+                this.isValidDate(content.dischargeDate) ? format(new Date(content.dischargeDate), 'dd MMMM yyyy') : content.dischargeDate);
+        }
+        if (content.progressCompared) {
+            this.renderField(doc, 'Progress Compared', content.progressCompared);
+        }
+        if (content.dischargeCriteria) {
+            this.renderField(doc, 'Discharge Criteria', content.dischargeCriteria);
+        }
+        if (content.dischargeSummary) {
+            this.renderParagraph(doc, 'Discharge Summary', content.dischargeSummary);
+        }
+        if (content.postDischargeRecommendations) {
+            this.renderField(doc, 'Post-Discharge Recommendations', content.postDischargeRecommendations);
+        }
+        if (content.transitionSupports) {
+            this.renderField(doc, 'Transition Supports', content.transitionSupports);
+        }
+        if (content.supportingDocuments) {
+            this.renderField(doc, 'Supporting Documents', content.supportingDocuments);
+        }
+        if (content.reviewNotes) {
+            this.renderParagraph(doc, 'Review Notes', content.reviewNotes);
+        }
+    }
+
+    renderConsentSignatures(doc, content) {
+        if (!content || Object.keys(content).length === 0) return;
+
+        this.renderSectionHeader(doc, 'Consent & Signatures');
+
+        if (content.consentStatement) {
+            this.renderParagraph(doc, 'Consent Statement', content.consentStatement);
+        }
+        if (content.servicesConsented) {
+            this.renderField(doc, 'Services Consented', content.servicesConsented);
+        }
+        if (content.consentLimitations) {
+            this.renderField(doc, 'Consent Limitations', content.consentLimitations);
+        }
+        if (content.clientGuardianName) {
+            this.renderField(doc, 'Client / Guardian Name', content.clientGuardianName);
+        }
+        if (content.relationshipToClient) {
+            this.renderField(doc, 'Relationship To Client', this.formatCategory(content.relationshipToClient));
+        }
+
+        doc.moveDown(0.5);
+        this.renderSignature(doc, 'Client Signature', content.clientSignature);
+        if (content.clientSignatureDate) {
+            this.renderField(doc, 'Client Signature Date',
+                this.isValidDate(content.clientSignatureDate) ? format(new Date(content.clientSignatureDate), 'dd MMMM yyyy') : content.clientSignatureDate);
+        }
+
+        doc.moveDown(0.5);
+        if (content.clinicianName) {
+            this.renderField(doc, 'Clinician Name', content.clinicianName);
+        }
+        if (content.clinicianRole) {
+            this.renderField(doc, 'Clinician Role', this.formatCategory(content.clinicianRole));
+        }
+        this.renderSignature(doc, 'Clinician Signature', content.clinicianSignature);
+        if (content.clinicianSignatureDate) {
+            this.renderField(doc, 'Clinician Signature Date',
+                this.isValidDate(content.clinicianSignatureDate) ? format(new Date(content.clinicianSignatureDate), 'dd MMMM yyyy') : content.clinicianSignatureDate);
+        }
+
+        if (content.consentNotes) {
+            doc.moveDown(0.5);
+            this.renderParagraph(doc, 'Consent Notes', content.consentNotes);
+        }
+    }
+
+    renderSignature(doc, label, signature) {
+        if (!signature || typeof signature !== 'string') {
+            this.renderField(doc, label, 'N/A');
+            return;
+        }
+
+        if (signature.startsWith('data:image')) {
+            if (doc.y > this.pageHeight - this.margin.bottom - 120) {
+                doc.addPage();
+            }
+
+            doc.fontSize(this.fonts.label.size)
+                .fillColor(this.colors.label)
+                .font(this.fonts.label.font)
+                .text(label + ':');
+            doc.moveDown(0.2);
+
+            try {
+                const base64Data = signature.split(',')[1] || '';
+                const imageBuffer = Buffer.from(base64Data, 'base64');
+                doc.image(imageBuffer, this.margin.left, doc.y, { width: 180 });
+                doc.moveDown(4);
+            } catch {
+                this.renderField(doc, `${label} (image unreadable)`, 'N/A');
+            }
+            return;
+        }
+
+        this.renderField(doc, label, signature);
+    }
+
     addPageNumbers(doc) {
         const pageCount = doc.bufferedPageRange().count;
 
@@ -384,7 +1094,7 @@ class ClinicalReportPdfGenerator {
             doc.switchToPage(i);
 
             // Footer text
-            const footerY = this.pageHeight - this.margin.bottom + 20;
+            const footerY = this.pageHeight - this.margin.bottom - 15;
 
             doc.fontSize(7)
                 .fillColor(this.colors.text)
@@ -455,10 +1165,22 @@ class ClinicalReportPdfGenerator {
     }
 
     formatCategory(category) {
+        if (!category || typeof category !== 'string') return 'N/A';
         return category
             .split('-')
             .map(word => this.capitalizeFirst(word))
             .join(' ');
+    }
+
+    formatList(values) {
+        if (!values) return 'N/A';
+        const arr = Array.isArray(values) ? values : [values];
+        if (arr.length === 0) return 'N/A';
+        return arr.map(v => this.formatCategory(v)).join(', ');
+    }
+
+    isValidDate(value) {
+        return !isNaN(new Date(value).getTime());
     }
 
     capitalizeFirst(str) {
