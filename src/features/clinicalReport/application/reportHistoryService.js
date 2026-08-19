@@ -16,7 +16,7 @@ class ClinicalReportHistoryService {
     }
 
     async getHistories(clinicalReportId) {
-        const records = await this.repository.findAll({ clinicalReportId });
+        const records = await this.repository.findAllWithCreatedBy({ clinicalReportId });
         if (!records) throw new Error("No histories found for this report");
         return records;
     }
