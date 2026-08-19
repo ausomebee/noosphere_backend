@@ -35,6 +35,8 @@ export const adminProtect = (options = {}) =>
             where: { id: decoded.id },
             select: {
                 id: true,
+                firstName: true,
+                lastName: true,
                 superAdmin: true,
                 active: true,
                 isDeleted: true,
@@ -58,7 +60,13 @@ export const adminProtect = (options = {}) =>
             return next(new Error("Forbidden: Super admin access required"));
         }
 
-        req.user = { id: admin.id, type: "ADMIN", superAdmin: admin.superAdmin, role: admin.roles };
+        req.user = {
+            id: admin.id,
+            name: `${admin.firstName || ""} ${admin.lastName || ""}`.trim(),
+            type: "ADMIN",
+            superAdmin: admin.superAdmin,
+            role: admin.roles
+        };
         req.admin = admin;
         next();
     });
@@ -83,6 +91,7 @@ const staffProtectMiddleware = asyncHandler(async (req, res, next) => {
         where: { id: decoded.id },
         select: {
             id: true,
+            fullName: true,
             tenantId: true,
             active: true,
             isDeleted: true,
@@ -101,7 +110,13 @@ const staffProtectMiddleware = asyncHandler(async (req, res, next) => {
         return next(new Error("Not Authorized: Account not found or inactive"));
     }
 
-    req.user = { id: staff.id, type: "STAFF", tenantId: staff.tenantId, role: staff.role };
+    req.user = {
+        id: staff.id,
+        name: staff.fullName,
+        type: "STAFF",
+        tenantId: staff.tenantId,
+        role: staff.role
+    };
     req.tenantStaff = staff;
     next();
 });

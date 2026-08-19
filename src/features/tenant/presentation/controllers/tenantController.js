@@ -561,7 +561,7 @@ class TenantController {
             ipAddress: req.ip || null,
             userAgent: req.headers["user-agent"] || null,
             outcome: "SUCCESS",
-            accessedBy: staff.id,
+            accessedBy: staff.fullName,
         });
 
         if (!log) {

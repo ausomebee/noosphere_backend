@@ -11,13 +11,13 @@ class LogsController {
     }
 
     createLog = expressAsyncHandler(async (req, res) => {
-        const actorId = req.user?.id || req.body.accessedBy || null;
+        const actorName = req.user?.name || req.body.accessedBy || null;
         const log = await this.service.createLog({
             ...req.body,
             ipAddress: req.ip || req.body.ipAddress || null,
             userAgent: req.headers["user-agent"] || req.body.userAgent || null,
             outcome: req.body.outcome || "SUCCESS",
-            accessedBy: actorId,
+            accessedBy: actorName,
             adminId: req.user?.type === "ADMIN" ? req.user.id : req.body.adminId,
             clientId: req.user?.type === "CLIENT" ? req.user.clientId : req.body.clientId,
             tenantId: req.user?.tenantId || req.body.tenantId
