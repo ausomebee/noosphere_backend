@@ -721,31 +721,13 @@ class AppointmentService {
     }
 
     async getTenantUpcomingAppointments(tenantId) {
-        const now = new Date();
+        const appointments = await this.appointmentRepository.getUpcomingAppointments({ tenantId });
 
-        const allAppointments = await this.appointmentRepository.findAllAndPopulate(
-            { isCanceled: false, tenantId },
-            {
-                client: {
-                    select: {
-                        id: true, firstName: true,
-                        lastName: true,
-                        preferredName: true, email: true
-                    }
-                },
-                session: true,
-                appointmentServices: { include: { serviceCode: true } },
-                clinicians: { select: { id: true, fullName: true, email: true } }
-            }
-        );
+        if (!appointments || appointments.length === 0) {
+            return [];
+        }
 
-        return allAppointments
-        // .filter(appt => this.isUpcoming(appt, now))
-        // .sort((a, b) => {
-        //     const aDate = new Date(`${a.date}T${a.startTime}:00`);
-        //     const bDate = new Date(`${b.date}T${b.startTime}:00`);
-        //     return aDate - bDate;
-        // });
+        return appointments;
     }
 
     async getTenantPastAppointments(tenantId) {
