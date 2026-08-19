@@ -373,7 +373,7 @@ class IssueController {
             ipAddress: req.ip || null,
             userAgent: req.headers["user-agent"] || null,
             outcome: "SUCCESS",
-            accessedBy: req.user?.id || issue.adminLoggedById || null,
+            accessedBy: req.user?.name || null,
         });
         if (!log) return res.status(500).json({ message: 'Failed to log issue' });
 
@@ -616,7 +616,7 @@ class IssueController {
             ipAddress: req.ip || null,
             userAgent: req.headers["user-agent"] || null,
             outcome: "SUCCESS",
-            accessedBy: req.user?.id || comment.adminId || null,
+            accessedBy: req.user?.name || null,
         });
 
         if (!log) {

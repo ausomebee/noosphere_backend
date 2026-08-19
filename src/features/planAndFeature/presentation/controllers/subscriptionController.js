@@ -296,7 +296,7 @@ class SubscriptionController {
             ipAddress: req.ip || null,
             userAgent: req.headers["user-agent"] || null,
             outcome: "SUCCESS",
-            accessedBy: req.user?.id || req.body.adminId || null,
+            accessedBy: req.user?.name || null,
         })));
 
         return res.status(201).json({
