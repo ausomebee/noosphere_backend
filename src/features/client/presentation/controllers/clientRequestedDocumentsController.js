@@ -108,7 +108,7 @@ class ClientRequestedDocumentsController {
                 dueDate: new Date(request.dueDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
                 companyName: tenant.companyName,
                 tenantEmail: tenant.email,
-                clientPortalUrl: templateRenderer.buildTenantClientUrl(tenant.subdomain),
+                clientPortalUrl: `${templateRenderer.buildTenantClientUrl(tenant.subdomain)}/client/`,
             });
 
             const sendMail = await emailService.sendTenantEmail({
