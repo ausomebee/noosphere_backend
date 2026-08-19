@@ -36,11 +36,12 @@ class ClinicalReportRepository extends BaseRepository {
         });
     }
 
-    async findAllByStatusForClient(clientTenantId, status) {
+    async findAllByStatusForClient(clientTenantId, status, creatorId) {
         return await this.model.findMany({
             where: {
                 clientTenantId: clientTenantId,
                 status: status,
+                creatorId: creatorId,
                 isDeleted: false
             },
             include: {
