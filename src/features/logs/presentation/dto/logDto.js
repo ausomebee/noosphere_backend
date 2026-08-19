@@ -26,7 +26,8 @@ class LogsDto {
             ipAddress: Joi.string().trim().optional(),
             userAgent: Joi.string().trim().optional(),
             outcome: Joi.string().trim().optional(),
-            accessedBy: Joi.string().trim().optional()
+            accessedBy: Joi.string().trim().optional(),
+            location: Joi.string().trim().optional()
         });
 
         Validator.validateRequest(req, next, schema);

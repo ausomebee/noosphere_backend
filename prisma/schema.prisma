@@ -826,6 +826,7 @@ model Logs {
   userAgent      String?
   outcome        String?
   accessedBy     String?
+  location       String?
   subscriptionId String?
   issueId        String?
   createdAt      DateTime @default(now())
