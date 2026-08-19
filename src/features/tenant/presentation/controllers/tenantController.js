@@ -557,7 +557,11 @@ class TenantController {
             action: `${staff.fullName} logged in`,
             reason: "User login",
             details: `Staff ${staff.fullName} logged in at ${new Date().toISOString()}`,
-            feature: "login"
+            feature: "login",
+            ipAddress: req.ip || null,
+            userAgent: req.headers["user-agent"] || null,
+            outcome: "SUCCESS",
+            accessedBy: staff.id,
         });
 
         if (!log) {

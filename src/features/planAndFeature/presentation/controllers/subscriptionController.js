@@ -287,11 +287,16 @@ class SubscriptionController {
         }
 
         await Promise.all(subscriptions.map((subscription) => this.logService.createLog({
-            adminId: req.body.adminId,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : req.body.adminId,
             reason: req.body.reason,
             action: "change subscription status",
             details: req.body.comment,
             subscriptionId: subscription.id,
+            tenantId: subscription.tenantId,
+            ipAddress: req.ip || null,
+            userAgent: req.headers["user-agent"] || null,
+            outcome: "SUCCESS",
+            accessedBy: req.user?.id || req.body.adminId || null,
         })));
 
         return res.status(201).json({
