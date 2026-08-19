@@ -5,7 +5,12 @@ class ClientRequestedDocumentsService {
 
     async createRequestedDocument(data) {
         const exists = await this.clientRequestedDocumentsRepository.findFirstDynamic({
-            where: { name: data.name, tenantClientId: data.tenantClientId },
+            where: {
+                name: data.name,
+                tenantClientId: data.tenantClientId,
+                isDeleted: false,
+                status: { not: "CANCELLED" }
+            },
             select: { id: true }
         });
 
@@ -23,7 +28,13 @@ class ClientRequestedDocumentsService {
     }
 
     async updateRequestedDocument(data) {
-        const request = await this.clientRequestedDocumentsRepository.findOne({ id: data.id });
+        const request = await this.clientRequestedDocumentsRepository.findFirstDynamic({
+            where: {
+                id: data.id,
+                isDeleted: false,
+                status: { not: "CANCELLED" }
+            }
+        });
 
         if (!request) {
             throw new Error("Requested Document not found");
@@ -83,7 +94,13 @@ class ClientRequestedDocumentsService {
     }
 
     async getSingleRequestedDocument(data) {
-        const request = await this.clientRequestedDocumentsRepository.findOne({ id: data.id });
+        const request = await this.clientRequestedDocumentsRepository.findFirstDynamic({
+            where: {
+                id: data.id,
+                isDeleted: false,
+                status: { not: "CANCELLED" }
+            }
+        });
 
         if (!request) {
             throw new Error("Requested Document not found");
@@ -93,7 +110,11 @@ class ClientRequestedDocumentsService {
     }
 
     async getRequestedDocuments(tenantClientId) {
-        const requests = await this.clientRequestedDocumentsRepository.findAllAndPopulate({ tenantClientId }, { clientDocuments: true });
+        const requests = await this.clientRequestedDocumentsRepository.findAllAndPopulate({
+            tenantClientId,
+            isDeleted: false,
+            status: { not: "CANCELLED" }
+        }, { clientDocuments: true });
 
         if (!requests) {
             throw new Error("Requested Documents not found");
