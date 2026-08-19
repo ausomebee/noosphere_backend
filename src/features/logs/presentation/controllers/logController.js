@@ -18,6 +18,7 @@ class LogsController {
             userAgent: req.headers["user-agent"] || req.body.userAgent || null,
             outcome: req.body.outcome || "SUCCESS",
             accessedBy: actorName,
+            location: req.body.location || null,
             adminId: req.user?.type === "ADMIN" ? req.user.id : req.body.adminId,
             clientId: req.user?.type === "CLIENT" ? req.user.clientId : req.body.clientId,
             tenantId: req.user?.tenantId || req.body.tenantId

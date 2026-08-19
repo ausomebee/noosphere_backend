@@ -1,0 +1,2 @@
+ALTER TABLE "Logs"
+ADD COLUMN "location" TEXT;
