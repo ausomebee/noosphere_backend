@@ -139,6 +139,8 @@ class ClinicalReportPdfGenerator {
             } else if (fieldValue && typeof fieldValue === 'object') {
                 this.renderEntryHeader(doc, label);
                 this.renderValue(doc, fieldValue);
+            } else if (this.isImageValue(fieldValue)) {
+                this.renderImageField(doc, label, fieldValue);
             } else if (this.isRichText(fieldValue) || String(fieldValue).length > 110) {
                 this.renderParagraph(doc, label, fieldValue);
             } else {
@@ -194,6 +196,34 @@ class ClinicalReportPdfGenerator {
 
     isRichText(value) {
         return typeof value === 'string' && /<\/?[a-z][^>]*>/i.test(value);
+    }
+
+    isImageValue(value) {
+        return typeof value === 'string' && /^data:image\/(png|jpe?g|gif|webp);base64,/i.test(value);
+    }
+
+    renderImageField(doc, label, imageData) {
+        const imageBuffer = Buffer.from(imageData.split(',')[1] || '', 'base64');
+        const maxWidth = Math.min(240, this.contentWidth - 24);
+        const maxHeight = 100;
+
+        this.ensureSpace(doc, maxHeight + 38);
+        doc.fillColor(this.colors.label)
+            .font(this.fonts.label.font)
+            .fontSize(this.fonts.label.size)
+            .text(`${label}:`);
+        doc.moveDown(0.25);
+
+        try {
+            doc.image(imageBuffer, this.margin.left, doc.y, {
+                fit: [maxWidth, maxHeight],
+                align: 'left',
+                valign: 'top'
+            });
+            doc.y += maxHeight + 8;
+        } catch {
+            this.renderAlignedField(doc, label, 'Image could not be rendered');
+        }
     }
 
     formatLabel(key) {
