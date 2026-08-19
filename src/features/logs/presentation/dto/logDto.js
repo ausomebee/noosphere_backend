@@ -23,7 +23,10 @@ class LogsDto {
             module: Joi.string().trim().required(),
             action: Joi.string().trim().required(),
             details: Joi.string().trim().optional(),
-            ipAddress: Joi.string().trim().required()
+            ipAddress: Joi.string().trim().optional(),
+            userAgent: Joi.string().trim().optional(),
+            outcome: Joi.string().trim().optional(),
+            accessedBy: Joi.string().trim().optional()
         });
 
         Validator.validateRequest(req, next, schema);

@@ -11,7 +11,17 @@ class LogsController {
     }
 
     createLog = expressAsyncHandler(async (req, res) => {
-        const log = await this.service.createLog(req.body);
+        const actorId = req.user?.id || req.body.accessedBy || null;
+        const log = await this.service.createLog({
+            ...req.body,
+            ipAddress: req.ip || req.body.ipAddress || null,
+            userAgent: req.headers["user-agent"] || req.body.userAgent || null,
+            outcome: req.body.outcome || "SUCCESS",
+            accessedBy: actorId,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : req.body.adminId,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : req.body.clientId,
+            tenantId: req.user?.tenantId || req.body.tenantId
+        });
 
         if (!log) {
             res.status(500).json({ message: 'Failed to create log' });
