@@ -31,6 +31,9 @@ class AuditLogger {
         subscriptionId = null,
     } = {}) {
         try {
+            if (req) {
+                req.auditLogged = true;
+            }
             const service = this._getService();
             await service.createLog({
                 tenantId,

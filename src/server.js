@@ -6,6 +6,7 @@ import morgan from "morgan";
 import swaggerUi from 'swagger-ui-express';
 import { specs } from './config/swagger.js';
 import errorHandler from "./middleware/error-handler.js";
+import auditRequestLogger from "./middleware/audit-request-logger.js";
 import prismaService from "./config/prisma.js";
 import socketService from "./config/socket.js"
 // import PassportUtil from "./config/passport.js";
@@ -118,6 +119,7 @@ class App {
         this.initializeDatabase();
         this.initializeMiddlewares();
         this.initializeRequestTracking();
+        this.initializeAuditLogging();
         this.initializeSwagger();
         this.initializeRoutes();
         this.initializeErrorHandler();
@@ -203,6 +205,10 @@ class App {
 
             next();
         });
+    }
+
+    initializeAuditLogging() {
+        this.app.use(auditRequestLogger);
     }
 
     initializeRoutes() {
