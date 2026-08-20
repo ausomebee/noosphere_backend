@@ -142,6 +142,22 @@ class ClinicalReportChangeRequestController {
         });
     });
 
+    markAsViewed = expressAsyncHandler(async (req, res) => {
+        const record = await this.service.markAsViewed(req.params.id);
+
+        if (!record) {
+            return res
+                .status(500)
+                .json({ message: "Failed to mark report change request as viewed" });
+        }
+
+        return res.status(200).json({
+            message: "Report change request marked as viewed",
+            status: "ok",
+            data: record
+        });
+    });
+
 }
 
 export default ClinicalReportChangeRequestController;

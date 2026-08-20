@@ -183,7 +183,10 @@ class IssueController {
         return res.status(201).json({
             message: "Issue fetched successfully",
             status: 'ok',
-            data: issue
+            data: {
+                ...issue,
+                issueName: issue.title
+            }
         });
     });
 

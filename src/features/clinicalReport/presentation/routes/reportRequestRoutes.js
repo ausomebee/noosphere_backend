@@ -122,6 +122,29 @@ class ClinicalReportChangeRequestRoutes {
             staffProtect(),
             this.controller.getReportChangeRequests
         );
+
+        /**
+         * @swagger
+         * /api/v1/clinical-report-change-requests/{id}/view:
+         *   patch:
+         *     summary: Mark a clinical report change request as viewed
+         *     tags: [clinical-report-change-request]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: Clinical report change request ID
+         *     responses:
+         *       200:
+         *         description: Change request marked as viewed successfully
+         */
+        this.router.patch(
+            "/:id/view",
+            staffProtect(),
+            this.controller.markAsViewed
+        );
     }
 
     getRouter() {
