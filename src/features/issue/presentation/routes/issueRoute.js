@@ -338,6 +338,33 @@ class IssueRoutes {
 
         /**
         * @swagger
+        * /api/v1/issue/tenant/{tenantId}/status/{status}:
+        *   get:
+        *     summary: gets tenant issue by status
+        *     tags: [Issue]
+        *     parameters:
+        *       - in: path
+        *         name: tenantId
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The ID of the tenant
+        *       - in: path
+        *         name: status
+        *         required: true
+        *         schema:
+        *           type: string
+        *         description: The status of the issue
+        *     responses:
+        *       200:
+        *         description: issue fetched successfully
+        *       400:
+        *         description: Validation error
+        */
+        this.router.get("/tenant/:tenantId/status/:status", adminProtect(), this.controller.getTenantIssueByStatus);
+
+        /**
+        * @swagger
         * /api/v1/issue/tenant/{tenantId}:
         *   get:
         *     summary: gets tenant issue
@@ -398,33 +425,6 @@ class IssueRoutes {
         *         description: Validation error
         */
         this.router.get("/tenant-management-overview/:tenantId", adminProtect(),  this.controller.tenantManagementOverview);
-
-        /**
-        * @swagger
-        * /api/v1/issue/tenant/{tenantId}/status/{status}:
-        *   get:
-        *     summary: gets tenant issue by status
-        *     tags: [Issue]
-        *     parameters:
-        *       - in: path
-        *         name: tenantId
-        *         required: true
-        *         schema:
-        *           type: string
-        *         description: The ID of the tenant
-        *       - in: path
-        *         name: status
-        *         required: true
-        *         schema:
-        *           type: string
-        *         description: The status of the issue
-        *     responses:
-        *       200:
-        *         description: issue fetched successfully
-        *       400:
-        *         description: Validation error
-        */
-        this.router.get("/tenant/:tenantId/status/:status", adminProtect(), this.controller.getTenantIssueByStatus);
 
          /**
         * @swagger

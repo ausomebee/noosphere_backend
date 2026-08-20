@@ -76,6 +76,13 @@ class ClinicalReportChangeRequestRepository extends BaseRepository {
             }
         });
     }
+
+    async markAsViewed(id) {
+        return await this.model.update({
+            where: { id },
+            data: { viewed: true }
+        });
+    }
 }
 
 export default ClinicalReportChangeRequestRepository;

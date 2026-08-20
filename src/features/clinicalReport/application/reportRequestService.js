@@ -50,6 +50,33 @@ class ClinicalReportChangeRequestService {
         }
         return records;
     }
+
+    async markAsViewed(id) {
+        const existing = await this.repository.findOneAndPopulate({ id }, {
+            client: {
+                select: {
+                    client: {
+                        select: {
+                            firstName: true,
+                            lastName: true
+                        }
+                    }
+                }
+            },
+            approver: { select: { fullName: true } }
+        });
+
+        if (!existing) {
+            throw new Error("Clinical Report Change Request not found");
+        }
+
+        const updated = await this.repository.markAsViewed(id);
+        if (!updated) {
+            throw new Error("Failed to mark Clinical Report Change Request as viewed");
+        }
+
+        return updated;
+    }
 }
 
 export default ClinicalReportChangeRequestService;
