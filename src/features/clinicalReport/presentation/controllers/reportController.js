@@ -589,7 +589,7 @@ class ClinicalReportController {
             staffId: report.approverId,
             type: NotificationType.REPORT_APPROVAL_REQUEST_TO_SUPERVISOR,
             title: "Clinical report submitted for approval",
-            content: `${report.creator?.fullName || "A staff member"} submitted "${report.title}" for your approval.`,
+            content: `${report.creator?.fullName || "A staff member"} submitted "${report.title}" for ${report.client?.client?.firstName || "client"} ${report.client?.client?.lastName || ""} for your approval.`,
             subject: `Clinical report approval requested: ${report.title}`
         });
     }
