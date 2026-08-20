@@ -29,6 +29,7 @@ class LogsService {
     async getTenantLogs(data) {
         const logs = await this.logsRepository.getTenantLogs({
             tenantId: data.tenantId,
+            adminId: data.adminId,
             featureNames: data.featureNames ? [data.featureNames] : [],
             page: parseInt(data.page) || 1,
             limit: parseInt(data.limit) || 20,

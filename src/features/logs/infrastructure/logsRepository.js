@@ -32,11 +32,12 @@ class LogsRepository {
         });
     }
 
-    async getTenantLogs({ tenantId, featureNames = [], page = 1, limit = 20 }) {
+    async getTenantLogs({ tenantId, adminId, featureNames = [], page = 1, limit = 20 }) {
         const skip = (page - 1) * limit;
 
         const where = {
             tenantId,
+            ...(adminId !== undefined && { adminId }),
             ...(featureNames.length > 0 && {
                 feature: {
                     in: featureNames,
