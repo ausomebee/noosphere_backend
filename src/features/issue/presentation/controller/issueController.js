@@ -3,9 +3,7 @@ import prismaService from "../../../../config/prisma.js";
 import IssueRepository from "../../infrastructure/issueRepository.js";
 import IssueCommentRepository from "../../infrastructure/issueCommentRepository.js";
 import IssueService from "../../application/issueService.js";
-import LogsService from "../../../logs/application/logsService.js";
-import LogsRepository from "../../../logs/infrastructure/logsRepository.js";
-import Issue from "../../domain/issue.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 import AdminService from "../../../admin/application/adminService.js";
 import AdminRepository from "../../../admin/infrastructure/adminRepository.js";
 import MailService from "../../../../utilities/nodemailer.js";
@@ -20,9 +18,7 @@ class IssueController {
         this.prisma = prismaService.getClient()
         this.issueRepository = new IssueRepository(this.prisma.issue);
         this.issueCommentRepository = new IssueCommentRepository(this.prisma.issueComment);
-        this.logsRepository = new LogsRepository(this.prisma.logs);
         this.service = new IssueService({ issueRepository: this.issueRepository, issueCommentRepository: this.issueCommentRepository });
-        this.logService = new LogsService({ logsRepository: this.logsRepository });
         this.adminService = new AdminService();
         this.adminRepository = new AdminRepository(this.prisma.admin);
         this.notificationRepository = new NotificationsRepository(this.prisma.notification);
@@ -73,6 +69,17 @@ class IssueController {
         if (!issue) {
             res.status(500).json({ message: 'Failed to create issue' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: issue.tenantId,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : "TENANT",
+            feature: "Issue Management",
+            action: `created issue ${issue.id}`,
+            reason: "Issue management",
+            accessedBy: req.user?.name || null,
+            issueId: issue.id,
+        });
 
         const submittedOn = new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
         const issueTenant = await this.prisma.tenant.findUnique({
@@ -358,25 +365,16 @@ class IssueController {
         const issue = await this.service.updateIssue(data);
         if (!issue) return res.status(500).json({ message: 'Failed to update issue' });
 
-        const issueData = new Issue({
+        await auditLogger.log(req, {
             tenantId: issue.tenantId,
-            issueId: issue.id,
-            adminId: req.user.type === "ADMIN" ? req.user.id : null,
-            action: "updated an issue",
-            reason: "to improve tracking",
-            details: "updated an issue",
-            feature: "Issue Management"
-        });
-
-        const log = await this.logService.createLog({
-            ...issueData.createLog,
-            ipAddress: req.ip || null,
-            userAgent: req.headers["user-agent"] || null,
-            outcome: "SUCCESS",
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : "TENANT",
+            feature: "Issue Management",
+            action: `updated issue ${issue.id}`,
+            reason: "Issue management",
             accessedBy: req.user?.name || null,
-            location: req.originalUrl || req.url || null,
+            issueId: issue.id,
         });
-        if (!log) return res.status(500).json({ message: 'Failed to log issue' });
 
         if (data.status || data.category || data.priority || data.adminId) {
             const superAdmin = await this.adminService.getSuperAdmin();
@@ -609,21 +607,16 @@ class IssueController {
             res.status(500).json({ message: 'Failed to create issue comment' });
         }
 
-        const issueData = new Issue({ issueId: comment.issueId, adminId: comment.adminId, action: "added a comment", reason: "to improve tracking", details: "commented on an issue", feature: "Issue Management" });
-
-        const log = await this.logService.createLog({
-            ...issueData.createLog,
+        await auditLogger.log(req, {
             tenantId: comment.tenantId || null,
-            ipAddress: req.ip || null,
-            userAgent: req.headers["user-agent"] || null,
-            outcome: "SUCCESS",
+            adminId: req.user?.type === "ADMIN" ? req.user.id : comment.adminId || null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : "TENANT",
+            feature: "Issue Management",
+            action: `added comment to issue ${comment.issueId}`,
+            reason: "Issue management",
             accessedBy: req.user?.name || null,
-            location: req.originalUrl || req.url || null,
+            issueId: comment.issueId,
         });
-
-        if (!log) {
-            res.status(500).json({ message: 'Failed to log issue' });
-        }
 
         return res.status(201).json({
             message: "Issue comment created successfully",
