@@ -50,7 +50,8 @@ class LogsController {
     });
 
     getTenantLogs = expressAsyncHandler(async (req, res) => {
-        const logs = await this.service.getTenantLogs(req.query);
+        const query = { ...req.query, adminId: null };
+        const logs = await this.service.getTenantLogs(query);
 
         if (!logs) {
             res.status(500).json({ message: 'Failed to fetch logs' });
