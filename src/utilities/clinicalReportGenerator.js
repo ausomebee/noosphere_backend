@@ -14,15 +14,15 @@ class ClinicalReportPdfGenerator {
         };
         this.contentWidth = this.pageWidth - this.margin.left - this.margin.right;
 
-        // Colors
+        // Colors (NooSphere blue palette)
         this.colors = {
             confidential: '#999999',
-            primary: '#2C3E50',
-            secondary: '#34495E',
-            label: '#2C3E50',
-            text: '#4A4A4A',
-            lightGray: '#F5F5F5',
-            border: '#E0E0E0'
+            primary: '#1E3A8A',
+            secondary: '#2563EB',
+            label: '#1E3A8A',
+            text: '#374151',
+            lightGray: '#F3F4F6',
+            border: '#E5E7EB'
         };
 
         // Typography
@@ -117,12 +117,12 @@ class ClinicalReportPdfGenerator {
         }
 
         if (!value || typeof value !== 'object') {
-            this.renderParagraph(doc, entryNumber ? `Entry ${entryNumber}` : 'Value', value);
+            this.renderParagraph(doc, entryNumber ? `Assessment ${entryNumber}` : 'Value', value);
             return;
         }
 
         if (entryNumber) {
-            this.renderEntryHeader(doc, `Entry ${entryNumber}`);
+            this.renderEntryHeader(doc, `Assessment ${entryNumber}`);
         }
 
         Object.entries(value).forEach(([key, fieldValue]) => {
@@ -153,7 +153,10 @@ class ClinicalReportPdfGenerator {
         this.ensureSpace(doc, 28);
         doc.moveDown(0.25);
         doc.roundedRect(this.margin.left, doc.y, this.contentWidth, 20, 3)
-            .fillColor('#EEF4F8')
+            .fillColor('#EFF6FF')
+            .fill();
+        doc.rect(this.margin.left, doc.y, 3, 20)
+            .fillColor(this.colors.secondary)
             .fill();
         doc.fillColor(this.colors.secondary)
             .font('Helvetica-Bold')
@@ -171,7 +174,7 @@ class ClinicalReportPdfGenerator {
         const y = doc.y;
         const labelWidth = 155;
         doc.roundedRect(this.margin.left, y - 2, this.contentWidth, rowHeight, 2)
-            .fillColor('#FAFBFC')
+            .fillColor('#F8FAFC')
             .fill();
         doc.fillColor(this.colors.label)
             .font('Helvetica-Bold')
@@ -254,14 +257,14 @@ class ClinicalReportPdfGenerator {
         const headerHeight = 92;
 
         doc.roundedRect(this.margin.left, y, this.contentWidth, headerHeight, 7)
-            .fillColor('#163B4D')
+            .fillColor('#1E3A8A')
             .fill();
         doc.rect(this.margin.left, y + headerHeight - 5, this.contentWidth, 5)
-            .fillColor('#5BB7B0')
+            .fillColor('#3B82F6')
             .fill();
 
         doc.roundedRect(this.margin.left + 18, y + 18, 48, 48, 10)
-            .fillColor('#5BB7B0')
+            .fillColor('#3B82F6')
             .fill();
         doc.fillColor('#FFFFFF')
             .font('Helvetica-Bold')
@@ -278,14 +281,14 @@ class ClinicalReportPdfGenerator {
                 width: rightX - this.margin.left - 98,
                 lineBreak: false
             });
-        doc.fillColor('#B9D5D9')
+        doc.fillColor('#BFDBFE')
             .font('Helvetica')
             .fontSize(8)
             .text('BEHAVIOUR HEALTH AND CLINICAL SERVICES', this.margin.left + 84, y + 45, {
                 characterSpacing: 1.2,
                 width: rightX - this.margin.left - 98
             });
-        doc.fillColor('#DCEDEF')
+        doc.fillColor('#DBEAFE')
             .font('Helvetica')
             .fontSize(7)
             .text('CONFIDENTIAL CLINICAL DOCUMENT', this.margin.left + 84, y + 65, {
@@ -293,7 +296,7 @@ class ClinicalReportPdfGenerator {
                 width: 220
             });
 
-        doc.fillColor('#B9D5D9')
+        doc.fillColor('#BFDBFE')
             .font('Helvetica-Bold')
             .fontSize(8)
             .text('CONTACT', rightX, y + 18, { width: rightWidth });
@@ -305,34 +308,34 @@ class ClinicalReportPdfGenerator {
             doc.text(`+${tenant.phoneNumber}`, rightX, y + 41, { width: rightWidth });
         }
         if (address) {
-            doc.fillColor('#DCEDEF').fontSize(7.5).text(address, rightX, y + 58, { width: rightWidth, height: 20 });
+            doc.fillColor('#DBEAFE').fontSize(7.5).text(address, rightX, y + 58, { width: rightWidth, height: 20 });
         }
 
         const metaY = y + headerHeight + 14;
         doc.roundedRect(this.margin.left, metaY, this.contentWidth, 38, 4)
-            .fillColor('#EEF6F7')
+            .fillColor('#EFF6FF')
             .fill();
-        doc.fillColor('#52717B')
+        doc.fillColor('#1D4ED8')
             .font('Helvetica-Bold')
             .fontSize(7)
             .text('PREPARED FOR', this.margin.left + 12, metaY + 8);
-        doc.fillColor('#163B4D')
+        doc.fillColor('#1E3A8A')
             .font('Helvetica-Bold')
             .fontSize(10)
             .text(clientName, this.margin.left + 12, metaY + 19, { width: 175, lineBreak: false });
-        doc.fillColor('#52717B')
+        doc.fillColor('#1D4ED8')
             .font('Helvetica-Bold')
             .fontSize(7)
             .text('REPORT STATUS', this.margin.left + 210, metaY + 8);
-        doc.fillColor('#163B4D')
+        doc.fillColor('#1E3A8A')
             .font('Helvetica')
             .fontSize(9)
             .text(this.formatCategory(report.status || 'Clinical Report'), this.margin.left + 210, metaY + 19, { width: 110, lineBreak: false });
-        doc.fillColor('#52717B')
+        doc.fillColor('#1D4ED8')
             .font('Helvetica-Bold')
             .fontSize(7)
             .text('DATE', this.margin.left + 350, metaY + 8);
-        doc.fillColor('#163B4D')
+        doc.fillColor('#1E3A8A')
             .font('Helvetica')
             .fontSize(9)
             .text(format(new Date(report.createdAt || Date.now()), 'dd MMM yyyy'), this.margin.left + 350, metaY + 19, { width: 90, lineBreak: false });
@@ -340,7 +343,7 @@ class ClinicalReportPdfGenerator {
         doc.moveTo(this.margin.left, metaY + 52)
             .lineTo(this.margin.left + this.contentWidth, metaY + 52)
             .lineWidth(1)
-            .strokeColor('#C7D8DE')
+            .strokeColor('#BFDBFE')
             .stroke();
 
         doc.y = metaY + 62;
