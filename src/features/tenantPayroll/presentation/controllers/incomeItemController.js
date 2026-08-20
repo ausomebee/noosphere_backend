@@ -3,6 +3,7 @@ import prismaService from "../../../../config/prisma.js";
 import IncomeItemRepository from "../../infrastructure/incomeItemRepository.js";
 import IncomeItemService from "../../application/incomeItemService.js";
 import IncomeItem from "../../domain/incomeItem.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class IncomeItemController {
     constructor() {
@@ -20,6 +21,16 @@ class IncomeItemController {
             return res.status(500).json({ message: "Failed to create income item" });
         }
 
+        await auditLogger.log(req, {
+            tenantId: incomeItem.tenantId || req.user?.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Income Item Management",
+            action: `created income item ${incomeItem.id}`,
+            reason: "Income item management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Income item created successfully",
             status: "ok",
@@ -33,6 +44,16 @@ class IncomeItemController {
         if (!incomeItem) {
             return res.status(500).json({ message: "Failed to update income item" });
         }
+
+        await auditLogger.log(req, {
+            tenantId: incomeItem.tenantId || req.user?.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Income Item Management",
+            action: `updated income item ${incomeItem.id}`,
+            reason: "Income item management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Income item updated successfully",
@@ -79,6 +100,16 @@ class IncomeItemController {
             return res.status(404).json({ message: "Income item not found" });
         }
 
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Income Item Management",
+            action: `deleted income item ${req.params.id}`,
+            reason: "Income item management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(200).json({ message: "Income item deleted" });
     });
 
@@ -91,6 +122,16 @@ class IncomeItemController {
         if (!incomeItem) {
             return res.status(500).json({ message: "Failed to deactivate income item" });
         }
+
+        await auditLogger.log(req, {
+            tenantId: incomeItem.tenantId || req.user?.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Income Item Management",
+            action: `${req.params.active === "true" ? "activated" : "deactivated"} income item ${incomeItem.id}`,
+            reason: "Income item management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Income item deactivated successfully",

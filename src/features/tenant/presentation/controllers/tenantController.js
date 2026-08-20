@@ -27,6 +27,7 @@ import NotificationService from "../../../notifications/application/notification
 import SocketService from "../../../../config/socket.js";
 import templateRenderer from "../../../../utilities/templateRenderer.js";
 import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class TenantController {
     constructor() {
@@ -552,22 +553,16 @@ class TenantController {
             return res.status(500).json({ message: 'Failed to login tenant staff.' });
         }
 
-        const log = await this.logService.createLog({
+        await auditLogger.log(req, {
             tenantId: staff.tenantId,
+            module: "TENANT",
             action: `${staff.fullName} logged in`,
             reason: "User login",
             details: `Staff ${staff.fullName} logged in at ${new Date().toISOString()}`,
             feature: "login",
-            ipAddress: req.ip || null,
-            userAgent: req.headers["user-agent"] || null,
             outcome: "SUCCESS",
             accessedBy: staff.fullName,
-            location: req.originalUrl || req.url || null,
         });
-
-        if (!log) {
-            res.status(500).json({ message: 'Failed to log login' });
-        }
 
         return res.status(200).json({
             message: "Login successful",

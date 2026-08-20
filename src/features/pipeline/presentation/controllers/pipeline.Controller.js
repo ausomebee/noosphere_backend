@@ -12,6 +12,7 @@ import PipelineDoneTaskRepository from "../../infrastructure/pipelineDoneTaskRep
 import PipelineSubmittedDocumentRepository from "../../infrastructure/pipelineSubmittedDocumentRepository.js";
 import PipelineItemCustomTaskRepository from "../../infrastructure/pipelineItemCustomTaskRepository.js";
 import PipelineItemCustomDocumentRepository from "../../infrastructure/pipelineItemCustomDocumentRepository.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class PipelineController {
     constructor() {
@@ -45,6 +46,17 @@ class PipelineController {
         if (!pipeline) {
             res.status(500).json({ message: 'Failed to create pipeline' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: pipeline.createdByTenantId || req.user?.tenantId || req.body.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `created a pipeline: ${pipeline.name}`,
+            reason: "Pipeline created",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Pipeline created successfully",
@@ -88,6 +100,17 @@ class PipelineController {
             res.status(500).json({ message: 'Failed to update pipeline' });
         }
 
+        await auditLogger.log(req, {
+            tenantId: pipeline.createdByTenantId || req.user?.tenantId || req.body.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `updated pipeline: ${pipeline.name}`,
+            reason: "Pipeline updated",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Pipeline updated successfully",
             status: 'ok',
@@ -101,6 +124,17 @@ class PipelineController {
         if (!stage) {
             res.status(500).json({ message: 'Failed to create stage' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || req.body.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `created a pipeline stage: ${stage.name}`,
+            reason: "Pipeline stage created",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Stage created successfully",
@@ -144,6 +178,17 @@ class PipelineController {
             res.status(500).json({ message: 'Failed to update stage' });
         }
 
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || req.body.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `updated pipeline stage: ${stage.name}`,
+            reason: "Pipeline stage updated",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Stage updated successfully",
             status: 'ok',
@@ -157,6 +202,17 @@ class PipelineController {
         if (!item) {
             res.status(500).json({ message: 'Failed to create item' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: item.tenantId || req.user?.tenantId || req.body.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : (item.clientId || null),
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `created pipeline item ${item.id}`,
+            reason: "Pipeline item created",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Item created successfully",
@@ -244,6 +300,17 @@ class PipelineController {
             res.status(500).json({ message: 'Failed to update item' });
         }
 
+        await auditLogger.log(req, {
+            tenantId: item.tenantId || req.user?.tenantId || req.body.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : (item.clientId || null),
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `updated pipeline item ${item.id}`,
+            reason: "Pipeline item updated",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Item updated successfully",
             status: 'ok',
@@ -273,6 +340,17 @@ class PipelineController {
             res.status(500).json({ message: 'Failed to update item' });
         }
 
+        await auditLogger.log(req, {
+            tenantId: item.tenantId || req.user?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : (item.clientId || null),
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `updated sent documents for pipeline item ${item.id}`,
+            reason: "Pipeline item sent documents updated",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Item updated successfully",
             status: 'ok',
@@ -286,6 +364,17 @@ class PipelineController {
         if (!stage) {
             res.status(500).json({ message: 'Failed to delete stage' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `deleted pipeline stage ${req.params.id}`,
+            reason: "Pipeline stage deleted",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Stage deleted successfully",
@@ -301,6 +390,17 @@ class PipelineController {
             res.status(500).json({ message: 'Failed to delete item' });
         }
 
+        await auditLogger.log(req, {
+            tenantId: item.tenantId || req.user?.tenantId || null,
+            clientId: item.clientId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `deleted pipeline item ${item.id}`,
+            reason: "Tenant pipeline item deleted",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Item deleted successfully",
             status: 'ok',
@@ -314,6 +414,17 @@ class PipelineController {
         if (!item) {
             res.status(500).json({ message: 'Failed to delete item' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: item.tenantId || req.user?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : (item.clientId || null),
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `deleted pipeline item ${item.id}`,
+            reason: "Client pipeline item deleted",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Item deleted successfully",
@@ -335,6 +446,17 @@ class PipelineController {
             res.status(500).json({ message: 'Failed to update client' });
         }
 
+        await auditLogger.log(req, {
+            tenantId: item.tenantId || req.user?.tenantId || null,
+            clientId: item.clientId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `moved pipeline item ${item.id} to client`,
+            reason: "Pipeline item moved to client",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Moved to client successfully",
             status: 'ok',
@@ -348,6 +470,17 @@ class PipelineController {
         if (!item) {
             res.status(500).json({ message: 'Failed to delete items' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `deleted ${req.body.ids?.length || 0} pipeline items`,
+            reason: "Multiple tenant pipeline items deleted",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Items deleted successfully",
@@ -363,6 +496,17 @@ class PipelineController {
             res.status(500).json({ message: 'Failed to move items' });
         }
 
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `moved ${req.body.ids?.length || 0} pipeline items`,
+            reason: "Multiple tenant pipeline items moved",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Items moved successfully",
             status: 'ok',
@@ -377,6 +521,17 @@ class PipelineController {
             res.status(500).json({ message: 'Failed to assign items' });
         }
 
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `assigned ${req.body.ids?.length || 0} pipeline items`,
+            reason: "Multiple tenant pipeline items assigned",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Items assigned successfully",
             status: 'ok',
@@ -388,6 +543,17 @@ class PipelineController {
 
     createCustomTask = expressAsyncHandler(async (req, res) => {
         const task = await this.service.createCustomTask(req.body);
+
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || req.body.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `created a custom task for pipeline item ${task.pipelineItemId}`,
+            reason: "Custom task created",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Custom task created successfully",
@@ -409,6 +575,17 @@ class PipelineController {
     updateCustomTask = expressAsyncHandler(async (req, res) => {
         const task = await this.service.updateCustomTask(req.body);
 
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || req.body.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `updated custom task ${task.id}`,
+            reason: "Custom task updated",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(200).json({
             message: "Custom task updated successfully",
             status: 'ok',
@@ -418,6 +595,17 @@ class PipelineController {
 
     deleteCustomTask = expressAsyncHandler(async (req, res) => {
         const task = await this.service.deleteCustomTask(req.params.id);
+
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `deleted custom task ${req.params.id}`,
+            reason: "Custom task deleted",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Custom task deleted successfully",
@@ -430,6 +618,17 @@ class PipelineController {
 
     createCustomDocument = expressAsyncHandler(async (req, res) => {
         const doc = await this.service.createCustomDocument(req.body);
+
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || req.body.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `created a custom document for pipeline item ${doc.pipelineItemId}`,
+            reason: "Custom document created",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Custom document created successfully",
@@ -451,6 +650,17 @@ class PipelineController {
     updateCustomDocument = expressAsyncHandler(async (req, res) => {
         const doc = await this.service.updateCustomDocument(req.body);
 
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || req.body.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `updated custom document ${doc.id}`,
+            reason: "Custom document updated",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(200).json({
             message: "Custom document updated successfully",
             status: 'ok',
@@ -460,6 +670,17 @@ class PipelineController {
 
     deleteCustomDocument = expressAsyncHandler(async (req, res) => {
         const doc = await this.service.deleteCustomDocument(req.params.id);
+
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Pipeline Management",
+            action: `deleted custom document ${req.params.id}`,
+            reason: "Custom document deleted",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Custom document deleted successfully",

@@ -26,6 +26,7 @@ import SocketService from "../../../../config/socket.js";
 import ReferralCodeGenerator from "../../../../utilities/generateCode.js";
 import argon2 from "argon2";
 import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class BillingController {
     constructor() {
@@ -77,6 +78,17 @@ class BillingController {
         if (!billing) {
             res.status(500).json({ message: 'Failed to create Billing Metadata' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: billing?.tenantId || req.body?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Billing",
+            action: `created billing metadata ${billing?.id}`,
+            reason: "Billing management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Billing Metadata created successfully",
@@ -142,6 +154,17 @@ class BillingController {
             res.status(500).json({ message: 'Failed to update Billing Metadata' });
         }
 
+        await auditLogger.log(req, {
+            tenantId: billing?.tenantId || req.body?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Billing",
+            action: `updated billing metadata ${billing?.id}`,
+            reason: "Billing management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Billing Metadata updated successfully",
             status: 'ok',
@@ -184,6 +207,17 @@ class BillingController {
         if (!transaction) {
             res.status(500).json({ message: 'Failed to create transaction' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: transaction?.tenantId || req.body?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : transaction?.clientId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Billing",
+            action: `created transaction ${transaction?.id}`,
+            reason: "Billing management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Transaction created successfully",
@@ -228,6 +262,17 @@ class BillingController {
             res.status(500).json({ message: 'Failed to create payment' });
         }
 
+        await auditLogger.log(req, {
+            tenantId: payment?.tenantId || req.body?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : payment?.clientId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Billing",
+            action: `created payment ${payment?.id}`,
+            reason: "Billing management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Payment created successfully",
             status: 'ok',
@@ -241,6 +286,17 @@ class BillingController {
         if (!payment) {
             res.status(500).json({ message: 'Failed to update payment' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: payment?.tenantId || req.body?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : payment?.clientId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Billing",
+            action: `updated payment ${payment?.id}`,
+            reason: "Billing management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Payment updated successfully",

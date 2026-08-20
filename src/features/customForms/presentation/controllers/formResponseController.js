@@ -14,6 +14,7 @@ import NotificationsRepository from "../../../notifications/infrastructure/notif
 import NotificationService from "../../../notifications/application/notificationsService.js";
 import SocketService from "../../../../config/socket.js";
 import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class FormResponseController {
     constructor() {
@@ -66,6 +67,17 @@ class FormResponseController {
             }, SocketService.emitToUser.bind(SocketService));
         }
 
+        await auditLogger.log(req, {
+            tenantId: response.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Custom Forms",
+            action: `created form response ${response.id}`,
+            reason: "Custom form response management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Form response created successfully",
             status: "ok",
@@ -100,6 +112,17 @@ class FormResponseController {
                 }
             }
         }
+
+        await auditLogger.log(req, {
+            tenantId: updatedResponse.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Custom Forms",
+            action: `updated form response ${updatedResponse.id}`,
+            reason: "Custom form response management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Form response updated successfully",
@@ -154,6 +177,17 @@ class FormResponseController {
         if (!response) {
             return res.status(500).json({ message: "Failed to delete form response" });
         }
+
+        await auditLogger.log(req, {
+            tenantId: response.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Custom Forms",
+            action: `deleted form response ${response.id}`,
+            reason: "Custom form response management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Form response deleted successfully",

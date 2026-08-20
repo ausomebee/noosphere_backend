@@ -23,6 +23,7 @@ import NotificationService from "../../../notifications/application/notification
 import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
 import ClientNotificationEmitter from "../../../client/application/clientNotificationEmitter.js";
 import ClinicalReportNotificationService from "../../application/clinicalReportNotificationService.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class ClinicalReportController {
     constructor() {
@@ -105,6 +106,17 @@ class ClinicalReportController {
             await this.notifyApproverReportSubmitted(reportForNotification);
         }
 
+        await auditLogger.log(req, {
+            tenantId: report.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Clinical Report",
+            action: `created clinical report ${report.id}`,
+            reason: "Clinical report management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             status: "ok",
             message: "Clinical report created successfully",
@@ -143,6 +155,17 @@ class ClinicalReportController {
             await this.notifyApproverReportSubmitted(reportForNotification);
         }
 
+        await auditLogger.log(req, {
+            tenantId: updated.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Clinical Report",
+            action: `updated clinical report ${updated.id}`,
+            reason: "Clinical report management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(200).json({
             status: "ok",
             message: "Clinical report updated successfully",
@@ -154,6 +177,17 @@ class ClinicalReportController {
         const updated = await this.reportService.updateReport(
             { id: req.params.id, isDeleted: true }
         );
+
+        await auditLogger.log(req, {
+            tenantId: updated.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Clinical Report",
+            action: `deleted clinical report ${updated.id}`,
+            reason: "Clinical report management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             status: "ok",
@@ -178,6 +212,17 @@ class ClinicalReportController {
             const reportForNotification = await this.reportService.getReportForExport(updated.id);
             await this.notifyApproverReportSubmitted(reportForNotification);
         }
+
+        await auditLogger.log(req, {
+            tenantId: updated.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Clinical Report",
+            action: `changed clinical report ${updated.id} status to ${updated.status}`,
+            reason: "Clinical report management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             status: "ok",
@@ -248,14 +293,35 @@ class ClinicalReportController {
                 const pageWidth = 595.28; // A4 width in points
                 const leftMargin = 50;
                 const rightMargin = 50;
+                const brandPurple = "#8B5CF6";
+                const brandPink = "#EC4899";
+                const brandRed = "#EF4444";
 
                 /* ---------- HEADER ---------- */
+                // Noosphere brand gradient bar
+                const headerGradient = doc.linearGradient(leftMargin, 40, pageWidth - rightMargin, 75);
+                headerGradient.stop(0, brandPurple);
+                headerGradient.stop(0.5, brandPink);
+                headerGradient.stop(1, brandRed);
+                doc.rect(leftMargin, 40, pageWidth - leftMargin - rightMargin, 35).fill(headerGradient);
+
+                doc
+                    .fontSize(10)
+                    .fillColor("#ffffff")
+                    .font("Helvetica-Bold")
+                    .text("NooSphere Clinical Reports", leftMargin, 50, {
+                        align: "center",
+                        width: pageWidth - leftMargin - rightMargin
+                    });
+
+                doc.moveDown(2.5);
+
                 // "Confidential" text
                 doc
                     .fontSize(11)
-                    .fillColor("#999999")
+                    .fillColor("#9ca3af")
                     .font("Helvetica")
-                    .text("Confidential", leftMargin, 50, {
+                    .text("Confidential", leftMargin, doc.y, {
                         align: "center",
                         width: pageWidth - leftMargin - rightMargin
                     });
@@ -266,7 +332,7 @@ class ClinicalReportController {
                 const clientNameY = doc.y;
                 doc
                     .fontSize(11)
-                    .fillColor("#000000")
+                    .fillColor("#1a1a1a")
                     .font("Helvetica")
                     .text(`Client Name `, leftMargin, clientNameY, { continued: true })
                     .font("Helvetica-Bold")
@@ -277,7 +343,7 @@ class ClinicalReportController {
 
                 doc
                     .fontSize(11)
-                    .fillColor("#000000")
+                    .fillColor("#1a1a1a")
                     .font("Helvetica-Bold")
                     .text("Tenant Company", rightColumnX, clientNameY, {
                         width: 200,
@@ -286,7 +352,7 @@ class ClinicalReportController {
 
                 doc
                     .fontSize(9)
-                    .fillColor("#888888")
+                    .fillColor("#6b7280")
                     .font("Helvetica")
                     .text("email@gmail.com", rightColumnX, doc.y + 2, {
                         width: 200,
@@ -295,7 +361,7 @@ class ClinicalReportController {
 
                 doc
                     .fontSize(9)
-                    .fillColor("#888888")
+                    .fillColor("#6b7280")
                     .text("+441 344 36849", rightColumnX, doc.y + 2, {
                         width: 200,
                         align: "right"
@@ -303,7 +369,7 @@ class ClinicalReportController {
 
                 doc
                     .fontSize(9)
-                    .fillColor("#888888")
+                    .fillColor("#6b7280")
                     .text("304 Sharafa Street, Benz, Texas, US, 94562", rightColumnX, doc.y + 2, {
                         width: 200,
                         align: "right"
@@ -314,7 +380,7 @@ class ClinicalReportController {
                 /* ---------- TITLE ---------- */
                 doc
                     .fontSize(24)
-                    .fillColor("#000000")
+                    .fillColor(brandPurple)
                     .font("Helvetica-Bold")
                     .text("Document Title", leftMargin, doc.y, {
                         align: "center",
@@ -326,7 +392,7 @@ class ClinicalReportController {
                 /* ---------- SECTION HEADER ---------- */
                 doc
                     .fontSize(13)
-                    .fillColor("#000000")
+                    .fillColor(brandPurple)
                     .font("Helvetica-Bold")
                     .text("SECTION HEADER", leftMargin, doc.y);
 
@@ -335,38 +401,38 @@ class ClinicalReportController {
                 /* ---------- CLIENT DETAILS ---------- */
                 doc
                     .fontSize(11)
-                    .fillColor("#000000")
+                    .fillColor("#1a1a1a")
                     .font("Helvetica-Bold")
                     .text("Input Label (Client Name): ", leftMargin, doc.y, { continued: true })
                     .font("Helvetica")
-                    .fillColor("#333333")
+                    .fillColor("#4b5563")
                     .text(`Body Text (${"report.childName"})`);
 
                 doc
                     .fontSize(11)
-                    .fillColor("#000000")
+                    .fillColor("#1a1a1a")
                     .font("Helvetica-Bold")
                     .text("Date of Birth: ", leftMargin, doc.y + 4, { continued: true })
                     .font("Helvetica")
-                    .fillColor("#333333")
+                    .fillColor("#4b5563")
                     .text("report.dob");
 
                 doc
                     .fontSize(11)
-                    .fillColor("#000000")
+                    .fillColor("#1a1a1a")
                     .font("Helvetica-Bold")
                     .text("Gender: ", leftMargin, doc.y + 4, { continued: true })
                     .font("Helvetica")
-                    .fillColor("#333333")
+                    .fillColor("#4b5563")
                     .text("report.gender");
 
                 doc
                     .fontSize(11)
-                    .fillColor("#000000")
+                    .fillColor("#1a1a1a")
                     .font("Helvetica-Bold")
                     .text("Client age: ", leftMargin, doc.y + 4, { continued: true })
                     .font("Helvetica")
-                    .fillColor("#333333")
+                    .fillColor("#4b5563")
                     .text("report.age");
 
                 doc.moveDown(1.5);
@@ -374,13 +440,13 @@ class ClinicalReportController {
                 /* ---------- CLIENT BACKGROUND ---------- */
                 doc
                     .fontSize(11)
-                    .fillColor("#000000")
+                    .fillColor("#1a1a1a")
                     .font("Helvetica-Bold")
                     .text("Client background:", leftMargin, doc.y);
 
                 doc
                     .fontSize(11)
-                    .fillColor("#4a4a4a")
+                    .fillColor("#4b5563")
                     .font("Helvetica")
                     .text("report.background", leftMargin, doc.y + 4, {
                         width: pageWidth - leftMargin - rightMargin,
@@ -395,33 +461,33 @@ class ClinicalReportController {
                     // Diagnosis name
                     doc
                         .fontSize(11)
-                        .fillColor("#000000")
+                        .fillColor("#1a1a1a")
                         .font("Helvetica-Bold")
                         .text("Diagnosis name: ", leftMargin, doc.y, { continued: true })
                         .font("Helvetica")
-                        .fillColor("#333333")
+                        .fillColor("#4b5563")
                         .text("section.name");
 
                     // Diagnosis Code
                     doc
                         .fontSize(11)
-                        .fillColor("#000000")
+                        .fillColor("#1a1a1a")
                         .font("Helvetica-Bold")
                         .text("Diagnosis Code: ", leftMargin, doc.y + 4, { continued: true })
                         .font("Helvetica")
-                        .fillColor("#333333")
+                        .fillColor("#4b5563")
                         .text("section.code");
 
                     // Diagnosis Description
                     doc
                         .fontSize(11)
-                        .fillColor("#000000")
+                        .fillColor("#1a1a1a")
                         .font("Helvetica-Bold")
                         .text("Diagnosis Description: ", leftMargin, doc.y + 4, { continued: false });
 
                     doc
                         .fontSize(11)
-                        .fillColor("#4a4a4a")
+                        .fillColor("#4b5563")
                         .font("Helvetica")
                         .text(section.description, leftMargin, doc.y, {
                             width: pageWidth - leftMargin - rightMargin,
@@ -433,33 +499,33 @@ class ClinicalReportController {
                     if (section.diagnosisDate) {
                         doc
                             .fontSize(11)
-                            .fillColor("#000000")
+                            .fillColor("#1a1a1a")
                             .font("Helvetica-Bold")
                             .text("Diagnosis date: ", leftMargin, doc.y + 4, { continued: true })
                             .font("Helvetica")
-                            .fillColor("#333333")
+                            .fillColor("#4b5563")
                             .text(section.diagnosisDate);
                     }
 
                     if (section.diagnosedBy) {
                         doc
                             .fontSize(11)
-                            .fillColor("#000000")
+                            .fillColor("#1a1a1a")
                             .font("Helvetica-Bold")
                             .text("Diagnosed by: ", leftMargin, doc.y + 4, { continued: true })
                             .font("Helvetica")
-                            .fillColor("#333333")
+                            .fillColor("#4b5563")
                             .text(section.diagnosedBy);
                     }
 
                     if (section.primaryDiagnosis !== undefined) {
                         doc
                             .fontSize(11)
-                            .fillColor("#000000")
+                            .fillColor("#1a1a1a")
                             .font("Helvetica-Bold")
                             .text("Primary diagnosis: ", leftMargin, doc.y + 4, { continued: true })
                             .font("Helvetica")
-                            .fillColor("#333333")
+                            .fillColor("#4b5563")
                             .text(section.primaryDiagnosis ? "Yes" : "No");
                     }
 
@@ -475,7 +541,7 @@ class ClinicalReportController {
 
                 doc
                     .fontSize(9)
-                    .fillColor("#777777")
+                    .fillColor("#6b7280")
                     .font("Helvetica")
                     .text(
                         "This document was created using ",
@@ -487,23 +553,23 @@ class ClinicalReportController {
                             align: "center"
                         }
                     )
-                    .fillColor("#0066cc")
+                    .fillColor(brandPurple)
                     .font("Helvetica-Bold")
                     .text("NooSphere ABA PMS", { continued: true })
-                    .fillColor("#777777")
+                    .fillColor("#6b7280")
                     .font("Helvetica")
                     .text(". Visit ", { continued: true })
-                    .fillColor("#0066cc")
+                    .fillColor(brandPurple)
                     .font("Helvetica-Bold")
                     .text("www.noospherehub.net", { continued: true })
-                    .fillColor("#777777")
+                    .fillColor("#6b7280")
                     .font("Helvetica")
                     .text(" to get started");
 
                 // Page number in bottom right
                 doc
                     .fontSize(9)
-                    .fillColor("#999999")
+                    .fillColor("#9ca3af")
                     .font("Helvetica")
                     .text("01", pageWidth - rightMargin - 30, footerY, {
                         width: 30,

@@ -4,6 +4,7 @@ import prismaService from "../../../../config/prisma.js";
 import ClientFormRepository from "../../infrastructure/clientFormRepository.js";
 import ClientFormService from "../../application/clientFormService.js";
 import ClientForm from "../../domain/clientForm.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class ClientFormController {
     constructor() {
@@ -22,6 +23,17 @@ class ClientFormController {
         if (!clientForm) {
             return res.status(500).json({ message: "Failed to create client form" });
         }
+
+        await auditLogger.log(req, {
+            tenantId: clientForm.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Custom Forms",
+            action: `created client form ${clientForm.id}`,
+            reason: "Custom form management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "client form created successfully",

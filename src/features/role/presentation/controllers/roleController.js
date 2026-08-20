@@ -4,6 +4,7 @@ import Role from "../../domain/role.js";
 import RoleModuleAccessRepository from "../../infrastructure/roleModuleAccessRepository.js";
 import RoleModuleAccessService from "../../application/roleModuleAccessService.js";
 import prismaService from "../../../../config/prisma.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class RoleController {
     constructor() {
@@ -22,6 +23,17 @@ class RoleController {
         if (!role) {
             res.status(500).json({ message: 'Failed to create role' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || null,
+            clientId: null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Role Management",
+            action: "created an admin role",
+            reason: "Admin role created",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Role created successfully",
@@ -69,6 +81,17 @@ class RoleController {
             res.status(500).json({ message: 'Failed to deactivate role' });
         }
 
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || null,
+            clientId: null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Role Management",
+            action: `deactivated role ${req.params.id}`,
+            reason: "Role deactivated",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Role deactivated successfully",
             status: 'ok',
@@ -86,6 +109,17 @@ class RoleController {
         if (!role) {
             return res.status(500).json({ message: 'Failed to activate role' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || null,
+            clientId: null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Role Management",
+            action: `activated role ${req.params.id}`,
+            reason: "Role activated",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Role activated successfully",
@@ -120,6 +154,17 @@ class RoleController {
         if (!role) {
             res.status(500).json({ message: 'Failed to create role' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || null,
+            clientId: null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Role Management",
+            action: "created a tenant role",
+            reason: "Tenant role created",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Role created successfully",
@@ -158,6 +203,17 @@ class RoleController {
             });
         }
 
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || null,
+            clientId: null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Role Management",
+            action: "created a role",
+            reason: "Role created",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Role created successfully",
             status: 'ok',
@@ -192,6 +248,17 @@ class RoleController {
                 }
             }
         }
+
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || null,
+            clientId: null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Role Management",
+            action: `updated role ${updatedRole.id}`,
+            reason: "Role updated",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Role and module accesses updated successfully",

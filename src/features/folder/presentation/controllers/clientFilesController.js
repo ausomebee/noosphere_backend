@@ -3,6 +3,7 @@ import prismaService from "../../../../config/prisma.js";
 import ClientFilesRepository from "../../infrastucture/clientFilesRepository.js";
 import ClientFilesService from "../../application/clientFilesService.js";
 import ClientFiles from "../../domain/clientFiles.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class ClientFilesController {
     constructor() {
@@ -25,6 +26,17 @@ class ClientFilesController {
             return res.status(500).json({ message: "Failed to create client file" });
         }
 
+        await auditLogger.log(req, {
+            tenantId: newRecord.tenantId || req.user?.tenantId || req.body.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : newRecord.clientId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user ? (req.user.type === "ADMIN" ? "ADMIN" : req.user.type === "STAFF" ? "TENANT" : "CLIENT") : null,
+            feature: "Client Folder",
+            action: "created a client file",
+            reason: "Client file created",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Client file created successfully",
             status: "ok",
@@ -38,6 +50,17 @@ class ClientFilesController {
         if (!updated) {
             return res.status(500).json({ message: "Failed to update client file" });
         }
+
+        await auditLogger.log(req, {
+            tenantId: updated.tenantId || req.user?.tenantId || req.body.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : updated.clientId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user ? (req.user.type === "ADMIN" ? "ADMIN" : req.user.type === "STAFF" ? "TENANT" : "CLIENT") : null,
+            feature: "Client Folder",
+            action: `updated client file ${updated.id}`,
+            reason: "Client file updated",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Client file updated successfully",

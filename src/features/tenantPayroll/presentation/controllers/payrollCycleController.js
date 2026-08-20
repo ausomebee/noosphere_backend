@@ -15,6 +15,7 @@ import PayrollCycleStaffIncomeItemsRepository from "../../infrastructure/payroll
 import PayrollCycleStaffIncomeItemsService from "../../application/payrollCycleStaffIncomeItemsService.js";
 import PayrollCycleStaffDeduction from "../../domain/payrollCycleStaffDeductions.js";
 import PayrollCycleStaffIncomeItem from "../../domain/payrollCycleStaffIncomeItems.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class PayrollCycleController {
     constructor() {
@@ -88,6 +89,16 @@ class PayrollCycleController {
             }
         }
 
+        await auditLogger.log(req, {
+            tenantId: payrollCycle.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Payroll Cycle",
+            action: `created payroll cycle ${payrollCycle.id}`,
+            reason: "Payroll cycle management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Payroll cycle created successfully",
             status: "ok",
@@ -142,6 +153,16 @@ class PayrollCycleController {
             });
         }
 
+        await auditLogger.log(req, {
+            tenantId: payrollCycle.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Payroll Cycle",
+            action: `manually created payroll cycle ${payrollCycle.id}`,
+            reason: "Payroll cycle management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Payroll cycle created successfully",
             status: "ok",
@@ -156,6 +177,16 @@ class PayrollCycleController {
         if (!payrollCycle) {
             return res.status(500).json({ message: "Failed to update payroll cycle" });
         }
+
+        await auditLogger.log(req, {
+            tenantId: payrollCycle.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Payroll Cycle",
+            action: `updated payroll cycle ${payrollCycle.id}`,
+            reason: "Payroll cycle management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Payroll cycle updated successfully",
@@ -201,6 +232,16 @@ class PayrollCycleController {
         if (!payrollCycle) {
             return res.status(500).json({ message: "Failed to deactivate payroll cycle" });
         }
+
+        await auditLogger.log(req, {
+            tenantId: payrollCycle.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Payroll Cycle",
+            action: `${req.params.active === "true" ? "activated" : "deactivated"} payroll cycle ${payrollCycle.id}`,
+            reason: "Payroll cycle management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Payroll cycle deactivated successfully",

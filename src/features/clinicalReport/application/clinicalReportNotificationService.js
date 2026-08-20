@@ -76,7 +76,7 @@ class ClinicalReportNotificationService {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>${safe(title)}</title>
         <style type="text/css">
-            body { margin: 0; padding: 0; width: 100% !important; background: #eef3f5; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+            body { margin: 0; padding: 0; width: 100% !important; background: #f5f5f5; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
             table { border-collapse: collapse; }
             img { border: 0; display: block; }
             @media screen and (max-width: 620px) {
@@ -86,24 +86,28 @@ class ClinicalReportNotificationService {
             }
         </style>
         </head>
-        <body style="margin:0;padding:0;background:#eef3f5;font-family:Arial,Helvetica,sans-serif;color:#243746;">
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#eef3f5;">
+        <body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f5f5f5;">
             <tr>
             <td class="page-padding" align="center" style="padding:32px 18px;">
-                <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px;background:#ffffff;">
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px;background:#ffffff;border-radius:8px;overflow:hidden;">
                     <tr>
-                        <td style="height:7px;background:#5bb7b0;font-size:0;line-height:0;">&nbsp;</td>
+                        <td align="center" style="padding:0;height:60px;background:linear-gradient(90deg, #8B5CF6 0%, #EC4899 50%, #EF4444 100%);">
+                            <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:600px;height:60px;">
+                                <v:fill type="gradient" color="#8B5CF6" color2="#EF4444" angle="90" />
+                            </v:rect>
+                        </td>
                     </tr>
                     <tr>
-                        <td style="padding:22px 32px;background:#163b4d;">
+                        <td style="padding:22px 32px;background:#ffffff;">
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                                 <tr>
                                     <td width="42" valign="middle">
-                                        <table role="presentation" width="36" height="36" cellspacing="0" cellpadding="0" border="0" style="background:#5bb7b0;">
-                                            <tr><td align="center" valign="middle" style="color:#ffffff;font-size:14px;font-weight:bold;">NR</td></tr>
+                                        <table role="presentation" width="36" height="36" cellspacing="0" cellpadding="0" border="0" style="background:linear-gradient(135deg, #8B5CF6, #EC4899);">
+                                            <tr><td align="center" valign="middle" style="color:#ffffff;font-size:14px;font-weight:bold;">N</td></tr>
                                         </table>
                                     </td>
-                                    <td class="brand-name" valign="middle" style="padding-left:12px;color:#ffffff;font-size:20px;font-weight:bold;letter-spacing:.2px;">
+                                    <td class="brand-name" valign="middle" style="padding-left:12px;color:#1a1a1a;font-size:20px;font-weight:bold;letter-spacing:.2px;">
                                         NooSphere Clinical Reports
                                     </td>
                                 </tr>
@@ -112,29 +116,29 @@ class ClinicalReportNotificationService {
                     </tr>
                     <tr>
                         <td class="content-padding" style="padding:34px 40px 36px;">
-                            <p style="margin:0 0 7px;color:#6a818b;font-size:12px;font-weight:bold;letter-spacing:1.4px;text-transform:uppercase;">Clinical report update</p>
-                            <h1 style="margin:0 0 18px;color:#163b4d;font-size:25px;line-height:1.25;font-weight:bold;">${safe(title)}</h1>
-                            <p style="margin:0 0 24px;color:#536872;font-size:15px;line-height:1.7;">Hello ${safe(recipientName)},<br />${safe(content)}</p>
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f4f8f9;border:1px solid #d9e6e9;">
+                            <p style="margin:0 0 7px;color:#8B5CF6;font-size:12px;font-weight:bold;letter-spacing:1.4px;text-transform:uppercase;">Clinical report update</p>
+                            <h1 style="margin:0 0 18px;color:#1a1a1a;font-size:25px;line-height:1.25;font-weight:bold;">${safe(title)}</h1>
+                            <p style="margin:0 0 24px;color:#666666;font-size:15px;line-height:1.7;">Hello ${safe(recipientName)},<br />${safe(content)}</p>
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#faf5ff;border:1px solid #e9d5ff;border-radius:8px;">
                                 <tr>
-                                    <td style="padding:17px 18px 8px;color:#6a818b;font-size:11px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;">Report requiring attention</td>
+                                    <td style="padding:17px 18px 8px;color:#8B5CF6;font-size:11px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;">Report requiring attention</td>
                                 </tr>
                                 <tr>
-                                    <td style="padding:0 18px 17px;color:#163b4d;font-size:16px;font-weight:bold;line-height:1.4;">${safe(reportTitle)}</td>
+                                    <td style="padding:0 18px 17px;color:#1a1a1a;font-size:16px;font-weight:bold;line-height:1.4;">${safe(reportTitle)}</td>
                                 </tr>
                             </table>
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin-top:26px;">
                                 <tr>
-                                    <td style="background:#2f7d8c;">
+                                    <td style="background:#8B5CF6;border-radius:6px;">
                                         <span style="display:inline-block;padding:13px 22px;color:#ffffff;font-size:14px;font-weight:bold;">Review in NooSphere</span>
                                     </td>
                                 </tr>
                             </table>
-                            <p style="margin:24px 0 0;color:#7a8b92;font-size:13px;line-height:1.6;">Sign in to NooSphere to review the report and take the required action.</p>
+                            <p style="margin:24px 0 0;color:#666666;font-size:13px;line-height:1.6;">Sign in to NooSphere to review the report and take the required action.</p>
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding:17px 40px;border-top:1px solid #e3ebed;background:#fbfcfc;color:#81929a;font-size:12px;line-height:1.5;">
+                        <td style="padding:17px 40px;border-top:1px solid #f3f4f6;background:#fafafa;color:#9ca3af;font-size:12px;line-height:1.5;">
                             This message was sent by NooSphere Clinical Reports. Please do not reply to this automated notification.
                         </td>
                     </tr>

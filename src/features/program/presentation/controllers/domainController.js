@@ -3,6 +3,7 @@ import prismaService from "../../../../config/prisma.js";
 import DomainRepository from "../../infrastructure/domainRepository.js";
 import DomainService from "../../application/domainService.js";
 import Domain from "../../domain/domain.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class DomainController {
     constructor() {
@@ -19,6 +20,16 @@ class DomainController {
             res.status(500).json({ message: 'Failed to create domain' });
         }
 
+        await auditLogger.log(req, {
+            tenantId: domain.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Domain Management",
+            action: `created domain ${domain.id}`,
+            reason: "Domain management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "domain created successfully",
             status: 'ok',
@@ -32,6 +43,16 @@ class DomainController {
         if (!domain) {
             res.status(500).json({ message: 'Failed to update domain' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: domain.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Domain Management",
+            action: `updated domain ${domain.id}`,
+            reason: "Domain management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "domain updated successfully",
@@ -60,6 +81,16 @@ class DomainController {
         if (!domain) {
             res.status(500).json({ message: 'Failed to delete domain' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: domain.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Domain Management",
+            action: `deleted domain ${domain.id}`,
+            reason: "Domain management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "domain deleted successfully",

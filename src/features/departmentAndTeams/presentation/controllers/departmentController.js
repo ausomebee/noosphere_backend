@@ -6,6 +6,7 @@ import Department from "../../domain/department.js";
 import DepartmentMembers from "../../domain/departmentMembers.js";
 import DepartmentMembersRepository from "../../infrastructure/departmentMembersRepository.js";
 import DepartmentMembersService from "../../application/departmentMembersService.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class DepartmentController {
     constructor() {
@@ -57,6 +58,17 @@ console.log("jjjjj",departmentMemberInstance.createDepartmentMember)
             }
         }
 
+        await auditLogger.log(req, {
+            tenantId: department.tenantId || req.user?.tenantId || req.body.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user ? (req.user.type === "ADMIN" ? "ADMIN" : req.user.type === "STAFF" ? "TENANT" : "CLIENT") : null,
+            feature: "Department Management",
+            action: "created a department",
+            reason: "Department created",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Department created successfully",
             status: "ok",
@@ -105,6 +117,17 @@ console.log("jjjjj",departmentMemberInstance.createDepartmentMember)
                 await this.departmentMembersService.removeDepartmentMember(adminId);
             }
         }
+
+        await auditLogger.log(req, {
+            tenantId: department.tenantId || req.user?.tenantId || req.body.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user ? (req.user.type === "ADMIN" ? "ADMIN" : req.user.type === "STAFF" ? "TENANT" : "CLIENT") : null,
+            feature: "Department Management",
+            action: `updated department ${id}`,
+            reason: "Department updated",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Department updated successfully",
@@ -161,6 +184,17 @@ console.log("jjjjj",departmentMemberInstance.createDepartmentMember)
             });
         }
 
+        await auditLogger.log(req, {
+            tenantId: department.tenantId || req.user?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user ? (req.user.type === "ADMIN" ? "ADMIN" : req.user.type === "STAFF" ? "TENANT" : "CLIENT") : null,
+            feature: "Department Management",
+            action: `updated active status for department ${req.params.id}`,
+            reason: "Department active status updated",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(200).json({
             message: "Department deactivated successfully",
             status: "ok",
@@ -179,6 +213,17 @@ console.log("jjjjj",departmentMemberInstance.createDepartmentMember)
                 message: "Failed to delete department"
             });
         }
+
+        await auditLogger.log(req, {
+            tenantId: department.tenantId || req.user?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user ? (req.user.type === "ADMIN" ? "ADMIN" : req.user.type === "STAFF" ? "TENANT" : "CLIENT") : null,
+            feature: "Department Management",
+            action: `deleted department ${req.params.id}`,
+            reason: "Department deleted",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Department deleted successfully",

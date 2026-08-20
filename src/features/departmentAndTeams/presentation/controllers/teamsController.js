@@ -6,6 +6,7 @@ import Team from "../../domain/teams.js";
 import TeamMembers from "../../domain/teamMembers.js";
 import TeamMembersService from "../../application/teamMembersService.js";
 import TeamMembersRepository from "../../infrastructure/teamMembersRepository.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class TeamsController {
     constructor() {
@@ -56,6 +57,17 @@ class TeamsController {
                 continue;
             }
         }
+
+        await auditLogger.log(req, {
+            tenantId: team.tenantId || req.user?.tenantId || req.body.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user ? (req.user.type === "ADMIN" ? "ADMIN" : req.user.type === "STAFF" ? "TENANT" : "CLIENT") : null,
+            feature: "Team Management",
+            action: "created a team",
+            reason: "Team created",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Team created successfully",
@@ -108,6 +120,17 @@ class TeamsController {
                 await this.teamMembersService.removeTeamMember(membership.id);
             }
         }
+
+        await auditLogger.log(req, {
+            tenantId: team.tenantId || req.user?.tenantId || req.body.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user ? (req.user.type === "ADMIN" ? "ADMIN" : req.user.type === "STAFF" ? "TENANT" : "CLIENT") : null,
+            feature: "Team Management",
+            action: `updated team ${id}`,
+            reason: "Team updated",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Team updated successfully",
@@ -165,6 +188,17 @@ class TeamsController {
             });
         }
 
+        await auditLogger.log(req, {
+            tenantId: team.tenantId || req.user?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user ? (req.user.type === "ADMIN" ? "ADMIN" : req.user.type === "STAFF" ? "TENANT" : "CLIENT") : null,
+            feature: "Team Management",
+            action: `updated active status for team ${req.params.id}`,
+            reason: "Team active status updated",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(200).json({
             message: "Team deactivated successfully",
             status: "ok",
@@ -183,6 +217,17 @@ class TeamsController {
                 message: "Failed to delete team"
             });
         }
+
+        await auditLogger.log(req, {
+            tenantId: team.tenantId || req.user?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user ? (req.user.type === "ADMIN" ? "ADMIN" : req.user.type === "STAFF" ? "TENANT" : "CLIENT") : null,
+            feature: "Team Management",
+            action: `deleted team ${req.params.id}`,
+            reason: "Team deleted",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Team deleted successfully",
