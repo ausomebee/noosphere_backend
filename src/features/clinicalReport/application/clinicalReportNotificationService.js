@@ -92,9 +92,9 @@ class ClinicalReportNotificationService {
             <td class="page-padding" align="center" style="padding:32px 18px;">
                 <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px;background:#ffffff;border-radius:8px;overflow:hidden;">
                     <tr>
-                        <td align="center" style="padding:0;height:60px;background:linear-gradient(90deg, #8B5CF6 0%, #EC4899 50%, #EF4444 100%);">
+                        <td align="center" style="padding:0;height:60px;background:linear-gradient(90deg, #2563eb 0%, #3B82F6 100%);">
                             <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:600px;height:60px;">
-                                <v:fill type="gradient" color="#8B5CF6" color2="#EF4444" angle="90" />
+                                <v:fill type="gradient" color="#2563eb" color2="#3B82F6" angle="90" />
                             </v:rect>
                         </td>
                     </tr>
@@ -103,7 +103,7 @@ class ClinicalReportNotificationService {
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                                 <tr>
                                     <td width="42" valign="middle">
-                                        <table role="presentation" width="36" height="36" cellspacing="0" cellpadding="0" border="0" style="background:linear-gradient(135deg, #8B5CF6, #EC4899);">
+                                        <table role="presentation" width="36" height="36" cellspacing="0" cellpadding="0" border="0" style="background:linear-gradient(135deg, #2563eb, #3B82F6);">
                                             <tr><td align="center" valign="middle" style="color:#ffffff;font-size:14px;font-weight:bold;">N</td></tr>
                                         </table>
                                     </td>
@@ -116,12 +116,12 @@ class ClinicalReportNotificationService {
                     </tr>
                     <tr>
                         <td class="content-padding" style="padding:34px 40px 36px;">
-                            <p style="margin:0 0 7px;color:#8B5CF6;font-size:12px;font-weight:bold;letter-spacing:1.4px;text-transform:uppercase;">Clinical report update</p>
+                            <p style="margin:0 0 7px;color:#2563eb;font-size:12px;font-weight:bold;letter-spacing:1.4px;text-transform:uppercase;">Clinical report update</p>
                             <h1 style="margin:0 0 18px;color:#1a1a1a;font-size:25px;line-height:1.25;font-weight:bold;">${safe(title)}</h1>
                             <p style="margin:0 0 24px;color:#666666;font-size:15px;line-height:1.7;">Hello ${safe(recipientName)},<br />${safe(content)}</p>
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#faf5ff;border:1px solid #e9d5ff;border-radius:8px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;">
                                 <tr>
-                                    <td style="padding:17px 18px 8px;color:#8B5CF6;font-size:11px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;">Report requiring attention</td>
+                                    <td style="padding:17px 18px 8px;color:#2563eb;font-size:11px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;">Report requiring attention</td>
                                 </tr>
                                 <tr>
                                     <td style="padding:0 18px 17px;color:#1a1a1a;font-size:16px;font-weight:bold;line-height:1.4;">${safe(reportTitle)}</td>
@@ -129,7 +129,7 @@ class ClinicalReportNotificationService {
                             </table>
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin-top:26px;">
                                 <tr>
-                                    <td style="background:#8B5CF6;border-radius:6px;">
+                                    <td style="background:#2563eb;border-radius:6px;">
                                         <span style="display:inline-block;padding:13px 22px;color:#ffffff;font-size:14px;font-weight:bold;">Review in NooSphere</span>
                                     </td>
                                 </tr>

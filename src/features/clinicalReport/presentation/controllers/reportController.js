@@ -713,7 +713,7 @@ class ClinicalReportController {
         const token = await this.token.generateClinicalReportToken(report.id, this.prisma);
         const tenantClientUrl = templateRenderer.buildTenantClientUrl(report.tenant.subdomain);
 
-        return `${tenantClientUrl}/tenant/report/client-view/${token}`;
+        return `${tenantClientUrl}/client/report/client-view/${token}`;
     }
 
     async emitSignatureRequestedNotification(report, signatureLink) {
