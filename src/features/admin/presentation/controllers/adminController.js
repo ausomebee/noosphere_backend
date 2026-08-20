@@ -1,6 +1,7 @@
 import expressAsyncHandler from "express-async-handler";
 import AdminService from "../../application/adminService.js";
 import Admin from "../../domain/admin.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class AdminController {
     constructor() {
@@ -57,6 +58,17 @@ class AdminController {
         if (!admin) {
             res.status(500).json({ message: 'Failed to signin admin' });
         }
+
+        await auditLogger.log(req, {
+            adminId: admin.id,
+            module: "ADMIN",
+            feature: "login",
+            action: `${admin.firstName} ${admin.lastName} logged in`,
+            reason: "User login",
+            details: `Admin ${admin.firstName} ${admin.lastName} logged in at ${new Date().toISOString()}`,
+            outcome: "SUCCESS",
+            accessedBy: `${admin.firstName} ${admin.lastName}`,
+        });
 
         return res.status(201).json({
             message: "Admin login successfully",

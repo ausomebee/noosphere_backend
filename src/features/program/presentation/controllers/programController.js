@@ -28,6 +28,16 @@ class ProgramController {
             res.status(500).json({ message: 'Failed to create program' });
         }
 
+        await auditLogger.log(req, {
+            tenantId: program.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Program Management",
+            action: `created program ${program.id}`,
+            reason: "Program management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "program created successfully",
             status: 'ok',
@@ -50,6 +60,17 @@ class ProgramController {
             res.status(500).json({ message: 'Failed to create client program' });
         }
 
+        await auditLogger.log(req, {
+            tenantId: program.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Program Management",
+            action: `created custom program ${program.id}`,
+            reason: "Program management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "program created successfully",
             status: 'ok',
@@ -63,6 +84,16 @@ class ProgramController {
         if (!program) {
             res.status(500).json({ message: 'Failed to update program' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: program.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Program Management",
+            action: `updated program ${program.id}`,
+            reason: "Program management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "program updated successfully",
@@ -105,6 +136,16 @@ class ProgramController {
         if (!program) {
             res.status(500).json({ message: 'Failed to delete program' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: program.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Program Management",
+            action: `deleted program ${program.id}`,
+            reason: "Program management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "program deleted successfully",

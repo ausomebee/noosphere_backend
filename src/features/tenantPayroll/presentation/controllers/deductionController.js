@@ -3,6 +3,7 @@ import prismaService from "../../../../config/prisma.js";
 import DeductionRepository from "../../infrastructure/deductionRepository.js";
 import DeductionService from "../../application/deductionService.js";
 import Deduction from "../../domain/deduction.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class DeductionController {
     constructor() {
@@ -20,6 +21,16 @@ class DeductionController {
             return res.status(500).json({ message: "Failed to create deduction" });
         }
 
+        await auditLogger.log(req, {
+            tenantId: deduction.tenantId || req.user?.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Deduction Management",
+            action: `created deduction ${deduction.id}`,
+            reason: "Deduction management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Deduction created successfully",
             status: "ok",
@@ -33,6 +44,16 @@ class DeductionController {
         if (!deduction) {
             return res.status(500).json({ message: "Failed to update deduction" });
         }
+
+        await auditLogger.log(req, {
+            tenantId: deduction.tenantId || req.user?.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Deduction Management",
+            action: `updated deduction ${deduction.id}`,
+            reason: "Deduction management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Deduction updated successfully",
@@ -79,6 +100,16 @@ class DeductionController {
             return res.status(404).json({ message: "Deduction not found" });
         }
 
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Deduction Management",
+            action: `deleted deduction ${req.params.id}`,
+            reason: "Deduction management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(200).json({ message: "Deduction deleted" });
     });
 
@@ -91,6 +122,16 @@ class DeductionController {
         if (!deduction) {
             return res.status(500).json({ message: "Failed to deactivate deduction" });
         }
+
+        await auditLogger.log(req, {
+            tenantId: deduction.tenantId || req.user?.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Deduction Management",
+            action: `${req.params.active === "true" ? "activated" : "deactivated"} deduction ${deduction.id}`,
+            reason: "Deduction management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Deduction deactivated successfully",

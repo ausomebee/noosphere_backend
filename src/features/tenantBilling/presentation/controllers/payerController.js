@@ -9,6 +9,7 @@ import PayerServiceCodes from "../../domain/payerServiceCodes.js";
 import ServiceCodesService from "../../application/serviceCodesService.js";
 import ServiceCodesRepository from "../../infrastructure/serviceCodesRepository.js";
 import ServiceCodes from "../../domain/serviceCodes.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class PayerController {
     constructor() {
@@ -54,6 +55,17 @@ class PayerController {
                 }
             }
         }
+
+        await auditLogger.log(req, {
+            tenantId: payer.tenantId || data.tenantId || req.user?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Payer Management",
+            action: "created a payer",
+            reason: "Payer created",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Payer created successfully",
@@ -142,6 +154,17 @@ class PayerController {
             }
         }
 
+        await auditLogger.log(req, {
+            tenantId: updatedPayer.tenantId || data.tenantId || req.user?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Payer Management",
+            action: `updated payer ${updatedPayer.id}`,
+            reason: "Payer updated",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(200).json({
             message: "Payer updated successfully",
             status: "ok",
@@ -186,6 +209,17 @@ class PayerController {
         if (!payer) {
             return res.status(500).json({ message: "Failed to delete payer" });
         }
+
+        await auditLogger.log(req, {
+            tenantId: payer.tenantId || req.user?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Payer Management",
+            action: `deactivated payer ${payer.id}`,
+            reason: "Payer deactivated",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Payer deleted successfully",

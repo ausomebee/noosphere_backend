@@ -3,6 +3,7 @@ import prismaService from "../../../../config/prisma.js";
 import InsuranceTypeRepository from "../../infrastructure/insuranceTypeRepository.js";
 import InsuranceTypeService from "../../application/insuranceTypeService.js";
 import InsuranceType from "../../domain/insuranceType.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class InsuranceTypeController {
     constructor() {
@@ -20,6 +21,17 @@ class InsuranceTypeController {
             return res.status(500).json({ message: "Failed to create insurance type" });
         }
 
+        await auditLogger.log(req, {
+            tenantId: insuranceType.tenantId || data.tenantId || req.user?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Insurance Type Management",
+            action: "created an insurance type",
+            reason: "Insurance type created",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Insurance type created successfully",
             status: "ok",
@@ -33,6 +45,17 @@ class InsuranceTypeController {
         if (!insuranceType) {
             return res.status(500).json({ message: "Failed to update insurance type" });
         }
+
+        await auditLogger.log(req, {
+            tenantId: insuranceType.tenantId || req.user?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Insurance Type Management",
+            action: `updated insurance type ${insuranceType.id}`,
+            reason: "Insurance type updated",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Insurance type updated successfully",
@@ -78,6 +101,17 @@ class InsuranceTypeController {
         if (!insuranceType) {
             return res.status(500).json({ message: "Failed to deactivate insurance type" });
         }
+
+        await auditLogger.log(req, {
+            tenantId: insuranceType.tenantId || req.user?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Insurance Type Management",
+            action: `deactivated insurance type ${insuranceType.id}`,
+            reason: "Insurance type deactivated",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Insurance type deactivated successfully",

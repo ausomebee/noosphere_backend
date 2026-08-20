@@ -5,6 +5,7 @@ import PayrollCycleStaffService from "../../application/payrollCycleStaffService
 import PayrollCycleStaff from "../../domain/payrollCycleStaff.js";
 import PayrollRepository from "../../../organizationStaff/infrastructure/payrollRepository.js";
 import PayrollService from "../../../organizationStaff/application/payrollService.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class PayrollCycleStaffController {
     constructor() {
@@ -39,6 +40,16 @@ class PayrollCycleStaffController {
             });
         }
 
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Payroll Cycle",
+            action: `assigned staff to payroll cycle ${record.payrollCycleId}`,
+            reason: "Payroll cycle staff management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Staff assigned to payroll cycle successfully",
             status: "ok",
@@ -55,6 +66,16 @@ class PayrollCycleStaffController {
                 message: "Failed to update payroll cycle staff record"
             });
         }
+
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Payroll Cycle",
+            action: `updated payroll cycle staff record ${record.id}`,
+            reason: "Payroll cycle staff management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Payroll cycle staff record updated successfully",
@@ -88,6 +109,16 @@ class PayrollCycleStaffController {
                 message: "Failed to delete payroll cycle staff record"
             });
         }
+
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Payroll Cycle",
+            action: `deleted payroll cycle staff record ${req.params.id}`,
+            reason: "Payroll cycle staff management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Payroll cycle staff record deleted successfully",
@@ -146,6 +177,16 @@ class PayrollCycleStaffController {
                 });
             }
         }
+
+        await auditLogger.log(req, {
+            tenantId: req.user?.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Payroll Cycle",
+            action: "updated payroll breakdown",
+            reason: "Payroll cycle staff management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Payroll breakdown updated successfully"

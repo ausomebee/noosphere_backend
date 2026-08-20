@@ -13,6 +13,7 @@ import MailService from "../../../../utilities/nodemailer.js";
 import TenantRepository from "../../../tenant/infrastructure/tenantRepository.js";
 import TenantService from "../../../tenant/application/tenantService.js";
 import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class SubscriptionController {
     constructor() {
@@ -41,6 +42,17 @@ class SubscriptionController {
         if (!subscription) {
             res.status(500).json({ message: 'Failed to create subscription' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: subscription.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Subscription Management",
+            action: `created subscription ${subscription.id}`,
+            reason: "Subscription management",
+            accessedBy: req.user?.name || null,
+            subscriptionId: subscription.id,
+        });
 
         return res.status(201).json({
             message: "subscription created successfully",

@@ -14,6 +14,7 @@ import SocketService from "../../../../config/socket.js";
 import emailService from "../../../../utilities/ses.js";
 import templateRenderer from "../../../../utilities/templateRenderer.js";
 import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 export class AppointmentController {
     constructor() {
@@ -288,6 +289,17 @@ export class AppointmentController {
             console.error("Appointment notification/email processing failed:", notificationError);
         }
 
+        await auditLogger.log(req, {
+            tenantId: appointment.tenantId || data.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : appointment.clientId || data.clientId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Appointment Management",
+            action: `created appointment ${appointment.id}`,
+            reason: "Appointment management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Appointment created successfully",
             status: "ok",
@@ -325,6 +337,17 @@ export class AppointmentController {
                 metadata: { previousDate: appointment.previousDate || null, reason: appointment.reasonForReschedule || null },
             });
         }
+
+        await auditLogger.log(req, {
+            tenantId: appointment.tenantId || req.body.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : appointment.clientId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Appointment Management",
+            action: `updated appointment ${appointment.id}`,
+            reason: "Appointment management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Appointment updated successfully",
@@ -502,6 +525,17 @@ export class AppointmentController {
         if (!appointments) {
             res.status(500).json({ message: 'Failed to fetch appointments' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: appointments?.[0]?.tenantId || req.body?.[0]?.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : appointments?.[0]?.clientId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Appointment Management",
+            action: "accepted a reschedule appointment request",
+            reason: "Appointment management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "appointments fetched successfully",

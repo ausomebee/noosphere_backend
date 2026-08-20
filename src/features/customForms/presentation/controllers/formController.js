@@ -12,6 +12,7 @@ import ClientNotificationEmitter from "../../../client/application/clientNotific
 import SocketService from "../../../../config/socket.js";
 import MailService from "../../../../utilities/nodemailer.js";
 import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class FormController {
     constructor() {
@@ -75,6 +76,17 @@ class FormController {
             }
         }
 
+        await auditLogger.log(req, {
+            tenantId: form.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Custom Forms",
+            action: `created form ${form.id}`,
+            reason: "Custom form management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Form created successfully",
             status: "ok",
@@ -109,6 +121,17 @@ class FormController {
                 }
             }
         }
+
+        await auditLogger.log(req, {
+            tenantId: updatedForm.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Custom Forms",
+            action: `updated form ${updatedForm.id}`,
+            reason: "Custom form management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Form updated successfully",
@@ -157,6 +180,17 @@ class FormController {
                 return res.status(500).json({ message: "Failed to create form field" });
             }
         }
+
+        await auditLogger.log(req, {
+            tenantId: newForm.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Custom Forms",
+            action: `duplicated form ${form.id} into ${newForm.id}`,
+            reason: "Custom form management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Form duplicated successfully",
@@ -216,6 +250,17 @@ class FormController {
         if (!form) {
             return res.status(500).json({ message: "Failed to deactivate form" });
         }
+
+        await auditLogger.log(req, {
+            tenantId: form.tenantId || null,
+            clientId: req.user?.type === "CLIENT" ? req.user.clientId : null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Custom Forms",
+            action: `${req.params.delete === "true" ? "deactivated" : "reactivated"} form ${form.id}`,
+            reason: "Custom form management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Form deactivated successfully",

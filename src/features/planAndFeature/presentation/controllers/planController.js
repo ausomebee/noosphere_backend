@@ -10,6 +10,7 @@ import NotificationsRepository from "../../../notifications/infrastructure/notif
 import NotificationService from "../../../notifications/application/notificationsService.js";
 import SocketService from "../../../../config/socket.js";
 import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class PlanController {
     constructor() {
@@ -63,6 +64,15 @@ class PlanController {
             );
         }
 
+        await auditLogger.log(req, {
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: "ADMIN",
+            feature: "Plan Management",
+            action: `created billing plan ${billingPlan.name}`,
+            reason: "Plan management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "billing Plan created successfully",
             status: 'ok',
@@ -110,6 +120,15 @@ class PlanController {
                 );
             }
         }
+
+        await auditLogger.log(req, {
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: "ADMIN",
+            feature: "Plan Management",
+            action: `updated billing plan ${billingPlan.name}`,
+            reason: "Plan management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "billing Plan updated successfully",
@@ -197,6 +216,15 @@ class PlanController {
                 html
             );
         }
+
+        await auditLogger.log(req, {
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: "ADMIN",
+            feature: "Plan Management",
+            action: `deleted billing plan ${billingPlan.name || billingPlan.id}`,
+            reason: "Plan management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "billing Plan deleted successfully",

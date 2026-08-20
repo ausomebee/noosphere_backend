@@ -6,6 +6,7 @@ import PlanRepository from "../../../planAndFeature/infrastructure/planRepositio
 import InvoiceManagementRepository from "../../infrastructure/invoiceManagementRepository.js";
 import InvoiceTokenRepository from "../../infrastructure/invoiceTokenRepository.js";
 import TenantRepository from "../../../tenant/infrastructure/tenantRepository.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class InvoiceController {
     constructor() {
@@ -24,6 +25,16 @@ class InvoiceController {
         if (!invoice) {
             res.status(500).json({ message: 'Failed to create invoice' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: invoice.tenantId || req.body.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Invoice Management",
+            action: `created invoice ${invoice.id}`,
+            reason: "Invoice management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Invoice created successfully",
@@ -82,6 +93,16 @@ class InvoiceController {
             res.status(500).json({ message: 'Failed to generate payment link' });
         }
 
+        await auditLogger.log(req, {
+            tenantId: req.body.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Invoice Management",
+            action: "generated a payment link",
+            reason: "Invoice management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Payment link generated successfully",
             status: 'ok',
@@ -96,6 +117,16 @@ class InvoiceController {
         if (!paymentLink) {
             res.status(500).json({ message: 'Failed to regenerate payment link' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Invoice Management",
+            action: `regenerated payment link for tenant ${tenantId}`,
+            reason: "Invoice management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Payment link regenerated successfully",
@@ -239,6 +270,15 @@ class InvoiceController {
             res.status(500).json({ message: 'Failed to create invoice management' });
         }
 
+        await auditLogger.log(req, {
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Invoice Management",
+            action: "created invoice management config",
+            reason: "Invoice management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Invoice management created successfully",
             status: 'ok',
@@ -266,6 +306,15 @@ class InvoiceController {
         if (!invoice) {
             res.status(500).json({ message: 'Failed to update invoice management' });
         }
+
+        await auditLogger.log(req, {
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Invoice Management",
+            action: "updated invoice management config",
+            reason: "Invoice management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(201).json({
             message: "Invoice management updated successfully",

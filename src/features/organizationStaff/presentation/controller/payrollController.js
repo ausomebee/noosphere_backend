@@ -2,6 +2,7 @@ import expressAsyncHandler from "express-async-handler";
 import prismaService from "../../../../config/prisma.js";
 import PayrollRepository from "../../infrastructure/payrollRepository.js";
 import PayrollService from "../../application/payrollService.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class PayrollController {
     constructor() {
@@ -26,6 +27,16 @@ class PayrollController {
         if (!payroll) {
             res.status(500).json({ message: "Failed to update payroll" });
         }
+
+        await auditLogger.log(req, {
+            tenantId: payroll.tenantId || req.user?.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Staff Payroll",
+            action: `updated payroll ${payroll.id}`,
+            reason: "Staff payroll management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Payroll updated successfully",

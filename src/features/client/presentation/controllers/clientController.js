@@ -12,6 +12,7 @@ import TenantRepository from "../../../tenant/infrastructure/tenantRepository.js
 import TenantService from "../../../tenant/application/tenantService.js";
 import RefreshTokenRepository from "../../../auth/infrastructure/refreshTokenRepository.js";
 import RefreshTokenService from "../../../auth/application/refreshTokenService.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class ClientController {
     constructor() {
@@ -156,6 +157,18 @@ class ClientController {
         if (!refreshToken) {
             return res.status(500).json({ message: 'Failed to create refresh token' });
         }
+
+        await auditLogger.log(req, {
+            tenantId: client.tenantId,
+            clientId: client.id,
+            module: "CLIENT",
+            feature: "login",
+            action: `${client.firstName || client.fullName || "Client"} logged in`,
+            reason: "User login",
+            details: `Client logged in at ${new Date().toISOString()}`,
+            outcome: "SUCCESS",
+            accessedBy: client.firstName || client.fullName || null,
+        });
 
         return res.status(201).json({
             message: "login successful",

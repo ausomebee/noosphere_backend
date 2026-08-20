@@ -3,6 +3,7 @@ import prismaService from "../../../../config/prisma.js";
 import PayrollRecordRepository from "../../infrastructure/payrollRecordRepository.js";
 import PayrollRecordService from "../../application/payrollRecordService.js";
 import PayrollRecord from "../../domain/payrollRecord.js";
+import auditLogger from "../../../logs/application/auditLogger.js";
 
 class PayrollRecordController {
     constructor() {
@@ -20,6 +21,16 @@ class PayrollRecordController {
             return res.status(500).json({ message: "Failed to create payroll record" });
         }
 
+        await auditLogger.log(req, {
+            tenantId: payrollRecord.tenantId || req.user?.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Payroll Record",
+            action: `created payroll record ${payrollRecord.id}`,
+            reason: "Payroll record management",
+            accessedBy: req.user?.name || null,
+        });
+
         return res.status(201).json({
             message: "Payroll record created successfully",
             status: "ok",
@@ -33,6 +44,16 @@ class PayrollRecordController {
         if (!payrollRecord) {
             return res.status(500).json({ message: "Failed to update payroll record" });
         }
+
+        await auditLogger.log(req, {
+            tenantId: payrollRecord.tenantId || req.user?.tenantId || null,
+            adminId: req.user?.type === "ADMIN" ? req.user.id : null,
+            module: req.user?.type === "ADMIN" ? "ADMIN" : req.user?.type === "STAFF" ? "TENANT" : req.user?.type === "CLIENT" ? "CLIENT" : null,
+            feature: "Payroll Record",
+            action: `updated payroll record ${payrollRecord.id}`,
+            reason: "Payroll record management",
+            accessedBy: req.user?.name || null,
+        });
 
         return res.status(200).json({
             message: "Payroll record updated successfully",
