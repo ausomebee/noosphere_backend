@@ -138,6 +138,26 @@ class StaffRepository extends BaseRepository {
         });
     }
 
+    async findAvailableByTenantAndDayTime(tenantId, dayOfWeek, time) {
+        return await this.model.findMany({
+            where: {
+                tenantId,
+                staffAvailabilities: {
+                    some: {
+                        availabilityDays: {
+                            some: {
+                                dayOfWeek,
+                                available: true,
+                                from: { lte: time },
+                                to: { gte: time }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     async getStaffByPaymentSchedule(tenantId, paymentSchedule) {
         return await this.model.findMany({
             where: {

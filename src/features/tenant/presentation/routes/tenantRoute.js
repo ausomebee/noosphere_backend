@@ -1456,6 +1456,41 @@ class TenantRoutes {
          */
         this.router.get("/tenant/staff/:tenantId", staffProtect(), this.controller.getTenantStaffs);
 
+        /**
+         * @swagger
+         * /api/v1/tenant/tenant/staff/{tenantId}/available:
+         *   get:
+         *     summary: Gets tenant staff available at the requested date and time
+         *     tags: [Tenant]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *       - in: query
+         *         name: date
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: date
+         *       - in: query
+         *         name: time
+         *         required: true
+         *         schema:
+         *           type: string
+         *           example: "14:30"
+         *     responses:
+         *       200:
+         *         description: Available tenant staff retrieved successfully
+         */
+        this.router.get(
+            "/tenant/staff/:tenantId/available",
+            staffProtect(),
+            TenantDto.getAvailableTenantStaffsDto,
+            this.controller.getAvailableTenantStaffs
+        );
+
     }
 
     getRouter() {
