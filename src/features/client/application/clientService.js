@@ -229,6 +229,46 @@ class ClientService {
         return clients;
     }
 
+    async getTenantClientsByAvailableStaff(tenantId, date, actor) {
+        const requestedDate = new Date(`${date}T00:00:00.000Z`);
+
+        if (
+            Number.isNaN(requestedDate.getTime()) ||
+            requestedDate.toISOString().slice(0, 10) !== date
+        ) {
+            throw new Error("Invalid availability date");
+        }
+
+        const days = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+        const dayOfWeek = days[requestedDate.getUTCDay()];
+
+        const clients = await this.clientTenantRepository.findAllAndPopulate(
+            await this.buildClientAccessWhere({ tenantId }, actor),
+            {
+                client: { include: { payer: true } },
+                clinicians: {
+                    where: {
+                        isDeleted: false,
+                        active: true,
+                        staffAvailabilities: {
+                            some: {
+                                availabilityDays: {
+                                    some: { dayOfWeek, available: true }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+        if (!clients) {
+            throw new Error("clients not found");
+        }
+
+        return clients;
+    }
+
     async getSingleClient(clientId, actor) {
         const client = await this.clientTenantRepository.findFirstDynamic({
             where: await this.buildClientAccessWhere({ clientId }, actor),

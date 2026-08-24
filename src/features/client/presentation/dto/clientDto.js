@@ -368,6 +368,20 @@ class ClientDto {
 
         Validator.validateRequest(req, next, schema);
     };
+
+    static getTenantClientsByAvailabilityDto = (req, res, next) => {
+        const schema = Joi.object({
+            date: Joi.string()
+                .pattern(/^\d{4}-\d{2}-\d{2}$/)
+                .required()
+                .messages({
+                    "string.pattern.base": "date must use the YYYY-MM-DD format",
+                    "any.required": "date is required"
+                })
+        });
+
+        Validator.validateRequest(req, next, schema, req.query);
+    };
 }
 
 export default ClientDto;
