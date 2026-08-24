@@ -133,7 +133,10 @@ class App {
         // new PassportUtil(this.app)
         this.app.use(morgan("dev"));
         this.app.use(cors(this.allowedOrigins));
-        this.app.use(express.json({ limit: "50mb" }));
+        this.app.use(express.json({
+            limit: "50mb",
+            type: (req) => req.originalUrl !== "/api/v1/billing/stripe/webhook"
+        }));
         this.app.use(express.urlencoded({ extended: true, limit: "50mb" }));
     }
 

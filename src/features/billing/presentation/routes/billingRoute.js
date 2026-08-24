@@ -98,6 +98,38 @@ import { adminProtect } from "../../../../middleware/auth_handlers.js";
  *           enum: [Successful, Failed, InProgress]
  *           example: "Successful"
  *           description: Status of the payment (Successful, Failed, InProgress).
+ *     CreateStripePaymentIntentDto:
+ *       type: object
+ *       required: [token]
+ *       properties:
+ *         token:
+ *           type: string
+ *           description: Invoice payment-link token. This is the credential for the public payment page.
+ *     ConfirmStripePaymentDto:
+ *       type: object
+ *       required: [token, paymentIntentId]
+ *       properties:
+ *         token:
+ *           type: string
+ *         paymentIntentId:
+ *           type: string
+ *           example: pi_3SExample123
+ *     StripePaymentIntentResponse:
+ *       type: object
+ *       required: [clientSecret, paymentIntentId, amount, currency]
+ *       properties:
+ *         clientSecret:
+ *           type: string
+ *           description: Pass only to Stripe.js to confirm the payment; never log it.
+ *         paymentIntentId:
+ *           type: string
+ *         amount:
+ *           type: integer
+ *           example: 5000
+ *           description: Server-derived amount in the currency's smallest unit (USD cents).
+ *         currency:
+ *           type: string
+ *           example: usd
  *     CreateTransactionDto:
  *       type: object
  *       required:
@@ -465,7 +497,7 @@ class BillingRoutes {
          * @swagger
          * /api/v1/billing/pay-payment-link:
          *   post:
-         *     summary: Pay payment link
+         *     summary: Deprecated; cannot activate a payment
          *     tags: [billing]
          *     requestBody:
          *       required: true
@@ -474,12 +506,100 @@ class BillingRoutes {
          *           schema:
          *             $ref: '#/components/schemas/PayPaymentLinkDto'
          *     responses:
-         *       201:
-         *         description: payment recorded successfully
-         *       400:
-         *         description: Validation error
+         *       410:
+         *         description: Deprecated. Use the Stripe PaymentIntent endpoints.
          */
         this.router.post("/pay-payment-link", BillingDto.payPaymentLinkDto, this.controller.payPaymentLink);
+
+        /**
+         * @swagger
+         * /api/v1/billing/stripe/create-payment-intent:
+         *   post:
+         *     summary: Create or resume a Stripe PaymentIntent for an invoice payment link
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/CreateStripePaymentIntentDto'
+         *     responses:
+         *       200:
+         *         description: Stripe PaymentIntent is ready for Stripe.js confirmation.
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/StripePaymentIntentResponse'
+         *       400:
+         *         description: Invalid, expired, or used payment-link token.
+         *       409:
+         *         description: Invoice has already been paid.
+         *       500:
+         *         description: Stripe could not create the PaymentIntent.
+         */
+        this.router.post(
+            "/stripe/create-payment-intent",
+            BillingDto.createStripePaymentIntentDto,
+            this.controller.createStripePaymentIntent
+        );
+
+        /**
+         * @swagger
+         * /api/v1/billing/stripe/confirm-payment:
+         *   post:
+         *     summary: Verify a successful Stripe PaymentIntent and activate the invoice
+         *     tags: [billing]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/ConfirmStripePaymentDto'
+         *     responses:
+         *       201:
+         *         description: Payment was verified and the invoice was activated.
+         *       200:
+         *         description: Invoice was already activated by a prior confirmation or webhook.
+         *       400:
+         *         description: The intent is not successful, does not belong to the invoice, or its amount does not match.
+         */
+        this.router.post(
+            "/stripe/confirm-payment",
+            BillingDto.confirmStripePaymentDto,
+            this.controller.confirmStripePayment
+        );
+
+        /**
+         * @swagger
+         * /api/v1/billing/stripe/webhook:
+         *   post:
+         *     summary: Receive and verify Stripe webhook events
+         *     tags: [billing]
+         *     parameters:
+         *       - in: header
+         *         name: stripe-signature
+         *         required: true
+         *         schema:
+         *           type: string
+         *         description: Signature generated by Stripe. Do not call this endpoint from the browser.
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             description: Raw Stripe event payload.
+         *     responses:
+         *       200:
+         *         description: Verified event received.
+         *       400:
+         *         description: Invalid Stripe signature or event payload.
+         */
+        this.router.post(
+            "/stripe/webhook",
+            express.raw({ type: "application/json" }),
+            this.controller.stripeWebhook
+        );
 
         /**
         * @swagger
