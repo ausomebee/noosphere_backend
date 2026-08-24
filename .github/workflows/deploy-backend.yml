@@ -97,6 +97,8 @@ jobs:
                 echo "RDS_INSTANCE_ID=${{ secrets.DEV_RDS_INSTANCE_ID }}"
                 echo "RDS_TOTAL_MEMORY_GB=${{ secrets.DEV_RDS_TOTAL_MEMORY_GB }}"
                 echo "RDS_TOTAL_STORAGE_GB=${{ secrets.DEV_RDS_TOTAL_STORAGE_GB }}"
+                echo "STRIPE_SECRET_KEY=${{ secrets.DEV_STRIPE_SECRET_KEY }}"
+                echo "STRIPE_WEBHOOK_SECRET=${{ secrets.DEV_STRIPE_WEBHOOK_SECRET }}"
               } > .env
             elif [ "$BRANCH" = "pre-prod" ]; then
               {
@@ -120,6 +122,8 @@ jobs:
                 echo "RDS_INSTANCE_ID=${{ secrets.PREPROD_RDS_INSTANCE_ID }}"
                 echo "RDS_TOTAL_MEMORY_GB=${{ secrets.PREPROD_RDS_TOTAL_MEMORY_GB }}"
                 echo "RDS_TOTAL_STORAGE_GB=${{ secrets.PREPROD_RDS_TOTAL_STORAGE_GB }}"
+                echo "STRIPE_SECRET_KEY=${{ secrets.PREPROD_STRIPE_SECRET_KEY }}"
+                echo "STRIPE_WEBHOOK_SECRET=${{ secrets.PREPROD_STRIPE_WEBHOOK_SECRET }}"
               } > .env
             elif [ "$BRANCH" = "master" ]; then
               {
@@ -143,12 +147,16 @@ jobs:
                 echo "RDS_INSTANCE_ID=${{ secrets.PROD_RDS_INSTANCE_ID }}"
                 echo "RDS_TOTAL_MEMORY_GB=${{ secrets.PROD_RDS_TOTAL_MEMORY_GB }}"
                 echo "RDS_TOTAL_STORAGE_GB=${{ secrets.PROD_RDS_TOTAL_STORAGE_GB }}"
+                echo "STRIPE_SECRET_KEY=${{ secrets.PROD_STRIPE_SECRET_KEY }}"
+                echo "STRIPE_WEBHOOK_SECRET=${{ secrets.PROD_STRIPE_WEBHOOK_SECRET }}"
               } > .env
             fi
 
             echo "✅ .env created successfully"
 
             npm install --production
+
+            npx prisma migrate deploy
 
             if ! command -v pm2 &> /dev/null; then
               echo "Installing PM2..."
