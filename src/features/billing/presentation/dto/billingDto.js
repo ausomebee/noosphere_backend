@@ -135,6 +135,17 @@ class BillingDto {
         Validator.validateRequest(req, next, schema);
     };
 
+    static createStripePaymentIntentDto = (req, res, next) => {
+        Validator.validateRequest(req, next, Joi.object({ token: Joi.string().required() }));
+    };
+
+    static confirmStripePaymentDto = (req, res, next) => {
+        Validator.validateRequest(req, next, Joi.object({
+            token: Joi.string().required(),
+            paymentIntentId: Joi.string().pattern(/^pi_/).required()
+        }));
+    };
+
     static updateChargeOnDueDateDto = (req, res, next) => {
         const schema = Joi.object({
             id: Joi.string().uuid().required().messages({

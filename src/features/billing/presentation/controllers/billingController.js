@@ -27,6 +27,7 @@ import ReferralCodeGenerator from "../../../../utilities/generateCode.js";
 import argon2 from "argon2";
 import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
 import auditLogger from "../../../logs/application/auditLogger.js";
+import StripeBillingService from "../../application/stripeBillingService.js";
 
 class BillingController {
     constructor() {
@@ -47,6 +48,7 @@ class BillingController {
         this.invoiceTokenRepository = new InvoiceTokenRepository(this.prisma.invoiceToken);
         this.invoiceRepository = new InvoiceRepository(this.prisma.invoice);
         this.invoiceService = new InvoiceService({ invoiceRepository: this.invoiceRepository, invoiceTokenRepository: this.invoiceTokenRepository });
+        this.stripeBillingService = new StripeBillingService({ prisma: this.prisma, invoiceService: this.invoiceService });
 
         this.subscriptionRepository = new SubscriptionRepository(this.prisma.subscription);
         this.subscriptionService = new SubscriptionService({ subscriptionRepository: this.subscriptionRepository });
@@ -433,6 +435,10 @@ class BillingController {
     });
 
     payPaymentLink = expressAsyncHandler(async (req, res) => {
+        return res.status(410).json({
+            message: "This endpoint is deprecated. Confirm the Stripe PaymentIntent with /stripe/confirm-payment instead."
+        });
+
         const paymentData = new Billing({ ...req.body, status: req.body.paymentStatus });
 
         const result = await this.prisma.$transaction(async (tx) => {
@@ -657,6 +663,47 @@ class BillingController {
             data: invoice
         });
     });
+
+    createStripePaymentIntent = expressAsyncHandler(async (req, res) => {
+        try {
+            const paymentIntent = await this.stripeBillingService.createPaymentIntent(req.body.token);
+            return res.status(200).json(paymentIntent);
+        } catch (error) {
+            const statusCode = error.statusCode || (error.type?.startsWith("Stripe") ? 500 : 400);
+            return res.status(statusCode).json({ message: error.message });
+        }
+    });
+
+    confirmStripePayment = expressAsyncHandler(async (req, res) => {
+        try {
+            const result = await this.stripeBillingService.confirmPayment(req.body.token, req.body.paymentIntentId);
+            return res.status(result.alreadyPaid ? 200 : 201).json({
+                message: "payment recorded successfully",
+                status: "ok",
+                data: result.invoice
+            });
+        } catch (error) {
+            return res.status(400).json({ message: error.message });
+        }
+    });
+
+    stripeWebhook = async (req, res) => {
+        try {
+            if (!process.env.STRIPE_WEBHOOK_SECRET) {
+                return res.status(500).json({ message: "STRIPE_WEBHOOK_SECRET is not configured" });
+            }
+
+            const event = this.stripeBillingService.stripe.webhooks.constructEvent(
+                req.body,
+                req.headers["stripe-signature"],
+                process.env.STRIPE_WEBHOOK_SECRET
+            );
+            await this.stripeBillingService.handleWebhook(event);
+            return res.status(200).json({ received: true });
+        } catch (error) {
+            return res.status(400).json({ message: `Webhook Error: ${error.message}` });
+        }
+    };
 }
 
 export default BillingController;

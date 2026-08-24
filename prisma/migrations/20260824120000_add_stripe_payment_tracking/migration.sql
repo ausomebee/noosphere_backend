@@ -1,0 +1,15 @@
+ALTER TABLE "Invoice" ADD COLUMN "stripePaymentIntentId" TEXT;
+
+CREATE UNIQUE INDEX "Invoice_stripePaymentIntentId_key"
+ON "Invoice"("stripePaymentIntentId");
+
+CREATE TABLE "StripeWebhookEvent" (
+    "id" TEXT NOT NULL,
+    "eventId" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "StripeWebhookEvent_pkey" PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX "StripeWebhookEvent_eventId_key"
+ON "StripeWebhookEvent"("eventId");
