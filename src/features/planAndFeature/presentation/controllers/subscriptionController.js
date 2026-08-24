@@ -35,6 +35,53 @@ class SubscriptionController {
         this.notificationService = new NotificationService({ notificationRepository: this.notificationRepository });
     }
 
+    getSubscriptionNotification(req, subscription) {
+        const endpoint = req.path;
+
+        if (endpoint === "/cancelnow") {
+            return { type: NotificationType.SUBSCRIPTION_CANCELLED, action: "cancelled" };
+        }
+        if (endpoint === "/cancelatend") {
+            return { type: NotificationType.SUBSCRIPTION_CANCELLATION_SCHEDULED, action: "scheduled for cancellation" };
+        }
+        if (endpoint === "/pausenow" || endpoint === "/pauseuntil") {
+            return { type: NotificationType.SUBSCRIPTION_PAUSED, action: "paused" };
+        }
+        if (endpoint === "/pauseschedule") {
+            return { type: NotificationType.SUBSCRIPTION_PAUSE_SCHEDULED, action: "scheduled for pause" };
+        }
+        if (endpoint === "/resumenow") {
+            return {
+                type: subscription.autoRenew ? NotificationType.SUBSCRIPTION_AUTO_RENEWED : NotificationType.SUBSCRIPTION_RESUMED,
+                action: subscription.autoRenew ? "renewed" : "resumed"
+            };
+        }
+        if (endpoint === "/resumelater") {
+            return { type: NotificationType.SUBSCRIPTION_RESUME_SCHEDULED, action: "scheduled for resumption" };
+        }
+
+        return null;
+    }
+
+    dispatchSubscriptionNotification = async (req, subscription, notification) => {
+        if (!notification) return;
+
+        const superAdmin = await this.adminService.getSuperAdmin();
+        if (!superAdmin) {
+            throw new Error("Failed to fetch super admin.");
+        }
+
+        await this.notificationService.dispatch({
+            recipients: [{ userId: superAdmin.id, userType: "ADMIN" }],
+            type: notification.type,
+            title: `Subscription ${notification.action.charAt(0).toUpperCase()}${notification.action.slice(1)}`,
+            content: `A subscription for tenant ${subscription.tenantId} has been ${notification.action}. Click here to view details.`,
+            entityType: NotificationEntityType.SUBSCRIPTION,
+            entityId: subscription.id,
+            metadata: { tenantId: subscription.tenantId, planId: subscription.planId, status: subscription.status },
+        }, SocketService.emitToUser.bind(SocketService));
+    };
+
     createSubscription = expressAsyncHandler(async (req, res) => {
         const subscriptionData = new Subscription(req.body);
         const subscription = await this.service.createSubscription(subscriptionData.createSubscription);
@@ -54,6 +101,11 @@ class SubscriptionController {
             subscriptionId: subscription.id,
         });
 
+        await this.dispatchSubscriptionNotification(req, subscription, {
+            type: NotificationType.SUBSCRIPTION_CREATED,
+            action: "created"
+        });
+
         return res.status(201).json({
             message: "subscription created successfully",
             status: 'ok',
@@ -69,33 +121,13 @@ class SubscriptionController {
         }
 
         for (const subscription of subscriptions) {
+            const subscriptionNotification = this.getSubscriptionNotification(req, subscription);
+            await this.dispatchSubscriptionNotification(req, subscription, subscriptionNotification);
+
             const isCancelled = req.body.status === "CANCELLED";
             const isPaused = req.body.status === "PAUSED";
             const isActive = req.body.status === "ACTIVE";
             const isAutoRenewed = isActive && subscription.autoRenew === true;
-
-            if (isCancelled || isPaused || isAutoRenewed) {
-                const superAdmin = await this.adminService.getSuperAdmin();
-                if (!superAdmin) {
-                    throw new Error('Failed to fetch super admin.');
-                }
-
-                const type = isCancelled
-                    ? NotificationType.SUBSCRIPTION_CANCELLED
-                    : isPaused
-                        ? NotificationType.SUBSCRIPTION_PAUSED
-                        : NotificationType.SUBSCRIPTION_AUTO_RENEWED;
-                const action = isCancelled ? "cancelled" : isPaused ? "paused" : "renewed";
-                await this.notificationService.dispatch({
-                    recipients: [{ userId: superAdmin.id, userType: "ADMIN" }],
-                    type,
-                    title: `Subscription ${action.charAt(0).toUpperCase()}${action.slice(1)}`,
-                    content: `A subscription for tenant ${subscription.tenantId} has been ${action}. Click here to view details.`,
-                    entityType: NotificationEntityType.SUBSCRIPTION,
-                    entityId: subscription.id,
-                    metadata: { tenantId: subscription.tenantId, planId: subscription.planId, status: subscription.status },
-                }, SocketService.emitToUser.bind(SocketService));
-            }
 
             const shouldSendTenantEmail = isCancelled || isAutoRenewed
                 || (req.body.mailNotification === true && isPaused);
