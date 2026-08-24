@@ -1,7 +1,7 @@
 import express from "express";
 import NotificationController from "../controllers/notificationController.js";
 import NotificationDto from "../dtos/notificationDto.js";
-import { clientProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
+import { adminProtect, clientProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
  * @swagger
