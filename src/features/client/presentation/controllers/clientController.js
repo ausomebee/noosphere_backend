@@ -125,6 +125,21 @@ class ClientController {
         });
     });
 
+    getTenantClientsByAvailableStaff = expressAsyncHandler(async (req, res) => {
+        const clients = await this.service.getTenantClientsByAvailableStaff(
+            req.params.tenantId,
+            req.query.date,
+            req.query.time,
+            req.user
+        );
+
+        return res.status(200).json({
+            message: "clients with available staff fetched successfully",
+            status: "ok",
+            data: clients
+        });
+    });
+
     getClientsByClinician = expressAsyncHandler(async (req, res) => {
         const clients = await this.service.getClientsByClinician(req.params.staffId, req.params.tenantId);
 

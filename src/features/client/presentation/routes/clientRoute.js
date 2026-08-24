@@ -521,6 +521,43 @@ class ClientRoutes {
         this.router.get("/tenant/tenant/:tenantId", staffProtect(), this.controller.getTenantClients);
 
         /**
+         * @swagger
+         * /api/v1/client/tenant/tenant/{tenantId}/available-staff:
+         *   get:
+         *     summary: Gets tenant clients with only staff available on the requested date
+         *     tags: [Clients]
+         *     parameters:
+         *       - in: path
+         *         name: tenantId
+         *         required: true
+         *         schema:
+         *           type: string
+         *       - in: query
+         *         name: date
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: date
+         *         description: Date used to determine the staff availability day
+         *       - in: query
+         *         name: time
+         *         required: true
+         *         schema:
+         *           type: string
+         *           example: "14:30"
+         *         description: 24-hour time used to determine staff availability
+         *     responses:
+         *       200:
+         *         description: Tenant clients with available staff fetched successfully
+         */
+        this.router.get(
+            "/tenant/tenant/:tenantId/available-staff",
+            staffProtect(),
+            ClientDto.getTenantClientsByAvailabilityDto,
+            this.controller.getTenantClientsByAvailableStaff
+        );
+
+        /**
         * @swagger
         * /api/v1/client/client/{clientId}:
         *   get:
