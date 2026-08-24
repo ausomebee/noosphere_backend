@@ -377,6 +377,13 @@ class ClientDto {
                 .messages({
                     "string.pattern.base": "date must use the YYYY-MM-DD format",
                     "any.required": "date is required"
+                }),
+            time: Joi.string()
+                .pattern(/^([01]\d|2[0-3]):[0-5]\d$/)
+                .required()
+                .messages({
+                    "string.pattern.base": "time must use the 24-hour HH:mm format",
+                    "any.required": "time is required"
                 })
         });
 

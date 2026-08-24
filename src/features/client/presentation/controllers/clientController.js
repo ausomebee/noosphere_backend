@@ -129,6 +129,7 @@ class ClientController {
         const clients = await this.service.getTenantClientsByAvailableStaff(
             req.params.tenantId,
             req.query.date,
+            req.query.time,
             req.user
         );
 

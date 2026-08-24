@@ -229,7 +229,7 @@ class ClientService {
         return clients;
     }
 
-    async getTenantClientsByAvailableStaff(tenantId, date, actor) {
+    async getTenantClientsByAvailableStaff(tenantId, date, time, actor) {
         const requestedDate = new Date(`${date}T00:00:00.000Z`);
 
         if (
@@ -253,7 +253,12 @@ class ClientService {
                         staffAvailabilities: {
                             some: {
                                 availabilityDays: {
-                                    some: { dayOfWeek, available: true }
+                                    some: {
+                                        dayOfWeek,
+                                        available: true,
+                                        from: { lte: time },
+                                        to: { gte: time }
+                                    }
                                 }
                             }
                         }

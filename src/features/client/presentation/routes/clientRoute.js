@@ -539,6 +539,13 @@ class ClientRoutes {
          *           type: string
          *           format: date
          *         description: Date used to determine the staff availability day
+         *       - in: query
+         *         name: time
+         *         required: true
+         *         schema:
+         *           type: string
+         *           example: "14:30"
+         *         description: 24-hour time used to determine staff availability
          *     responses:
          *       200:
          *         description: Tenant clients with available staff fetched successfully
