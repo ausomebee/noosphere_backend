@@ -159,7 +159,7 @@ class SubscriptionDto {
                 "string.empty": "Tenant ID is required",
                 "string.guid": "Tenant ID must be a valid UUID"
             }),
-            comment: Joi.string().required(),
+            comment: Joi.string().optional(),
             reason: Joi.string().required(),
             autoRenew: Joi.boolean().required().default(false),
             mailNotification: Joi.boolean().required()
