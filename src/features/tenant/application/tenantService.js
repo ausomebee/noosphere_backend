@@ -869,7 +869,7 @@ class TenantService {
         return staffs;
     }
 
-    async getAvailableTenantStaffs(tenantId, date, time) {
+    async getAvailableTenantStaffs(tenantId, date, startTime, endTime) {
         const requestedDate = new Date(`${date}T00:00:00.000Z`);
 
         if (
@@ -881,10 +881,15 @@ class TenantService {
 
         const days = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
         const dayOfWeek = days[requestedDate.getUTCDay()];
-        const staffs = await this.staffRepository.findAvailableByTenantAndDayTime(
+        if (startTime >= endTime) {
+            throw new Error("Availability end time must be after start time");
+        }
+
+        const staffs = await this.staffRepository.findAvailableByTenantAndTimeRange(
             tenantId,
             dayOfWeek,
-            time
+            startTime,
+            endTime
         );
 
         if (!staffs) {

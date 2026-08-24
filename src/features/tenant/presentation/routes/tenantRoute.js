@@ -1460,7 +1460,7 @@ class TenantRoutes {
          * @swagger
          * /api/v1/tenant/tenant/staff/{tenantId}/available:
          *   get:
-         *     summary: Gets tenant staff available at the requested date and time
+         *     summary: Gets tenant staff available for the requested date and time range
          *     tags: [Tenant]
          *     parameters:
          *       - in: path
@@ -1475,11 +1475,17 @@ class TenantRoutes {
          *           type: string
          *           format: date
          *       - in: query
-         *         name: time
+         *         name: startTime
          *         required: true
          *         schema:
          *           type: string
          *           example: "14:30"
+         *       - in: query
+         *         name: endTime
+         *         required: true
+         *         schema:
+         *           type: string
+         *           example: "15:30"
          *     responses:
          *       200:
          *         description: Available tenant staff retrieved successfully

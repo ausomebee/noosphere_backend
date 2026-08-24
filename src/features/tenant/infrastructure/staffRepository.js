@@ -138,7 +138,7 @@ class StaffRepository extends BaseRepository {
         });
     }
 
-    async findAvailableByTenantAndDayTime(tenantId, dayOfWeek, time) {
+    async findAvailableByTenantAndTimeRange(tenantId, dayOfWeek, startTime, endTime) {
         return await this.model.findMany({
             where: {
                 tenantId,
@@ -148,8 +148,8 @@ class StaffRepository extends BaseRepository {
                             some: {
                                 dayOfWeek,
                                 available: true,
-                                from: { lte: time },
-                                to: { gte: time }
+                                from: { lte: startTime },
+                                to: { gte: endTime }
                             }
                         }
                     }

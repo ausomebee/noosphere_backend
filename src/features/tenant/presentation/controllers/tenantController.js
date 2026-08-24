@@ -645,7 +645,8 @@ class TenantController {
         const staffs = await this.service.getAvailableTenantStaffs(
             req.params.tenantId,
             req.query.date,
-            req.query.time
+            req.query.startTime,
+            req.query.endTime
         );
 
         return res.status(200).json({
