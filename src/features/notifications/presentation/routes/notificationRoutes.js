@@ -237,6 +237,30 @@ class NotificationRoutes {
 
         /**
          * @swagger
+         * /api/v1/notifications/read/admin/{id}:
+         *   patch:
+         *     summary: Mark notification as read
+         *     tags: [notification]
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *         description: Notification ID
+         *     responses:
+         *       200:
+         *         description: Notification marked as read
+         */
+        this.router.patch(
+            "/read/admin/:id",
+            adminProtect(),
+            this.controller.markAsRead
+        );
+
+        /**
+         * @swagger
          * /api/v1/notifications/read/{id}:
          *   patch:
          *     summary: Mark notification as read

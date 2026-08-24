@@ -81,10 +81,10 @@ class SubscriptionDto {
                 "string.guid": "ID must be a valid UUID"
             })).required(),
             adminId: Joi.string().uuid().required().messages({
-                "string.empty": "Tenant ID is required",
-                "string.guid": "Tenant ID must be a valid UUID"
+                "string.empty": "Admin ID is required",
+                "string.guid": "Admin ID must be a valid UUID"
             }),
-            comment: Joi.string().required(),
+            comment: Joi.string().optional(),
             reason: Joi.string().required(),
             autoRenew: Joi.boolean().required().default(false)
         });
@@ -99,10 +99,10 @@ class SubscriptionDto {
                 "string.guid": "ID must be a valid UUID"
             })).required(),
             adminId: Joi.string().uuid().required().messages({
-                "string.empty": "Tenant ID is required",
-                "string.guid": "Tenant ID must be a valid UUID"
+                "string.empty": "Admin ID is required",
+                "string.guid": "Admin ID must be a valid UUID"
             }),
-            comment: Joi.string().required(),
+            comment: Joi.string().optional(),
             reason: Joi.string().required(),
             autoRenew: Joi.boolean().required().default(false)
         });
@@ -118,8 +118,8 @@ class SubscriptionDto {
                 "string.guid": "ID must be a valid UUID"
             })).required(),
             adminId: Joi.string().uuid().required().messages({
-                "string.empty": "Tenant ID is required",
-                "string.guid": "Tenant ID must be a valid UUID"
+                "string.empty": "Admin ID is required",
+                "string.guid": "Admin ID must be a valid UUID"
             }),
             comment: Joi.string().optional(),
             reason: Joi.string().required(),
@@ -136,10 +136,10 @@ class SubscriptionDto {
                 "string.guid": "ID must be a valid UUID"
             })).required(),
             adminId: Joi.string().uuid().required().messages({
-                "string.empty": "Tenant ID is required",
-                "string.guid": "Tenant ID must be a valid UUID"
+                "string.empty": "Admin ID is required",
+                "string.guid": "Admin ID must be a valid UUID"
             }),
-            comment: Joi.string().required(),
+            comment: Joi.string().optional(),
             reason: Joi.string().required(),
             resumeShedule: Joi.date().required(),
             mailNotification: Joi.boolean().required()
@@ -156,10 +156,10 @@ class SubscriptionDto {
                 "string.guid": "ID must be a valid UUID"
             })).required(),
             adminId: Joi.string().uuid().required().messages({
-                "string.empty": "Tenant ID is required",
-                "string.guid": "Tenant ID must be a valid UUID"
+                "string.empty": "Admin ID is required",
+                "string.guid": "Admin ID must be a valid UUID"
             }),
-            comment: Joi.string().required(),
+            comment: Joi.string().optional(),
             reason: Joi.string().required(),
             autoRenew: Joi.boolean().required().default(false),
             mailNotification: Joi.boolean().required()
@@ -176,10 +176,10 @@ class SubscriptionDto {
                 "string.guid": "ID must be a valid UUID"
             })).required(),
             adminId: Joi.string().uuid().required().messages({
-                "string.empty": "Tenant ID is required",
-                "string.guid": "Tenant ID must be a valid UUID"
+                "string.empty": "Admin ID is required",
+                "string.guid": "Admin ID must be a valid UUID"
             }),
-            comment: Joi.string().required(),
+            comment: Joi.string().optional(),
             reason: Joi.string().required(),
             resumeShedule: Joi.date().required(),
             autoRenew: Joi.boolean().required().default(false),
@@ -196,10 +196,10 @@ class SubscriptionDto {
                 "string.guid": "ID must be a valid UUID"
             })).required(),
             adminId: Joi.string().uuid().required().messages({
-                "string.empty": "Tenant ID is required",
-                "string.guid": "Tenant ID must be a valid UUID"
+                "string.empty": "Admin ID is required",
+                "string.guid": "Admin ID must be a valid UUID"
             }),
-            comment: Joi.string().required(),
+            comment: Joi.string().optional(),
             reason: Joi.string().required(),
             pauseSchedule: Joi.date().required(),
             autoRenew: Joi.boolean().required().default(true),
