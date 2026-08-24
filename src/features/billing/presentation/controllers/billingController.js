@@ -693,12 +693,30 @@ class BillingController {
                 return res.status(500).json({ message: "STRIPE_WEBHOOK_SECRET is not configured" });
             }
 
-            const event = this.stripeBillingService.stripe.webhooks.constructEvent(
-                req.body,
-                req.headers["stripe-signature"],
-                process.env.STRIPE_WEBHOOK_SECRET
-            );
-            await this.stripeBillingService.handleWebhook(event);
+            const stripe = this.stripeBillingService.stripe;
+            const payload = JSON.parse(req.body.toString("utf8"));
+            const isThinEvent = payload.object === "v2.core.event";
+            const event = isThinEvent
+                ? await stripe.parseEventNotification(
+                    req.body,
+                    req.headers["stripe-signature"],
+                    process.env.STRIPE_WEBHOOK_SECRET
+                )
+                : stripe.webhooks.constructEvent(
+                    req.body,
+                    req.headers["stripe-signature"],
+                    process.env.STRIPE_WEBHOOK_SECRET
+                );
+
+            // Thin v2 notifications contain only a related-object reference. Most
+            // account events are irrelevant here; v1 payment events are fetched
+            // before they enter the existing payment activation flow.
+            if (isThinEvent && !event.type.startsWith("v1.payment_intent.")) {
+                return res.status(200).json({ received: true });
+            }
+
+            const paymentEvent = isThinEvent ? await event.fetchEvent() : event;
+            await this.stripeBillingService.handleWebhook(paymentEvent);
             return res.status(200).json({ received: true });
         } catch (error) {
             return res.status(400).json({ message: `Webhook Error: ${error.message}` });
