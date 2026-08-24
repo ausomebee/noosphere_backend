@@ -184,6 +184,35 @@ class NotificationRoutes {
 
         /**
          * @swagger
+         * /api/v1/notifications/user/admin/{userId}/{userType}:
+         *   get:
+         *     summary: Get notifications for a user
+         *     tags: [notification]
+         *     parameters:
+         *       - in: path
+         *         name: userId
+         *         required: true
+         *         schema:
+         *           type: string
+         *           format: uuid
+         *       - in: path
+         *         name: userType
+         *         required: true
+         *         schema:
+         *           type: string
+         *           enum: [ADMIN, TENANT_STAFF, CLIENT]
+         *     responses:
+         *       200:
+         *         description: Notifications fetched successfully
+         */
+        this.router.get(
+            "/user/admin/:userId/:userType",
+            adminProtect(),
+            this.controller.getNotificationsByUser
+        );
+
+        /**
+         * @swagger
          * /api/v1/notifications/read/client/{id}:
          *   patch:
          *     summary: Mark notification as read
