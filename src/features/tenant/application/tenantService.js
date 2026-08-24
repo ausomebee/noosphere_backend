@@ -869,6 +869,36 @@ class TenantService {
         return staffs;
     }
 
+    async getAvailableTenantStaffs(tenantId, date, startTime, endTime) {
+        const requestedDate = new Date(`${date}T00:00:00.000Z`);
+
+        if (
+            Number.isNaN(requestedDate.getTime()) ||
+            requestedDate.toISOString().slice(0, 10) !== date
+        ) {
+            throw new Error("Invalid availability date");
+        }
+
+        const days = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+        const dayOfWeek = days[requestedDate.getUTCDay()];
+        if (startTime >= endTime) {
+            throw new Error("Availability end time must be after start time");
+        }
+
+        const staffs = await this.staffRepository.findAvailableByTenantAndTimeRange(
+            tenantId,
+            dayOfWeek,
+            startTime,
+            endTime
+        );
+
+        if (!staffs) {
+            throw new Error("staffs not found");
+        }
+
+        return staffs;
+    }
+
     async updateStaffPassword(data) {
         const existingStaff = await this.staffRepository.findOne({ id: data.staffId });
 
