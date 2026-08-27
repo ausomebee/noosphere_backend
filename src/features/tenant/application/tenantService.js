@@ -545,8 +545,14 @@ class TenantService {
 
         const tenant = await this.tenantRepository.findOne({ id: tenantStaff.tenantId });
 
-        if (!tenant?.active || tenant.isDeleted) {
+        if (!tenant || tenant.isDeleted) {
             throw new Error("Not Authorized: Tenant account is not active.");
+        }
+
+        if (!tenant.active) {
+            throw new Error(tenant.suspended && tenant.suspensionReason
+                ? tenant.suspensionReason
+                : "Not Authorized: Tenant account is not active.");
         }
 
         if (!tenantStaff.password) {

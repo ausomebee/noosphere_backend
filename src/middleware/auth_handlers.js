@@ -102,12 +102,30 @@ const staffProtectMiddleware = asyncHandler(async (req, res, next) => {
                     systemModule: true,
                 },
             },
+            tenant: {
+                select: {
+                    active: true,
+                    isDeleted: true,
+                    featuresDisabled: true,
+                    suspensionReason: true,
+                },
+            },
         },
     });
 
     if (!staff || staff.isDeleted || !staff.active) {
         res.status(401);
         return next(new Error("Not Authorized: Account not found or inactive"));
+    }
+
+    if (!staff.tenant || staff.tenant.isDeleted || !staff.tenant.active) {
+        res.status(401);
+        return next(new Error(staff.tenant?.suspensionReason || "Not Authorized: Tenant account is not active"));
+    }
+
+    if (staff.tenant.featuresDisabled) {
+        res.status(403);
+        return next(new Error(staff.tenant.suspensionReason || "Access to this feature has been suspended"));
     }
 
     req.user = {

@@ -19,6 +19,10 @@ class SubscriptionInvoiceJob {
         this.dayInMs = 24 * 60 * 60 * 1000;
     }
 
+    async getConfig() {
+        return this.prisma.invoiceManagement.findFirst();
+    }
+
     getTargetDateRange(now = new Date()) {
         const start = new Date(now);
         start.setUTCHours(0, 0, 0, 0);
@@ -137,6 +141,13 @@ class SubscriptionInvoiceJob {
     }
 
     async run(now = new Date()) {
+        const config = await this.getConfig();
+
+        if (!config || !config.onPlanPurchase) {
+            console.log("Subscription invoice job skipped: onPlanPurchase is disabled");
+            return { skipped: true };
+        }
+
         const { start, end } = this.getTargetDateRange(now);
         const subscriptions = await this.prisma.subscription.findMany({
             where: {
