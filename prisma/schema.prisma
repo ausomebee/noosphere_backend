@@ -266,6 +266,11 @@ model Tenant {
   createdBy        String
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+  stripeCustomerId String?
+  suspended        Boolean  @default(false)
+  featuresDisabled Boolean  @default(false)
+  suspensionReason String?
+  suspendedAt      DateTime?
 
   pipelineItems                     PipelineItem[]
   clientLinks                       ClientTenant[]
@@ -854,6 +859,12 @@ model Invoice {
   billingPeriodEnd DateTime?
   emailedAt        DateTime?
   stripePaymentIntentId String? @unique
+  upcomingEmailedAt     DateTime?
+  dueEmailedAt          DateTime?
+  overdueRemindersSent  Int[]      @default([])
+  chargeAttemptOffsetsSent     Int[]      @default([])
+  lastChargeAttemptAt          DateTime?
+  cancellationWarningEmailedAt DateTime?
 
   tenant        Tenant?        @relation(fields: [tenantId], references: [id])
   plan          BillingPlan?   @relation(fields: [planId], references: [id])
@@ -883,14 +894,16 @@ model InvoiceToken {
 }
 
 model PaymentMethod {
-  id             String   @id @default(uuid())
+  id             String    @id @default(uuid())
   cardType       String
   lastFourDigits String
   holderName     String?
   tenantId       String
   gatewayToken   String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  lastUsedAt     DateTime?
+  isDefault      Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   payment Payment[]
   tenant  Tenant?   @relation(fields: [tenantId], references: [id])
