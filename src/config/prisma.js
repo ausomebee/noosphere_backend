@@ -48,6 +48,10 @@ class PrismaService {
     getClient() {
         return this.prisma;
     }
+
+    async disconnect() {
+        await this.prisma.$disconnect();
+    }
 }
 
 const prismaService = new PrismaService();

@@ -20,6 +20,22 @@ class StripeBillingService {
         return Math.round(Number(invoice.total) * 100);
     }
 
+    // Runs `fn` inside a Serializable transaction, retrying a few times if
+    // Postgres aborts the transaction due to a write conflict (Prisma P2034).
+    // This matters here because the same invoice can be settled concurrently
+    // via the Stripe webhook and the client-facing confirm-payment endpoint.
+    async runSerializableTransaction(fn, { retries = 3 } = {}) {
+        for (let attempt = 1; attempt <= retries; attempt += 1) {
+            try {
+                return await this.prisma.$transaction(fn, { isolationLevel: "Serializable" });
+            } catch (error) {
+                const isConflict = error.code === "P2034";
+                if (!isConflict || attempt === retries) throw error;
+                await new Promise((resolve) => setTimeout(resolve, 50 * attempt));
+            }
+        }
+    }
+
     async ensureCustomer(tenant) {
         if (tenant.stripeCustomerId) return tenant.stripeCustomerId;
 
@@ -29,10 +45,21 @@ class StripeBillingService {
             metadata: { tenantId: tenant.id }
         });
 
-        await this.prisma.tenant.update({
-            where: { id: tenant.id },
+        // Guard against a race where two concurrent requests both see no
+        // stripeCustomerId and each create a Stripe customer. Only persist ours
+        // if nobody has set one in the meantime; otherwise defer to theirs.
+        const updateResult = await this.prisma.tenant.updateMany({
+            where: { id: tenant.id, stripeCustomerId: null },
             data: { stripeCustomerId: customer.id }
         });
+
+        if (updateResult.count === 0) {
+            const current = await this.prisma.tenant.findUnique({ where: { id: tenant.id }, select: { stripeCustomerId: true } });
+            if (current?.stripeCustomerId) {
+                await this.stripe.customers.del(customer.id).catch(() => {});
+                return current.stripeCustomerId;
+            }
+        }
 
         return customer.id;
     }
@@ -136,7 +163,7 @@ class StripeBillingService {
         const card = charge?.payment_method_details?.card;
         const paymentMethodId = typeof paymentIntent.payment_method === "string" ? paymentIntent.payment_method : "";
 
-        return this.prisma.$transaction(async (tx) => {
+        return this.runSerializableTransaction(async (tx) => {
             const currentInvoice = await tx.invoice.findUnique({ where: { id: invoice.id } });
             if (currentInvoice.status === "Paid") return { alreadyPaid: true, invoice: currentInvoice };
 
@@ -180,13 +207,13 @@ class StripeBillingService {
             await tx.invoiceToken.updateMany({ where: { invoiceId: invoice.id, tokenHash: token }, data: { used: true } });
             await tx.tenant.update({ where: { id: invoice.tenantId }, data: { active: true } });
             return { alreadyPaid: false, invoice: updatedInvoice };
-        }, { isolationLevel: "Serializable" });
+        });
     }
 
     async activateFromSavedCharge(invoice, paymentIntent, paymentMethod) {
         const charge = paymentIntent.latest_charge;
 
-        return this.prisma.$transaction(async (tx) => {
+        return this.runSerializableTransaction(async (tx) => {
             const currentInvoice = await tx.invoice.findUnique({ where: { id: invoice.id } });
             if (currentInvoice.status === "Paid") return { alreadyPaid: true, invoice: currentInvoice };
 
@@ -237,7 +264,7 @@ class StripeBillingService {
             });
 
             return { alreadyPaid: false, invoice: updatedInvoice };
-        }, { isolationLevel: "Serializable" });
+        });
     }
 
     async chargeInvoiceWithSavedMethod(invoice, paymentMethod, attemptOffset = 0) {
@@ -308,32 +335,117 @@ class StripeBillingService {
         }
 
         try {
-            if (event.type === "payment_intent.payment_failed") {
-                await this.recordFailedPayment(event.data.object);
-                return;
+            switch (event.type) {
+                case "payment_intent.payment_failed":
+                    await this.recordFailedPayment(event.data.object);
+                    return;
+                case "payment_intent.succeeded":
+                    await this.handlePaymentIntentSucceeded(event.data.object);
+                    return;
+                case "charge.refunded":
+                    await this.handleChargeRefunded(event.data.object);
+                    return;
+                case "charge.dispute.created":
+                case "charge.dispute.closed":
+                    await this.handleChargeDispute(event.data.object);
+                    return;
+                default:
+                    return;
             }
-            if (event.type !== "payment_intent.succeeded") return;
-            const paymentIntent = await this.stripe.paymentIntents.retrieve(event.data.object.id, { expand: ["latest_charge"] });
-            const invoiceId = Number(paymentIntent.metadata.invoiceId);
-            const invoice = await this.prisma.invoice.findUnique({ where: { id: invoiceId }, include: { tenant: true, plan: true } });
-            if (!invoice) throw new Error("Invoice not found for Stripe payment intent");
-            this.assertPaymentIntent(invoice, paymentIntent);
-
-            if (paymentIntent.metadata.autoCharge === "true") {
-                const paymentMethodId = typeof paymentIntent.payment_method === "string" ? paymentIntent.payment_method : "";
-                const paymentMethod = await this.prisma.paymentMethod.findFirst({
-                    where: { tenantId: invoice.tenantId, gatewayToken: paymentMethodId }
-                });
-                if (paymentMethod) {
-                    await this.activateFromSavedCharge(invoice, paymentIntent, paymentMethod);
-                }
-                return;
-            }
-
-            await this.activate(invoice, paymentIntent.metadata.paymentToken, paymentIntent);
         } catch (error) {
             await this.prisma.stripeWebhookEvent.deleteMany({ where: { eventId: event.id } });
             throw error;
+        }
+    }
+
+    async handlePaymentIntentSucceeded(paymentIntentRef) {
+        const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentRef.id, { expand: ["latest_charge"] });
+        const invoiceId = Number(paymentIntent.metadata.invoiceId);
+        const invoice = await this.prisma.invoice.findUnique({ where: { id: invoiceId }, include: { tenant: true, plan: true } });
+        if (!invoice) throw new Error("Invoice not found for Stripe payment intent");
+        this.assertPaymentIntent(invoice, paymentIntent);
+
+        if (paymentIntent.metadata.autoCharge === "true") {
+            const paymentMethodId = typeof paymentIntent.payment_method === "string" ? paymentIntent.payment_method : "";
+            const paymentMethod = await this.prisma.paymentMethod.findFirst({
+                where: { tenantId: invoice.tenantId, gatewayToken: paymentMethodId }
+            });
+            if (paymentMethod) {
+                await this.activateFromSavedCharge(invoice, paymentIntent, paymentMethod);
+            }
+            return;
+        }
+
+        await this.activate(invoice, paymentIntent.metadata.paymentToken, paymentIntent);
+    }
+
+    // Reflects money actually leaving our Stripe balance back into our own
+    // records: without this, an invoice stays "Paid" and the tenant stays
+    // active/subscribed even after the customer has been refunded or won a
+    // chargeback, which is both a revenue leak and an access-control gap.
+    async handleChargeRefunded(charge) {
+        const payment = await this.prisma.payment.findFirst({ where: { transactionRef: charge.id } });
+        if (!payment) return;
+
+        const fullyRefunded = charge.amount_refunded >= charge.amount;
+
+        await this.prisma.$transaction(async (tx) => {
+            await tx.payment.update({
+                where: { id: payment.id },
+                data: { status: fullyRefunded ? "Refunded" : "PartiallyRefunded" }
+            });
+
+            if (!fullyRefunded) return;
+
+            const invoice = await tx.invoice.findUnique({ where: { id: payment.invoiceId } });
+            if (invoice && invoice.status === "Paid") {
+                await tx.invoice.update({ where: { id: invoice.id }, data: { status: "Overdue" } });
+            }
+        });
+
+        await this.notifyAdminOfChargeback(payment, `Charge ${charge.id} was ${fullyRefunded ? "fully" : "partially"} refunded.`);
+    }
+
+    async handleChargeDispute(dispute) {
+        const payment = await this.prisma.payment.findFirst({ where: { transactionRef: dispute.charge } });
+        if (!payment) return;
+
+        const isClosed = Boolean(dispute.status && dispute.status !== "warning_needs_response" && dispute.status !== "needs_response" && dispute.status !== "under_review");
+        const status = !isClosed ? "Disputed" : dispute.status === "won" ? "Successful" : "Refunded";
+
+        await this.prisma.payment.update({ where: { id: payment.id }, data: { status } });
+
+        if (status === "Refunded") {
+            const invoice = await this.prisma.invoice.findUnique({ where: { id: payment.invoiceId } });
+            if (invoice && invoice.status === "Paid") {
+                await this.prisma.invoice.update({ where: { id: invoice.id }, data: { status: "Overdue" } });
+            }
+        }
+
+        await this.notifyAdminOfChargeback(payment, `Dispute for charge ${dispute.charge} is now '${dispute.status}'.`);
+    }
+
+    async notifyAdminOfChargeback(payment, message) {
+        try {
+            const superAdmin = await this.prisma.admin.findFirst({ where: { superAdmin: true, isDeleted: false, active: true } });
+            if (!superAdmin) return;
+
+            await this.prisma.notification.create({
+                data: {
+                    userId: superAdmin.id,
+                    userType: "ADMIN",
+                    type: "PAYMENT_CHARGEBACK",
+                    title: "Payment refunded or disputed",
+                    content: `${message} (invoice INV${payment.invoiceId}, tenant ${payment.tenantId})`,
+                    entityType: "PAYMENT",
+                    entityId: String(payment.id),
+                    isRead: false
+                }
+            });
+        } catch (error) {
+            // Never let an admin-notification failure roll back or mask the
+            // refund/dispute bookkeeping that already committed above.
+            console.error("Failed to notify admin of chargeback:", error);
         }
     }
 

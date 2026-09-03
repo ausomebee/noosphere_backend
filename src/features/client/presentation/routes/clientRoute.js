@@ -2,6 +2,7 @@ import express from "express";
 import ClientController from "../controllers/clientController.js";
 import ClientDto from "../dto/clientDto.js";
 import { adminProtect, clientProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
+import { authRateLimiter } from "../../../../middleware/rate_limit.js";
 /**
  * @swagger
  * components:
@@ -387,7 +388,7 @@ class ClientRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.post("/login", ClientDto.clientSigninDto, this.controller.login);
+        this.router.post("/login", authRateLimiter, ClientDto.clientSigninDto, this.controller.login);
 
         /**
          * @swagger

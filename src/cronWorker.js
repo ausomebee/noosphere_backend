@@ -2,6 +2,15 @@ import "./config/env.js";
 import prismaService from "./config/prisma.js";
 import cronScheduler from "./cron/scheduler.js";
 
+process.on("unhandledRejection", (reason) => {
+    console.error("🔥 Unhandled promise rejection in cron worker:", reason);
+});
+
+process.on("uncaughtException", (err) => {
+    console.error("🔥 Uncaught exception in cron worker, shutting down:", err);
+    process.exit(1);
+});
+
 async function startCronWorker() {
     try {
         await prismaService.connect();

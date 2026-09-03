@@ -2,6 +2,7 @@ import express from "express";
 import BillingController from "../controllers/billingController.js";
 import BillingDto from "../dto/billingDto.js";
 import { adminProtect } from "../../../../middleware/auth_handlers.js";
+import { paymentLinkRateLimiter, webhookRateLimiter } from "../../../../middleware/rate_limit.js";
 
 /**
  * @swagger
@@ -539,6 +540,7 @@ class BillingRoutes {
          */
         this.router.post(
             "/stripe/create-payment-intent",
+            paymentLinkRateLimiter,
             BillingDto.createStripePaymentIntentDto,
             this.controller.createStripePaymentIntent
         );
@@ -565,6 +567,7 @@ class BillingRoutes {
          */
         this.router.post(
             "/stripe/confirm-payment",
+            paymentLinkRateLimiter,
             BillingDto.confirmStripePaymentDto,
             this.controller.confirmStripePayment
         );
@@ -597,6 +600,7 @@ class BillingRoutes {
          */
         this.router.post(
             "/stripe/webhook",
+            webhookRateLimiter,
             express.raw({ type: "application/json" }),
             this.controller.stripeWebhook
         );

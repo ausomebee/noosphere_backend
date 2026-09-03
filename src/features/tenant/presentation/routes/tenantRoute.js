@@ -3,6 +3,7 @@ import TenantDto from "../dto/tenantDto.js";
 import TenantController from "../controllers/tenantController.js";
 import multer from "multer";
 import { adminProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
+import { authRateLimiter } from "../../../../middleware/rate_limit.js";
 
 /**
  * @swagger
@@ -669,7 +670,7 @@ class TenantRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.post("/signin", TenantDto.staffSigninDto, this.controller.tenantStaffLogin);
+        this.router.post("/signin", authRateLimiter, TenantDto.staffSigninDto, this.controller.tenantStaffLogin);
 
         /**
         * @swagger
