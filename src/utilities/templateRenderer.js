@@ -18,13 +18,24 @@ class TemplateRenderer {
         this.clientPortalUrl = process.env.CLIENT_PORTAL_URL || `${this.clientUrl}/client`;
     }
 
+    sanitizeSubdomain(subdomain) {
+        const value = String(subdomain || '').trim().toLowerCase();
+
+        if (!/^[a-z0-9-]+$/.test(value)) {
+            throw new Error(`Invalid subdomain: '${subdomain}'`);
+        }
+
+        return value;
+    }
+
     buildTenantClientUrl(subdomain) {
+        const safeSubdomain = this.sanitizeSubdomain(subdomain);
         const normalizedClientUrl = this.clientUrl.trim().replace(/\/+$/, '');
         const url = new URL(/^[a-z][a-z\d+\-.]*:\/\//i.test(normalizedClientUrl)
             ? normalizedClientUrl
             : `https://${normalizedClientUrl}`);
 
-        url.hostname = `${subdomain}.${url.hostname.replace(/^www\./, '')}`;
+        url.hostname = `${safeSubdomain}.${url.hostname.replace(/^www\./, '')}`;
 
         return url.toString().replace(/\/$/, '');
     }

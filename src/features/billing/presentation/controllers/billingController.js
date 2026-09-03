@@ -709,9 +709,9 @@ class BillingController {
                 );
 
             // Thin v2 notifications contain only a related-object reference. Most
-            // account events are irrelevant here; v1 payment events are fetched
-            // before they enter the existing payment activation flow.
-            if (isThinEvent && !event.type.startsWith("v1.payment_intent.")) {
+            // account events are irrelevant here; v1 payment/charge events are
+            // fetched before they enter the existing payment activation flow.
+            if (isThinEvent && !/^v1\.(payment_intent|charge)\./.test(event.type)) {
                 return res.status(200).json({ received: true });
             }
 

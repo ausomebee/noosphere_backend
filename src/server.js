@@ -89,6 +89,15 @@ import messagesRoute from "./features/messaging/presentation/routes/messageRoute
 import tenantNotificationSettingsRoute from "./features/tenant/presentation/routes/tenantNotificationSettingsRoutes.js";
 import prospectRoute from "./features/prospect/presentation/routes/prospectRoutes.js";
 
+process.on("unhandledRejection", (reason) => {
+    console.error("🔥 Unhandled promise rejection:", reason);
+});
+
+process.on("uncaughtException", (err) => {
+    console.error("🔥 Uncaught exception, shutting down:", err);
+    process.exit(1);
+});
+
 class App {
     constructor() {
         this.app = express();
@@ -130,6 +139,10 @@ class App {
     }
 
     initializeMiddlewares() {
+        // Trust the first hop (nginx/load balancer) so req.ip reflects the real
+        // client address from X-Forwarded-For. Without this, rate limiting and
+        // audit logs would all key off the proxy's IP instead of the caller's.
+        this.app.set("trust proxy", Number(process.env.TRUST_PROXY_HOPS || 1));
         // new PassportUtil(this.app)
         this.app.use(morgan("dev"));
         this.app.use(cors(this.allowedOrigins));

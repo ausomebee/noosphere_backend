@@ -109,7 +109,13 @@ class SocketService {
     }
 
     emitToUser(userId, userType, event, payload) {
-        if (!this.io) throw new Error("Socket.IO not initialized");
+        if (!this.io) {
+            // Background workers (e.g. cronWorker.js) never call init() since they
+            // don't own an HTTP server for Socket.IO to bind to. Notifications are
+            // still persisted to the DB by the caller; just skip the realtime push.
+            console.warn("Socket.IO not initialized; skipping realtime emit for", userType, userId);
+            return;
+        }
 
         const room = `${userType}_${userId}`;
         const legacyStaffRoom = userType === "TENANT_STAFF" ? `STAFF_${userId}` : null;

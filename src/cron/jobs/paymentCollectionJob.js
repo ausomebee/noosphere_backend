@@ -132,7 +132,7 @@ class PaymentCollectionJob {
         });
     }
 
-    async attemptCharge(invoice, config) {
+    async attemptCharge(invoice, config, daysSinceDue) {
         const methods = await this.getOrderedPaymentMethods(invoice.tenantId, config.chargeLastUsedFirst);
         if (methods.length === 0) return { attempted: false };
 
@@ -140,7 +140,7 @@ class PaymentCollectionJob {
         let lastError = null;
 
         for (const method of candidates) {
-            const result = await this.stripeBillingService.chargeInvoiceWithSavedMethod(invoice, method, this.daysBetween(new Date(), invoice.dueDate));
+            const result = await this.stripeBillingService.chargeInvoiceWithSavedMethod(invoice, method, daysSinceDue);
             await this.notifyChargeAttempt(invoice, config, method, result);
 
             if (result.success) {
@@ -195,7 +195,7 @@ class PaymentCollectionJob {
             summary.matched += 1;
 
             try {
-                const result = await this.attemptCharge(invoice, config);
+                const result = await this.attemptCharge(invoice, config, daysSinceDue);
                 if (!result.attempted) continue;
 
                 await this.prisma.invoice.update({
@@ -235,10 +235,10 @@ class PaymentCollectionJob {
         return summary;
     }
 
-    async applySuspension(tenant, config) {
+    async applySuspension(tenant, config, client = this.prisma) {
         const preventLogin = this.isSuspensionPreventingLogin(config.suspensionAction);
 
-        await this.prisma.tenant.update({
+        await client.tenant.update({
             where: { id: tenant.id },
             data: preventLogin
                 ? {
@@ -299,12 +299,17 @@ class PaymentCollectionJob {
             }
 
             try {
-                await this.prisma.subscription.update({
-                    where: { id: invoice.subscriptionId },
-                    data: { status: "CANCELLED" },
-                });
+                await this.prisma.$transaction(async (tx) => {
+                    const currentSubscription = await tx.subscription.findUnique({ where: { id: invoice.subscriptionId } });
+                    if (!currentSubscription || currentSubscription.status === "CANCELLED") return;
 
-                await this.applySuspension(invoice.tenant, config);
+                    await tx.subscription.update({
+                        where: { id: invoice.subscriptionId },
+                        data: { status: "CANCELLED" },
+                    });
+
+                    await this.applySuspension(invoice.tenant, config, tx);
+                }, { isolationLevel: "Serializable" });
 
                 await this.notifySystemAdmin(invoice, {
                     type: NotificationType.TENANT_ACCOUNT_SUSPENDED,

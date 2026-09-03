@@ -7,10 +7,11 @@ import argon2 from "argon2";
 import templateRenderer from "../../../utilities/templateRenderer.js";
 
 const buildClientLoginUrl = (baseUrl, subdomain) => {
+    const safeSubdomain = templateRenderer.sanitizeSubdomain(subdomain);
     const normalizedBaseUrl = (baseUrl || 'http://noospherehub.net').trim().replace(/\/+$/, '');
     const url = new URL(/^[a-z][a-z\d+\-.]*:\/\//i.test(normalizedBaseUrl) ? normalizedBaseUrl : `https://${normalizedBaseUrl}`);
 
-    url.hostname = `www.${subdomain}.${url.hostname.replace(/^www\./, '')}`;
+    url.hostname = `www.${safeSubdomain}.${url.hostname.replace(/^www\./, '')}`;
 
     return `${url.origin}/client/intialLogin`;
 };
@@ -426,15 +427,17 @@ class ClientService {
     }
 
     async login(data) {
+        if (!data.subdomain) {
+            throw new Error("Unable to determine tenant from request");
+        }
+
         const client = await this.clientRepository.findFirstDynamic({
             where: {
                 email: data.email,
                 tenantLinks: {
                     some: {
                         tenant: {
-                            OrganizationInformation: {
-                                subDomain: data.subDomain,
-                            },
+                            subdomain: data.subdomain,
                         },
                     },
                 },

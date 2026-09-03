@@ -140,7 +140,9 @@ class ClientController {
     });
 
     login = expressAsyncHandler(async (req, res) => {
-        const client = await this.service.login({...req.body, subdomain: req.headers.host.split('.')[0]});
+        const host = (req.headers.host || "").split(":")[0];
+        const subdomain = host.split(".")[0] || undefined;
+        const client = await this.service.login({ ...req.body, subdomain });
 
         if (!client) {
             return res.status(500).json({ message: 'Failed to login' });

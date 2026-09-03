@@ -2,6 +2,7 @@ import express from "express";
 import AdminController from "../controllers/adminController.js";
 import AdminDto from "../dto/adminDto.js";
 import { adminProtect } from "../../../../middleware/auth_handlers.js";
+import { authRateLimiter } from "../../../../middleware/rate_limit.js";
 
 /**
  * @swagger
@@ -288,7 +289,7 @@ class AdminRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.post("/signin", AdminDto.adminSigninDto, this.controller.adminSignin);
+        this.router.post("/signin", authRateLimiter, AdminDto.adminSigninDto, this.controller.adminSignin);
 
         /**
         * @swagger
