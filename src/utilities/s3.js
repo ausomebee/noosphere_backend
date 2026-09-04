@@ -1,4 +1,5 @@
 import { S3Client, GetObjectCommand, DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import multer from "multer";
 import multerS3 from "multer-s3";
 import path from "path";
@@ -71,6 +72,15 @@ class S3Service {
 
     await this.s3.send(command);
     return `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+  }
+
+  async getPresignedUrl(key, expiresIn = 3600) {
+    const command = new GetObjectCommand({
+      Bucket: this.bucketName,
+      Key: key,
+    });
+
+    return getSignedUrl(this.s3, command, { expiresIn });
   }
 
   async getObjectStream(key) {
