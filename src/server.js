@@ -148,7 +148,11 @@ class App {
         this.app.use(cors(this.allowedOrigins));
         this.app.use(express.json({
             limit: "50mb",
-            type: (req) => req.originalUrl !== "/api/v1/billing/stripe/webhook"
+            // Only attempt to parse bodies that are actually JSON. The previous
+            // check only excluded the Stripe webhook path and otherwise returned
+            // true unconditionally, so body-parser tried (and failed) to
+            // JSON.parse every multipart/form-data upload across the whole app.
+            type: (req) => req.originalUrl !== "/api/v1/billing/stripe/webhook" && req.is("application/json")
         }));
         this.app.use(express.urlencoded({ extended: true, limit: "50mb" }));
     }
