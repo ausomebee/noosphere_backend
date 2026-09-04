@@ -234,7 +234,7 @@ class ClientDocumentsRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.delete("/:id", clientProtect(), this.controller.deleteClientDocument);
+        this.router.delete("/:id", staffProtect(), this.controller.deleteClientDocument);
 
 	}
 
