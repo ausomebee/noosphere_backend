@@ -89,8 +89,7 @@ class S3Service {
       Key: key,
     });
 
-    const { Body } = await this.s3.send(command);
-    return Body;
+    return this.s3.send(command);
   }
 
   async deleteObject(key) {
