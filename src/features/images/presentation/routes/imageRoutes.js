@@ -381,6 +381,16 @@ class ImageRoutes {
           res.end();
         }
       });
+
+      // Without this, a client aborting the download mid-stream (closing a
+      // preview tab, flaky connection, etc.) makes `res` emit an unhandled
+      // 'error' (ECONNRESET/EPIPE). Since nothing was listening for it, that
+      // error escaped as an uncaughtException and killed the whole process,
+      // taking down every other in-flight request with it.
+      res.on("error", (error) => {
+        console.error("Error writing streamed file to response:", error.message);
+        Body.destroy();
+      });
     } catch (error) {
       console.error("Error streaming file:", error.message);
       const status = error.name === "NoSuchKey" ? 404 : 500;
