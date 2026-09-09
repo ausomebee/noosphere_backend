@@ -89,13 +89,27 @@ import messagesRoute from "./features/messaging/presentation/routes/messageRoute
 import tenantNotificationSettingsRoute from "./features/tenant/presentation/routes/tenantNotificationSettingsRoutes.js";
 import prospectRoute from "./features/prospect/presentation/routes/prospectRoutes.js";
 
+let httpServerRef = null;
+
 process.on("unhandledRejection", (reason) => {
     console.error("🔥 Unhandled promise rejection:", reason);
 });
 
 process.on("uncaughtException", (err) => {
-    console.error("🔥 Uncaught exception, shutting down:", err);
-    process.exit(1);
+    console.error("🔥 Uncaught exception:", err);
+
+    // Node's guidance is to treat an uncaughtException as an unclean state and
+    // not resume normal operation. But killing the process instantly with
+    // process.exit(1) drops every other in-flight request/socket that had
+    // nothing to do with the error that was thrown. Give the server a short
+    // window to stop accepting new connections and let existing ones finish
+    // before exiting, falling back to a hard exit if that takes too long.
+    if (httpServerRef) {
+        httpServerRef.close(() => process.exit(1));
+        setTimeout(() => process.exit(1), 5000).unref();
+    } else {
+        process.exit(1);
+    }
 });
 
 class App {
@@ -317,6 +331,7 @@ class App {
     }
 
     start() {
+        httpServerRef = this.server;
         this.server.listen(this.port, () => {
             console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${this.port}`);
 
