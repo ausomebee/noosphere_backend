@@ -730,6 +730,26 @@ class InvoiceRoutes {
 
         /**
          * @swagger
+         * /api/v1/invoice/invoice/management/on-plan-purchase/admin:
+         *   patch:
+         *     summary: Update onPlanPurchase flag as an admin
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateOnPlanPurchaseDto'
+         *     responses:
+         *       200:
+         *         description: onPlanPurchase updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/invoice/management/on-plan-purchase/admin", adminProtect(), InvoiceDto.updateOnPlanPurchaseDto, this.controller.updateInvoiceManagement);
+
+        /**
+         * @swagger
          * /api/v1/invoice/invoice/management/days-before-due-date:
          *   patch:
          *     summary: Update days before due date
@@ -867,6 +887,26 @@ class InvoiceRoutes {
          *         description: Validation error
          */
         this.router.patch("/invoice/management/on-due-date", staffProtect(), InvoiceDto.updateOnDueDateDto, this.controller.updateInvoiceManagement);
+
+        /**
+         * @swagger
+         * /api/v1/invoice/invoice/management/on-due-date/admin:
+         *   patch:
+         *     summary: Update onDueDate flag as an admin
+         *     tags: [Invoice]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/UpdateOnDueDateDto'
+         *     responses:
+         *       200:
+         *         description: onDueDate updated successfully
+         *       400:
+         *         description: Validation error
+         */
+        this.router.patch("/invoice/management/on-due-date/admin", adminProtect(), InvoiceDto.updateOnDueDateDto, this.controller.updateInvoiceManagement);
 
         /**
          * @swagger
