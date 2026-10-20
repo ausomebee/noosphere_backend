@@ -1,26 +1,31 @@
 {
-  "name": "noosphere",
+  "name": "noosphere-backend",
   "version": "1.0.0",
-  "main": "src/server.js",
+  "private": true,
+  "main": "apps/main-app/src/server.js",
   "type": "module",
   "scripts": {
-    "start": "node src/server.js",
-    "server": "nodemon src/server.js",
-    "start:worker": "node src/cronWorker.js",
-    "worker": "nodemon src/cronWorker.js",
+    "start": "node apps/main-app/src/server.js",
+    "server": "nodemon apps/main-app/src/server.js",
+    "start:worker": "node apps/main-app/src/cronWorker.js",
+    "worker": "nodemon apps/main-app/src/cronWorker.js",
+    "start:cache": "node apps/cache-service/src/main.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "npx prisma generate",
-    "deploy": "npx prisma generate && npx prisma migrate deploy && npx prisma db seed"
+    "postinstall": "npx prisma generate --config apps/main-app/prisma.config.ts",
+    "deploy": "npx prisma generate --config apps/main-app/prisma.config.ts && npx prisma migrate deploy --config apps/main-app/prisma.config.ts && npx prisma db seed --config apps/main-app/prisma.config.ts",
+    "nx": "nx"
   },
   "prisma": {
-    "seed": "node prisma/seed.js"
+    "seed": "node apps/main-app/prisma/seed.js"
   },
+  "workspaces": ["apps/main-app", "apps/cache-service"],
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
     "nodemon": "^3.1.9",
+    "nx": "^22.3.3",
     "prisma": "^7.0.0"
   },
   "dependencies": {

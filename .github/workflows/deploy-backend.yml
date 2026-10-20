@@ -156,15 +156,14 @@ jobs:
 
             npm install --production
 
-            npx prisma migrate deploy
+            npx prisma migrate deploy --config apps/main-app/prisma.config.ts
 
             if ! command -v pm2 &> /dev/null; then
               echo "Installing PM2..."
               npm install -g pm2
             fi
 
-            pm2 reload noosphere-backend || pm2 start src/server.js --name noosphere-backend
-            pm2 reload noosphere-worker || pm2 start src/cronWorker.js --name noosphere-worker
+            pm2 startOrReload ecosystem.config.cjs --update-env
             pm2 save
 
             echo "✅ Deployment completed"
