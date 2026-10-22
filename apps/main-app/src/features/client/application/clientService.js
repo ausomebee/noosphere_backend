@@ -1,6 +1,5 @@
 import TokenService from "../../../utilities/generate_token.js";
 import ReferralCodeGenerator from "../../../utilities/generateCode.js";
-import MailService from "../../../utilities/nodemailer.js";
 import emailService from "../../../utilities/ses.js";
 import Client from "../domain/client.js";
 import argon2 from "argon2";

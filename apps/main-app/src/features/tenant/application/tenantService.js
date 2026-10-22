@@ -1,4 +1,4 @@
-import MailService from '../../../utilities/nodemailer.js';
+import MailService from '../../../utilities/ses.js';
 import Tenant from '../domain/tenant.js';
 import argon2 from "argon2";
 import { seedTenantBillingDefaults } from './tenantOnboardingSeed.js';

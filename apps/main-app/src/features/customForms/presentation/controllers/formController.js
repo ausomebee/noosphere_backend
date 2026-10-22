@@ -10,7 +10,7 @@ import NotificationsRepository from "../../../notifications/infrastructure/notif
 import NotificationService from "../../../notifications/application/notificationsService.js";
 import ClientNotificationEmitter from "../../../client/application/clientNotificationEmitter.js";
 import SocketService from "../../../../config/socket.js";
-import MailService from "../../../../utilities/nodemailer.js";
+import MailService from "../../../../utilities/ses.js";
 import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";
 import auditLogger from "../../../logs/application/auditLogger.js";
 

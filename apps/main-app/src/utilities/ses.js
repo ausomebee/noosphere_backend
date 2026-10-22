@@ -1,4 +1,5 @@
 import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2";
+import { readFile } from "node:fs/promises";
 
 class EmailService {
     constructor() {
@@ -14,6 +15,97 @@ class EmailService {
     sanitizeHeader(value) {
         if (!value) return '';
         return String(value).replace(/[\r\n]/g, '');
+    }
+
+    get fromAddress() {
+        const from = process.env.SES_FROM_EMAIL || process.env.MAIL_USER;
+        if (!from) throw new Error("SES_FROM_EMAIL (or MAIL_USER) is not configured");
+        return this.sanitizeHeader(from);
+    }
+
+    async sendMail(to, subject, text, html = null, attachments = null) {
+        const recipients = Array.isArray(to) ? to : [to];
+        try {
+            this.validateEmails(recipients);
+            const fromAddress = this.fromAddress;
+            let content;
+            if (attachments?.length) {
+                const raw = await this.buildRawMimeEmail({ fromAddress, to: recipients, subject, text, html, attachments });
+                content = { Raw: { Data: raw } };
+            } else {
+                content = {
+                    Simple: {
+                        Subject: { Data: this.sanitizeHeader(subject) },
+                        Body: {
+                            Html: html ? { Data: html } : undefined,
+                            Text: text ? { Data: text } : undefined
+                        }
+                    }
+                };
+            }
+
+            const response = await this.client.send(new SendEmailCommand({
+                FromEmailAddress: `"Noosphere" <${fromAddress}>`,
+                Destination: { ToAddresses: recipients },
+                Content: content
+            }));
+            return { success: true, messageId: response.MessageId };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
+    async buildRawMimeEmail({ fromAddress, to, subject, text, html, attachments }) {
+        const boundary = `Noosphere_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const altBoundary = `Alt_${boundary}`;
+        const parts = [
+            `From: "Noosphere" <${this.sanitizeHeader(fromAddress)}>`,
+            `To: ${to.map(email => this.sanitizeHeader(email)).join(", ")}`,
+            `Subject: ${this.encodeMimeHeader(subject)}`,
+            "MIME-Version: 1.0",
+            `Content-Type: multipart/mixed; boundary="${boundary}"`,
+            "",
+            `--${boundary}`,
+            `Content-Type: multipart/alternative; boundary="${altBoundary}"`,
+            "",
+            `--${altBoundary}`,
+            'Content-Type: text/plain; charset="UTF-8"',
+            "Content-Transfer-Encoding: base64",
+            "",
+            this.splitBase64(Buffer.from(text || "").toString("base64")),
+            `--${altBoundary}`,
+            'Content-Type: text/html; charset="UTF-8"',
+            "Content-Transfer-Encoding: base64",
+            "",
+            this.splitBase64(Buffer.from(html || "").toString("base64")),
+            `--${altBoundary}--`
+        ];
+
+        for (const attachment of attachments) {
+            const content = attachment.content ?? (attachment.path ? await readFile(attachment.path) : null);
+            if (!content) throw new Error(`Attachment ${attachment.filename || "(unnamed)"} has no content or path`);
+            const data = Buffer.isBuffer(content) ? content : Buffer.from(content);
+            const filename = this.sanitizeHeader(attachment.filename || "attachment").replace(/[\"\\]/g, "_");
+            const mimeType = this.sanitizeHeader(attachment.contentType || "application/octet-stream");
+            parts.push(
+                `--${boundary}`,
+                `Content-Type: ${mimeType}; name="${filename}"`,
+                `Content-Disposition: ${attachment.cid ? "inline" : "attachment"}; filename="${filename}"`,
+                "Content-Transfer-Encoding: base64",
+                ...(attachment.cid ? [`Content-ID: <${this.sanitizeHeader(attachment.cid)}>`] : []),
+                "",
+                this.splitBase64(data.toString("base64"))
+            );
+        }
+        parts.push(`--${boundary}--`, "");
+        return Buffer.from(parts.join("\r\n"));
+    }
+
+    encodeMimeHeader(value) {
+        const sanitized = this.sanitizeHeader(value);
+        return /^[\x20-\x7E]*$/.test(sanitized)
+            ? sanitized
+            : `=?UTF-8?B?${Buffer.from(sanitized).toString("base64")}?=`;
     }
 
     splitBase64(base64String, lineLength = 76) {
@@ -112,10 +204,10 @@ class EmailService {
         // Validate email addresses
         this.validateEmails(to);
 
-        const fromAddress = `${tenantSlug}@noospherehub.net`;
+        const fromAddress = this.fromAddress;
 
         const command = new SendEmailCommand({
-            FromEmailAddress: `"${this.formatTenantName(tenantSlug)}" <${fromAddress}>`,
+            FromEmailAddress: `"Noosphere" <${fromAddress}>`,
             Destination: {
                 ToAddresses: to
             },
@@ -183,8 +275,8 @@ class EmailService {
             throw new Error(`Attachment size (${attachmentSizeMB.toFixed(2)}MB) exceeds 10MB limit`);
         }
 
-        const fromAddress = `${tenantSlug}@noospherehub.net`;
-        const from = `"${this.formatTenantName(tenantSlug)}" <${fromAddress}>`;
+        const fromAddress = this.fromAddress;
+        const from = `"Noosphere" <${fromAddress}>`;
 
         const rawMessage = this.buildRawEmail({
             from,
@@ -239,15 +331,6 @@ class EmailService {
             });
             throw error;
         }
-    }
-
-    /**
-     * Format tenant slug into a readable name
-     */
-    formatTenantName(slug) {
-        return slug
-            .replace(/-/g, " ")
-            .replace(/\b\w/g, char => char.toUpperCase());
     }
 
     /**

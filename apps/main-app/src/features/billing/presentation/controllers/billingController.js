@@ -20,7 +20,7 @@ import TenantService from "../../../tenant/application/tenantService.js";
 import AdminService from "../../../admin/application/adminService.js";
 import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
 import NotificationService from "../../../notifications/application/notificationsService.js";
-import MailService from "../../../../utilities/nodemailer.js";
+import MailService from "../../../../utilities/ses.js";
 import templateRenderer from "../../../../utilities/templateRenderer.js";
 import SocketService from "../../../../config/socket.js";
 import ReferralCodeGenerator from "../../../../utilities/generateCode.js";

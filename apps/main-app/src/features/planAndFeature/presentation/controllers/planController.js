@@ -4,7 +4,7 @@ import PlanRepository from "../../../planAndFeature/infrastructure/planRepositio
 import PlanService from "../../application/planService.js";
 import AdminRepository from "../../../admin/infrastructure/adminRepository.js";
 import AdminService from "../../../admin/application/adminService.js";
-import MailService from "../../../../utilities/nodemailer.js";
+import MailService from "../../../../utilities/ses.js";
 import templateRenderer from "../../../../utilities/templateRenderer.js";
 import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
 import NotificationService from "../../../notifications/application/notificationsService.js";

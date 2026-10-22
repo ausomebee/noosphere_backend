@@ -1,6 +1,6 @@
 import prismaService from "../../config/prisma.js";
 import TokenService from "../../utilities/generate_token.js";
-import MailService from "../../utilities/nodemailer.js";
+import MailService from "../../utilities/ses.js";
 import templateRenderer from "../../utilities/templateRenderer.js";
 import invoicePdfGenerator from "../../utilities/invoicePdfGenerator.js";
 

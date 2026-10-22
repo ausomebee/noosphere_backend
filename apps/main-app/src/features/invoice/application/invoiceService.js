@@ -1,7 +1,7 @@
 import e from "express";
 import TokenService from "../../../utilities/generate_token.js";
 import Invoice from "../domain/invoice.js";
-import MailService from "../../../utilities/nodemailer.js";
+import MailService from "../../../utilities/ses.js";
 import templateRenderer from "../../../utilities/templateRenderer.js";
 
 class InvoiceService {

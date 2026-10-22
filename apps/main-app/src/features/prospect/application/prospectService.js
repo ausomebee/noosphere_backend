@@ -1,4 +1,4 @@
-import MailService from '../../../utilities/nodemailer.js';
+import MailService from '../../../utilities/ses.js';
 import templateRenderer from '../../../utilities/templateRenderer.js';
 
 const escapeHtml = (value = '') => String(value)

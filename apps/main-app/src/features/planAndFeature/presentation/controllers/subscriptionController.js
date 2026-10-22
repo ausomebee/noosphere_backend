@@ -9,7 +9,7 @@ import AdminService from "../../../admin/application/adminService.js";
 import NotificationsRepository from "../../../notifications/infrastructure/notificationsRepository.js";
 import NotificationService from "../../../notifications/application/notificationsService.js";
 import SocketService from "../../../../config/socket.js";
-import MailService from "../../../../utilities/nodemailer.js";
+import MailService from "../../../../utilities/ses.js";
 import TenantRepository from "../../../tenant/infrastructure/tenantRepository.js";
 import TenantService from "../../../tenant/application/tenantService.js";
 import { NotificationEntityType, NotificationType } from "../../../notifications/domain/notificationTypes.js";

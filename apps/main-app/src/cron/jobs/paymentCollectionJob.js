@@ -1,5 +1,5 @@
 import prismaService from "../../config/prisma.js";
-import MailService from "../../utilities/nodemailer.js";
+import MailService from "../../utilities/ses.js";
 import templateRenderer from "../../utilities/templateRenderer.js";
 import SocketService from "../../config/socket.js";
 import StripeBillingService from "../../features/billing/application/stripeBillingService.js";

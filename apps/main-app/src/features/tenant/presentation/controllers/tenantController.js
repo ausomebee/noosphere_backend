@@ -1,5 +1,5 @@
 import expressAsyncHandler from "express-async-handler";
-import MailService from "../../../../utilities/nodemailer.js";
+import MailService from "../../../../utilities/ses.js";
 import TenantService from "../../application/tenantService.js";
 import prismaService from "../../../../config/prisma.js";
 import TenantRepository from "../../infrastructure/tenantRepository.js";
