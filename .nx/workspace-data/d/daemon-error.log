@@ -1,0 +1,26 @@
+Daemon process terminated and closed the connection
+
+Messages from the log:
+[NX v22.3.3 Daemon Server] - 2026-10-21T12:38:53.117Z - [REQUEST]: Client Request for Project Graph Received
+[NX v22.3.3 Daemon Server] - 2026-10-21T12:38:53.119Z - Time taken for 'Load Nx Plugin: /Users/malk/Documents/noosphere_backend/node_modules/nx/src/plugins/project-json/build-nodes/project-json' 188.81100000000004ms
+[NX v22.3.3 Daemon Server] - 2026-10-21T12:38:53.128Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.3.3 Daemon Server] - 2026-10-21T12:38:53.128Z - [REQUEST]: 
+[NX v22.3.3 Daemon Server] - 2026-10-21T12:38:53.128Z - [REQUEST]: 
+[NX v22.3.3 Daemon Server] - 2026-10-21T12:38:53.129Z - Reusing in-memory cached project graph because no files changed.
+Time for 'nx/js/dependencies-and-lockfile:createNodes' 0.07875000000001364
+[NX v22.3.3 Daemon Server] - 2026-10-21T12:38:53.130Z - Started listening on: /private/var/folders/x2/81r_xdn10bl7blqczkr7rsyh0000gn/T/a75b48ca6652cd450cbb/d.sock
+[NX v22.3.3 Daemon Server] - 2026-10-21T12:38:53.131Z - [WATCHER]: Subscribed to changes within: /Users/malk/Documents/noosphere_backend (native)
+[NX v22.3.3 Daemon Server] - 2026-10-21T12:38:53.131Z - [NX-CONSOLE]: Pulling latest Nx (latest) to check console status...
+Fetching nx...
+[NX v22.3.3 Daemon Server] - 2026-10-21T12:38:53.132Z - Time taken for 'loadDefaultNxPlugins' 197.19345899999996ms
+Time for 'nx/core/project-json:createNodes' 0.7394170000000031
+Time for 'nx/core/package-json:createNodes' 3.466208000000023
+[NX v22.3.3 Daemon Server] - 2026-10-21T12:38:53.151Z - Time taken for 'build-project-configs' 12.511041999999975ms
+[NX v22.3.3 Daemon Server] - 2026-10-21T12:38:53.151Z - Closed a connection. Number of open connections: 0
+[NX v22.3.3 Daemon Server] - 2026-10-21T12:38:53.151Z - [WATCHER]: Stopping the watcher for /Users/malk/Documents/noosphere_backend (sources)
+[NX v22.3.3 Daemon Server] - 2026-10-21T12:38:53.151Z - [WATCHER]: Stopping the watcher for /Users/malk/Documents/noosphere_backend (outputs)
+[NX v22.3.3 Daemon Server] - 2026-10-21T12:38:53.151Z - Server stopped because: "this process is no longer the current daemon (native)"
+
+
+
+More information: /Users/malk/Documents/noosphere_backend/.nx/workspace-data/d/daemon.log

@@ -1,0 +1,90 @@
+import expressAsyncHandler from "express-async-handler";
+import prismaService from "../../../../config/prisma.js";
+import DeductionRepository from "../../infrastructure/deductionRepository.js";
+import DeductionService from "../../application/deductionService.js";
+import Deduction from "../../domain/deduction.js";
+
+class DeductionController {
+    constructor() {
+        this.prisma = prismaService.getClient();
+        this.deductionRepository = new DeductionRepository(this.prisma.deductions);
+        this.service = new DeductionService({ deductionRepository: this.deductionRepository });
+    }
+
+    createDeduction = expressAsyncHandler(async (req, res) => {
+        const data = req.body;
+        const deductionData = new Deduction(data);
+        const deduction = await this.service.createDeduction(deductionData.createDeduction);
+
+        if (!deduction) {
+            return res.status(500).json({ message: "Failed to create deduction" });
+        }
+
+        return res.status(201).json({
+            message: "Deduction created successfully",
+            status: "ok",
+            data: deduction
+        });
+    });
+
+    updateDeduction = expressAsyncHandler(async (req, res) => {
+        const deduction = await this.service.updateDeduction(req.body);
+
+        if (!deduction) {
+            return res.status(500).json({ message: "Failed to update deduction" });
+        }
+
+        return res.status(200).json({
+            message: "Deduction updated successfully",
+            status: "ok",
+            data: deduction
+        });
+    });
+
+    getSingleDeduction = expressAsyncHandler(async (req, res) => {
+        const deduction = await this.service.getSingleDeduction(req.params);
+
+        if (!deduction) {
+            return res.status(404).json({ message: "Deduction not found" });
+        }
+
+        return res.status(200).json({
+            message: "Deduction fetched successfully",
+            status: "ok",
+            data: deduction
+        });
+    });
+
+    getTenantDeductions = expressAsyncHandler(async (req, res) => {
+        const deductions = await this.service.getTenantDeductions(req.params.tenantId);
+
+        if (!deductions) {
+            return res.status(404).json({ message: "No deductions found" });
+        }
+
+        return res.status(200).json({
+            message: "Deductions fetched successfully",
+            status: "ok",
+            data: deductions
+        });
+    });
+
+    deactivateDeduction = expressAsyncHandler(async (req, res) => {
+        const deduction = await this.service.updateDeduction({
+            id: req.params.id,
+            isActive: req.params.active === "true"
+        });
+
+        if (!deduction) {
+            return res.status(500).json({ message: "Failed to deactivate deduction" });
+        }
+
+        return res.status(200).json({
+            message: "Deduction deactivated successfully",
+            status: "ok",
+            data: deduction
+        });
+    });
+}
+
+export default DeductionController;

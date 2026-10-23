@@ -1,0 +1,93 @@
+class OrganizationSessionTypesService {
+    constructor({ organizationSessionTypesRepository }) {
+        this.organizationSessionTypesRepository = organizationSessionTypesRepository;
+    }
+
+    async createOrganizationSessionType(data) {
+        const existingType = await this.organizationSessionTypesRepository.findFirstDynamic({
+            where: { name: data.name, tenantId: data.tenantId },
+            select: { name: true }
+        });
+
+        if (existingType) {
+            throw new Error("This session type already exists.");
+        }
+
+        const newType = await this.organizationSessionTypesRepository.create(data);
+
+        if (!newType) {
+            throw new Error("Failed to create OrganizationSessionType");
+        }
+
+        return newType;
+    }
+
+    async updateOrganizationSessionType(data) {
+        const type = await this.organizationSessionTypesRepository.findOne({ id: data.id });
+
+        if (!type) {
+            throw new Error("OrganizationSessionType not found");
+        }
+
+        const update = await this.organizationSessionTypesRepository.update(data.id, {
+            name: data.name || type.name,
+            category: data.category || type.category,
+            staffRolesAllowed: data.staffRolesAllowed || type.staffRolesAllowed,
+            locationsAllowed: data.locationsAllowed || type.locationsAllowed,
+            defaultDuration: data.defaultDuration || type.defaultDuration,
+            isActive: data.isActive ?? type.isActive,
+            isBillable: data.isBillable ?? type.isBillable,
+        });
+
+        if (!update) {
+            throw new Error("Failed to update OrganizationSessionType");
+        }
+
+        return update;
+    }
+
+    async getOrganizationSessionType(id) {
+        const type = await this.organizationSessionTypesRepository.findOne({ id });
+
+        if (!type) {
+            throw new Error("OrganizationSessionType not found");
+        }
+
+        return type;
+    }
+
+    async getTenantSessionTypes(tenantId) {
+        const sessionTypes = await this.organizationSessionTypesRepository.findAllAndPopulate({ tenantId }, {
+            sessionTypeServices: {
+                include: {
+                    serviceCode: true
+                }
+            }
+        });
+
+        if (!sessionTypes) {
+            throw new Error("Session types not found");
+        }
+
+        return sessionTypes;
+    }
+
+    async getActiveTenantSessionTypes(tenantId) {
+        const sessionTypes = await this.organizationSessionTypesRepository.findAllAndPopulate({ AND: [{ tenantId }, { isActive: true }] }, {
+            sessionTypeServices: {
+                include: {
+                    serviceCode: true
+                }
+            }
+        });
+
+        if (!sessionTypes) {
+            throw new Error("Session types not found");
+        }
+
+        return sessionTypes;
+    }
+
+}
+
+export default OrganizationSessionTypesService;
