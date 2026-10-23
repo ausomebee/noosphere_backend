@@ -120,7 +120,6 @@ jobs:
                 cd /opt/noosphere/backend/releases/current
                 source /opt/noosphere/backend/.env.sh
                 npm install --include=dev
-                npx prisma generate
               '
 
               echo "Preparation complete"
