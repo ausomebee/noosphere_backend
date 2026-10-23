@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Noosphere account has been reset</title>
+    <style>
+        body, table, td, p, a {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-size: 100%;
+            font: inherit;
+            vertical-align: baseline;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .email-content {
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .logo-container {
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            font-size: 40px;
+            font-weight: 600;
+            color: #000000;
+            text-decoration: none;
+        }
+
+        .welcome-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #004ABA;
+            margin-bottom: 25px;
+        }
+
+        .welcome-text {
+            font-size: 16px;
+            color: #475467;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .company-name {
+            color: #004ABA;
+            font-weight: 600;
+        }
+
+        .instruction-text {
+            font-size: 16px;
+            color: #475467;
+            margin: 25px 0 30px 0;
+        }
+
+        .credentials-container {
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .credential-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 12px;
+            text-align: left;
+        }
+
+        .credential-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .credential-label {
+            font-weight: 600;
+            color: #333333;
+            font-size: 16px;
+            min-width: 90px;
+        }
+
+        .login-button {
+            display: inline-block;
+            background-color: #004ABA;
+            color: #FFFFFF !important;
+            text-decoration: none;
+            padding: 14px 32px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 25px 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .info-box {
+            background-color: #E3F2FD;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+            border: 1px solid #99C2FF;
+        }
+
+        .info-title {
+            font-size: 16px;
+            color: #666666;
+            margin-bottom: 15px;
+        }
+
+        .info-list {
+            text-align: left;
+            margin: 0;
+            padding: 0;
+        }
+
+        .info-item {
+            color: #666666;
+            font-size: 16px;
+            margin-bottom: 8px;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+        }
+
+        .footer-text {
+            color: #1976D2;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .team-signature {
+            color: #1976D2;
+            font-size: 16px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-content">
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="cid:unique@image" alt="Noosphere logo">
+                </div>
+            </div>
+            <h1 class="welcome-title">Your account has been reset</h1>
+            <p class="welcome-text">
+                Your staff account for <span class="company-name">{{companyName}}</span> has been reset on Noosphere and needs to be reconfigured.
+            </p>
+            <p class="instruction-text">
+                Use the credentials below to log in and complete your setup:
+            </p>
+            <div class="credentials-container">
+                <div class="credential-row">
+                    <span class="credential-label">Email: {{email}}</span>
+                </div>
+                <div class="credential-row">
+                    <span class="credential-label">Temporary Password: {{password}}</span>
+                </div>
+            </div>
+            <a href="{{clientUrl}}/tenant/auth/staff/onboarding/{{email}}/{{staffId}}" class="login-button" style="color: #FFFFFF !important;">Login to my account</a>
+            <div class="info-box">
+                <p class="info-title">Once you're in, you'll be prompted to:</p>
+                <ol class="info-list">
+                    <li class="info-item">Set a new password.</li>
+                    <li class="info-item">Configure 2-factor authentication for your account.</li>
+                </ol>
+            </div>
+            <div class="footer">
+                <p class="footer-text">Welcome aboard,</p>
+                <p class="team-signature">The NooSphere Team</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

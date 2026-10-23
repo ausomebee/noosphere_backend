@@ -1,0 +1,42 @@
+{
+  "name": "main-app",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "root": "apps/main-app",
+  "sourceRoot": "apps/main-app/src",
+  "projectType": "application",
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": { "command": "node apps/main-app/src/server.js", "cwd": "{workspaceRoot}" },
+      "configurations": {
+        "development": { "command": "nodemon apps/main-app/src/server.js", "cwd": "{workspaceRoot}" }
+      }
+    },
+    "worker": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": { "command": "node apps/main-app/src/cronWorker.js", "cwd": "{workspaceRoot}" },
+      "configurations": {
+        "development": { "command": "nodemon apps/main-app/src/cronWorker.js", "cwd": "{workspaceRoot}" }
+      }
+    },
+    "prisma:generate": {
+      "executor": "nx:run-commands",
+      "options": { "command": "npx prisma generate --config apps/main-app/prisma.config.ts", "cwd": "{workspaceRoot}" }
+    },
+    "prisma:migrate": {
+      "executor": "nx:run-commands",
+      "options": { "command": "npx prisma migrate dev --config apps/main-app/prisma.config.ts", "cwd": "{workspaceRoot}" }
+    },
+    "prisma:migrate:deploy": {
+      "executor": "nx:run-commands",
+      "options": { "command": "npx prisma migrate deploy --config apps/main-app/prisma.config.ts", "cwd": "{workspaceRoot}" }
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "options": { "command": "npm run deploy" }
+    }
+  },
+  "tags": ["type:app"]
+}

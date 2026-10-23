@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription invoice</title>
+</head>
+<body style="margin:0;background:#f5f7fa;font-family:Arial,sans-serif;color:#1f2937;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:24px;">
+        <tr><td align="center">
+            <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;background:#fff;border-radius:12px;padding:32px;">
+                <tr><td>
+                    <h1 style="color:#004aba;font-size:24px;">Your subscription invoice</h1>
+                    <p>Hello {{companyName}},</p>
+                    <p>Your Noosphere subscription renews in 10 days. Here are the invoice details:</p>
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="8" style="background:#f9fafb;border-radius:8px;">
+                        <tr><td><strong>Invoice</strong></td><td align="right">{{invoiceNumber}}</td></tr>
+                        <tr><td><strong>Plan</strong></td><td align="right">{{planName}}</td></tr>
+                        <tr><td><strong>Billing frequency</strong></td><td align="right">{{billingFrequency}}</td></tr>
+                        <tr><td><strong>Amount</strong></td><td align="right">${{total}}</td></tr>
+                        <tr><td><strong>Due date</strong></td><td align="right">{{dueDate}}</td></tr>
+                    </table>
+                    <p style="text-align:center;margin:28px 0;">
+                        <a href="{{paymentLink}}" style="background:#004aba;color:#fff;text-decoration:none;padding:14px 24px;border-radius:8px;display:inline-block;">View and pay invoice</a>
+                    </p>
+                    <p style="font-size:13px;color:#6b7280;">This secure payment link expires shortly after the due date.</p>
+                </td></tr>
+            </table>
+        </td></tr>
+    </table>
+</body>
+</html>

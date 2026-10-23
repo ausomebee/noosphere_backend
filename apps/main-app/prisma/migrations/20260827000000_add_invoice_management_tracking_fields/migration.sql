@@ -1,0 +1,4 @@
+ALTER TABLE "Invoice"
+ADD COLUMN "upcomingEmailedAt" TIMESTAMP(3),
+ADD COLUMN "dueEmailedAt" TIMESTAMP(3),
+ADD COLUMN "overdueRemindersSent" INTEGER[] NOT NULL DEFAULT ARRAY[]::INTEGER[];

@@ -1,0 +1,7 @@
+.env
+node_modules
+.nx
+package-lock.json
+src2
+*.md
+*.pdf

@@ -1,0 +1,44 @@
+name: Pre-prod Prisma Migration
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type MIGRATE_PREPROD to run Prisma migrate dev against pre-prod.
+        required: true
+        type: string
+
+jobs:
+  migrate:
+    name: Migrate pre-prod database
+    runs-on: ubuntu-latest
+    environment: preprod
+
+    steps:
+      - name: Confirm migration
+        run: |
+          if [ "${{ inputs.confirmation }}" != "MIGRATE_PREPROD" ]; then
+            echo "Confirmation value must be MIGRATE_PREPROD."
+            exit 1
+          fi
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf "%s" "${{ secrets.PREPROD_EC2_SSH_KEY_BACKEND }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${{ secrets.PREPROD_EC2_HOST_BACKEND }}" >> ~/.ssh/known_hosts
+
+      - name: Run Prisma migration and restart PM2
+        run: |
+          ssh -o StrictHostKeyChecking=yes \
+            "${{ secrets.EC2_USER }}@${{ secrets.PREPROD_EC2_HOST_BACKEND }}" << 'EOF'
+            set -e
+
+            DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
+            cd "$DEPLOY_PATH"
+
+            npx prisma migrate dev --name init
+            npx prisma generate
+            pm2 restart 0
+          EOF

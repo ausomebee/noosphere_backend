@@ -1,0 +1,936 @@
+import Appointment from "../domain/appointment.js";
+
+class AppointmentService {
+    constructor({ appointmentRepository, appointmentRescheduleRequestRepository, appointmentServiceRepository }) {
+        this.appointmentRepository = appointmentRepository;
+        this.appointmentRescheduleRequestRepository = appointmentRescheduleRequestRepository;
+        this.appointmentServiceRepository = appointmentServiceRepository;
+    }
+
+    async createAppointment(data) {
+        const appointmentExists = await this.appointmentRepository.findFirstDynamic({
+            where: {
+                clientId: data.clientId,
+                sessionId: data.sessionId,
+                date: data.date,
+                startTime: data.startTime,
+                endTime: data.endTime
+            },
+            select: { id: true }
+        });
+
+        if (appointmentExists) {
+            throw new Error("This appointment already exists.");
+        }
+
+        const newAppointment = await this.appointmentRepository.create(data);
+
+        if (!newAppointment) {
+            throw new Error("Failed to create Appointment");
+        }
+
+        return newAppointment;
+    }
+
+    async updateAppointment(data) {
+        const appointment = await this.appointmentRepository.findFirstDynamic({
+            where: { id: data.id }, include: {
+                clinicians: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                    }
+                }
+            }
+        });
+        if ((!data.forAll || !appointment.isRecurring) && data.relatedAppointment || !appointment.isRecurring) {
+            if (appointment && appointment.relatedAppointment || !appointment.isRecurring) {
+                const update = await this.appointmentRepository.update(data.id, {
+                    clientId: data.clientId || appointment.clientId,
+                    sessionId: data.sessionId || appointment.sessionId,
+                    clinicians: {
+                        set: data.clinicians || appointment.clinicians
+                    },
+                    service: data.service || appointment.service,
+                    date: data.date || appointment.date,
+                    isRecurring: data.isRecurring ?? appointment.isRecurring,
+                    startTime: data.startTime || appointment.startTime,
+                    endTime: data.endTime || appointment.endTime,
+                    recurrence: data.recurrence || appointment.recurrence,
+                    isBillable: data.isBillable ?? appointment.isBillable,
+                    serviceLocation: data.serviceLocation || appointment.serviceLocation,
+                    requiresTravel: data.requiresTravel ?? appointment.requiresTravel,
+                    colourCode: data.colourCode || appointment.colourCode,
+                    isCanceled: data.isCanceled ?? appointment.isCanceled,
+                    reasonForCancel: data.reasonForCancel || appointment.reasonForCancel,
+                    rescheduled: data.rescheduled ?? appointment.rescheduled,
+                    rescheduleAccepted: data.rescheduled ? false : (data.rescheduleAccepted ?? appointment.rescheduleAccepted),
+                    canceledBy: data.canceledBy ?? appointment.canceledBy,
+                    cancelTime: data.isCanceled ? new Date() : null,
+                    previousDate: data.rescheduled ? appointment.date : null,
+                    previousStartTime: data.rescheduled ? appointment.startTime : null,
+                    previousEndTime: data.rescheduled ? appointment.endTime : null
+                });
+
+                if (!update) {
+                    throw new Error("Failed to update Appointment");
+                }
+
+                return update;
+            } else {
+                const appointmentData = new Appointment({ ...appointment, ...data });
+                const newAppointment = await this.appointmentRepository.create({
+                    ...appointmentData.createAppointment,
+                    clinicians: {
+                        connect: data.clinicians || appointment.clinicians
+                    },
+                    rescheduleAccepted: data.rescheduled ? false : (data.rescheduleAccepted ?? appointment.rescheduleAccepted),
+                    previousDate: data.rescheduled ? appointment.date : null,
+                    previousStartTime: data.rescheduled ? appointment.startTime : null,
+                    previousEndTime: data.rescheduled ? appointment.endTime : null
+                });
+
+                if (!newAppointment) {
+                    throw new Error("Failed to create Appointment");
+                }
+
+                return newAppointment;
+            }
+        }
+
+
+        if (!appointment) {
+            throw new Error("Appointment not found");
+        }
+
+        const update = await this.appointmentRepository.update(data.id, {
+            clientId: data.clientId || appointment.clientId,
+            sessionId: data.sessionId || appointment.sessionId,
+            clinicians: {
+                set: data.clinicians || appointment.clinicians
+            }, service: data.service || appointment.service,
+            date: data.date || appointment.date,
+            isRecurring: data.isRecurring ?? appointment.isRecurring,
+            startTime: data.startTime || appointment.startTime,
+            endTime: data.endTime || appointment.endTime,
+            recurrence: data.recurrence || appointment.recurrence,
+            isBillable: data.isBillable ?? appointment.isBillable,
+            serviceLocation: data.serviceLocation || appointment.serviceLocation,
+            requiresTravel: data.requiresTravel ?? appointment.requiresTravel,
+            colourCode: data.colourCode || appointment.colourCode,
+            isCanceled: data.isCanceled ?? appointment.isCanceled,
+            reasonForCancel: data.reasonForCancel || appointment.reasonForCancel,
+            rescheduled: data.rescheduled ?? appointment.rescheduled,
+            rescheduleAccepted: data.rescheduled ? false : (data.rescheduleAccepted ?? appointment.rescheduleAccepted),
+            canceledBy: data.canceledBy ?? appointment.canceledBy,
+            cancelTime: data.isCanceled ? new Date() : null,
+            previousDate: data.rescheduled ? appointment.date : null,
+            previousStartTime: data.rescheduled ? appointment.startTime : null,
+            previousEndTime: data.rescheduled ? appointment.endTime : null
+        });
+
+        if (!update) {
+            throw new Error("Failed to update Appointment");
+        }
+
+        return update;
+    }
+
+    async getClientAppointments(clientId) {
+        const appointments = await this.appointmentRepository.findAllAndPopulate(
+            { clientId },
+            {
+                tenant: true, client: true, session: true, appointmentServices: true, clinicians: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                    }
+                }
+            }
+        );
+
+        if (!appointments || appointments.length === 0) {
+            return [];
+        }
+
+        const grouped = {};
+
+        for (const appt of appointments) {
+            if (!appt.relatedAppointment) {
+                grouped[appt.id] = {
+                    ...appt,
+                    relatedAppointments: [],
+                };
+            }
+        }
+
+        for (const appt of appointments) {
+            if (appt.relatedAppointment) {
+                if (grouped[appt.relatedAppointment]) {
+                    grouped[appt.relatedAppointment].relatedAppointments.push(appt);
+                } else {
+                    grouped[appt.id] = {
+                        ...appt,
+                        relatedAppointments: [],
+                    };
+                }
+            }
+        }
+
+        const result = Object.values(grouped).sort(
+            (a, b) => new Date(a.date) - new Date(b.date)
+        );
+
+        for (const item of result) {
+            item.relatedAppointments.sort((a, b) => {
+                const d = new Date(a.date) - new Date(b.date);
+                if (d !== 0) return d;
+                return a.startTime.localeCompare(b.startTime);
+            });
+        }
+
+        return result;
+    }
+
+    async getClientUpcomingAppointments(clientId) {
+        const appointments = await this.appointmentRepository.getUpcomingAppointments({ clientId });
+
+        if (!appointments || appointments.length === 0) {
+            return [];
+        }
+
+        return appointments;
+    }
+
+    async getClientPastAppointments(clientId) {
+        const appointments = await this.appointmentRepository.getPastAppointments({clientId});
+
+        if (!appointments || appointments.length === 0) {
+            return [];
+        }
+
+        return appointments;
+    }
+
+    // async getStaffAppointments(staffId) {
+    //     const appointments = await this.appointmentRepository.findAllAndPopulate(
+    //         {
+    //             clinicians: {
+    //                 some: { id: staffId }
+    //             }
+    //         },
+    //         {
+    //             tenant: true, client: true, appointmentServices: true, session: true, clinicians: {
+    //                 select: {
+    //                     id: true,
+    //                     fullName: true,
+    //                     email: true,
+    //                 }
+    //             }
+    //         }
+    //     );
+
+    //     if (!appointments || appointments.length === 0) {
+    //         return [];
+    //     }
+
+    //     const grouped = {};
+
+    //     for (const appt of appointments) {
+    //         if (!appt.relatedAppointment) {
+    //             grouped[appt.id] = {
+    //                 ...appt,
+    //                 relatedAppointments: [],
+    //             };
+    //         }
+    //     }
+
+    //     for (const appt of appointments) {
+    //         if (appt.relatedAppointment) {
+    //             if (grouped[appt.relatedAppointment]) {
+    //                 grouped[appt.relatedAppointment].relatedAppointments.push(appt);
+    //             } else {
+    //                 grouped[appt.id] = {
+    //                     ...appt,
+    //                     relatedAppointments: [],
+    //                 };
+    //             }
+    //         }
+    //     }
+
+    //     const result = Object.values(grouped).sort(
+    //         (a, b) => new Date(a.date) - new Date(b.date)
+    //     );
+
+    //     for (const item of result) {
+    //         item.relatedAppointments.sort((a, b) => {
+    //             const d = new Date(a.date) - new Date(b.date);
+    //             if (d !== 0) return d;
+    //             return a.startTime.localeCompare(b.startTime);
+    //         });
+    //     }
+
+    //     return result;
+    // }
+
+    async getTenantAppointments(tenantId) {
+        const appointments = await this.appointmentRepository.getAppointmentsByTenant(tenantId);
+
+        if (!appointments || appointments.length === 0) {
+            return [];
+        }
+
+        const grouped = {};
+
+        for (const appt of appointments) {
+            if (!appt.relatedAppointment) {
+                grouped[appt.id] = {
+                    ...appt,
+                    relatedAppointments: [],
+                };
+            }
+        }
+
+        for (const appt of appointments) {
+            if (appt.relatedAppointment) {
+                if (grouped[appt.relatedAppointment]) {
+                    grouped[appt.relatedAppointment].relatedAppointments.push(appt);
+                } else {
+                    grouped[appt.id] = {
+                        ...appt,
+                        relatedAppointments: [],
+                    };
+                }
+            }
+        }
+
+        const result = Object.values(grouped).sort(
+            (a, b) => new Date(a.date) - new Date(b.date)
+        );
+
+        for (const item of result) {
+            item.relatedAppointments.sort((a, b) => {
+                const d = new Date(a.date) - new Date(b.date);
+                if (d !== 0) return d;
+                return a.startTime.localeCompare(b.startTime);
+            });
+        }
+
+        return result;
+    }
+
+    rescheduleRequestInclude() {
+        return {
+            appointment: {
+                include: {
+                    client: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            preferredName: true,
+                            email: true,
+                        },
+                    },
+                    session: true,
+                    clinicians: {
+                        select: {
+                            id: true,
+                            fullName: true,
+                            email: true,
+                        }
+                    },
+                    appointmentServices: { include: { serviceCode: true } },
+                }
+            }
+        };
+    }
+
+    async getTenantRescheduledAppointments(tenantId) {
+        const requests = await this.appointmentRescheduleRequestRepository.findAllAndPopulate(
+            { tenantId, status: "PENDING" },
+            this.rescheduleRequestInclude()
+        );
+
+        if (!requests) {
+            throw new Error("Failed to fetch reschedule requests");
+        }
+
+        return requests;
+    }
+
+    async getStaffRescheduledAppointments(staffId) {
+        const requests = await this.appointmentRescheduleRequestRepository.findAllAndPopulate(
+            {
+                status: "PENDING",
+                appointment: {
+                    clinicians: {
+                        some: { id: staffId }
+                    }
+                }
+            },
+            this.rescheduleRequestInclude()
+        );
+
+        if (!requests) {
+            throw new Error("Failed to fetch reschedule requests");
+        }
+
+        return requests;
+    }
+
+    async requestReschedule(data) {
+        const appointment = await this.appointmentRepository.findOne({ id: data.appointmentId });
+
+        if (!appointment) {
+            throw new Error("Appointment not found");
+        }
+
+        if (appointment.isCanceled) {
+            throw new Error("Cannot reschedule a canceled appointment");
+        }
+
+        if (appointment.rescheduled && appointment.rescheduleAccepted) {
+            throw new Error("This appointment has already been rescheduled");
+        }
+
+        const existingPending = await this.appointmentRescheduleRequestRepository.findFirstDynamic({
+            where: { appointmentId: appointment.id, status: "PENDING" }
+        });
+
+        if (existingPending) {
+            throw new Error("A reschedule request is already pending for this appointment");
+        }
+
+        const request = await this.appointmentRescheduleRequestRepository.create({
+            appointmentId: appointment.id,
+            tenantId: data.tenantId || appointment.tenantId,
+            clientId: appointment.clientId,
+            date: data.date,
+            startTime: data.startTime,
+            endTime: data.endTime,
+            reasonForReschedule: data.reasonForReschedule || null,
+            requestedByType: data.requestedByType,
+            requestedById: data.requestedById || null,
+            status: "PENDING",
+        });
+
+        if (!request) {
+            throw new Error("Failed to create reschedule request");
+        }
+
+        const updatedAppointment = await this.appointmentRepository.update(appointment.id, {
+            rescheduled: true,
+            rescheduleAccepted: false,
+            rescheduleRejected: false,
+            reasonForReschedule: data.reasonForReschedule || appointment.reasonForReschedule,
+        });
+
+        if (!updatedAppointment) {
+            throw new Error("Failed to update Appointment");
+        }
+
+        return { request, appointment: updatedAppointment };
+    }
+
+    async acceptRescheduleAppointment(data) {
+        const results = [];
+
+        for (const obj of data) {
+            const request = await this.appointmentRescheduleRequestRepository.findOne({ id: obj.id });
+
+            if (!request) {
+                throw new Error("Reschedule request not found");
+            }
+
+            if (request.status !== "PENDING") {
+                throw new Error("Reschedule request has already been resolved");
+            }
+
+            const appointment = await this.appointmentRepository.findFirstDynamic({
+                where: { id: request.appointmentId },
+                include: {
+                    clinicians: { select: { id: true } },
+                    appointmentServices: true,
+                }
+            });
+
+            if (!appointment) {
+                throw new Error("Appointment not found");
+            }
+
+            const newAppointment = await this.appointmentRepository.create({
+                clientId: appointment.clientId,
+                tenantId: appointment.tenantId,
+                sessionId: appointment.sessionId,
+                date: request.date,
+                startTime: request.startTime,
+                endTime: request.endTime,
+                isRecurring: appointment.isRecurring,
+                recurrence: appointment.recurrence,
+                isBillable: appointment.isBillable,
+                serviceLocation: appointment.serviceLocation,
+                requiresTravel: appointment.requiresTravel,
+                colourCode: appointment.colourCode,
+                relatedAppointment: appointment.id,
+                rescheduled: false,
+                rescheduleAccepted: true,
+                rescheduleRejected: false,
+                clinicians: {
+                    connect: appointment.clinicians.map((clinician) => ({ id: clinician.id }))
+                },
+            });
+
+            if (!newAppointment) {
+                throw new Error("Failed to create rescheduled appointment");
+            }
+
+            for (const service of appointment.appointmentServices || []) {
+                const newService = await this.appointmentServiceRepository.create({
+                    serviceCodeId: service.serviceCodeId,
+                    appointmentId: newAppointment.id,
+                    modifiers: service.modifiers,
+                });
+
+                if (!newService) {
+                    throw new Error("Failed to copy appointment service to rescheduled appointment");
+                }
+            }
+
+            const updatedAppointment = await this.appointmentRepository.update(appointment.id, {
+                rescheduled: true,
+                rescheduleAccepted: true,
+                rescheduleRejected: false,
+            });
+
+            if (!updatedAppointment) {
+                throw new Error("Failed to update Appointment");
+            }
+
+            const updatedRequest = await this.appointmentRescheduleRequestRepository.update(request.id, {
+                status: "ACCEPTED",
+                respondedByType: obj.respondedByType || null,
+                respondedById: obj.respondedById || null,
+                respondedAt: new Date(),
+                newAppointmentId: newAppointment.id,
+            });
+
+            if (!updatedRequest) {
+                throw new Error("Failed to update reschedule request");
+            }
+
+            results.push({ request: updatedRequest, appointment: newAppointment });
+        };
+
+        return results;
+    }
+
+    async rejectRescheduleAppointment(data) {
+        const results = [];
+
+        for (const obj of data) {
+            const request = await this.appointmentRescheduleRequestRepository.findOne({ id: obj.id });
+
+            if (!request) {
+                throw new Error("Reschedule request not found");
+            }
+
+            if (request.status !== "PENDING") {
+                throw new Error("Reschedule request has already been resolved");
+            }
+
+            const appointment = await this.appointmentRepository.findOne({ id: request.appointmentId });
+
+            if (!appointment) {
+                throw new Error("Appointment not found");
+            }
+
+            const updatedAppointment = await this.appointmentRepository.update(appointment.id, {
+                rescheduled: true,
+                rescheduleAccepted: false,
+                rescheduleRejected: true,
+            });
+
+            if (!updatedAppointment) {
+                throw new Error("Failed to update Appointment");
+            }
+
+            const updatedRequest = await this.appointmentRescheduleRequestRepository.update(request.id, {
+                status: "REJECTED",
+                respondedByType: obj.respondedByType || null,
+                respondedById: obj.respondedById || null,
+                respondedAt: new Date(),
+            });
+
+            if (!updatedRequest) {
+                throw new Error("Failed to update reschedule request");
+            }
+
+            results.push(updatedRequest);
+        };
+
+        return results;
+    }
+
+    async getTenantCanceledAppointments(tenantId) {
+        const appointments = await this.appointmentRepository.findAllAndPopulate({ tenantId, isCanceled: true }, {
+            client: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    preferredName: true,
+                    email: true,
+                },
+            },
+            session: true,
+            appointmentServices: { include: { serviceCode: true } },
+            clinicians: {
+                select: {
+                    id: true,
+                    fullName: true,
+                    email: true,
+                }
+            }
+        });
+
+        if (!appointments) {
+            throw new Error("Failed to fetch Appointment");
+        }
+
+        return appointments;
+    }
+
+    async getClientCanceledAppointments(clientId) {
+        const appointments = await this.appointmentRepository.findAllAndPopulate({ clientId, isCanceled: true }, {
+            client: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    preferredName: true,
+                    email: true,
+                },
+            },
+            session: true,
+            appointmentServices: { include: { serviceCode: true } },
+            clinicians: {
+                select: {
+                    id: true,
+                    fullName: true,
+                    email: true,
+                }
+            }
+        });
+
+        if (!appointments) {
+            throw new Error("Failed to fetch Appointment");
+        }
+
+        return appointments;
+    }
+
+    async getClientRescheduledAppointments(clientId) {
+        const requests = await this.appointmentRescheduleRequestRepository.findAllAndPopulate(
+            { clientId, status: "PENDING" },
+            this.rescheduleRequestInclude()
+        );
+
+        if (!requests) {
+            throw new Error("Failed to fetch reschedule requests");
+        }
+
+        return requests;
+    }
+
+    async getStaffCanceledAppointments(staffId) {
+        const appointments = await this.appointmentRepository.findAllAndPopulate({
+            clinicians: {
+                some: { id: staffId }
+            }, isCanceled: true
+        }, {
+            client: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    preferredName: true,
+                    email: true,
+                },
+            },
+            session: true,
+            appointmentServices: { include: { serviceCode: true } },
+            clinicians: {
+                select: {
+                    id: true,
+                    fullName: true,
+                    email: true,
+                }
+            }
+        });
+
+        if (!appointments) {
+            throw new Error("Failed to fetch Appointment");
+        }
+
+        return appointments;
+    }
+
+    async appointmentsMetric(tenantId, status, period) {
+        const appointments = await this.appointmentRepository.appointmentsMetric(tenantId, status, period);
+
+        if (!appointments) {
+            throw new Error("Failed to fetch Appointment");
+        }
+
+        return appointments;
+    }
+
+    isUpcoming(appt, now = new Date()) {
+        const start = new Date(`${appt.date}T${appt.startTime}:00`);
+
+        // if (!appt.isRecurring) {
+        return start >= now;
+        // }
+
+        // const recurrenceEnd = appt.recurrence?.endOn
+        //     ? new Date(appt.recurrence.endOn)
+        //     : null;
+
+        // if (!recurrenceEnd) return true;
+
+        // return recurrenceEnd >= now;
+    }
+
+    isPast(appt, now = new Date()) {
+        const end = new Date(`${appt.date}T${appt.endTime}:00`);
+
+        // if (!appt.isRecurring) {
+        return end < now;
+        // }
+
+        // const recurrenceEnd = appt.recurrence?.endOn
+        //     ? new Date(appt.recurrence.endOn)
+        //     : null;
+
+        // if (!recurrenceEnd) return false;
+
+        // return recurrenceEnd < now;
+    }
+
+    async getTenantUpcomingAppointments(tenantId) {
+        const appointments = await this.appointmentRepository.getUpcomingAppointments({ tenantId });
+
+        if (!appointments || appointments.length === 0) {
+            return [];
+        }
+
+        return appointments;
+    }
+
+    async getTenantPastAppointments(tenantId) {
+        const now = new Date();
+
+        const allAppointments = await this.appointmentRepository.findAllAndPopulate(
+            { isCanceled: false, tenantId },
+            {
+                client: {
+                    select: {
+                        id: true, firstName: true,
+                        lastName: true,
+                        preferredName: true, email: true
+                    }
+                },
+                session: true,
+                appointmentServices: { include: { serviceCode: true } },
+                clinicians: { select: { id: true, fullName: true, email: true } }
+            }
+        );
+
+        return allAppointments
+            .filter(appt => this.isPast(appt, now))
+            .sort((a, b) => {
+                const aDate = new Date(`${a.date}T${a.startTime}:00`);
+                const bDate = new Date(`${b.date}T${b.startTime}:00`);
+                return aDate - bDate;
+            });
+    }
+
+    async getStaffUpcomingAppointments(staffId) {
+        const appointments = await this.appointmentRepository.getUpcomingAppointments({
+            clinicians: {
+                some: {
+                    id: staffId
+                }
+            },
+        });
+
+        if (!appointments || appointments.length === 0) {
+            return [];
+        }
+
+        return appointments;
+    }
+
+    async getStaffAppointments(staffId) {
+        const appointments = await this.appointmentRepository.getAllAppointments({
+            clinicians: {
+                some: {
+                    id: staffId
+                }
+            },
+        });
+
+        if (!appointments || appointments.length === 0) {
+            return [];
+        }
+
+        return appointments;
+    }
+
+    async getStaffPastAppointments(staffId) {
+        const now = new Date();
+
+        const allAppointments = await this.appointmentRepository.findAllAndPopulate(
+            {
+                isCanceled: false, clinicians: {
+                    some: { id: staffId }
+                }
+            },
+            {
+                client: {
+                    select: {
+                        id: true, firstName: true,
+                        lastName: true,
+                        preferredName: true, email: true
+                    }
+                },
+                session: true,
+                appointmentServices: { include: { serviceCode: true } },
+                clinicians: { select: { id: true, fullName: true, email: true } }
+            }
+        );
+
+        return allAppointments
+            .filter(appt => this.isPast(appt, now))
+            .sort((a, b) => {
+                const aDate = new Date(`${a.date}T${a.startTime}:00`);
+                const bDate = new Date(`${b.date}T${b.startTime}:00`);
+                return aDate - bDate;
+            });
+    }
+
+    // async getClientUpcomingAppointments(clientId) {
+    //     const now = new Date();
+
+    //     const allAppointments = await this.appointmentRepository.findAllAndPopulate(
+    //         { isCanceled: false, clientId },
+    //         {
+    //             client: {
+    //                 select: {
+    //                     id: true, firstName: true,
+    //                     lastName: true,
+    //                     preferredName: true, email: true
+    //                 }
+    //             },
+    //             session: true,
+    //             appointmentServices: { include: { serviceCode: true } },
+    //             clinicians: { select: { id: true, fullName: true, email: true } }
+    //         }
+    //     );
+
+    //     return allAppointments
+    //         .filter(appt => this.isUpcoming(appt, now))
+    //         .sort((a, b) => {
+    //             const aDate = new Date(`${a.date}T${a.startTime}:00`);
+    //             const bDate = new Date(`${b.date}T${b.startTime}:00`);
+    //             return aDate - bDate;
+    //         });
+    // }
+
+    async getCliniciansByClientId(clientId, tenantId) {
+        const clients = await this.appointmentRepository.getCliniciansByClientId(clientId, tenantId);
+        if (!clients) {
+            throw new Error("clients not found")
+        }
+
+        return clients;
+    }
+
+    async getClientPastAppointments(clientId) {
+        const now = new Date();
+
+        const allAppointments = await this.appointmentRepository.findAllAndPopulate(
+            { isCanceled: false, clientId },
+            {
+                client: {
+                    select: {
+                        id: true, firstName: true,
+                        lastName: true,
+                        preferredName: true, email: true
+                    }
+                },
+                session: true,
+                appointmentServices: { include: { serviceCode: true } },
+                clinicians: { select: { id: true, fullName: true, email: true } }
+            }
+        );
+
+        return allAppointments
+            .filter(appt => this.isPast(appt, now))
+            .sort((a, b) => {
+                const aDate = new Date(`${a.date}T${a.startTime}:00`);
+                const bDate = new Date(`${b.date}T${b.startTime}:00`);
+                return aDate - bDate;
+            });
+    }
+
+    async getAppointment(id) {
+        const appointment = await this.appointmentRepository.findFirstDynamic({
+            where: {
+                id: id,
+            },
+            include: {
+                client: { include: { payer: true } },
+                clinicians: true,
+                session: true,
+                appointmentServices: { include: { serviceCode: true } },
+            }
+        });
+
+        if (!appointment) {
+            throw new Error("appointment not found.");
+        }
+
+        return appointment;
+    }
+
+    async countTenantAppointments(id) {
+        const appointmentCount = await this.appointmentRepository.countTenantAppointments(id);
+        return appointmentCount || 0;
+    }
+
+    async getAppointmentsForTimesheet(id) {
+        const appointment = await this.appointmentRepository.getAppointmentsForTimesheet(id);
+
+        if (!appointment) {
+            throw new Error("Appointment not found");
+        }
+
+        const tenantClientId = appointment.client.tenantLinks[0]?.id;
+
+        if (!tenantClientId) {
+            throw new Error("Client is not linked to tenant");
+        }
+
+        const requiredServices = appointment.appointmentServices.map(s => ({
+            serviceCodeId: s.serviceCodeId,
+        }));
+
+        return { tenantClientId, requiredServices };
+    }
+}
+
+export default AppointmentService;
