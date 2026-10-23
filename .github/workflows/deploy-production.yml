@@ -1,0 +1,261 @@
+
+name: Deploy Noosphere Backend
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: noosphere-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::571600828327:role/noosphere-prod-github-actions-role
+          aws-region: us-west-1
+
+      - name: Create deployment script
+        run: |
+          cat > deploy.sh <<'SCRIPT'
+          #!/bin/bash
+          set -euo pipefail
+          umask 077
+
+          SHA="$1"
+          PHASE="$2"
+          BASE="/opt/noosphere/backend"
+          APP="$BASE/releases/current"
+          ENV_FILE="$BASE/.env.sh"
+          REPO="git@github.com:ausomebee/noosphere_backend.git"
+
+          export PATH="/opt/nodejs/node-v22.22.3-linux-x64/bin:/usr/local/bin:/usr/bin:/bin"
+
+          [[ "$SHA" =~ ^[a-f0-9]{40}$ ]] || exit 1
+
+          case "$PHASE" in
+            prepare)
+              echo "Preparing commit $SHA"
+
+              install -d -o noosphere -g noosphere \
+                -m 750 "$BASE/releases"
+
+              if [ ! -d "$APP/.git" ]; then
+                runuser -u noosphere -- env \
+                  GIT_SSH_COMMAND="ssh -i /home/noosphere/.ssh/id_ed25519 -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
+                  git clone --branch master "$REPO" "$APP"
+              fi
+
+              runuser -u noosphere -- env \
+                GIT_SSH_COMMAND="ssh -i /home/noosphere/.ssh/id_ed25519 -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
+                git -C "$APP" fetch origin master
+
+              runuser -u noosphere -- git -C "$APP" \
+                merge-base --is-ancestor "$SHA" origin/master
+
+              runuser -u noosphere -- git -C "$APP" \
+                checkout --detach --force "$SHA"
+
+              TMP="$(mktemp "$BASE/.secret.XXXXXXXX")"
+              trap 'rm -f "$TMP"' EXIT
+
+              aws secretsmanager get-secret-value \
+                --secret-id noosphere/prod/backend/app-config \
+                --region us-west-1 \
+                --query SecretString \
+                --output text > "$TMP"
+
+              python3 - "$TMP" "$ENV_FILE" <<'PY'
+          import json
+          import os
+          import pwd
+          import re
+          import shlex
+          import sys
+
+          with open(sys.argv[1]) as f:
+              config = json.load(f)
+
+          if not config.get("DATABASE_URL"):
+              raise SystemExit("DATABASE_URL missing")
+
+          lines = []
+          for key, value in config.items():
+              if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", key):
+                  raise SystemExit("Invalid configuration key")
+              if not isinstance(value, (str, int, float, bool)):
+                  raise SystemExit("Invalid configuration value")
+              lines.append(
+                  f"export {key}={shlex.quote(str(value))}\n"
+              )
+
+          target = sys.argv[2]
+          temp = target + ".new"
+          user = pwd.getpwnam("noosphere")
+
+          with open(temp, "w") as f:
+              f.writelines(lines)
+
+          os.chmod(temp, 0o600)
+          os.chown(temp, user.pw_uid, user.pw_gid)
+          os.replace(temp, target)
+          PY
+
+              rm -f "$TMP"
+              trap - EXIT
+
+              runuser -u noosphere -- bash -c '
+                set -e
+                cd /opt/noosphere/backend/releases/current
+                source /opt/noosphere/backend/.env.sh
+                npm ci --include=dev
+                npx prisma generate
+              '
+
+              echo "Preparation complete"
+              ;;
+
+            migrate)
+              runuser -u noosphere -- bash -c '
+                set -e
+                cd /opt/noosphere/backend/releases/current
+                source /opt/noosphere/backend/.env.sh
+                npx prisma migrate deploy
+              '
+              echo "Migration complete"
+              ;;
+
+            start)
+              runuser -u noosphere -- bash -c '
+                set -e
+                export PM2_HOME=/home/noosphere/.pm2
+                cd /opt/noosphere/backend/releases/current
+                source /opt/noosphere/backend/.env.sh
+
+                pm2 delete noosphere-api >/dev/null 2>&1 || true
+                pm2 start src/server.js --name noosphere-api
+                pm2 save
+              '
+
+              systemctl enable pm2-noosphere.service
+
+              for i in $(seq 1 30); do
+                if curl -fsS --max-time 3 \
+                  http://127.0.0.1:5000/health >/dev/null; then
+                  echo "API healthy"
+                  exit 0
+                fi
+                sleep 2
+              done
+
+              echo "API health check failed" >&2
+              exit 1
+              ;;
+
+            *)
+              echo "Unknown deployment phase" >&2
+              exit 1
+              ;;
+          esac
+          SCRIPT
+
+      - name: Deploy both backend servers
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          BACKEND_1A="i-0dbb6c40028185fc9"
+          BACKEND_1C="i-0580429f5aecf1398"
+
+          # Execute one deployment phase and wait for all targets.
+          deploy_phase() {
+            local phase="$1"
+            shift
+            local instances=("$@")
+
+            echo "Starting phase: $phase"
+
+            local encoded command_id
+            encoded="$(base64 -w0 deploy.sh)"
+
+            export SSM_COMMAND="printf '%s' '$encoded' | base64 -d | bash -s -- '$COMMIT_SHA' '$phase'"
+            export SSM_INSTANCES="$(IFS=,; echo "${instances[*]}")"
+
+            python3 - <<'PY'
+          import json
+          import os
+
+          payload = {
+              "DocumentName": "AWS-RunShellScript",
+              "InstanceIds": os.environ["SSM_INSTANCES"].split(","),
+              "Parameters": {
+                  "commands": [os.environ["SSM_COMMAND"]]
+              },
+              "TimeoutSeconds": 1800
+          }
+
+          with open("ssm-request.json", "w") as f:
+              json.dump(payload, f)
+          PY
+
+            command_id="$(aws ssm send-command \
+              --cli-input-json file://ssm-request.json \
+              --query 'Command.CommandId' \
+              --output text)"
+
+            for instance in "${instances[@]}"; do
+              echo "Waiting for $instance ($phase)"
+
+              local status="Pending"
+
+              for attempt in $(seq 1 180); do
+                status="$(aws ssm get-command-invocation \
+                  --command-id "$command_id" \
+                  --instance-id "$instance" \
+                  --query Status \
+                  --output text 2>/dev/null || echo Pending)"
+
+                case "$status" in
+                  Success|Failed|Cancelled|TimedOut|Cancelling)
+                    break
+                    ;;
+                esac
+
+                sleep 10
+              done
+
+              echo "Instance $instance: $status"
+
+              if [ "$status" != "Success" ]; then
+                aws ssm get-command-invocation \
+                  --command-id "$command_id" \
+                  --instance-id "$instance" \
+                  --query '[StandardOutputContent,StandardErrorContent]' \
+                  --output text || true
+                exit 1
+              fi
+            done
+          }
+
+          # Prepare both servers using the exact same Git commit.
+          deploy_phase prepare "$BACKEND_1A" "$BACKEND_1C"
+
+          # Apply database migrations once.
+          deploy_phase migrate "$BACKEND_1A"
+
+          # Start the API on both servers in one SSM command.
+          deploy_phase start "$BACKEND_1A" "$BACKEND_1C"
+
+          echo "Noosphere production deployment successful"
