@@ -130,7 +130,7 @@ jobs:
                 set -e
                 cd /opt/noosphere/backend/releases/current
                 source /opt/noosphere/backend/.env.sh
-                npx prisma migrate deploy
+                npx prisma migrate deploy --config apps/main-app/prisma.config.ts
               '
               echo "Migration complete"
               ;;
