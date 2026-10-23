@@ -2,6 +2,7 @@ import express from "express";
 import PerformanceController from "../controller/performanceController.js";
 import PerformanceDto from "../dto/performanceDto.js";
 import CloudWatchUtil from "../../../../utilities/cloudWatch.js";
+import { getInstanceId } from "../../../../utilities/ec2Metadata.js";
 import { adminProtect } from "../../../../middleware/auth_handlers.js";
 
 /**
@@ -918,7 +919,7 @@ class PerformanceRoutes {
          */
         this.router.get("/general", adminProtect(), async (req, res) => {
             const result = await this.cloudWatchUtil.getGeneralMetrics({
-                instanceId: process.env.EC2_INSTANCE_ID,
+                instanceId: await getInstanceId(),
                 dbInstanceIdentifier: process.env.RDS_INSTANCE_ID
             });
             res.json(result);
@@ -939,7 +940,7 @@ class PerformanceRoutes {
          */
         this.router.get("/general/timeseries", adminProtect(), async (req, res) => {
             const result = await this.cloudWatchUtil.getGeneralTimeseries({
-                instanceId: process.env.EC2_INSTANCE_ID,
+                instanceId: await getInstanceId(),
                 dbInstanceIdentifier: process.env.RDS_INSTANCE_ID
             });
             res.json(result);
@@ -959,7 +960,7 @@ class PerformanceRoutes {
          */
         this.router.get("/api-error-rate", adminProtect(), async (req, res) => {
             const result = await this.cloudWatchUtil.getApiErrorRate({
-                instanceId: process.env.EC2_INSTANCE_ID
+                instanceId: await getInstanceId()
             });
             res.json(result);
         });
@@ -978,7 +979,7 @@ class PerformanceRoutes {
          */
         this.router.get("/resources", adminProtect(), async (req, res) => {
             const result = await this.cloudWatchUtil.getResourceMetrics({
-                instanceId: process.env.EC2_INSTANCE_ID,
+                instanceId: await getInstanceId(),
                 dbInstanceIdentifier: process.env.RDS_INSTANCE_ID
             });
             res.json(result);
@@ -998,7 +999,7 @@ class PerformanceRoutes {
          */
         this.router.get("/resources/timeseries", adminProtect(), async (req, res) => {
             const result = await this.cloudWatchUtil.getResourceTimeseries({
-                instanceId: process.env.EC2_INSTANCE_ID,
+                instanceId: await getInstanceId(),
                 dbInstanceIdentifier: process.env.RDS_INSTANCE_ID
             });
             res.json(result);

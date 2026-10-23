@@ -1,3 +1,5 @@
+import { getInstanceId } from "../../../utilities/ec2Metadata.js";
+
 class PerformanceService {
     constructor({cloudWatchUtil}) {
         this.cloudWatchUtil = cloudWatchUtil;
@@ -5,7 +7,7 @@ class PerformanceService {
 
     async getAllMetrics(data) {
         const { startTime, endTime } = data;
-        const instanceId = process.env.EC2_INSTANCE_ID;
+        const instanceId = await getInstanceId();
         const dbInstanceId = process.env.MY_DB_INSTANCE;
 
         const metricFetchers = [
@@ -84,51 +86,51 @@ class PerformanceService {
     }
 
     async getCPUUtilizationMetric({ startTime, endTime }) {
-        return this.cloudWatchUtil.getCPUUtilization(process.env.EC2_INSTANCE_ID, startTime, endTime);
+        return this.cloudWatchUtil.getCPUUtilization(await getInstanceId(), startTime, endTime);
     }
 
     async getDiskReadBytesMetric({ startTime, endTime }) {
-        return this.cloudWatchUtil.getDiskReadBytes(process.env.EC2_INSTANCE_ID, startTime, endTime);
+        return this.cloudWatchUtil.getDiskReadBytes(await getInstanceId(), startTime, endTime);
     }
 
     async getDiskWriteBytesMetric({ startTime, endTime }) {
-        return this.cloudWatchUtil.getDiskWriteBytes(process.env.EC2_INSTANCE_ID, startTime, endTime);
+        return this.cloudWatchUtil.getDiskWriteBytes(await getInstanceId(), startTime, endTime);
     }
 
     async getDiskReadOpsMetric({ startTime, endTime }) {
-        return this.cloudWatchUtil.getDiskReadOps(process.env.EC2_INSTANCE_ID, startTime, endTime);
+        return this.cloudWatchUtil.getDiskReadOps(await getInstanceId(), startTime, endTime);
     }
 
     async getDiskWriteOpsMetric({ startTime, endTime }) {
-        return this.cloudWatchUtil.getDiskWriteOps(process.env.EC2_INSTANCE_ID, startTime, endTime);
+        return this.cloudWatchUtil.getDiskWriteOps(await getInstanceId(), startTime, endTime);
     }
 
     async getNetworkInMetric({ startTime, endTime }) {
-        return this.cloudWatchUtil.getNetworkIn(process.env.EC2_INSTANCE_ID, startTime, endTime);
+        return this.cloudWatchUtil.getNetworkIn(await getInstanceId(), startTime, endTime);
     }
 
     async getNetworkOutMetric({ startTime, endTime }) {
-        return this.cloudWatchUtil.getNetworkOut(process.env.EC2_INSTANCE_ID, startTime, endTime);
+        return this.cloudWatchUtil.getNetworkOut(await getInstanceId(), startTime, endTime);
     }
 
     async getNetworkPacketsInMetric({ startTime, endTime }) {
-        return this.cloudWatchUtil.getNetworkPacketsIn(process.env.EC2_INSTANCE_ID, startTime, endTime);
+        return this.cloudWatchUtil.getNetworkPacketsIn(await getInstanceId(), startTime, endTime);
     }
 
     async getNetworkPacketsOutMetric({ startTime, endTime }) {
-        return this.cloudWatchUtil.getNetworkPacketsOut(process.env.EC2_INSTANCE_ID, startTime, endTime);
+        return this.cloudWatchUtil.getNetworkPacketsOut(await getInstanceId(), startTime, endTime);
     }
 
     async getStatusCheckFailedMetric({ startTime, endTime }) {
-        return this.cloudWatchUtil.getStatusCheckFailed(process.env.EC2_INSTANCE_ID, startTime, endTime);
+        return this.cloudWatchUtil.getStatusCheckFailed(await getInstanceId(), startTime, endTime);
     }
 
     async getStatusCheckFailedInstanceMetric({ startTime, endTime }) {
-        return this.cloudWatchUtil.getStatusCheckFailedInstance(process.env.EC2_INSTANCE_ID, startTime, endTime);
+        return this.cloudWatchUtil.getStatusCheckFailedInstance(await getInstanceId(), startTime, endTime);
     }
 
     async getStatusCheckFailedSystemMetric({ startTime, endTime }) {
-        return this.cloudWatchUtil.getStatusCheckFailedSystem(process.env.EC2_INSTANCE_ID, startTime, endTime);
+        return this.cloudWatchUtil.getStatusCheckFailedSystem(await getInstanceId(), startTime, endTime);
     }
 
     async getRDSCPUUtilizationMetric({ startTime, endTime }) {
