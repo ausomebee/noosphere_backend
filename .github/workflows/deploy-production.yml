@@ -143,7 +143,7 @@ jobs:
                 source /opt/noosphere/backend/.env.sh
 
                 pm2 delete noosphere-api >/dev/null 2>&1 || true
-                pm2 start src/server.js --name noosphere-api
+                pm2 start apps/main-app/src/server.js --name noosphere-api
                 pm2 save
               '
 
