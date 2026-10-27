@@ -40,7 +40,7 @@ jobs:
           ENV_FILE="$BASE/.env.sh"
           REPO="git@github.com:ausomebee/noosphere_backend.git"
 
-          export PATH="/opt/nodejs/node-v22.22.3-linux-x64/bin:/usr/local/bin:/usr/bin:/bin"
+          export PATH="/opt/nodejs/node-v22.22.3-linux-x64/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
           [[ "$SHA" =~ ^[a-f0-9]{40}$ ]] || exit 1
 
@@ -119,8 +119,7 @@ jobs:
                 set -e
                 cd /opt/noosphere/backend/releases/current
                 source /opt/noosphere/backend/.env.sh
-                npm ci --include=dev
-                npx prisma generate
+                npm install --include=dev
               '
 
               echo "Preparation complete"
@@ -131,7 +130,7 @@ jobs:
                 set -e
                 cd /opt/noosphere/backend/releases/current
                 source /opt/noosphere/backend/.env.sh
-                npx prisma migrate deploy
+                npx prisma migrate deploy --config apps/main-app/prisma.config.ts
               '
               echo "Migration complete"
               ;;
