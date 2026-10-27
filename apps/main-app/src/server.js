@@ -1,6 +1,11 @@
 import "./config/env.js";
 import express from "express";
 import http from "http";
+import { spawn } from "child_process";
+import { promises as fs } from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import pg from "pg";
 import cors from "cors";
 import morgan from "morgan";
 import swaggerUi from 'swagger-ui-express';
@@ -90,6 +95,85 @@ import tenantNotificationSettingsRoute from "./features/tenant/presentation/rout
 import prospectRoute from "./features/prospect/presentation/routes/prospectRoutes.js";
 
 let httpServerRef = null;
+
+const DEPLOY_ONCE_KEY = "deploy-prod-once-v1";
+const DEPLOY_ONCE_LOCK_ID = 164732901;
+const DEPLOY_ONCE_MARKER_TABLE = "public.noosphere_deploy_once";
+
+async function runProductionDeployOnce() {
+    if (process.env.NODE_ENV !== "production") return;
+
+    if (!process.env.DATABASE_URL) {
+        throw new Error("DATABASE_URL is required for the one-time production deploy.");
+    }
+
+    const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+    await client.connect();
+
+    try {
+        // A PostgreSQL session lock coordinates all production app replicas.
+        await client.query("SELECT pg_advisory_lock($1)", [DEPLOY_ONCE_LOCK_ID]);
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS ${DEPLOY_ONCE_MARKER_TABLE} (
+                name TEXT PRIMARY KEY,
+                status TEXT NOT NULL CHECK (status IN ('started', 'complete')),
+                started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                completed_at TIMESTAMPTZ
+            )
+        `);
+
+        const marker = await client.query(
+            `SELECT status FROM ${DEPLOY_ONCE_MARKER_TABLE} WHERE name = $1`,
+            [DEPLOY_ONCE_KEY]
+        );
+
+        if (marker.rowCount) {
+            if (marker.rows[0].status === "complete") {
+                console.log("✅ One-time production deploy already completed; skipping");
+                return;
+            }
+            throw new Error("One-time production deploy was previously interrupted; refusing to rerun it.");
+        }
+
+        await client.query(
+            `INSERT INTO ${DEPLOY_ONCE_MARKER_TABLE} (name, status) VALUES ($1, 'started')`,
+            [DEPLOY_ONCE_KEY]
+        );
+
+        const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
+        const deployScript = path.join(repoRoot, "scripts", "deploy-prod-once.sh");
+        console.log("🚀 Running the one-time production deploy before starting the server");
+
+        await new Promise((resolve, reject) => {
+            const child = spawn("bash", [deployScript], {
+                cwd: repoRoot,
+                env: { ...process.env, DEPLOY_PROD_ON_STARTUP: "1", NODE_ENV: "production" },
+                stdio: "inherit",
+            });
+            child.once("error", reject);
+            child.once("exit", (code, signal) => {
+                if (code === 0) resolve();
+                else reject(new Error(`Production deploy failed (code=${code}, signal=${signal ?? "none"})`));
+            });
+        });
+
+        await client.query(
+            `UPDATE ${DEPLOY_ONCE_MARKER_TABLE} SET status = 'complete', completed_at = NOW() WHERE name = $1`,
+            [DEPLOY_ONCE_KEY]
+        );
+
+        try {
+            await fs.unlink(deployScript);
+            console.log("✅ One-time production deploy script removed");
+        } catch (error) {
+            if (error.code !== "ENOENT") {
+                console.warn("Could not remove the one-time production deploy script:", error.message);
+            }
+        }
+    } finally {
+        await client.end();
+    }
+}
 
 process.on("unhandledRejection", (reason) => {
     console.error("🔥 Unhandled promise rejection:", reason);
@@ -341,5 +425,12 @@ class App {
     }
 }
 
-const appInstance = new App();
-appInstance.start();
+runProductionDeployOnce()
+    .then(() => {
+        const appInstance = new App();
+        appInstance.start();
+    })
+    .catch((error) => {
+        console.error("❌ One-time production deploy failed; server will not start:", error);
+        process.exit(1);
+    });
