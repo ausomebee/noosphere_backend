@@ -5,11 +5,15 @@ on:
     branches: [master]
   workflow_dispatch:
     inputs:
+      confirm_bootstrap:
+        description: 'For bootstrap only, type INITIALIZE_PRODUCTION_AFTER_BACKUP'
+        required: false
+        type: string
       mode:
-        description: 'deploy or reconcile'
+        description: 'deploy, reconcile, or one-time bootstrap'
         required: true
         type: choice
-        options: [deploy, reconcile]
+        options: [deploy, reconcile, bootstrap]
         default: reconcile
   schedule:
     - cron: '*/15 * * * *'
@@ -163,12 +167,25 @@ jobs:
           }
 
           start_api() {
-            check_marker
-            runuser -u noosphere -- bash -c '
+            # Bootstrap is explicitly requested; normal starts require a complete marker.
+            if [[ "${1:-normal}" != bootstrap ]]; then
+              check_marker
+            fi
+            if [[ "${1:-normal}" == bootstrap ]]; then
+              export NOOSPHERE_BOOTSTRAP=1
+            else
+              export NOOSPHERE_BOOTSTRAP=0
+            fi
+            runuser -u noosphere -- env NOOSPHERE_BOOTSTRAP="$NOOSPHERE_BOOTSTRAP" bash -c '
               set -euo pipefail
               export PM2_HOME=/home/noosphere/.pm2
               cd /opt/noosphere/backend/releases/current
               source /opt/noosphere/backend/.env.sh
+              if [[ "${NOOSPHERE_BOOTSTRAP:-0}" == 1 ]]; then
+                export DEPLOY_PROD_ON_STARTUP=1
+              else
+                unset DEPLOY_PROD_ON_STARTUP
+              fi
               pm2 delete noosphere-api >/dev/null 2>&1 || true
               pm2 start apps/main-app/src/server.js --name noosphere-api
               pm2 save
@@ -177,8 +194,9 @@ jobs:
             for i in $(seq 1 30); do
               if curl --fail --silent --show-error --max-time 3 \
                 http://127.0.0.1:5000/health >/dev/null 2>&1; then
+                check_marker
                 install -o root -g root -m 600 "${VERSION_FILE}.pending" "$VERSION_FILE"
-                echo 'API healthy'; return 0
+                echo 'API healthy and marker complete'; return 0
               fi
               sleep 2
             done
@@ -221,6 +239,12 @@ jobs:
               ;;
             start)
               start_api
+              ;;
+            bootstrap)
+              # Explicit, operator-authorised bootstrap only.
+              # App itself manages advisory lock, marker and seed.
+              # A failed bootstrap is NOT automatically retried.
+              start_api bootstrap
               ;;
             reconcile)
               ensure_ca
@@ -276,7 +300,15 @@ jobs:
               fi
             done
           }
-          if [[ "$MODE" == deploy ]]; then
+          if [[ "$MODE" == bootstrap ]]; then
+            [[ "${{ inputs.confirm_bootstrap }}" == INITIALIZE_PRODUCTION_AFTER_BACKUP ]] || { echo 'Explicit bootstrap confirmation required' >&2; exit 1; }
+            # Explicit workflow_dispatch only; first initialise on 1a, then start 1c.
+            [[ "${{ github.event_name }}" == workflow_dispatch ]] || exit 1
+            run_phase prepare "$BACKEND_1A" "$BACKEND_1C"
+            run_phase migrate "$BACKEND_1A"
+            run_phase bootstrap "$BACKEND_1A"
+            run_phase start "$BACKEND_1C"
+          elif [[ "$MODE" == deploy ]]; then
             run_phase prepare "$BACKEND_1A" "$BACKEND_1C"
             run_phase migrate "$BACKEND_1A"
             # Sequential restarts; the second node remains available while the first starts.
