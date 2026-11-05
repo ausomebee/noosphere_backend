@@ -1,10 +1,22 @@
-
-name: Deploy Noosphere Backend
+name: Deploy Noosphere Backend and Reconcile RDS Rotation
 
 on:
   push:
     branches: [master]
   workflow_dispatch:
+    inputs:
+      confirm_bootstrap:
+        description: 'For bootstrap only, type INITIALIZE_PRODUCTION_AFTER_BACKUP'
+        required: false
+        type: string
+      mode:
+        description: 'deploy, reconcile, or one-time bootstrap'
+        required: true
+        type: choice
+        options: [deploy, reconcile, bootstrap]
+        default: reconcile
+  schedule:
+    - cron: '*/15 * * * *'
 
 permissions:
   id-token: write
@@ -15,247 +27,295 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  backend:
     runs-on: ubuntu-latest
     timeout-minutes: 45
-
+    env:
+      AWS_REGION: us-west-1
+      BACKEND_1A: i-0dbb6c40028185fc9
+      BACKEND_1C: i-0580429f5aecf1398
     steps:
-      - name: Configure AWS credentials
+      - name: Determine operation
+        id: operation
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_MODE: ${{ inputs.mode }}
+        run: |
+          if [[ "$EVENT_NAME" == push ]]; then mode=deploy
+          elif [[ "$EVENT_NAME" == schedule ]]; then mode=reconcile
+          else mode="$INPUT_MODE"; fi
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+
+      - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::571600828327:role/noosphere-prod-github-actions-role
           aws-region: us-west-1
 
-      - name: Create deployment script
+      - name: Build SSM script
         run: |
           cat > deploy.sh <<'SCRIPT'
-          #!/bin/bash
-          set -euo pipefail
+          #!/usr/bin/env bash
+          set -Eeuo pipefail
           umask 077
-
-          SHA="$1"
-          PHASE="$2"
-          BASE="/opt/noosphere/backend"
+          export PATH="/opt/nodejs/node-v22.22.3-linux-x64/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+          SHA="$1"; PHASE="$2"
+          BASE=/opt/noosphere/backend
           APP="$BASE/releases/current"
           ENV_FILE="$BASE/.env.sh"
-          REPO="git@github.com:ausomebee/noosphere_backend.git"
+          VERSION_FILE="$BASE/.rds-secret-version"
+          CA_FILE=/etc/pki/tls/certs/rds-ca-bundle.pem
+          RDS_SECRET='arn:aws:secretsmanager:us-west-1:571600828327:secret:rds!db-0475f1af-8411-4eb8-b68f-203b245471a1-iQk9TH'
+          APP_SECRET='noosphere/prod/backend/app-config'
+          REGION=us-west-1
+          HOST='noosphere-prod-db.cx2mysgge3lr.us-west-1.rds.amazonaws.com'
+          REPO='git@github.com:ausomebee/noosphere_backend.git'
 
-          export PATH="/opt/nodejs/node-v22.22.3-linux-x64/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+          ensure_ca() {
+            if [[ ! -s "$CA_FILE" ]]; then
+              curl --fail --silent --show-error --location --retry 3 \
+                'https://truststore.pki.rds.amazonaws.com/us-west-1/us-west-1-bundle.pem' \
+                -o "${CA_FILE}.new"
+              chmod 644 "${CA_FILE}.new"
+              mv -f "${CA_FILE}.new" "$CA_FILE"
+            fi
+            test -s "$CA_FILE"
+          }
 
-          [[ "$SHA" =~ ^[a-f0-9]{40}$ ]] || exit 1
+          current_version() {
+            aws secretsmanager get-secret-value \
+              --secret-id "$RDS_SECRET" --version-stage AWSCURRENT \
+              --region "$REGION" --query VersionId --output text
+          }
+
+          refresh_environment() {
+            ensure_ca
+            local app_tmp rds_tmp metadata_tmp
+            app_tmp=$(mktemp "$BASE/.app.XXXXXXXX")
+            rds_tmp=$(mktemp "$BASE/.rds.XXXXXXXX")
+            metadata_tmp=$(mktemp "$BASE/.version.XXXXXXXX")
+            trap 'rm -f "${app_tmp:-}" "${rds_tmp:-}" "${metadata_tmp:-}"' RETURN
+            aws secretsmanager get-secret-value --secret-id "$APP_SECRET" \
+              --version-stage AWSCURRENT --region "$REGION" \
+              --query SecretString --output text > "$app_tmp"
+            aws secretsmanager get-secret-value --secret-id "$RDS_SECRET" \
+              --version-stage AWSCURRENT --region "$REGION" \
+              --query SecretString --output text > "$rds_tmp"
+            current_version > "$metadata_tmp"
+            python3 - "$app_tmp" "$rds_tmp" "$ENV_FILE" "$HOST" "$CA_FILE" <<'PY'
+          import json, os, pwd, re, shlex, sys, tempfile
+          from urllib.parse import quote
+          app_path, rds_path, target, host, ca_file = sys.argv[1:]
+          with open(app_path) as f: config = json.load(f)
+          with open(rds_path) as f: rds = json.load(f)
+          if not isinstance(config, dict): raise SystemExit('Invalid app config')
+          if not rds.get('username') or not rds.get('password'):
+              raise SystemExit('Missing RDS credentials')
+          # Fixed, reviewed connection target: never trust host values from a secret.
+          user = quote(rds['username'], safe='')
+          password = quote(rds['password'], safe='')
+          config['DATABASE_URL'] = (
+              f'postgresql://{user}:{password}@{host}:5432/noosphere?sslmode=verify-full'
+          )
+          config['NODE_EXTRA_CA_CERTS'] = ca_file
+          lines = []
+          for key, value in config.items():
+              if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', key):
+                  raise SystemExit('Invalid environment key')
+              if not isinstance(value, (str, int, float, bool)):
+                  raise SystemExit('Invalid environment value')
+              lines.append(f'export {key}={shlex.quote(str(value))}\n')
+          owner = pwd.getpwnam('noosphere')
+          fd, tmp = tempfile.mkstemp(prefix='.env.', dir=os.path.dirname(target))
+          try:
+              os.fchmod(fd, 0o600)
+              os.fchown(fd, owner.pw_uid, owner.pw_gid)
+              with os.fdopen(fd, 'w') as f:
+                  f.writelines(lines)
+                  f.flush()
+                  os.fsync(f.fileno())
+              os.replace(tmp, target)
+          except BaseException:
+              if os.path.exists(tmp): os.unlink(tmp)
+              raise
+          PY
+            install -o root -g root -m 600 "$metadata_tmp" "${VERSION_FILE}.pending"
+            echo 'Environment refreshed from AWSCURRENT RDS secret'
+          }
+
+          check_marker() {
+            # Do not launch a backend that could implicitly run a production seed.
+            runuser -u noosphere -- bash -c '
+              set -euo pipefail
+              source /opt/noosphere/backend/.env.sh
+              node - <<'"'"'NODE'"'"'
+          const {Client}=require("/opt/noosphere/backend/releases/current/node_modules/pg");
+          (async()=>{
+            const c=new Client({connectionString:process.env.DATABASE_URL,connectionTimeoutMillis:10000});
+            try {
+              await c.connect();
+              const r=await c.query("SELECT to_regclass($1) AS t",["public.noosphere_deploy_once"]);
+              if(!r.rows[0].t) throw Error("Production deploy marker table missing; backend engineer review required");
+              const s=await c.query("SELECT status FROM public.noosphere_deploy_once WHERE name=$1",["deploy-prod-once-v1"]);
+              if(s.rows.length!==1 || s.rows[0].status!=="complete")
+                throw Error("Production deploy marker is not complete; backend engineer review required");
+              console.log("One-time deployment marker: complete");
+            } finally {await c.end().catch(()=>{});}
+          })().catch(e=>{console.error(e.message);process.exitCode=1});
+          NODE
+            '
+          }
+
+          start_api() {
+            # Bootstrap is explicitly requested; normal starts require a complete marker.
+            if [[ "${1:-normal}" != bootstrap ]]; then
+              check_marker
+            fi
+            if [[ "${1:-normal}" == bootstrap ]]; then
+              export NOOSPHERE_BOOTSTRAP=1
+            else
+              export NOOSPHERE_BOOTSTRAP=0
+            fi
+            runuser -u noosphere -- env NOOSPHERE_BOOTSTRAP="$NOOSPHERE_BOOTSTRAP" bash -c '
+              set -euo pipefail
+              export PM2_HOME=/home/noosphere/.pm2
+              cd /opt/noosphere/backend/releases/current
+              source /opt/noosphere/backend/.env.sh
+              if [[ "${NOOSPHERE_BOOTSTRAP:-0}" == 1 ]]; then
+                export DEPLOY_PROD_ON_STARTUP=1
+              else
+                unset DEPLOY_PROD_ON_STARTUP
+              fi
+              pm2 delete noosphere-api >/dev/null 2>&1 || true
+              pm2 start apps/main-app/src/server.js --name noosphere-api
+              pm2 save
+            '
+            systemctl enable pm2-noosphere.service
+            for i in $(seq 1 30); do
+              if curl --fail --silent --show-error --max-time 3 \
+                http://127.0.0.1:5000/health >/dev/null 2>&1; then
+                check_marker
+                install -o root -g root -m 600 "${VERSION_FILE}.pending" "$VERSION_FILE"
+                echo 'API healthy and marker complete'; return 0
+              fi
+              sleep 2
+            done
+            echo 'API health check failed' >&2
+            return 1
+          }
 
           case "$PHASE" in
             prepare)
-              echo "Preparing commit $SHA"
-
-              install -d -o noosphere -g noosphere \
-                -m 750 "$BASE/releases"
-
-              if [ ! -d "$APP/.git" ]; then
+              [[ "$SHA" =~ ^[a-f0-9]{40}$ ]] || exit 1
+              install -d -o noosphere -g noosphere -m 750 "$BASE/releases"
+              if [[ ! -d "$APP/.git" ]]; then
                 runuser -u noosphere -- env \
-                  GIT_SSH_COMMAND="ssh -i /home/noosphere/.ssh/id_ed25519 -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
+                  GIT_SSH_COMMAND='ssh -i /home/noosphere/.ssh/id_ed25519 -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes' \
                   git clone --branch master "$REPO" "$APP"
               fi
-
               runuser -u noosphere -- env \
-                GIT_SSH_COMMAND="ssh -i /home/noosphere/.ssh/id_ed25519 -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
+                GIT_SSH_COMMAND='ssh -i /home/noosphere/.ssh/id_ed25519 -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes' \
                 git -C "$APP" fetch origin master
-
-              runuser -u noosphere -- git -C "$APP" \
-                merge-base --is-ancestor "$SHA" origin/master
-
-              runuser -u noosphere -- git -C "$APP" \
-                checkout --detach --force "$SHA"
-
-              TMP="$(mktemp "$BASE/.secret.XXXXXXXX")"
-              trap 'rm -f "$TMP"' EXIT
-
-              aws secretsmanager get-secret-value \
-                --secret-id noosphere/prod/backend/app-config \
-                --region us-west-1 \
-                --query SecretString \
-                --output text > "$TMP"
-
-              python3 - "$TMP" "$ENV_FILE" <<'PY'
-          import json
-          import os
-          import pwd
-          import re
-          import shlex
-          import sys
-
-          with open(sys.argv[1]) as f:
-              config = json.load(f)
-
-          if not config.get("DATABASE_URL"):
-              raise SystemExit("DATABASE_URL missing")
-
-          lines = []
-          for key, value in config.items():
-              if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", key):
-                  raise SystemExit("Invalid configuration key")
-              if not isinstance(value, (str, int, float, bool)):
-                  raise SystemExit("Invalid configuration value")
-              lines.append(
-                  f"export {key}={shlex.quote(str(value))}\n"
-              )
-
-          target = sys.argv[2]
-          temp = target + ".new"
-          user = pwd.getpwnam("noosphere")
-
-          with open(temp, "w") as f:
-              f.writelines(lines)
-
-          os.chmod(temp, 0o600)
-          os.chown(temp, user.pw_uid, user.pw_gid)
-          os.replace(temp, target)
-          PY
-
-              rm -f "$TMP"
-              trap - EXIT
-
+              runuser -u noosphere -- git -C "$APP" merge-base --is-ancestor "$SHA" origin/master
+              runuser -u noosphere -- git -C "$APP" checkout --detach --force "$SHA"
+              refresh_environment
               runuser -u noosphere -- bash -c '
-                set -e
+                set -euo pipefail
                 cd /opt/noosphere/backend/releases/current
                 source /opt/noosphere/backend/.env.sh
                 npm install --include=dev
               '
-
-              echo "Preparation complete"
+              echo 'Preparation complete'
               ;;
-
             migrate)
+              # Existing explicit migration phase, executed on 1a only.
               runuser -u noosphere -- bash -c '
-                set -e
+                set -euo pipefail
                 cd /opt/noosphere/backend/releases/current
                 source /opt/noosphere/backend/.env.sh
                 npx prisma migrate deploy --config apps/main-app/prisma.config.ts
               '
-              echo "Migration complete"
+              echo 'Migration complete'
               ;;
-
             start)
-              runuser -u noosphere -- bash -c '
-                set -e
-                export PM2_HOME=/home/noosphere/.pm2
-                cd /opt/noosphere/backend/releases/current
-                source /opt/noosphere/backend/.env.sh
-
-                pm2 delete noosphere-api >/dev/null 2>&1 || true
-                pm2 start src/server.js --name noosphere-api
-                pm2 start apps/main-app/src/server.js --name noosphere-api
-                pm2 save
-              '
-
-              systemctl enable pm2-noosphere.service
-
-              for i in $(seq 1 30); do
-                if curl -fsS --max-time 3 \
-                  http://127.0.0.1:5000/health >/dev/null; then
-                  echo "API healthy"
-                  exit 0
-                fi
-                sleep 2
-              done
-
-              echo "API health check failed" >&2
-              exit 1
+              start_api
               ;;
-
-            *)
-              echo "Unknown deployment phase" >&2
-              exit 1
+            bootstrap)
+              # Explicit, operator-authorised bootstrap only.
+              # App itself manages advisory lock, marker and seed.
+              # A failed bootstrap is NOT automatically retried.
+              start_api bootstrap
               ;;
+            reconcile)
+              ensure_ca
+              current=$(current_version)
+              deployed=$(cat "$VERSION_FILE" 2>/dev/null || true)
+              if [[ "$current" == "$deployed" && -s "$ENV_FILE" ]]; then
+                echo 'RDS credential version unchanged'; exit 0
+              fi
+              echo 'RDS credential version changed; refreshing runtime configuration'
+              refresh_environment
+              start_api
+              ;;
+            *) echo 'Unknown phase' >&2; exit 1;;
           esac
           SCRIPT
+          bash -n deploy.sh
 
-      - name: Deploy both backend servers
+      - name: Run SSM deployment or rotation reconciliation
         env:
+          MODE: ${{ steps.operation.outputs.mode }}
           COMMIT_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
-
-          BACKEND_1A="i-0dbb6c40028185fc9"
-          BACKEND_1C="i-0580429f5aecf1398"
-
-          # Execute one deployment phase and wait for all targets.
-          deploy_phase() {
-            local phase="$1"
-            shift
-            local instances=("$@")
-
-            echo "Starting phase: $phase"
-
-            local encoded command_id
-            encoded="$(base64 -w0 deploy.sh)"
-
-            export SSM_COMMAND="printf '%s' '$encoded' | base64 -d | bash -s -- '$COMMIT_SHA' '$phase'"
-            export SSM_INSTANCES="$(IFS=,; echo "${instances[*]}")"
-
-            python3 - <<'PY'
-          import json
-          import os
-
-          payload = {
-              "DocumentName": "AWS-RunShellScript",
-              "InstanceIds": os.environ["SSM_INSTANCES"].split(","),
-              "Parameters": {
-                  "commands": [os.environ["SSM_COMMAND"]]
-              },
-              "TimeoutSeconds": 1800
-          }
-
-          with open("ssm-request.json", "w") as f:
-              json.dump(payload, f)
+          encoded="$(base64 -w0 deploy.sh)"
+          run_phase() {
+            local phase="$1"; shift
+            local instance command_id status
+            for instance in "$@"; do
+              echo "Phase $phase on $instance"
+              export SSM_COMMAND="printf '%s' '$encoded' | base64 -d | bash -s -- '$COMMIT_SHA' '$phase'"
+              export SSM_INSTANCE="$instance"
+              python3 - <<'PY'
+          import json, os
+          with open('ssm-request.json','w') as f:
+              json.dump({
+                  'DocumentName':'AWS-RunShellScript',
+                  'InstanceIds':[os.environ['SSM_INSTANCE']],
+                  'Parameters':{'commands':[os.environ['SSM_COMMAND']]},
+                  'TimeoutSeconds':1800,
+              }, f)
           PY
-
-            command_id="$(aws ssm send-command \
-              --cli-input-json file://ssm-request.json \
-              --query 'Command.CommandId' \
-              --output text)"
-
-            for instance in "${instances[@]}"; do
-              echo "Waiting for $instance ($phase)"
-
-              local status="Pending"
-
+              command_id="$(aws ssm send-command --cli-input-json file://ssm-request.json --query 'Command.CommandId' --output text)"
+              status=Pending
               for attempt in $(seq 1 180); do
-                status="$(aws ssm get-command-invocation \
-                  --command-id "$command_id" \
-                  --instance-id "$instance" \
-                  --query Status \
-                  --output text 2>/dev/null || echo Pending)"
-
-                case "$status" in
-                  Success|Failed|Cancelled|TimedOut|Cancelling)
-                    break
-                    ;;
-                esac
-
+                status="$(aws ssm get-command-invocation --command-id "$command_id" --instance-id "$instance" --query Status --output text 2>/dev/null || echo Pending)"
+                case "$status" in Success|Failed|Cancelled|TimedOut|Cancelling) break;; esac
                 sleep 10
               done
-
               echo "Instance $instance: $status"
-
-              if [ "$status" != "Success" ]; then
-                aws ssm get-command-invocation \
-                  --command-id "$command_id" \
-                  --instance-id "$instance" \
-                  --query '[StandardOutputContent,StandardErrorContent]' \
-                  --output text || true
+              if [[ "$status" != Success ]]; then
+                aws ssm get-command-invocation --command-id "$command_id" --instance-id "$instance" --query '[StandardOutputContent,StandardErrorContent]' --output text || true
                 exit 1
               fi
             done
           }
-
-          # Prepare both servers using the exact same Git commit.
-          deploy_phase prepare "$BACKEND_1A" "$BACKEND_1C"
-
-          # Apply database migrations once.
-          deploy_phase migrate "$BACKEND_1A"
-
-          # Start the API on both servers in one SSM command.
-          deploy_phase start "$BACKEND_1A" "$BACKEND_1C"
-
-          echo "Noosphere production deployment successful"
+          if [[ "$MODE" == bootstrap ]]; then
+            [[ "${{ inputs.confirm_bootstrap }}" == INITIALIZE_PRODUCTION_AFTER_BACKUP ]] || { echo 'Explicit bootstrap confirmation required' >&2; exit 1; }
+            # Explicit workflow_dispatch only; first initialise on 1a, then start 1c.
+            [[ "${{ github.event_name }}" == workflow_dispatch ]] || exit 1
+            run_phase prepare "$BACKEND_1A" "$BACKEND_1C"
+            run_phase migrate "$BACKEND_1A"
+            run_phase bootstrap "$BACKEND_1A"
+            run_phase start "$BACKEND_1C"
+          elif [[ "$MODE" == deploy ]]; then
+            run_phase prepare "$BACKEND_1A" "$BACKEND_1C"
+            run_phase migrate "$BACKEND_1A"
+            # Sequential restarts; the second node remains available while the first starts.
+            run_phase start "$BACKEND_1A" "$BACKEND_1C"
+          elif [[ "$MODE" == reconcile ]]; then
+            run_phase reconcile "$BACKEND_1A" "$BACKEND_1C"
+          else
+            echo "Unsupported mode: $MODE" >&2; exit 1
+          fi
+          echo "Backend $MODE completed"
