@@ -5,16 +5,12 @@ on:
     branches: [master]
   workflow_dispatch:
     inputs:
-      confirm_bootstrap:
-        description: 'For bootstrap only, type INITIALIZE_PRODUCTION_AFTER_BACKUP'
-        required: false
-        type: string
       mode:
-        description: 'deploy, reconcile, or one-time bootstrap'
+        description: 'Deploy the backend or reconcile rotated RDS credentials'
         required: true
         type: choice
-        options: [deploy, reconcile, bootstrap]
-        default: reconcile
+        options: [deploy, reconcile]
+        default: deploy
   schedule:
     - cron: '*/15 * * * *'
 
@@ -143,49 +139,15 @@ jobs:
             echo 'Environment refreshed from AWSCURRENT RDS secret'
           }
 
-          check_marker() {
-            # Do not launch a backend that could implicitly run a production seed.
-            runuser -u noosphere -- bash -c '
-              set -euo pipefail
-              source /opt/noosphere/backend/.env.sh
-              node - <<'"'"'NODE'"'"'
-          const {Client}=require("/opt/noosphere/backend/releases/current/node_modules/pg");
-          (async()=>{
-            const c=new Client({connectionString:process.env.DATABASE_URL,connectionTimeoutMillis:10000});
-            try {
-              await c.connect();
-              const r=await c.query("SELECT to_regclass($1) AS t",["public.noosphere_deploy_once"]);
-              if(!r.rows[0].t) throw Error("Production deploy marker table missing; backend engineer review required");
-              const s=await c.query("SELECT status FROM public.noosphere_deploy_once WHERE name=$1",["deploy-prod-once-v1"]);
-              if(s.rows.length!==1 || s.rows[0].status!=="complete")
-                throw Error("Production deploy marker is not complete; backend engineer review required");
-              console.log("One-time deployment marker: complete");
-            } finally {await c.end().catch(()=>{});}
-          })().catch(e=>{console.error(e.message);process.exitCode=1});
-          NODE
-            '
-          }
-
           start_api() {
-            # Bootstrap is explicitly requested; normal starts require a complete marker.
-            if [[ "${1:-normal}" != bootstrap ]]; then
-              check_marker
-            fi
-            if [[ "${1:-normal}" == bootstrap ]]; then
-              export NOOSPHERE_BOOTSTRAP=1
-            else
-              export NOOSPHERE_BOOTSTRAP=0
-            fi
-            runuser -u noosphere -- env NOOSPHERE_BOOTSTRAP="$NOOSPHERE_BOOTSTRAP" bash -c '
+            # Application initialization is owned by the backend codebase.
+            # No deployment-marker check or bootstrap/seed flag is used here.
+            runuser -u noosphere -- bash -c '
               set -euo pipefail
               export PM2_HOME=/home/noosphere/.pm2
               cd /opt/noosphere/backend/releases/current
               source /opt/noosphere/backend/.env.sh
-              if [[ "${NOOSPHERE_BOOTSTRAP:-0}" == 1 ]]; then
-                export DEPLOY_PROD_ON_STARTUP=1
-              else
-                unset DEPLOY_PROD_ON_STARTUP
-              fi
+              unset DEPLOY_PROD_ON_STARTUP
               pm2 delete noosphere-api >/dev/null 2>&1 || true
               pm2 start apps/main-app/src/server.js --name noosphere-api
               pm2 save
@@ -194,9 +156,8 @@ jobs:
             for i in $(seq 1 30); do
               if curl --fail --silent --show-error --max-time 3 \
                 http://127.0.0.1:5000/health >/dev/null 2>&1; then
-                check_marker
                 install -o root -g root -m 600 "${VERSION_FILE}.pending" "$VERSION_FILE"
-                echo 'API healthy and marker complete'; return 0
+                echo 'API healthy'; return 0
               fi
               sleep 2
             done
@@ -239,12 +200,6 @@ jobs:
               ;;
             start)
               start_api
-              ;;
-            bootstrap)
-              # Explicit, operator-authorised bootstrap only.
-              # App itself manages advisory lock, marker and seed.
-              # A failed bootstrap is NOT automatically retried.
-              start_api bootstrap
               ;;
             reconcile)
               ensure_ca
@@ -300,18 +255,10 @@ jobs:
               fi
             done
           }
-          if [[ "$MODE" == bootstrap ]]; then
-            [[ "${{ inputs.confirm_bootstrap }}" == INITIALIZE_PRODUCTION_AFTER_BACKUP ]] || { echo 'Explicit bootstrap confirmation required' >&2; exit 1; }
-            # Explicit workflow_dispatch only; first initialise on 1a, then start 1c.
-            [[ "${{ github.event_name }}" == workflow_dispatch ]] || exit 1
+          if [[ "$MODE" == deploy ]]; then
             run_phase prepare "$BACKEND_1A" "$BACKEND_1C"
             run_phase migrate "$BACKEND_1A"
-            run_phase bootstrap "$BACKEND_1A"
-            run_phase start "$BACKEND_1C"
-          elif [[ "$MODE" == deploy ]]; then
-            run_phase prepare "$BACKEND_1A" "$BACKEND_1C"
-            run_phase migrate "$BACKEND_1A"
-            # Sequential restarts; the second node remains available while the first starts.
+            # Sequential restarts, each followed by a mandatory health check.
             run_phase start "$BACKEND_1A" "$BACKEND_1C"
           elif [[ "$MODE" == reconcile ]]; then
             run_phase reconcile "$BACKEND_1A" "$BACKEND_1C"
