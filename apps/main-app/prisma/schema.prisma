@@ -246,6 +246,18 @@ model RefreshTokens {
   used        Boolean  @default(false)
 }
 
+model PasswordResetToken {
+  id        String        @id @default(uuid())
+  ownerId   String
+  ownerType TokenOwnerType
+  tokenHash String        @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime      @default(now())
+
+  @@index([ownerId, ownerType])
+}
+
 model Tenant {
   id               String   @id @default(uuid())
   email            String
@@ -738,6 +750,7 @@ model BillingPlan {
   active                 Boolean  @default(true)
   tenantId               String?
   adminId                String?
+  currency               String   @default("USD")
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 
@@ -806,6 +819,7 @@ model Payment {
   transactionRef  String?
   gateway         String
   amount          Int
+  currency        String   @default("USD")
   invoiceId       Int
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -854,6 +868,7 @@ model Invoice {
   planId           String
   quantity         Int
   total            Int
+  currency         String                  @default("USD")
   billingFrequency incoiceBillingFrequency
   subscriptionId   String?
   billingPeriodEnd DateTime?
@@ -1753,8 +1768,11 @@ model Message {
   receiverId   String
   receiverType UserType
   content      String
+  clientMessageId String?
   isRead       Boolean  @default(false)
   createdAt    DateTime @default(now())
+
+  @@unique([senderId, senderType, clientMessageId])
 }
 
 model Notification {
@@ -1775,6 +1793,7 @@ model Notification {
 
 model ServerRequest {
   id             String   @id @default(uuid())
+  requestId      String?
   tenantId       String?
   adminId        String?
   tenantStaffId  String?

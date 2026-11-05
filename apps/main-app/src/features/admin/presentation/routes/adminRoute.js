@@ -363,7 +363,7 @@ class AdminRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.post("/superadminchoices", AdminDto.superAdminChoicesDto, this.controller.superAdminChoices);
+        this.router.post("/superadminchoices", adminProtect({ permission: "edit_security_settings" }), AdminDto.superAdminChoicesDto, this.controller.superAdminChoices);
 
         /**
          * @swagger
@@ -478,6 +478,7 @@ class AdminRoutes {
          *         description: Validation error
          */
         this.router.get("/forgotpassword/:email", AdminDto.forgotPasswordDto, this.controller.forgotPassword);
+        this.router.post("/forgotpassword", AdminDto.forgotPasswordRequestDto, this.controller.forgotPassword);
 
         /**
          * @swagger

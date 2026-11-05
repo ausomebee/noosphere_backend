@@ -690,7 +690,7 @@ class TenantRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.patch("/setpassword", TenantDto.updateStaffPasswordDto, this.controller.updateStaff);
+        this.router.patch("/setpassword", TenantDto.updateStaffPasswordDto, this.controller.setStaffPassword);
 
         /**
         * @swagger
@@ -710,7 +710,7 @@ class TenantRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.post("/tenantadminchoices", adminProtect(), TenantDto.tenantAdminChoicesDto, this.controller.tenantAdminChoices);
+        this.router.post("/tenantadminchoices", adminProtect({ permission: "edit_security_settings" }), TenantDto.tenantAdminChoicesDto, this.controller.tenantAdminChoices);
 
         /**
         * @swagger
@@ -730,7 +730,7 @@ class TenantRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.patch("/tenantadminchoices", TenantDto.updateTenantAdminChoicesDto, this.controller.updateTenantAdminChoices);
+        this.router.patch("/tenantadminchoices", staffProtect({ permission: "edit_security_settings" }), TenantDto.updateTenantAdminChoicesDto, this.controller.updateTenantAdminChoices);
 
         /**
          * @swagger
@@ -913,6 +913,7 @@ class TenantRoutes {
         this.router.patch(
             "/change-admin-password/:tenantId",
             adminProtect(),
+            TenantDto.adminPasswordConfirmationDto,
             this.controller.changeAdminPassword
         );
 
@@ -1300,6 +1301,7 @@ class TenantRoutes {
          *         description: Validation error
          */
         this.router.get("/forgotpassword/:email", TenantDto.forgotPasswordDto, this.controller.forgotPassword);
+        this.router.post("/forgotpassword", TenantDto.forgotPasswordRequestDto, this.controller.forgotPassword);
 
         /**
          * @swagger

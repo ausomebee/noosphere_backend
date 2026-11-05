@@ -130,9 +130,14 @@ class AppointmentRepository {
         return appointment;
     }
 
-    async getAppointmentsByTenant(tenantId) {
+    async getAppointmentsByTenant(tenantId, actor = null) {
         const appointments = await this.model.findMany({
-            where: { tenantId },
+            where: {
+                tenantId,
+                ...(actor?.type === "STAFF" && (!actor.permissions?.includes("view_staff_list") || !actor.permissions?.includes("view_client_list"))
+                    ? { clinicians: { some: { id: actor.id } } }
+                    : {}),
+            },
             include: {
                 client: {
                     select: {

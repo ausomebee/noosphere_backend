@@ -4,6 +4,7 @@ import emailService from "../../../utilities/ses.js";
 import Client from "../domain/client.js";
 import argon2 from "argon2";
 import templateRenderer from "../../../utilities/templateRenderer.js";
+import { issuePasswordResetToken, consumePasswordResetToken } from "../../../utilities/passwordResetTokens.js";
 
 const buildClientLoginUrl = (baseUrl, subdomain) => {
     const safeSubdomain = templateRenderer.sanitizeSubdomain(subdomain);
@@ -124,6 +125,9 @@ class ClientService {
             },
         });
 
+        if (!client) return true;
+        const token = await issuePasswordResetToken(this.prisma, { ownerId: client.id, ownerType: "CLIENT" });
+
         const attachments = [
             {
                 filename: "Logowrap.png",
@@ -135,21 +139,39 @@ class ClientService {
 
         const html = templateRenderer.render('client-password-reset.html', {
             subdomain: client.tenant.subdomain,
-            clientId: client.id
+            clientId: client.id,
+            resetToken: encodeURIComponent(token),
         });
 
-        const sendMail = await emailService.sendTenantEmail({
+        void emailService.sendTenantEmail({
             tenantSlug: client.tenant.subdomain,
             to: [email],
             subject: "Initiate password reset",
             html: html
+        }).catch((error) => console.error("Failed to send a password reset email:", error.message));
+
+        return true;
+    }
+
+    async resetClientPassword({ clientTenantId, password, token, authenticatedFirstLogin = false }) {
+        const hashedPassword = await argon2.hash(password);
+        return this.prisma.$transaction(async (tx) => {
+            if (authenticatedFirstLogin) {
+                const client = await tx.clientTenant.findUnique({ where: { id: clientTenantId }, select: { passwordChanged: true } });
+                if (!client || client.passwordChanged) {
+                    const error = new Error("A reset token is required");
+                    error.name = "Unauthorized";
+                    throw error;
+                }
+            } else {
+                await consumePasswordResetToken(tx, { token, ownerId: clientTenantId, ownerType: "CLIENT" });
+            }
+            return tx.clientTenant.update({
+                where: { id: clientTenantId },
+                data: { password: hashedPassword, passwordChanged: true },
+                select: { id: true, clientId: true, tenantId: true, passwordChanged: true },
+            });
         });
-
-        if (!sendMail.messageId) {
-            throw new Error("Failed to send mail");
-        }
-
-        return "email sent successfully";
     }
 
     async updateClient(data) {
@@ -274,6 +296,16 @@ class ClientService {
                     baseWhere,
                     { clientId: actor.clientId },
                     { tenantId: actor.tenantId },
+                ],
+            };
+        }
+
+        if (actor.type === "STAFF" && !actor.permissions?.includes("view_client_list")) {
+            return {
+                AND: [
+                    baseWhere,
+                    { tenantId: actor.tenantId },
+                    { OR: [{ createdBy: actor.id }, { clinicians: { some: { id: actor.id } } }] },
                 ],
             };
         }
@@ -456,11 +488,12 @@ class ClientService {
 
         const claims = {
             id: client.tenantLinks[0].id,
+            ownerType: "CLIENT",
         }
 
         const { tenantLinks, ...clientData } = client;
         const sanitizedLinks = tenantLinks.map(({ password: _cp, ...link }) => link);
-        return { ...clientData, tenantLinks: sanitizedLinks, accessToken: this.token.generateAccessToken(claims), refreshToken: this.token.generateRefreshToken(tenantLinks[0]?.id, "CLIENT") };
+        return { ...clientData, tenantLinks: sanitizedLinks, isSuperAdmin: false, accessToken: this.token.generateAccessToken({ ...claims, isSuperAdmin: false }), refreshToken: this.token.generateRefreshToken(tenantLinks[0]?.id, "CLIENT") };
     }
 
     async updateClientPassword(data) {

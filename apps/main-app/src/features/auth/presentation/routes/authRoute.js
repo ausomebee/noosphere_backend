@@ -1,6 +1,7 @@
 import express from "express";
 import AuthController from "../controllers/authController.js";
 import AuthDto from "../dto/authDto.js";
+import { twoFactorProtect } from "../../../../middleware/auth_handlers.js";
 
 class AuthRoutes {
     constructor() {
@@ -45,7 +46,7 @@ class AuthRoutes {
         *       401:
         *         description: Invalid or expired token
         */
-        this.router.post("/verify", AuthDto.verifyDto, this.controller.verifyCode);
+        this.router.post("/verify", twoFactorProtect("ADMIN"), AuthDto.verifyDto, this.controller.verifyCode);
 
         /**
          * @swagger
@@ -72,7 +73,7 @@ class AuthRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/:userId/:module", AuthDto.authDto, this.controller.generateAuthenticator);
+        this.router.get("/:userId/:module", twoFactorProtect("ADMIN"), AuthDto.authDto, this.controller.generateAuthenticator);
 
         /**
         * @swagger
@@ -116,7 +117,7 @@ class AuthRoutes {
         *       400:
         *         description: Invalid input
         */
-        this.router.post("/createsecretemessage", AuthDto.secretMessageDto, this.controller.createSecreteMessage);
+        this.router.post("/createsecretemessage", twoFactorProtect("ADMIN"), AuthDto.secretMessageDto, this.controller.createSecreteMessage);
 
         /**
         * @swagger
@@ -151,7 +152,7 @@ class AuthRoutes {
         *       400:
         *         description: Invalid input
         */
-        this.router.post("/verifysecretmessage", AuthDto.verifySecretMessageDto, this.controller.verifySecretMessage);
+        this.router.post("/verifysecretmessage", twoFactorProtect("ADMIN"), AuthDto.verifySecretMessageDto, this.controller.verifySecretMessage);
 
         /**
         * @swagger
@@ -188,7 +189,7 @@ class AuthRoutes {
         *       401:
         *         description: Invalid or expired token
         */
-        this.router.post("/tenant/verify", AuthDto.verifyDto, this.controller.verifyStaffCode);
+        this.router.post("/tenant/verify", twoFactorProtect("STAFF"), AuthDto.verifyDto, this.controller.verifyStaffCode);
 
         /**
          * @swagger
@@ -215,7 +216,7 @@ class AuthRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/tenant/:userId/:module", AuthDto.authDto, this.controller.generateTenantAuthenticator);
+        this.router.get("/tenant/:userId/:module", twoFactorProtect("STAFF"), AuthDto.authDto, this.controller.generateTenantAuthenticator);
 
         /**
         * @swagger
@@ -259,7 +260,7 @@ class AuthRoutes {
         *       400:
         *         description: Invalid input
         */
-        this.router.post("/tenant/createsecretemessage", AuthDto.secretMessageDto, this.controller.createStaffSecreteMessage);
+        this.router.post("/tenant/createsecretemessage", twoFactorProtect("STAFF"), AuthDto.secretMessageDto, this.controller.createStaffSecreteMessage);
 
         /**
         * @swagger
@@ -294,7 +295,7 @@ class AuthRoutes {
         *       400:
         *         description: Invalid input
         */
-        this.router.post("/tenant/verifysecretmessage", AuthDto.verifySecretMessageDto, this.controller.verifyStaffSecretMessage);
+        this.router.post("/tenant/verifysecretmessage", twoFactorProtect("STAFF"), AuthDto.verifySecretMessageDto, this.controller.verifyStaffSecretMessage);
 
         /**
         * @swagger

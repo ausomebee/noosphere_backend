@@ -371,7 +371,8 @@ export class AppointmentController {
     });
 
     getTenantAppointments = expressAsyncHandler(async (req, res) => {
-        const appointments = await this.service.getTenantAppointments(req.params.tenantId);
+        const tenantId = req.user?.type === "STAFF" ? req.user.tenantId : req.params.tenantId;
+        const appointments = await this.service.getTenantAppointments(tenantId, req.user);
 
         if (!appointments) {
             res.status(500).json({ message: 'Failed to fetch appointments' });

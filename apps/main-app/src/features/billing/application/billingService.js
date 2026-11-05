@@ -36,10 +36,6 @@ class BillingService {
             pageSize
         );
 
-        if (!result.data || result.data.length === 0) {
-            throw new Error("No payments found for this tenant");
-        }
-
         return result;
     }
 
@@ -59,10 +55,6 @@ class BillingService {
             pageSize
         );
 
-        if (!result.data || result.data.length === 0) {
-            throw new Error("No payments found");
-        }
-
         return result;
     }
 
@@ -72,10 +64,6 @@ class BillingService {
                 tenantId,
                 status
             );
-
-        if (!payments || payments.length === 0) {
-            throw new Error(`No payments found with status ${status}`);
-        }
 
         return payments;
     }
@@ -294,26 +282,9 @@ class BillingService {
             throw new Error("Payment Access not found");
         }
 
-        const update = await this.paymentAccessRepository.update(data.id, {
-            chargeOnDueDate: data.chargeOnDueDate ?? paymentAccess.chargeOnDueDate,
-            chargeLastUsedFirst: data.chargeLastUsedFirst ?? paymentAccess.chargeLastUsedFirst,
-            chargeAlternative: data.chargeAlternative ?? paymentAccess.chargeAlternative,
-            retryBefore: data.retryBefore || paymentAccess.retryBefore,
-            retryAfter: data.retryAfter || paymentAccess.retryAfter,
-            notifyTenant: data.notifyTenant ?? paymentAccess.notifyTenant,
-            notificationEmailHeader: data.notificationEmailHeader || paymentAccess.notificationEmailHeader,
-            notificationEmailBody: data.notificationEmailBody || paymentAccess.notificationEmailBody,
-            cancelAfter: data.cancelAfter || paymentAccess.cancelAfter,
-            manualCancel: data.manualCancel ?? paymentAccess.manualCancel,
-            suspensionAction: data.suspensionAction || paymentAccess.suspensionAction,
-            errorMessage: data.errorMessage || paymentAccess.errorMessage,
-            emailAfterAttempts: data.emailAfterAttempts || paymentAccess.emailAfterAttempts,
-            warningMailHeader: data.warningMailHeader || paymentAccess.warningMailHeader,
-            warningMailBody: data.warningMailBody || paymentAccess.warningMailBody,
-            sendOnSubscriptionCancel: data.sendOnSubscriptionCancel ?? paymentAccess.sendOnSubscriptionCancel,
-            cancelMailHeader: data.cancelMailHeader || paymentAccess.cancelMailHeader,
-            cancelMailBody: data.cancelMailBody || paymentAccess.cancelMailBody
-        });
+        const fields = ["chargeOnDueDate", "chargeLastUsedFirst", "chargeAlternative", "retryBefore", "retryAfter", "notifyTenant", "notificationEmailHeader", "notificationEmailBody", "cancelAfter", "manualCancel", "suspensionAction", "errorMessage", "emailAfterAttempts", "warningMailHeader", "warningMailBody", "sendOnSubscriptionCancel", "cancelMailHeader", "cancelMailBody"];
+        const updateData = Object.fromEntries(fields.filter((field) => Object.hasOwn(data, field)).map((field) => [field, data[field]]));
+        const update = await this.paymentAccessRepository.update(data.id, updateData);
 
         if (!update) {
             throw new Error("Failed to update Payment Access");

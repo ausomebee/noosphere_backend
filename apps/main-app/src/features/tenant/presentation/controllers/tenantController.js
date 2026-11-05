@@ -218,6 +218,8 @@ class TenantController {
 
         const tenant = await this.service.changeAdminPassword({
             id: tenantId,
+            adminId: req.admin.id,
+            adminPassword: req.body.adminPassword,
         });
 
         if (!tenant) {
@@ -266,7 +268,10 @@ class TenantController {
     });
 
     updateTenantAdminChoices = expressAsyncHandler(async (req, res) => {
-        const tenantAdminChoices = await this.service.updateTenantAdminChoices(req.body);
+        const tenantAdminChoices = await this.service.updateTenantAdminChoices({
+            ...req.body,
+            tenantId: req.user?.type === "STAFF" ? req.user.tenantId : req.body.tenantId,
+        });
 
         if (!tenantAdminChoices) {
             return res.status(500).json({
@@ -628,7 +633,8 @@ class TenantController {
     });
 
     getTenantStaffs = expressAsyncHandler(async (req, res) => {
-        const staffs = await this.service.getAllTenantStaffs(req.params.tenantId);
+        const tenantId = req.user?.type === "STAFF" ? req.user.tenantId : req.params.tenantId;
+        const staffs = await this.service.getAllTenantStaffs(tenantId, req.user);
 
         if (!staffs) {
             return res.status(500).json({ message: 'Failed to get staffs.' });
@@ -657,17 +663,18 @@ class TenantController {
     });
 
     forgotPassword = expressAsyncHandler(async (req, res) => {
-        const result = await this.service.forgotPassword(req.params.email);
-
-        if (!result) {
-            return res.status(500).json({ message: 'Failed to send mail.' });
-        }
+        void this.service.forgotPassword(req.body?.email || req.params.email)
+            .catch((error) => console.error("Password reset request could not be processed:", error.message));
 
         return res.status(200).json({
-            message: "Reset link sent to email",
+            message: "If an account exists for that email, reset instructions have been sent.",
             status: 'ok',
-            data: result
         });
+    });
+
+    setStaffPassword = expressAsyncHandler(async (req, res) => {
+        await this.service.resetStaffPassword(req.body);
+        return res.status(200).json({ message: "Password updated successfully", status: "ok" });
     });
 
     resetTenantStaff2FA = expressAsyncHandler(async (req, res) => {

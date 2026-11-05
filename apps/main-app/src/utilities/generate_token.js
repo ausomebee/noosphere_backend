@@ -7,11 +7,19 @@ class TokenService {
         });
     }
 
-    static generateRefreshToken(userId, ownerType) {
+    static generateRefreshToken(userId, ownerType, { mfaVerified = false } = {}) {
         return jwt.sign(
-            { id: userId, ownerType },
+            { id: userId, ownerType, mfaVerified },
             process.env.REFRESH_TOKEN_SECRET || "secret",
             { expiresIn: process.env.REFRESH_TOKEN_EXPIRE || "7d" }
+        );
+    }
+
+    static generateTwoFactorToken(userId, ownerType) {
+        return jwt.sign(
+            { id: userId, ownerType, tokenUse: "two_factor" },
+            process.env.ACCESS_TOKEN_SECRET || "secret",
+            { expiresIn: "5m" }
         );
     }
 

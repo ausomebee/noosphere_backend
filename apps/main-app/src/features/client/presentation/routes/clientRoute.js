@@ -408,7 +408,7 @@ class ClientRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/password-reset", ClientDto.resetPasswordDto, this.controller.resetPassword);
+        this.router.patch("/password-reset", clientProtect({ optional: true }), ClientDto.resetPasswordDto, this.controller.resetPassword);
 
         /**
          * @swagger
@@ -690,6 +690,7 @@ class ClientRoutes {
         *         description: Email sent successfully
         */
         this.router.patch("/initiate/password-reset/:email", this.controller.initiatePasswordReset);
+        this.router.post("/initiate/password-reset", ClientDto.forgotPasswordRequestDto, this.controller.initiatePasswordReset);
 
         /**
         * @swagger

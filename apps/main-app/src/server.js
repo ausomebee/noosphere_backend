@@ -1,11 +1,7 @@
 import "./config/env.js";
 import express from "express";
 import http from "http";
-import { spawn } from "child_process";
-import { promises as fs } from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-import pg from "pg";
+import { randomUUID } from "crypto";
 import cors from "cors";
 import morgan from "morgan";
 import swaggerUi from 'swagger-ui-express';
@@ -96,83 +92,21 @@ import prospectRoute from "./features/prospect/presentation/routes/prospectRoute
 
 let httpServerRef = null;
 
-const DEPLOY_ONCE_KEY = "deploy-prod-once-v1";
-const DEPLOY_ONCE_LOCK_ID = 164732901;
-const DEPLOY_ONCE_MARKER_TABLE = "public.noosphere_deploy_once";
+function normalizeDateOnlyFields(value) {
+    if (Array.isArray(value)) return value.map(normalizeDateOnlyFields);
+    if (!value || typeof value !== "object") return value;
+    const prototype = Object.getPrototypeOf(value);
+    if (prototype !== Object.prototype && prototype !== null) return value;
 
-async function runProductionDeployOnce() {
-    if (process.env.NODE_ENV !== "production") return;
-
-    if (!process.env.DATABASE_URL) {
-        throw new Error("DATABASE_URL is required for the one-time production deploy.");
-    }
-
-    const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
-    await client.connect();
-
-    try {
-        // A PostgreSQL session lock coordinates all production app replicas.
-        await client.query("SELECT pg_advisory_lock($1)", [DEPLOY_ONCE_LOCK_ID]);
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS ${DEPLOY_ONCE_MARKER_TABLE} (
-                name TEXT PRIMARY KEY,
-                status TEXT NOT NULL CHECK (status IN ('started', 'complete')),
-                started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-                completed_at TIMESTAMPTZ
-            )
-        `);
-
-        const marker = await client.query(
-            `SELECT status FROM ${DEPLOY_ONCE_MARKER_TABLE} WHERE name = $1`,
-            [DEPLOY_ONCE_KEY]
-        );
-
-        if (marker.rowCount) {
-            if (marker.rows[0].status === "complete") {
-                console.log("✅ One-time production deploy already completed; skipping");
-                return;
-            }
-            throw new Error("One-time production deploy was previously interrupted; refusing to rerun it.");
+    return Object.fromEntries(Object.entries(value).map(([key, fieldValue]) => {
+        if ((key === "DOB" || key === "dob") && fieldValue instanceof Date) {
+            return [key, fieldValue.toISOString().slice(0, 10)];
         }
-
-        await client.query(
-            `INSERT INTO ${DEPLOY_ONCE_MARKER_TABLE} (name, status) VALUES ($1, 'started')`,
-            [DEPLOY_ONCE_KEY]
-        );
-
-        const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
-        const deployScript = path.join(repoRoot, "scripts", "deploy-prod-once.sh");
-        console.log("🚀 Running the one-time production deploy before starting the server");
-
-        await new Promise((resolve, reject) => {
-            const child = spawn("bash", [deployScript], {
-                cwd: repoRoot,
-                env: { ...process.env, DEPLOY_PROD_ON_STARTUP: "1", NODE_ENV: "production" },
-                stdio: "inherit",
-            });
-            child.once("error", reject);
-            child.once("exit", (code, signal) => {
-                if (code === 0) resolve();
-                else reject(new Error(`Production deploy failed (code=${code}, signal=${signal ?? "none"})`));
-            });
-        });
-
-        await client.query(
-            `UPDATE ${DEPLOY_ONCE_MARKER_TABLE} SET status = 'complete', completed_at = NOW() WHERE name = $1`,
-            [DEPLOY_ONCE_KEY]
-        );
-
-        try {
-            await fs.unlink(deployScript);
-            console.log("✅ One-time production deploy script removed");
-        } catch (error) {
-            if (error.code !== "ENOENT") {
-                console.warn("Could not remove the one-time production deploy script:", error.message);
-            }
+        if ((key === "DOB" || key === "dob") && typeof fieldValue === "string" && /^\d{4}-\d{2}-\d{2}T/.test(fieldValue)) {
+            return [key, fieldValue.slice(0, 10)];
         }
-    } finally {
-        await client.end();
-    }
+        return [key, normalizeDateOnlyFields(fieldValue)];
+    }));
 }
 
 process.on("unhandledRejection", (reason) => {
@@ -222,6 +156,7 @@ class App {
             },
             credentials: true,
             methods: ["GET", "POST", "PATCH", "DELETE", "PUT", "OPTIONS"],
+            allowedHeaders: ["Content-Type", "Authorization", "X-Request-Id", "X-Fingerprint"],
         };
         this.initializeDatabase();
         this.initializeMiddlewares();
@@ -241,9 +176,33 @@ class App {
         // client address from X-Forwarded-For. Without this, rate limiting and
         // audit logs would all key off the proxy's IP instead of the caller's.
         this.app.set("trust proxy", Number(process.env.TRUST_PROXY_HOPS || 1));
+        this.app.use((req, res, next) => {
+            const suppliedRequestId = req.get("X-Request-Id");
+            req.requestId = suppliedRequestId && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(suppliedRequestId)
+                ? suppliedRequestId
+                : randomUUID();
+            res.setHeader("X-Request-Id", req.requestId);
+            next();
+        });
         // new PassportUtil(this.app)
-        this.app.use(morgan("dev"));
+        this.app.use(morgan((tokens, req, res) => {
+            const safeUrl = req.originalUrl
+                .replace(/(\/forgotpassword\/)[^/?]+/i, "$1[redacted]")
+                .replace(/(\/initiate\/password-reset\/)[^/?]+/i, "$1[redacted]");
+            return [
+                tokens.method(req, res),
+                safeUrl,
+                tokens.status(req, res),
+                `${tokens['response-time'](req, res)} ms`,
+                `requestId=${req.requestId}`,
+            ].join(" ");
+        }));
         this.app.use(cors(this.allowedOrigins));
+        this.app.use((_req, res, next) => {
+            const originalJson = res.json.bind(res);
+            res.json = (body) => originalJson(normalizeDateOnlyFields(body));
+            next();
+        });
         this.app.use(express.json({
             limit: "50mb",
             // Only attempt to parse bodies that are actually JSON. The previous
@@ -271,7 +230,6 @@ class App {
             }
 
             const start = process.hrtime.bigint();
-
             res.on("finish", async () => {
                 try {
                     const durationMs =
@@ -283,7 +241,10 @@ class App {
                         tenantStaffId: null,
                         tenantClientId: null,
                         method: req.method,
-                        endpoint: req.originalUrl,
+                        requestId: req.requestId,
+                        endpoint: req.originalUrl
+                            .replace(/(\/forgotpassword\/)[^/?]+/i, "$1[redacted]")
+                            .replace(/(\/initiate\/password-reset\/)[^/?]+/i, "$1[redacted]"),
                         statusCode: res.statusCode,
                         durationMs: Math.round(durationMs),
                         ipAddress: req.ip,
@@ -425,12 +386,5 @@ class App {
     }
 }
 
-runProductionDeployOnce()
-    .then(() => {
-        const appInstance = new App();
-        appInstance.start();
-    })
-    .catch((error) => {
-        console.error("❌ One-time production deploy failed; server will not start:", error);
-        process.exit(1);
-    });
+const appInstance = new App();
+appInstance.start();

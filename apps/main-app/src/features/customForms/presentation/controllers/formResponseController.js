@@ -35,7 +35,18 @@ class FormResponseController {
     }
 
     createFormResponse = expressAsyncHandler(async (req, res) => {
-        const data = req.body;
+        const data = req.user?.type === "CLIENT"
+            ? { ...req.body, submittedBy: req.user.id, tenantId: req.user.tenantId }
+            : req.body;
+
+        const formFields = await this.prisma.formFields.findMany({
+            where: { formId: data.formId },
+            select: { id: true },
+        });
+        const validFieldIds = new Set(formFields.map((field) => field.id));
+        if (!formFields.length || (data.responseFields || []).some((field) => !validFieldIds.has(field.formFieldId))) {
+            return res.status(400).json({ message: "One or more response fields do not belong to this form." });
+        }
 
         const formResponseData = new FormResponse(data);
         const response = await this.formResponseService.createFormResponse(formResponseData.createFormResponse);

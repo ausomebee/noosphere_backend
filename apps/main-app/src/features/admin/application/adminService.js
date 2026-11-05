@@ -7,6 +7,7 @@ import DepartmentRepository from '../../departmentAndTeams/infrastructure/depart
 import RoleRepository from '../../role/infrastructure/roleRepository.js';
 import AuthRepository from '../../auth/infrastructure/authRepository.js';
 import templateRenderer from '../../../utilities/templateRenderer.js';
+import { issuePasswordResetToken, consumePasswordResetToken } from '../../../utilities/passwordResetTokens.js';
 
 class AdminService {
     constructor() {
@@ -53,7 +54,8 @@ class AdminService {
             },
         ]
 
-        const html = await templateRenderer.render('admin-invitation.html', { email: newAdmin.email, adminId: newAdmin.id });
+        const inviteToken = await issuePasswordResetToken(this.repository.prisma, { ownerId: newAdmin.id, ownerType: "ADMIN", expiresInMs: 7 * 24 * 60 * 60 * 1000 });
+        const html = await templateRenderer.render('admin-invitation.html', { email: newAdmin.email, adminId: newAdmin.id, resetToken: encodeURIComponent(inviteToken) });
         const sendMail = await MailService.sendMail(newAdmin.email, "Welcome to Noosphere", null, html, attachments)
         if (!sendMail.success) {
             throw new Error("Failed to send mail");
@@ -208,12 +210,18 @@ class AdminService {
 
         const claims = {
             id: admin.id,
+            ownerType: "ADMIN",
             role: admin.roles.name,
             permissions: admin.roles
         }
 
         const { password: _ap, ...adminData } = admin;
-        return { ...adminData, accessToken: this.token.generateAccessToken(claims), refreshToken: this.token.generateRefreshToken(admin.id, "ADMIN") };
+        const choices = await this.repository.findFirstChoice({});
+        const requiresTwoFactor = Boolean(choices?.isEnabled && (choices.setForAll || admin.authType));
+        if (requiresTwoFactor) {
+            return { ...adminData, isSuperAdmin: Boolean(admin.superAdmin), twoFactorRequired: true, twoFactorToken: this.token.generateTwoFactorToken(admin.id, "ADMIN") };
+        }
+        return { ...adminData, isSuperAdmin: Boolean(admin.superAdmin), accessToken: this.token.generateAccessToken({ ...claims, isSuperAdmin: Boolean(admin.superAdmin) }), refreshToken: this.token.generateRefreshToken(admin.id, "ADMIN") };
     }
 
     async verifyPassword(data) {
@@ -362,19 +370,8 @@ class AdminService {
             where: { email: data.email },
         });
 
-        if (!adminExists) {
-            throw new Error("Admin not found.");
-        }
-
-        if (!adminExists.auth2FADone && adminExists.superAdmin) {
-            throw new Error("2FA required.");
-        }
-
-        const setAll = await this.repository.findFirstChoice({});
-
-        if (!adminExists.auth2FADone && setAll.setForAll) {
-            throw new Error("2FA required.");
-        }
+        if (!adminExists) return true;
+        const token = await issuePasswordResetToken(this.repository.prisma, { ownerId: adminExists.id, ownerType: "ADMIN" });
 
         const attachments = [
             {
@@ -391,13 +388,19 @@ class AdminService {
             },
         ]
 
-        const html = await templateRenderer.render('admin-password-reset.html', { adminId: adminExists.id });
-        const sendMail = await MailService.sendMail(adminExists.email, "Reset your password", null, html, attachments)
-        if (!sendMail.success) {
-            throw new Error("Failed to send mail");
-        }
+        const html = await templateRenderer.render('admin-password-reset.html', { adminId: adminExists.id, resetToken: encodeURIComponent(token) });
+        void MailService.sendMail(adminExists.email, "Reset your password", null, html, attachments)
+            .catch((error) => console.error("Failed to send a password reset email:", error.message));
 
         return true;
+    }
+
+    async resetAdminPassword(data) {
+        const password = await argon2.hash(data.password);
+        return this.repository.prisma.$transaction(async (tx) => {
+            await consumePasswordResetToken(tx, { token: data.token, ownerId: data.id, ownerType: "ADMIN" });
+            return tx.admin.update({ where: { id: data.id }, data: { password } });
+        });
     }
 }
 
