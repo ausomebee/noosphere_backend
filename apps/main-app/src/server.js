@@ -143,6 +143,7 @@ class App {
                 const allowed =
                     /^https?:\/\/([a-z0-9-]+\.)*noospherehub\.net(:\d+)?$/.test(origin) ||
                     /^https?:\/\/([a-z0-9-]+\.)*noospherehub\.org(:\d+)?$/.test(origin) ||
+                    /^https?:\/\/([a-z0-9-]+\.)*noospherehub\.com(:\d+)?$/.test(origin) ||
                     /^http:\/\/localhost:\d+$/.test(origin) ||
                     /^http:\/\/127\.0\.0\.1:\d+$/.test(origin) ||
                     /^http:\/\/([a-z0-9-]+\.)*localhost:\d+$/.test(origin) ||
