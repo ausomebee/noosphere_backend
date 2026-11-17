@@ -152,14 +152,14 @@ class AdminService {
         const sendMail = await MailService.sendMail(data.email, "Welcome to Noosphere", null, html, attachments)
 
         if (!sendMail.success) {
-            throw new Error("Failed to send mail");
+            throw new Error(`Failed to send super admin welcome email: ${sendMail.error || "Unknown SES error"}`);
         }
 
         const html2 = templateRenderer.render('admin-password-delivery.html', { adminPassword: generatedAdminPass });
         const sendMail2 = await MailService.sendMail(data.email, "Your Administrator Password", null, html2, attachments)
 
         if (!sendMail2.success) {
-            throw new Error("Failed to send mail");
+            throw new Error(`Failed to send super admin password email: ${sendMail2.error || "Unknown SES error"}`);
         }
 
         const newAdmin = await this.repository.prisma.$transaction(async (tx) => {
