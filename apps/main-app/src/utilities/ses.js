@@ -3,16 +3,8 @@ import { readFile } from "node:fs/promises";
 
 class EmailService {
     constructor() {
-        const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
-        const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
         this.client = new SESv2Client({
-            region: process.env.AWS_REGION,
-            // When static keys are not configured, let the AWS SDK resolve
-            // credentials from the default provider chain (for example, the
-            // EC2 instance profile role).
-            ...(accessKeyId && secretAccessKey
-                ? { credentials: { accessKeyId, secretAccessKey } }
-                : {})
+            region: process.env.AWS_REGION
         });
     }
 
