@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 class EmailService {
     constructor() {
         this.client = new SESv2Client({
-            region: process.env.AWS_REGION
+            region: "us-west-1"
         });
     }
 
