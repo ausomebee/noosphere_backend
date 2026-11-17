@@ -22,7 +22,7 @@ class EmailService {
     }
 
     get fromAddress() {
-        const from = process.env.SES_FROM_EMAIL || process.env.MAIL_USER;
+        const from = "support@noospherehub.com";
         if (!from) throw new Error("SES_FROM_EMAIL (or MAIL_USER) is not configured");
         return this.sanitizeHeader(from);
     }
