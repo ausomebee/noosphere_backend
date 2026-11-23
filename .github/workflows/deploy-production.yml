@@ -189,14 +189,14 @@ jobs:
               echo 'Preparation complete'
               ;;
             migrate)
-              # Existing explicit migration phase, executed on 1a only.
+              # Generate Prisma, apply migrations, and seed missing records on 1a only.
               runuser -u noosphere -- bash -c '
                 set -euo pipefail
                 cd /opt/noosphere/backend/releases/current
                 source /opt/noosphere/backend/.env.sh
-                npx prisma migrate deploy --config apps/main-app/prisma.config.ts
+                npm run deploy
               '
-              echo 'Migration complete'
+              echo 'Migration and seeding complete'
               ;;
             start)
               start_api

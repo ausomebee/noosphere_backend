@@ -2,192 +2,111 @@ import 'dotenv/config';
 import prismaService from '../src/config/prisma.js';
 const prisma = prismaService.getClient();
 
-async function main() {
-    const pipelineCount = await prisma.pipeline.count();
-    if (pipelineCount === 0) {
-        await prisma.pipeline.create({
-            data: {
-                module: "TENANT",
-                name: "Client Onboarding",
-                description: "Manage your client intake process seamlessly"
-            }
-        });
+const featureGroupSeeds = [
+    {
+        name: "CORE FEATURES",
+        features: [
+            { name: "Appointment & Scheduling", description: "This is Appointment & Scheduling", managedBy: "Spyware Team" },
+            { name: "Client Management", description: "This is Client Management", managedBy: "Super Graft" },
+            { name: "Staff Management", description: "This is Staff Management", managedBy: "Core Dev" },
+            { name: "Basic Reporting", description: "This is Basic Reporting", managedBy: "Fin giants" },
+            { name: "Billing & Invoicing", description: "This is Billing & Invoicing", managedBy: "Aces League" }
+        ]
+    },
+    {
+        name: "ADVANCED FEATURES",
+        features: [
+            { name: "In-App Messaging", description: "This is In-App Messaging", managedBy: "Spyware Team" },
+            { name: "Pipeline Manager", description: "This is Pipeline Manager", managedBy: "Super Graft" },
+            { name: "Custom Forms", description: "This is Custom Forms", managedBy: "Core Dev" },
+            { name: "Document Request Manager", description: "This is Document Request Manager", managedBy: "Fin giants" },
+            { name: "Authorization Management", description: "This is Authorization Management", managedBy: "Aces League" },
+            { name: "Advanced Reporting", description: "This is Advanced Reporting", active: false, managedBy: "Aces League" },
+            { name: "Data Collection & Analysis", description: "This is Data Collection & Analysis", managedBy: "Aces League" }
+        ]
+    },
+    {
+        name: "CUSTOMIZATIONS & ADD-ONS",
+        features: [
+            { name: "Custom Branding", description: "This is Custom Branding", managedBy: "Spyware Team" },
+            { name: "API Access", description: "This is API Access", managedBy: "Super Graft" },
+            { name: "Third Party Integration", description: "This is Third Party Integration", active: false, managedBy: "Core Dev" }
+        ]
+    },
+    {
+        name: "EXTRA FEATURES",
+        features: [
+            { name: "Email Support", description: "This is Email Support", managedBy: "Spyware Team" },
+            { name: "Priority Support", description: "This is Priority Support", managedBy: "Super Graft" },
+            { name: "Dedicated Account Manager", description: "This is Dedicated Account Manager", managedBy: "Core Dev" },
+            { name: "SLA Backed Uptime", description: "This is SLA Backed Uptime", managedBy: "Core Dev" }
+        ]
+    }
+];
 
-        console.log("Initial pipeline seeded");
-    } else {
-        console.log("Pipeline already exist, skipping seed");
+async function seedPipeline() {
+    const existing = await prisma.pipeline.findFirst({
+        where: { module: "TENANT", name: "Client Onboarding" }
+    });
+
+    if (existing) {
+        console.log("Client Onboarding pipeline already exists; skipping");
+        return;
     }
 
-    const featureGroup = await prisma.featureGroup.count();
-    if (featureGroup === 0) {
-        console.log("Seeding feature groups and features...");
+    await prisma.pipeline.create({
+        data: {
+            module: "TENANT",
+            name: "Client Onboarding",
+            description: "Manage your client intake process seamlessly"
+        }
+    });
+    console.log("Initial pipeline seeded");
+}
 
-        const core = await prisma.featureGroup.create({
-            data: {
-                name: "CORE FEATURES",
-                active: true
-            }
+async function seedFeatureGroups() {
+    for (const groupSeed of featureGroupSeeds) {
+        let group = await prisma.featureGroup.findFirst({
+            where: { name: groupSeed.name }
         });
 
-        const advanced = await prisma.featureGroup.create({
-            data: {
-                name: "ADVANCED FEATURES",
-                active: true
-            }
-        });
+        if (!group) {
+            group = await prisma.featureGroup.create({
+                data: { name: groupSeed.name, active: true }
+            });
+            console.log(`Feature group "${groupSeed.name}" seeded`);
+        }
 
-        const customization = await prisma.featureGroup.create({
-            data: {
-                name: "CUSTOMIZATIONS & ADD-ONS",
-                active: true
-            }
-        });
-
-        const extra = await prisma.featureGroup.create({
-            data: {
-                name: "EXTRA FEATURES",
-                active: true
-            }
-        });
-
-        await prisma.feature.createMany({
-            data: [
-                // CORE FEATURES
-                {
-                    name: "Appointment & Scheduling",
-                    description: "This is Appointment & Scheduling",
-                    featureGroupId: core.id,
-                    managedBy: "Spyware Team"
-                },
-                {
-                    name: "Client Management",
-                    description: "This is Client Management",
-                    featureGroupId: core.id,
-                    managedBy: "Super Graft"
-                },
-                {
-                    name: "Staff Management",
-                    description: "This is Staff Management",
-                    featureGroupId: core.id,
-                    managedBy: "Core Dev"
-                },
-                {
-                    name: "Basic Reporting",
-                    description: "This is Basic Reporting",
-                    featureGroupId: core.id,
-                    managedBy: "Fin giants"
-                },
-                {
-                    name: "Billing & Invoicing",
-                    description: "This is Billing & Invoicing",
-                    featureGroupId: core.id,
-                    managedBy: "Aces League"
-                },
-
-                // ADVANCED FEATURES
-                {
-                    name: "In-App Messaging",
-                    description: "This is In-App Messaging",
-                    featureGroupId: advanced.id,
-                    managedBy: "Spyware Team"
-                },
-                {
-                    name: "Pipeline Manager",
-                    description: "This is Pipeline Manager",
-                    featureGroupId: advanced.id,
-                    managedBy: "Super Graft"
-                },
-                {
-                    name: "Custom Forms",
-                    description: "This is Custom Forms",
-                    featureGroupId: advanced.id,
-                    managedBy: "Core Dev"
-                },
-                {
-                    name: "Document Request Manager",
-                    description: "This is Document Request Manager",
-                    featureGroupId: advanced.id,
-                    managedBy: "Fin giants"
-                },
-                {
-                    name: "Authorization Management",
-                    description: "This is Authorization Management",
-                    featureGroupId: advanced.id,
-                    managedBy: "Aces League"
-                },
-                {
-                    name: "Advanced Reporting",
-                    description: "This is Advanced Reporting",
-                    featureGroupId: advanced.id,
-                    active: false,
-                    managedBy: "Aces League"
-                },
-                {
-                    name: "Data Collection & Analysis",
-                    description: "This is Data Collection & Analysis",
-                    featureGroupId: advanced.id,
-                    managedBy: "Aces League"
-                },
-
-                // CUSTOMIZATION
-                {
-                    name: "Custom Branding",
-                    description: "This is Custom Branding",
-                    featureGroupId: customization.id,
-                    managedBy: "Spyware Team"
-                },
-                {
-                    name: "API Access",
-                    description: "This is API Access",
-                    featureGroupId: customization.id,
-                    managedBy: "Super Graft"
-                },
-                {
-                    name: "Third Party Integration",
-                    description: "This is Third Party Integration",
-                    featureGroupId: customization.id,
-                    active: false,
-                    managedBy: "Core Dev"
-                },
-
-                // EXTRA
-                {
-                    name: "Email Support",
-                    description: "This is Email Support",
-                    featureGroupId: extra.id,
-                    managedBy: "Spyware Team"
-                },
-                {
-                    name: "Priority Support",
-                    description: "This is Priority Support",
-                    featureGroupId: extra.id,
-                    managedBy: "Super Graft"
-                },
-                {
-                    name: "Dedicated Account Manager",
-                    description: "This is Dedicated Account Manager",
-                    featureGroupId: extra.id,
-                    managedBy: "Core Dev"
-                },
-                {
-                    name: "SLA Backed Uptime",
-                    description: "This is SLA Backed Uptime",
-                    featureGroupId: extra.id,
-                    managedBy: "Core Dev"
+        for (const featureSeed of groupSeed.features) {
+            const existing = await prisma.feature.findFirst({
+                where: {
+                    name: featureSeed.name,
+                    featureGroupId: group.id
                 }
-            ]
-        });
+            });
 
-        console.log("Feature seed completed");
-    } else {
-        console.log("Feature groups already seeded. Skipping...");
+            if (existing) {
+                continue;
+            }
+
+            await prisma.feature.create({
+                data: { ...featureSeed, featureGroupId: group.id }
+            });
+            console.log(`Feature "${featureSeed.name}" seeded`);
+        }
     }
+}
 
+async function main() {
+    await seedPipeline();
+    await seedFeatureGroups();
 }
 
 main()
-    .catch(console.error)
+    .catch((error) => {
+        console.error(error);
+        process.exitCode = 1;
+    })
     .finally(async () => {
         await prisma.$disconnect();
-        process.exit(0);
     });
