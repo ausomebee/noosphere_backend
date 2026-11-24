@@ -198,7 +198,7 @@ jobs:
                   postgresql://*@noosphere-prod-db.cx2mysgge3lr.us-west-1.rds.amazonaws.com:5432/noosphere\?sslmode=verify-full) ;;
                   *) echo "Refusing to reset a database outside the configured production target" >&2; exit 1 ;;
                 esac
-                npx prisma migrate reset --force --skip-seed --config apps/main-app/prisma.config.ts
+                npx prisma migrate reset --force --config apps/main-app/prisma.config.ts
                 npm run deploy
               '
               echo 'Production database reset, migrations, and seeding complete'
