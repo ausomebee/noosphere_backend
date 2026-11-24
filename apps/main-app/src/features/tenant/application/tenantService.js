@@ -63,7 +63,12 @@ class TenantService {
             throw new Error("Failed to create candidate");
         }
 
-        return {...newCandidate.pipelineItem, companyName: data.companyName};
+        return {
+            ...newCandidate.pipelineItem,
+            companyName: data.companyName,
+            email: data.email,
+            phoneNumber: data.phoneNumber,
+        };
     }
 
     async sendTenantWelcomeEmail(tenant) {
