@@ -242,7 +242,7 @@ class InvoiceController {
             res.status(500).json({ message: 'Failed to fetch invoices' });
         }
 
-        return res.status(201).json({
+        return res.status(200).json({
             message: "Invoices fetched successfully",
             status: 'ok',
             data: invoice

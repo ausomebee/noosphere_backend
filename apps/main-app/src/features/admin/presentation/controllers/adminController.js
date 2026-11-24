@@ -39,9 +39,13 @@ class AdminController {
     });
 
     updateAdmin = expressAsyncHandler(async (req, res) => {
-        if (req.body.token) {
-            await this.service.resetAdminPassword(req.body);
-            return res.status(200).json({ message: "Password updated successfully", status: "ok" });
+        if (req.body.token || req.adminPasswordResetIdentity) {
+            const result = await this.service.resetAdminPassword(req.body, req.adminPasswordResetIdentity);
+            return res.status(200).json({
+                message: "Password updated successfully",
+                status: "ok",
+                data: result
+            });
         }
         const admin = await this.service.updateAdmin(req.body);
 

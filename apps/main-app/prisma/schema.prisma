@@ -150,6 +150,7 @@ model Admin {
   isDeleted             Boolean  @default(false)
   password              String?
   administratorPassword String?
+  passwordChanged       Boolean  @default(true)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
   authType              String?
@@ -361,6 +362,7 @@ model TenantStaff {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   password     String?
+  passwordChanged Boolean @default(true)
   authType     String?
   authQuestion String?
   auth2FADone  Boolean  @default(false)

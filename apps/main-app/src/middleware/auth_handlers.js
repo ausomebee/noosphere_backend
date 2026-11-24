@@ -175,6 +175,66 @@ const staffProtectMiddleware = (options = {}) => asyncHandler(async (req, res, n
 
 export const staffProtect = (options = {}) => staffProtectMiddleware(options);
 
+export const tenantPasswordResetProtect = asyncHandler(async (req, res, next) => {
+    const token = extractToken(req);
+    if (!token) return next();
+
+    let decoded;
+    try {
+        decoded = jwt.verify(token, ACCESS_TOKEN_SECRET);
+    } catch {
+        res.status(401);
+        return next(new Error("Not Authorized: Invalid or expired password-reset token"));
+    }
+
+    if (!decoded.id || decoded.ownerType !== "STAFF") {
+        res.status(403);
+        return next(new Error("Forbidden: A staff token is required"));
+    }
+
+    const staff = await prisma.tenantStaff.findUnique({
+        where: { id: decoded.id },
+        select: { id: true, active: true, isDeleted: true },
+    });
+    if (!staff || staff.isDeleted || !staff.active) {
+        res.status(401);
+        return next(new Error("Not Authorized: Account not found or inactive"));
+    }
+
+    req.tenantPasswordResetIdentity = { id: staff.id };
+    next();
+});
+
+export const adminPasswordResetProtect = asyncHandler(async (req, res, next) => {
+    const token = extractToken(req);
+    if (!token) return next();
+
+    let decoded;
+    try {
+        decoded = jwt.verify(token, ACCESS_TOKEN_SECRET);
+    } catch {
+        res.status(401);
+        return next(new Error("Not Authorized: Invalid or expired password-reset token"));
+    }
+
+    if (!decoded.id || decoded.ownerType !== "ADMIN") {
+        res.status(403);
+        return next(new Error("Forbidden: An admin token is required"));
+    }
+
+    const admin = await prisma.admin.findUnique({
+        where: { id: decoded.id },
+        select: { id: true, active: true, isDeleted: true },
+    });
+    if (!admin || admin.isDeleted || !admin.active) {
+        res.status(401);
+        return next(new Error("Not Authorized: Account not found or inactive"));
+    }
+
+    req.adminPasswordResetIdentity = { id: admin.id };
+    next();
+});
+
 const clientProtectMiddleware = (options = {}) => asyncHandler(async (req, res, next) => {
     const token = extractToken(req);
 
@@ -228,8 +288,13 @@ export const clientProtect = (options = {}) => clientProtectMiddleware(options);
 export const twoFactorProtect = (ownerType) => asyncHandler(async (req, res, next) => {
     const token = extractToken(req);
     if (!token) {
-        res.status(401);
-        return next(new Error("Not Authorized: No two-factor token provided"));
+        const legacyId = req.params?.userId || req.body?.userId;
+        if (!legacyId) {
+            res.status(401);
+            return next(new Error("Not Authorized: No two-factor token or user ID provided"));
+        }
+        req.twoFactor = { id: legacyId, ownerType };
+        return next();
     }
     let decoded;
     try {
@@ -245,6 +310,11 @@ export const twoFactorProtect = (ownerType) => asyncHandler(async (req, res, nex
     if (!decoded.id || (ownerType && decoded.ownerType && decoded.ownerType !== ownerType)) {
         res.status(403);
         return next(new Error("Forbidden: A valid two-factor or access token is required"));
+    }
+    const requestedId = req.params?.userId || req.body?.userId;
+    if (requestedId && requestedId !== decoded.id) {
+        res.status(403);
+        return next(new Error("Forbidden: The requested user does not match the authenticated user"));
     }
     req.twoFactor = { id: decoded.id, ownerType: decoded.ownerType || ownerType };
     next();

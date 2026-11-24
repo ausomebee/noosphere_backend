@@ -33,7 +33,7 @@ class AdminService {
             throw new Error("This phone number is already taken.");
         }
 
-        const newAdmin = await this.repository.create(data);
+        const newAdmin = await this.repository.create({ ...data, passwordChanged: false });
 
         if (!newAdmin) {
             throw new Error("Failed to create admin");
@@ -94,6 +94,7 @@ class AdminService {
             },
             password: hashedPass,
             administratorPassword: hashedAdminPass,
+            passwordChanged: data.password ? true : admin.passwordChanged,
             authType: data.authType || admin.authType,
             authQuestion: data.authQuestion || admin.authQuestion,
             auth2FADone: data.auth2FADone ?? admin.auth2FADone,
@@ -166,7 +167,7 @@ class AdminService {
 
         const newAdmin = await this.repository.prisma.$transaction(async (tx) => {
             const role = await this.roleRepository.createAdminRole("GLOBAL", null, tx);
-            const admin = await this.repository.txCreate({ ...data, password: hashedPass, administratorPassword: hashedAdminPass, roleId: role.id }, tx);
+            const admin = await this.repository.txCreate({ ...data, password: hashedPass, administratorPassword: hashedAdminPass, passwordChanged: false, roleId: role.id }, tx);
             const department = await tx.department.create({
                 data: {
                     name: "General",
@@ -215,13 +216,13 @@ class AdminService {
             permissions: admin.roles
         }
 
-        const { password: _ap, ...adminData } = admin;
+        const { password: _ap, administratorPassword: _administratorPassword, ...adminData } = admin;
         const choices = await this.repository.findFirstChoice({});
         const requiresTwoFactor = Boolean(choices?.isEnabled && (choices.setForAll || admin.authType));
         if (requiresTwoFactor) {
-            return { ...adminData, isSuperAdmin: Boolean(admin.superAdmin), twoFactorRequired: true, twoFactorToken: this.token.generateTwoFactorToken(admin.id, "ADMIN") };
+            return { ...adminData, role: admin.roles?.name, tenantId: null, passwordChanged: admin.passwordChanged, isSuperAdmin: Boolean(admin.superAdmin), twoFactorRequired: true, twoFactorToken: this.token.generateTwoFactorToken(admin.id, "ADMIN") };
         }
-        return { ...adminData, isSuperAdmin: Boolean(admin.superAdmin), accessToken: this.token.generateAccessToken({ ...claims, isSuperAdmin: Boolean(admin.superAdmin) }), refreshToken: this.token.generateRefreshToken(admin.id, "ADMIN") };
+        return { ...adminData, role: admin.roles?.name, tenantId: null, passwordChanged: admin.passwordChanged, isSuperAdmin: Boolean(admin.superAdmin), accessToken: this.token.generateAccessToken({ ...claims, isSuperAdmin: Boolean(admin.superAdmin) }), refreshToken: this.token.generateRefreshToken(admin.id, "ADMIN") };
     }
 
     async verifyPassword(data) {
@@ -395,11 +396,51 @@ class AdminService {
         return true;
     }
 
-    async resetAdminPassword(data) {
+    async resetAdminPassword(data, authenticatedIdentity) {
         const password = await argon2.hash(data.password);
         return this.repository.prisma.$transaction(async (tx) => {
-            await consumePasswordResetToken(tx, { token: data.token, ownerId: data.id, ownerType: "ADMIN" });
-            return tx.admin.update({ where: { id: data.id }, data: { password } });
+            if (authenticatedIdentity) {
+                if (authenticatedIdentity.id !== data.id) {
+                    const error = new Error("The password reset user does not match the authenticated user");
+                    error.name = "Forbidden";
+                    throw error;
+                }
+                const admin = await tx.admin.findUnique({
+                    where: { id: data.id },
+                    select: { passwordChanged: true },
+                });
+                if (!admin || admin.passwordChanged) {
+                    const error = new Error("A reset token is required");
+                    error.name = "Unauthorized";
+                    throw error;
+                }
+            } else {
+                await consumePasswordResetToken(tx, { token: data.token, ownerId: data.id, ownerType: "ADMIN" });
+            }
+
+            const updated = await tx.admin.update({
+                where: { id: data.id },
+                data: { password, passwordChanged: true },
+                include: { roles: { include: { roleModuleAccesses: true } } },
+            });
+
+            const choices = await tx.superAdminChoices.findFirst();
+            const requiresTwoFactor = Boolean(choices?.isEnabled && (choices.setForAll || updated.authType));
+            const base = {
+                passwordChanged: updated.passwordChanged,
+                auth2FADone: updated.auth2FADone,
+                authType: updated.authType,
+                authQuestion: updated.authQuestion,
+                isSuperAdmin: Boolean(updated.superAdmin),
+                role: updated.roles?.name,
+                tenantId: null,
+            };
+            if (!requiresTwoFactor) return base;
+            return {
+                ...base,
+                twoFactorRequired: true,
+                twoFactorToken: this.token.generateTwoFactorToken(updated.id, "ADMIN"),
+            };
         });
     }
 }

@@ -2,7 +2,7 @@ import express from "express";
 import TenantDto from "../dto/tenantDto.js";
 import TenantController from "../controllers/tenantController.js";
 import multer from "multer";
-import { adminProtect, staffProtect } from "../../../../middleware/auth_handlers.js";
+import { adminProtect, staffProtect, tenantPasswordResetProtect } from "../../../../middleware/auth_handlers.js";
 import { authRateLimiter } from "../../../../middleware/rate_limit.js";
 
 /**
@@ -690,7 +690,7 @@ class TenantRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.patch("/setpassword", TenantDto.updateStaffPasswordDto, this.controller.setStaffPassword);
+        this.router.patch("/setpassword", tenantPasswordResetProtect, TenantDto.updateStaffPasswordDto, this.controller.setStaffPassword);
 
         /**
         * @swagger

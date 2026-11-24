@@ -81,6 +81,7 @@ class TenantService {
         const hashedPass = await argon2.hash(generatedPass);
         const updatedStaff = await this.staffRepository.update(tenantStaff.id, {
             password: hashedPass,
+            passwordChanged: false,
         });
 
         if (!updatedStaff) {
@@ -281,6 +282,7 @@ class TenantService {
 
         const updated = await this.staffRepository.update(tenantStaff.id, {
             password: hashedPass,
+            passwordChanged: false,
         });
 
         if (!updated) {
@@ -585,9 +587,9 @@ class TenantService {
         const choices = await this.choiceRepository.findFirst({ tenantId: tenantStaff.tenantId });
         const requiresTwoFactor = Boolean(choices?.isEnabled && (choices.setForAll || tenantStaff.authType));
         if (requiresTwoFactor) {
-            return { ...staffData, isSuperAdmin: false, twoFactorRequired: true, twoFactorToken: this.token.generateTwoFactorToken(tenantStaff.id, "STAFF") };
+            return { ...staffData, role: tenantStaff.role.name, passwordChanged: tenantStaff.passwordChanged, tenantId: tenantStaff.tenantId, isSuperAdmin: false, twoFactorRequired: true, twoFactorToken: this.token.generateTwoFactorToken(tenantStaff.id, "STAFF") };
         }
-        return { ...staffData, isSuperAdmin: false, accessToken: this.token.generateAccessToken({ ...claims, isSuperAdmin: false }), refreshToken: this.token.generateRefreshToken(tenantStaff.id, "STAFF") };
+        return { ...staffData, role: tenantStaff.role.name, passwordChanged: tenantStaff.passwordChanged, tenantId: tenantStaff.tenantId, isSuperAdmin: false, accessToken: this.token.generateAccessToken({ ...claims, isSuperAdmin: false }), refreshToken: this.token.generateRefreshToken(tenantStaff.id, "STAFF") };
     }
 
     async tenantAdminChoices(data) {
@@ -765,11 +767,49 @@ class TenantService {
         return true;
     }
 
-    async resetStaffPassword(data) {
+    async resetStaffPassword(data, authenticatedIdentity) {
         const password = await argon2.hash(data.password);
         return this.prisma.$transaction(async (tx) => {
-            await consumePasswordResetToken(tx, { token: data.token, ownerId: data.id, ownerType: "STAFF" });
-            return tx.tenantStaff.update({ where: { id: data.id }, data: { password } });
+            if (authenticatedIdentity) {
+                if (authenticatedIdentity.id !== data.id) {
+                    const error = new Error("The password reset user does not match the authenticated user");
+                    error.name = "Forbidden";
+                    throw error;
+                }
+                const staff = await tx.tenantStaff.findUnique({
+                    where: { id: data.id },
+                    select: { passwordChanged: true },
+                });
+                if (!staff || staff.passwordChanged) {
+                    const error = new Error("A reset token is required");
+                    error.name = "Unauthorized";
+                    throw error;
+                }
+            } else {
+                await consumePasswordResetToken(tx, { token: data.token, ownerId: data.id, ownerType: "STAFF" });
+            }
+            const updated = await tx.tenantStaff.update({
+                where: { id: data.id },
+                data: { password, passwordChanged: true },
+                include: { role: true, tenant: { include: { tenantAdminChoices: true } } },
+            });
+            const choices = updated.tenant?.tenantAdminChoices;
+            const requiresTwoFactor = Boolean(choices?.isEnabled && (choices.setForAll || updated.authType));
+            const base = {
+                passwordChanged: updated.passwordChanged,
+                auth2FADone: updated.auth2FADone,
+                authType: updated.authType,
+                authQuestion: updated.authQuestion,
+                isSuperAdmin: false,
+                role: updated.role?.name,
+                tenantId: updated.tenantId,
+            };
+            if (!requiresTwoFactor) return base;
+            return {
+                ...base,
+                twoFactorRequired: true,
+                twoFactorToken: this.token.generateTwoFactorToken(updated.id, "STAFF"),
+            };
         });
     }
 
@@ -791,6 +831,7 @@ class TenantService {
 
         const updated = await this.staffRepository.update(staffId, {
             password: hashedPass,
+            passwordChanged: false,
             authType: null,
             authQuestion: null,
             auth2FADone: false,

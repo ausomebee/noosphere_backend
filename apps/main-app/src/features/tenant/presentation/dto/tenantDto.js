@@ -344,7 +344,9 @@ class TenantDto {
                 .messages({
                     "string.pattern.base": stringPasswordError,
                 }),
-            token: Joi.string().min(40).max(128).required(),
+            token: req.headers.authorization
+                ? Joi.string().min(40).max(128).optional()
+                : Joi.string().min(40).max(128).required(),
         });
 
         Validator.validateRequest(req, next, schema);

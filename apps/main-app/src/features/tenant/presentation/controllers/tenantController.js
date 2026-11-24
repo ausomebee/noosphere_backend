@@ -673,8 +673,8 @@ class TenantController {
     });
 
     setStaffPassword = expressAsyncHandler(async (req, res) => {
-        await this.service.resetStaffPassword(req.body);
-        return res.status(200).json({ message: "Password updated successfully", status: "ok" });
+        const result = await this.service.resetStaffPassword(req.body, req.tenantPasswordResetIdentity);
+        return res.status(200).json({ message: "Password updated successfully", status: "ok", data: result });
     });
 
     resetTenantStaff2FA = expressAsyncHandler(async (req, res) => {
