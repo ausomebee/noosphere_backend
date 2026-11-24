@@ -189,14 +189,28 @@ jobs:
               echo 'Preparation complete'
               ;;
             migrate)
-              # Generate Prisma, apply migrations, and seed missing records on 1a only.
+              # This workflow intentionally recreates the production database on deploy.
               runuser -u noosphere -- bash -c '
                 set -euo pipefail
                 cd /opt/noosphere/backend/releases/current
                 source /opt/noosphere/backend/.env.sh
+                case "$DATABASE_URL" in
+                  postgresql://*@noosphere-prod-db.cx2mysgge3lr.us-west-1.rds.amazonaws.com:5432/noosphere\?sslmode=verify-full) ;;
+                  *) echo "Refusing to reset a database outside the configured production target" >&2; exit 1 ;;
+                esac
+                npx prisma migrate reset --force --skip-seed --config apps/main-app/prisma.config.ts
                 npm run deploy
               '
-              echo 'Migration and seeding complete'
+              echo 'Production database reset, migrations, and seeding complete'
+              ;;
+            stop)
+              runuser -u noosphere -- bash -c '
+                set -euo pipefail
+                export PM2_HOME=/home/noosphere/.pm2
+                pm2 delete noosphere-api >/dev/null 2>&1 || true
+                pm2 save
+              '
+              echo 'API stopped for production database reset'
               ;;
             start)
               start_api
@@ -257,6 +271,7 @@ jobs:
           }
           if [[ "$MODE" == deploy ]]; then
             run_phase prepare "$BACKEND_1A" "$BACKEND_1C"
+            run_phase stop "$BACKEND_1A" "$BACKEND_1C"
             run_phase migrate "$BACKEND_1A"
             # Sequential restarts, each followed by a mandatory health check.
             run_phase start "$BACKEND_1A" "$BACKEND_1C"
