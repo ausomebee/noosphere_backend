@@ -12,7 +12,7 @@ jobs:
   migrate:
     name: Migrate pre-prod database
     runs-on: ubuntu-latest
-    environment: preprod
+    environment: pre-prod
 
     steps:
       - name: Confirm migration
