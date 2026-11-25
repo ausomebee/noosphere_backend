@@ -30,8 +30,6 @@ jobs:
         env:
           DEV_CACHE_SERVICE_URL: ${{ secrets.DEV_CACHE_SERVICE_URL }}
           DEV_CACHE_SERVICE_TOKEN: ${{ secrets.DEV_CACHE_SERVICE_TOKEN }}
-          PREPROD_REDIS_URL: ${{ secrets.PREPROD_REDIS_URL }}
-          PREPROD_CACHE_SERVICE_TOKEN: ${{ secrets.PREPROD_CACHE_SERVICE_TOKEN }}
         run: |
           BRANCH=${GITHUB_REF##*/}
           if [ "$BRANCH" = "develop" ]; then
@@ -39,11 +37,6 @@ jobs:
             CACHE_SERVICE_TOKEN="$DEV_CACHE_SERVICE_TOKEN"
             if [ -z "$CACHE_SERVICE_URL" ] || [ "${#CACHE_SERVICE_TOKEN}" -lt 32 ]; then
               echo "Set DEV_CACHE_SERVICE_URL and a DEV_CACHE_SERVICE_TOKEN of at least 32 characters." >&2
-              exit 1
-            fi
-          else
-            if [ -z "$PREPROD_REDIS_URL" ] || [ "${#PREPROD_CACHE_SERVICE_TOKEN}" -lt 32 ]; then
-              echo "Set PREPROD_REDIS_URL and a PREPROD_CACHE_SERVICE_TOKEN of at least 32 characters." >&2
               exit 1
             fi
           fi
@@ -89,7 +82,32 @@ jobs:
             git fetch origin
             git reset --hard origin/$BRANCH
 
+            if [ "$BRANCH" = "pre-prod" ]; then
+              if ! command -v valkey-server >/dev/null 2>&1; then
+                sudo dnf install -y valkey
+              fi
+              sudo systemctl enable --now valkey
+              if ! valkey-cli -h 127.0.0.1 -p 6379 ping 2>/dev/null | grep -qx PONG; then
+                echo "Local Valkey is not responding on 127.0.0.1:6379." >&2
+                exit 1
+              fi
+
+              TOKEN_FILE="\$HOME/.config/noosphere/cache-service-token"
+              install -d -m 700 "\$(dirname "\$TOKEN_FILE")"
+              if [ ! -s "\$TOKEN_FILE" ]; then
+                umask 077
+                openssl rand -hex 32 > "\$TOKEN_FILE"
+              fi
+              chmod 600 "\$TOKEN_FILE"
+              CACHE_SERVICE_TOKEN=\$(cat "\$TOKEN_FILE")
+              if [ "\${#CACHE_SERVICE_TOKEN}" -lt 32 ]; then
+                echo "Stored cache service token is too short." >&2
+                exit 1
+              fi
+            fi
+
             echo "📝 Creating .env file..."
+            umask 077
 
             if [ "$BRANCH" = "develop" ]; then
               {
@@ -142,14 +160,15 @@ jobs:
                 echo "RDS_TOTAL_STORAGE_GB=${{ secrets.PREPROD_RDS_TOTAL_STORAGE_GB }}"
                 echo "STRIPE_SECRET_KEY=${{ secrets.PREPROD_STRIPE_SECRET_KEY }}"
                 echo "STRIPE_WEBHOOK_SECRET=${{ secrets.PREPROD_STRIPE_WEBHOOK_SECRET }}"
-                echo "REDIS_URL=${{ secrets.PREPROD_REDIS_URL }}"
+                echo "REDIS_URL=redis://127.0.0.1:6379"
                 echo "CACHE_SERVICE_PORT=3333"
                 echo "CACHE_SERVICE_URL=http://127.0.0.1:3333"
                 echo "HOST=127.0.0.1"
-                echo "CACHE_SERVICE_TOKEN=${{ secrets.PREPROD_CACHE_SERVICE_TOKEN }}"
+                echo "CACHE_SERVICE_TOKEN=\$CACHE_SERVICE_TOKEN"
               } > .env
             fi
 
+            chmod 600 .env
             echo "✅ .env created successfully"
 
             npm install --production
@@ -161,7 +180,7 @@ jobs:
               npm install -g pm2
             fi
 
-            old_pm2_ids="$(pm2 jlist | node -e '
+            old_pm2_ids="\$(pm2 jlist | node -e '
               let input = "";
               process.stdin.setEncoding("utf8");
               process.stdin.on("data", chunk => input += chunk);
@@ -172,7 +191,7 @@ jobs:
                   const id = app.pm_id ?? app.pm2_env?.pm_id;
                   if (names.has(name)) {
                     if (id === undefined || id === null) {
-                      throw new Error(`Missing PM2 id for ${name}`);
+                      throw new Error("Missing PM2 id for " + name);
                     }
                     console.log(id);
                   }
@@ -181,23 +200,23 @@ jobs:
             ')"
             while IFS= read -r id; do
               if [ -n "$id" ]; then
-                echo "Removing stale PM2 process id $id"
-                pm2 delete "$id"
+                echo "Removing stale PM2 process id \$id"
+                pm2 delete "\$id"
               fi
-            done <<< "$old_pm2_ids"
+            done <<< "\$old_pm2_ids"
 
             if [ "$BRANCH" = "pre-prod" ]; then
               pm2 start npm --name noosphere-cache -- run start:cache
 
               cache_ready=0
-              for attempt in $(seq 1 30); do
+              for attempt in \$(seq 1 30); do
                 if curl --fail --silent --max-time 2 http://127.0.0.1:3333/health >/dev/null; then
                   cache_ready=1
                   break
                 fi
                 sleep 1
               done
-              if [ "$cache_ready" -ne 1 ]; then
+              if [ "\$cache_ready" -ne 1 ]; then
                 echo "Preprod cache service failed its health check." >&2
                 exit 1
               fi
