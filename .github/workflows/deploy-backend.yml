@@ -180,30 +180,37 @@ jobs:
               npm install -g pm2
             fi
 
-            old_pm2_ids="\$(pm2 jlist | node -e '
-              let input = "";
-              process.stdin.setEncoding("utf8");
-              process.stdin.on("data", chunk => input += chunk);
-              process.stdin.on("end", () => {
-                const names = new Set(["noosphere-backend", "noosphere-worker", "noosphere-cache"]);
-                for (const app of JSON.parse(input)) {
-                  const name = app.name ?? app.pm2_env?.name;
-                  const id = app.pm_id ?? app.pm2_env?.pm_id;
-                  if (names.has(name)) {
+            managed_pm2_ids() {
+              pm2 jlist | node -e '
+                let input = "";
+                process.stdin.setEncoding("utf8");
+                process.stdin.on("data", chunk => input += chunk);
+                process.stdin.on("end", () => {
+                  const names = new Set(["noosphere-backend", "noosphere-worker", "noosphere-cache"]);
+                  for (const app of JSON.parse(input)) {
+                    if (!names.has(app.name) && !names.has(app.pm2_env?.name)) continue;
+                    const id = app.pm_id ?? app.pm2_env?.pm_id;
                     if (id === undefined || id === null) {
-                      throw new Error("Missing PM2 id for " + name);
+                      throw new Error("Missing PM2 id for managed process");
                     }
                     console.log(id);
                   }
-                }
-              });
-            ')"
+                });
+              '
+            }
+            old_pm2_ids="\$(managed_pm2_ids)"
             while IFS= read -r id; do
               if [ -n "$id" ]; then
                 echo "Removing stale PM2 process id \$id"
                 pm2 delete "\$id"
               fi
             done <<< "\$old_pm2_ids"
+
+            remaining_pm2_ids="\$(managed_pm2_ids)"
+            if [ -n "\$remaining_pm2_ids" ]; then
+              echo "PM2 cleanup left managed process IDs: \$remaining_pm2_ids" >&2
+              exit 1
+            fi
 
             if [ "$BRANCH" = "pre-prod" ]; then
               pm2 start npm --name noosphere-cache -- run start:cache
@@ -220,6 +227,21 @@ jobs:
                 echo "Preprod cache service failed its health check." >&2
                 exit 1
               fi
+            fi
+
+            if ! node --input-type=module -e '
+              import "dotenv/config";
+              import net from "node:net";
+              const port = Number(process.env.PORT || 5000);
+              const server = net.createServer();
+              server.once("error", (error) => {
+                console.error("Backend port " + port + " is unavailable: " + error.message);
+                process.exitCode = 1;
+              });
+              server.listen(port, () => server.close());
+            '; then
+              echo "Refusing to start a second backend process on the configured port." >&2
+              exit 1
             fi
 
             pm2 start npm --name noosphere-backend -- run start
