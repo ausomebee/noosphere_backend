@@ -1,11 +1,15 @@
 import Stripe from "stripe";
+import MailService from "../../../utilities/ses.js";
+import templateRenderer from "../../../utilities/templateRenderer.js";
 
 const CURRENCY = "usd";
 
 class StripeBillingService {
-    constructor({ prisma, invoiceService }) {
+    constructor({ prisma, invoiceService, mailService = MailService, renderer = templateRenderer }) {
         this.prisma = prisma;
         this.invoiceService = invoiceService;
+        this.mailService = mailService;
+        this.renderer = renderer;
     }
 
     get stripe() {
@@ -158,12 +162,49 @@ class StripeBillingService {
         return endDate;
     }
 
+    async notifyPaymentConfirmation(invoice, paymentIntent) {
+        try {
+            const card = paymentIntent.latest_charge?.payment_method_details?.card;
+            const plan = invoice.plan;
+            const html = await this.renderer.render("billing-payment-confirmation.html", {
+                customerName: invoice.tenant.companyName,
+                subscriptionPlan: plan?.name || "Subscription",
+                numberOfLicenses: Number(plan?.forStaff || 0) + Number(plan?.forClient || 0),
+                billingCycle: invoice.billingFrequency,
+                amountPaid: `$${Number(invoice.total).toFixed(2)}`,
+                paymentMethod: card?.last4
+                    ? `${card.brand || "Card"} ending in ${card.last4}`
+                    : "Stripe",
+                transactionId: paymentIntent.id,
+                purchaseDate: new Date(paymentIntent.created * 1000).toDateString(),
+            });
+            const result = await this.mailService.sendMail(
+                invoice.tenant.email,
+                "Payment Made for Plan",
+                null,
+                html,
+                [{
+                    filename: "Logowrap.png",
+                    path: "Logowrap.png",
+                    cid: "unique@image",
+                    contentType: "Logowrap/png",
+                }],
+            );
+
+            if (!result?.success) {
+                throw new Error(result?.error || "Payment confirmation email was not accepted");
+            }
+        } catch (error) {
+            console.error(`Payment succeeded but confirmation email failed for invoice ${invoice.id}:`, error);
+        }
+    }
+
     async activate(invoice, token, paymentIntent) {
         const charge = paymentIntent.latest_charge;
         const card = charge?.payment_method_details?.card;
         const paymentMethodId = typeof paymentIntent.payment_method === "string" ? paymentIntent.payment_method : "";
 
-        return this.runSerializableTransaction(async (tx) => {
+        const result = await this.runSerializableTransaction(async (tx) => {
             const currentInvoice = await tx.invoice.findUnique({ where: { id: invoice.id } });
             if (currentInvoice.status === "Paid") return { alreadyPaid: true, invoice: currentInvoice };
 
@@ -209,12 +250,15 @@ class StripeBillingService {
             await tx.tenant.update({ where: { id: invoice.tenantId }, data: { active: true } });
             return { alreadyPaid: false, invoice: updatedInvoice };
         });
+
+        if (!result.alreadyPaid) await this.notifyPaymentConfirmation(invoice, paymentIntent);
+        return result;
     }
 
     async activateFromSavedCharge(invoice, paymentIntent, paymentMethod) {
         const charge = paymentIntent.latest_charge;
 
-        return this.runSerializableTransaction(async (tx) => {
+        const result = await this.runSerializableTransaction(async (tx) => {
             const currentInvoice = await tx.invoice.findUnique({ where: { id: invoice.id } });
             if (currentInvoice.status === "Paid") return { alreadyPaid: true, invoice: currentInvoice };
 
@@ -267,6 +311,9 @@ class StripeBillingService {
 
             return { alreadyPaid: false, invoice: updatedInvoice };
         });
+
+        if (!result.alreadyPaid) await this.notifyPaymentConfirmation(invoice, paymentIntent);
+        return result;
     }
 
     async chargeInvoiceWithSavedMethod(invoice, paymentMethod, attemptOffset = 0) {
