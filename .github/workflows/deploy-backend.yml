@@ -132,7 +132,7 @@ jobs:
               npm install -g pm2
             fi
 
-            pm2 startOrReload ecosystem.config.cjs --update-env
+            pm2 startOrReload ecosystem.deploy.config.cjs --update-env
             pm2 save
 
             echo "✅ Deployment completed"
