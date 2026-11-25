@@ -81,7 +81,7 @@ class ClientController {
     });
 
     updateClientPassword = expressAsyncHandler(async (req, res) => {
-        const client = await this.service.updateClientPassword(req.body);
+        const client = await this.service.updateClientPassword({ ...req.body, clientTenantId: req.user.id });
 
         if (!client) {
             return res.status(500).json({ message: 'Failed to update client password' });
@@ -180,7 +180,11 @@ class ClientController {
     });
 
     resetPassword = expressAsyncHandler(async (req, res) => {
-        const client = await this.service.updateTenantClient({...req.body, passwordChanged: true});
+        const client = await this.service.resetClientPassword({
+            ...req.body,
+            clientTenantId: req.user?.id || req.body.clientTenantId,
+            authenticatedFirstLogin: Boolean(req.user),
+        });
 
         if (!client) {
             return res.status(500).json({ message: 'Failed to reset password' });
@@ -208,16 +212,12 @@ class ClientController {
     });
 
     initiatePasswordReset = expressAsyncHandler(async (req, res) => {
-        const client = await this.service.initiatePasswordReset(req.params.email);
+        void this.service.initiatePasswordReset(req.body?.email || req.params.email)
+            .catch((error) => console.error("Password reset request could not be processed:", error.message));
 
-        if (!client) {
-            return res.status(500).json({ message: 'Failed to send email' });
-        }
-
-        return res.status(201).json({
-            message: "email sent successfully",
+        return res.status(200).json({
+            message: "If an account exists for that email, reset instructions have been sent.",
             status: 'ok',
-            data: client
         });
     });
 

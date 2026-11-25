@@ -107,7 +107,7 @@ class SubscriptionService {
         const PENDING = await this.subscriptionRepository.totalCount({ status: "PENDING" });
         const CANCELLED = await this.subscriptionRepository.totalCount({ status: "CANCELLED" });
 
-        if (!All || !ACTIVE || !PAUSED || !PENDING || !CANCELLED) {
+        if ([All, ACTIVE, PAUSED, PENDING, CANCELLED].some((count) => count == null)) {
             throw new Error("Failed to count payment");
         }
 

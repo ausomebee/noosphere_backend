@@ -174,8 +174,16 @@ class AdminDto {
                 .messages({
                     "string.pattern.base": stringPasswordError,
                 }),
+            token: req.headers.authorization
+                ? Joi.string().min(40).max(128).optional()
+                : Joi.string().min(40).max(128).required(),
         });
 
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static forgotPasswordRequestDto = (req, res, next) => {
+        const schema = Joi.object({ email: Joi.string().email().trim().lowercase().required() });
         Validator.validateRequest(req, next, schema);
     };
 

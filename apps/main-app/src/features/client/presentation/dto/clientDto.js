@@ -356,7 +356,8 @@ class ClientDto {
 
     static resetPasswordDto = (req, res, next) => {
         const schema = Joi.object({
-            clientTenantId: Joi.string().uuid().required(),
+            clientTenantId: req.user ? Joi.string().uuid().optional() : Joi.string().uuid().required(),
+            token: req.user ? Joi.string().min(40).max(128).optional() : Joi.string().min(40).max(128).required(),
             password: Joi.string()
                 .regex(strongPasswordRegex)
                 .required()
@@ -366,6 +367,11 @@ class ClientDto {
                 })
         });
 
+        Validator.validateRequest(req, next, schema);
+    };
+
+    static forgotPasswordRequestDto = (req, res, next) => {
+        const schema = Joi.object({ email: Joi.string().email().trim().lowercase().required() });
         Validator.validateRequest(req, next, schema);
     };
 }

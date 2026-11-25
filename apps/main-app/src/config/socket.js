@@ -1,4 +1,5 @@
 import { Server } from "socket.io";
+import jwt from "jsonwebtoken";
 import prismaService from "./prisma.js";
 import MessageRepository from "../features/messaging/infrastructure/messageRepository.js";
 import MessageService from "../features/messaging/application/messageService.js";
@@ -25,37 +26,90 @@ class SocketService {
             },
         });
 
+        this.io.use(async (socket, next) => {
+            try {
+                const token = socket.handshake.auth?.token;
+                if (!token) throw new Error("Authentication token required");
+                const claims = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET || "secret");
+                if (claims.tokenUse === "two_factor") throw new Error("Two-factor verification is incomplete");
+                let identity;
+                const ownerType = claims.ownerType || claims.userType;
+                if (ownerType === "ADMIN" || (!ownerType && await this.prisma.admin.findUnique({ where: { id: claims.id }, select: { id: true } }))) {
+                    const admin = await this.prisma.admin.findFirst({ where: { id: claims.id, active: true, isDeleted: false }, select: { id: true, superAdmin: true } });
+                    if (!admin) throw new Error("Account is inactive");
+                    identity = { id: admin.id, userType: "ADMIN", isSuperAdmin: admin.superAdmin };
+                } else if (ownerType === "STAFF" || (!ownerType && await this.prisma.tenantStaff.findUnique({ where: { id: claims.id }, select: { id: true } }))) {
+                    const staff = await this.prisma.tenantStaff.findFirst({ where: { id: claims.id, active: true, isDeleted: false, tenant: { active: true, isDeleted: false } }, select: { id: true, tenantId: true } });
+                    if (!staff) throw new Error("Account is inactive");
+                    identity = { id: staff.id, tenantId: staff.tenantId, userType: "TENANT_STAFF" };
+                } else if (ownerType === "CLIENT" || !ownerType) {
+                    const client = await this.prisma.clientTenant.findFirst({ where: { id: claims.id, active: true }, select: { id: true, tenantId: true } });
+                    if (!client) throw new Error("Account is inactive");
+                    identity = { id: client.id, tenantId: client.tenantId, userType: "CLIENT" };
+                } else {
+                    throw new Error("Invalid token owner type");
+                }
+                socket.data.identity = identity;
+                next();
+            } catch (error) {
+                next(new Error(`Unauthorized: ${error.message}`));
+            }
+        });
+
         this.io.on("connection", (socket) => {
             console.log("User connected:", socket.id);
 
-            socket.on("register", ({ userId, userType }) => {
-                const room = `${userType}_${userId}`;
-                socket.join(room);
-                console.log(`User joined room: ${room}`);
+            const identity = socket.data.identity;
+            const rooms = identity.userType === "TENANT_STAFF"
+                ? [`TENANT_STAFF_${identity.id}`, `STAFF_${identity.id}`]
+                : [`${identity.userType}_${identity.id}`];
+            socket.join(rooms);
+            socket.on("register", (_payload, callback) => {
+                socket.join(rooms);
+                callback?.({ success: true, message: "Registered" });
             });
 
             socket.on("chatMessage", async (data, callback) => {
+                const acknowledge = (payload) => {
+                    if (typeof callback === "function") callback(payload);
+                };
                 try {
-                    const { receiverId, receiverType } = data;
+                    const { receiverId, receiverType, clientMessageId } = data || {};
+                    if (!receiverId || !["ADMIN", "TENANT_STAFF", "CLIENT"].includes(receiverType) || typeof data?.content !== "string" || !data.content.trim()) {
+                        return acknowledge({ success: false, message: "A valid recipient and message are required" });
+                    }
+                    if (clientMessageId !== undefined && (typeof clientMessageId !== "string" || clientMessageId.length < 1 || clientMessageId.length > 128)) {
+                        return acknowledge({ success: false, message: "Invalid client message ID" });
+                    }
+                    const senderType = identity.userType;
+                    if (clientMessageId) {
+                        const existing = await this.messageRepository.findByClientMessageId(identity.id, senderType, clientMessageId);
+                        if (existing) return acknowledge({ success: true, message: existing });
+                    }
 
-                    const messageData = new Message(data);
+                    const messageData = new Message({ ...data, senderId: identity.id, senderType, clientMessageId });
                     const newRecord = await this.messageService.createMessage(messageData.createMessage);
 
                     if (!newRecord) {
-                        return callback?.({
-                            success: false,
-                            error: "Failed to create message",
-                        });
+                        return acknowledge({ success: false, message: "Failed to create message" });
                     }
 
                     const receiverRoom = `${receiverType}_${receiverId}`;
                     this.io.to(receiverRoom).emit("chatMessage", newRecord);
 
-                    if (callback) callback({ success: true, message: newRecord });
+                    acknowledge({ success: true, message: newRecord });
 
                 } catch (error) {
                     console.error("Chat error:", error);
-                    if (callback) callback({ success: false });
+                    if (error.code === "P2002" && typeof data?.clientMessageId === "string") {
+                        const existing = await this.messageRepository.findByClientMessageId(
+                            identity.id,
+                            identity.userType,
+                            data.clientMessageId
+                        ).catch(() => null);
+                        if (existing) return acknowledge({ success: true, message: existing });
+                    }
+                    acknowledge({ success: false, message: "Message could not be sent" });
                 }
             });
 

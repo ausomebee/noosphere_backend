@@ -275,8 +275,8 @@ class AppointmentService {
     //     return result;
     // }
 
-    async getTenantAppointments(tenantId) {
-        const appointments = await this.appointmentRepository.getAppointmentsByTenant(tenantId);
+    async getTenantAppointments(tenantId, actor = null) {
+        const appointments = await this.appointmentRepository.getAppointmentsByTenant(tenantId, actor);
 
         if (!appointments || appointments.length === 0) {
             return [];

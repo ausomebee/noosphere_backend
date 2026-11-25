@@ -29,6 +29,8 @@ Configure the API/worker hosts:
 - `CACHE_SERVICE_TOKEN`: the same secret configured on the cache service
 - `CRON_LOCK_TTL_MS`: optional lease duration, defaults to `120000` ms (service accepts 30000–600000 ms)
 
+The pre-prod deployment installs and starts Valkey on the backend host, then runs the cache service bound to `127.0.0.1:3333`. Redis uses `redis://127.0.0.1:6379`; the workflow creates a persistent random cache-service token in the EC2 user's home directory and writes it to the protected `.env` file.
+
 Keep the cache service and Redis reachable only from trusted application/worker networks. Do not expose the bearer token in browser code. Multiple cache-service instances can share the same Redis backend. For availability, Redis itself must also be managed or deployed with appropriate persistence/failover; the HTTP service alone does not provide cache durability.
 
 The lock prevents concurrent workers from normally running the same job, but a worker that pauses longer than its lease may continue after another worker acquires the expired lock. Jobs that create invoices, collect payments, or send notifications should remain idempotent and tolerate retries.

@@ -4,7 +4,17 @@ class MessageService {
     }
 
     async createMessage(data) {
-        const newMessage = await this.messageRepository.create(data);
+        if (data.clientMessageId) {
+            const existing = await this.messageRepository.findByClientMessageId(data.senderId, data.senderType, data.clientMessageId);
+            if (existing) return existing;
+        }
+        let newMessage;
+        try {
+            newMessage = await this.messageRepository.create(data);
+        } catch (error) {
+            if (error.code !== "P2002" || !data.clientMessageId) throw error;
+            return this.messageRepository.findByClientMessageId(data.senderId, data.senderType, data.clientMessageId);
+        }
 
         if (!newMessage) {
             throw new Error("Failed to create message.");

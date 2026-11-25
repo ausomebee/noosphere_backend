@@ -20,7 +20,7 @@ class ClientNotificationSettingsController {
     }
 
     createNotificationSettings = expressAsyncHandler(async (req, res) => {
-        const data = new ClientNotificationSettings(req.body);
+        const data = new ClientNotificationSettings({ ...req.body, tenantClientId: req.user.id });
 
         const newRecord = await this.service.createNotificationSettings(
             data.createNotificationSettings

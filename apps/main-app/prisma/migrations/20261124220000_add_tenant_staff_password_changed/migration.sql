@@ -1,0 +1,5 @@
+ALTER TABLE "TenantStaff"
+ADD COLUMN "passwordChanged" BOOLEAN NOT NULL DEFAULT true;
+
+ALTER TABLE "Admin"
+ADD COLUMN "passwordChanged" BOOLEAN NOT NULL DEFAULT true;

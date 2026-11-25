@@ -14,6 +14,10 @@ class MessageRepository extends BaseRepository {
             }
         });
     }
+
+    findByClientMessageId(senderId, senderType, clientMessageId) {
+        return this.model.findFirst({ where: { senderId, senderType, clientMessageId } });
+    }
 }
 
 export default MessageRepository;

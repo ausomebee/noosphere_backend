@@ -1,7 +1,7 @@
 import express from "express";
 import AdminController from "../controllers/adminController.js";
 import AdminDto from "../dto/adminDto.js";
-import { adminProtect } from "../../../../middleware/auth_handlers.js";
+import { adminProtect, adminPasswordResetProtect } from "../../../../middleware/auth_handlers.js";
 import { authRateLimiter } from "../../../../middleware/rate_limit.js";
 
 /**
@@ -323,7 +323,7 @@ class AdminRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.patch("/setpassword", AdminDto.updateAdminPasswordDto, this.controller.updateAdmin);
+        this.router.patch("/setpassword", adminPasswordResetProtect, AdminDto.updateAdminPasswordDto, this.controller.updateAdmin);
 
         /**
         * @swagger
@@ -363,7 +363,7 @@ class AdminRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.post("/superadminchoices", AdminDto.superAdminChoicesDto, this.controller.superAdminChoices);
+        this.router.post("/superadminchoices", adminProtect({ permission: "edit_security_settings" }), AdminDto.superAdminChoicesDto, this.controller.superAdminChoices);
 
         /**
          * @swagger
@@ -478,6 +478,7 @@ class AdminRoutes {
          *         description: Validation error
          */
         this.router.get("/forgotpassword/:email", AdminDto.forgotPasswordDto, this.controller.forgotPassword);
+        this.router.post("/forgotpassword", AdminDto.forgotPasswordRequestDto, this.controller.forgotPassword);
 
         /**
          * @swagger

@@ -5,7 +5,6 @@ on:
     branches:
       - develop
       - pre-prod
-      - master
 
 jobs:
   deploy:
@@ -25,9 +24,21 @@ jobs:
           elif [ "$BRANCH" = "pre-prod" ]; then
             echo "host=${{ secrets.PREPROD_EC2_HOST_BACKEND }}" >> $GITHUB_OUTPUT
             echo "env=preprod" >> $GITHUB_OUTPUT
-          elif [ "$BRANCH" = "master" ]; then
-            echo "host=${{ secrets.PROD_EC2_HOST_BACKEND }}" >> $GITHUB_OUTPUT
-            echo "env=prod" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate cache service secrets
+        env:
+          DEV_CACHE_SERVICE_URL: ${{ secrets.DEV_CACHE_SERVICE_URL }}
+          DEV_CACHE_SERVICE_TOKEN: ${{ secrets.DEV_CACHE_SERVICE_TOKEN }}
+        run: |
+          BRANCH=${GITHUB_REF##*/}
+          if [ "$BRANCH" = "develop" ]; then
+            CACHE_SERVICE_URL="$DEV_CACHE_SERVICE_URL"
+            CACHE_SERVICE_TOKEN="$DEV_CACHE_SERVICE_TOKEN"
+            if [ -z "$CACHE_SERVICE_URL" ] || [ "${#CACHE_SERVICE_TOKEN}" -lt 32 ]; then
+              echo "Set DEV_CACHE_SERVICE_URL and a DEV_CACHE_SERVICE_TOKEN of at least 32 characters." >&2
+              exit 1
+            fi
           fi
 
       - name: Setup SSH key
@@ -38,8 +49,6 @@ jobs:
             printf "%s" "${{ secrets.DEV_EC2_SSH_KEY_BACKEND }}" > ~/.ssh/id_rsa
           elif [ "$BRANCH" = "pre-prod" ]; then
             printf "%s" "${{ secrets.PREPROD_EC2_SSH_KEY_BACKEND }}" > ~/.ssh/id_rsa
-          elif [ "$BRANCH" = "master" ]; then
-            printf "%s" "${{ secrets.PROD_EC2_SSH_KEY_BACKEND }}" > ~/.ssh/id_rsa
           fi
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ steps.env.outputs.host }} >> ~/.ssh/known_hosts
@@ -73,7 +82,32 @@ jobs:
             git fetch origin
             git reset --hard origin/$BRANCH
 
+            if [ "$BRANCH" = "pre-prod" ]; then
+              if ! command -v valkey-server >/dev/null 2>&1; then
+                sudo dnf install -y valkey
+              fi
+              sudo systemctl enable --now valkey
+              if ! valkey-cli -h 127.0.0.1 -p 6379 ping 2>/dev/null | grep -qx PONG; then
+                echo "Local Valkey is not responding on 127.0.0.1:6379." >&2
+                exit 1
+              fi
+
+              TOKEN_FILE="\$HOME/.config/noosphere/cache-service-token"
+              install -d -m 700 "\$(dirname "\$TOKEN_FILE")"
+              if [ ! -s "\$TOKEN_FILE" ]; then
+                umask 077
+                openssl rand -hex 32 > "\$TOKEN_FILE"
+              fi
+              chmod 600 "\$TOKEN_FILE"
+              CACHE_SERVICE_TOKEN=\$(cat "\$TOKEN_FILE")
+              if [ "\${#CACHE_SERVICE_TOKEN}" -lt 32 ]; then
+                echo "Stored cache service token is too short." >&2
+                exit 1
+              fi
+            fi
+
             echo "📝 Creating .env file..."
+            umask 077
 
             if [ "$BRANCH" = "develop" ]; then
               {
@@ -99,6 +133,8 @@ jobs:
                 echo "RDS_TOTAL_STORAGE_GB=${{ secrets.DEV_RDS_TOTAL_STORAGE_GB }}"
                 echo "STRIPE_SECRET_KEY=${{ secrets.DEV_STRIPE_SECRET_KEY }}"
                 echo "STRIPE_WEBHOOK_SECRET=${{ secrets.DEV_STRIPE_WEBHOOK_SECRET }}"
+                echo "CACHE_SERVICE_URL=${{ secrets.DEV_CACHE_SERVICE_URL }}"
+                echo "CACHE_SERVICE_TOKEN=${{ secrets.DEV_CACHE_SERVICE_TOKEN }}"
               } > .env
             elif [ "$BRANCH" = "pre-prod" ]; then
               {
@@ -124,46 +160,92 @@ jobs:
                 echo "RDS_TOTAL_STORAGE_GB=${{ secrets.PREPROD_RDS_TOTAL_STORAGE_GB }}"
                 echo "STRIPE_SECRET_KEY=${{ secrets.PREPROD_STRIPE_SECRET_KEY }}"
                 echo "STRIPE_WEBHOOK_SECRET=${{ secrets.PREPROD_STRIPE_WEBHOOK_SECRET }}"
-              } > .env
-            elif [ "$BRANCH" = "master" ]; then
-              {
-                echo "NODE_ENV=${{ secrets.PROD_NODE_ENV }}"
-                echo "PORT=${{ secrets.PROD_PORT }}"
-                echo "DATABASE_URL=${{ secrets.PROD_DATABASE_URL }}"
-                echo "JWT_SECRET=${{ secrets.PROD_JWT_SECRET }}"
-                echo "JWT_EXPIRE=${{ secrets.PROD_JWT_EXPIRE }}"
-                echo "CLIENT_URL=${{ secrets.PROD_CLIENT_URL }}"
-                echo "SERVER_URL=${{ secrets.PROD_SERVER_URL }}"
-                echo "MAIL_PASS=${{ secrets.PROD_MAIL_PASS }}"
-                echo "MAIL_USER=${{ secrets.PROD_MAIL_USER }}"
-                echo "SESSION_SECRET=${{ secrets.PROD_SESSION_SECRET }}"
-                echo "CLOUDWATCH_USERNAME=${{ secrets.PROD_CLOUDWATCH_USERNAME }}"
-                echo "AWS_ACCESS_KEY_ID=${{ secrets.PROD_AWS_ACCESS_KEY_ID }}"
-                echo "AWS_SECRET_ACCESS_KEY=${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}"
-                echo "AWS_REGION=${{ secrets.PROD_AWS_REGION }}"
-                echo "EC2_INSTANCE_ID=${{ secrets.PROD_EC2_INSTANCE_ID }}"
-                echo "MY_DB_INSTANCE=${{ secrets.PROD_MY_DB_INSTANCE }}"
-                echo "S3_BUCKET_NAME=${{ secrets.PROD_S3_BUCKET_NAME }}"
-                echo "RDS_INSTANCE_ID=${{ secrets.PROD_RDS_INSTANCE_ID }}"
-                echo "RDS_TOTAL_MEMORY_GB=${{ secrets.PROD_RDS_TOTAL_MEMORY_GB }}"
-                echo "RDS_TOTAL_STORAGE_GB=${{ secrets.PROD_RDS_TOTAL_STORAGE_GB }}"
-                echo "STRIPE_SECRET_KEY=${{ secrets.PROD_STRIPE_SECRET_KEY }}"
-                echo "STRIPE_WEBHOOK_SECRET=${{ secrets.PROD_STRIPE_WEBHOOK_SECRET }}"
+                echo "REDIS_URL=redis://127.0.0.1:6379"
+                echo "CACHE_SERVICE_PORT=3333"
+                echo "CACHE_SERVICE_URL=http://127.0.0.1:3333"
+                echo "HOST=127.0.0.1"
+                echo "CACHE_SERVICE_TOKEN=\$CACHE_SERVICE_TOKEN"
               } > .env
             fi
 
+            chmod 600 .env
             echo "✅ .env created successfully"
 
             npm install --production
 
-            npm run deploy
+            npx prisma migrate deploy --config apps/main-app/prisma.config.ts
 
             if ! command -v pm2 &> /dev/null; then
               echo "Installing PM2..."
               npm install -g pm2
             fi
 
-            pm2 startOrReload ecosystem.config.cjs --update-env
+            managed_pm2_ids() {
+              pm2 jlist | node -e '
+                let input = "";
+                process.stdin.setEncoding("utf8");
+                process.stdin.on("data", chunk => input += chunk);
+                process.stdin.on("end", () => {
+                  const names = new Set(["noosphere-backend", "noosphere-worker", "noosphere-cache"]);
+                  for (const app of JSON.parse(input)) {
+                    if (!names.has(app.name) && !names.has(app.pm2_env?.name)) continue;
+                    const id = app.pm_id ?? app.pm2_env?.pm_id;
+                    if (id === undefined || id === null) {
+                      throw new Error("Missing PM2 id for managed process");
+                    }
+                    console.log(id);
+                  }
+                });
+              '
+            }
+            old_pm2_ids="\$(managed_pm2_ids)"
+            while IFS= read -r id; do
+              if [ -n "\$id" ]; then
+                echo "Removing stale PM2 process id \$id"
+                pm2 delete "\$id"
+              fi
+            done <<< "\$old_pm2_ids"
+
+            remaining_pm2_ids="\$(managed_pm2_ids)"
+            if [ -n "\$remaining_pm2_ids" ]; then
+              echo "PM2 cleanup left managed process IDs: \$remaining_pm2_ids" >&2
+              exit 1
+            fi
+
+            if [ "$BRANCH" = "pre-prod" ]; then
+              pm2 start npm --name noosphere-cache -- run start:cache
+
+              cache_ready=0
+              for attempt in \$(seq 1 30); do
+                if curl --fail --silent --max-time 2 http://127.0.0.1:3333/health >/dev/null; then
+                  cache_ready=1
+                  break
+                fi
+                sleep 1
+              done
+              if [ "\$cache_ready" -ne 1 ]; then
+                echo "Preprod cache service failed its health check." >&2
+                exit 1
+              fi
+            fi
+
+            if ! node --input-type=module -e '
+              import "dotenv/config";
+              import net from "node:net";
+              const port = Number(process.env.PORT || 5000);
+              const server = net.createServer();
+              server.once("error", (error) => {
+                console.error("Backend port " + port + " is unavailable: " + error.message);
+                process.exitCode = 1;
+              });
+              server.listen(port, () => server.close());
+            '; then
+              echo "Refusing to start a second backend process on the configured port." >&2
+              exit 1
+            fi
+
+            pm2 start npm --name noosphere-backend -- run start
+            pm2 start npm --name noosphere-worker -- run start:worker
             pm2 save
 
             echo "✅ Deployment completed"

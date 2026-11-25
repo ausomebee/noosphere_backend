@@ -1,6 +1,7 @@
 import express from "express";
 import AuthController from "../controllers/authController.js";
 import AuthDto from "../dto/authDto.js";
+import { twoFactorProtect } from "../../../../middleware/auth_handlers.js";
 
 class AuthRoutes {
     constructor() {
@@ -45,7 +46,7 @@ class AuthRoutes {
         *       401:
         *         description: Invalid or expired token
         */
-        this.router.post("/verify", AuthDto.verifyDto, this.controller.verifyCode);
+        this.router.post("/verify", twoFactorProtect("ADMIN"), AuthDto.verifyDto, this.controller.verifyCode);
 
         /**
          * @swagger
@@ -72,14 +73,14 @@ class AuthRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/:userId/:module", AuthDto.authDto, this.controller.generateAuthenticator);
+        this.router.get("/:userId/:module", twoFactorProtect("ADMIN"), AuthDto.authDto, this.controller.generateAuthenticator);
 
         /**
         * @swagger
         * /api/v1/auth/createsecretemessage:
         *   post:
         *     summary: create 2FA secret message
-        *     description: creates a user's 2FA secret using their user ID and secret.
+        *     description: creates a 2FA secret for the authenticated user. userId is only needed for legacy calls without a bearer token.
         *     tags:
         *       - Auth
         *     requestBody:
@@ -89,15 +90,15 @@ class AuthRoutes {
         *           schema:
         *             type: object
         *             required:
-        *               - userId
         *               - secret
+        *               - authQuestion
         *               - module
         *             properties:
         *               userId:
         *                 type: string
         *                 format: uuid
         *                 example: "123e4567-e89b-12d3-a456-426614174000"
-        *                 description: UUID of the user
+        *                 description: Optional with Authorization bearer token; required only for legacy calls without a token
         *               secret:
         *                 type: string
         *                 example: "malik"
@@ -116,7 +117,7 @@ class AuthRoutes {
         *       400:
         *         description: Invalid input
         */
-        this.router.post("/createsecretemessage", AuthDto.secretMessageDto, this.controller.createSecreteMessage);
+        this.router.post("/createsecretemessage", twoFactorProtect("ADMIN"), AuthDto.secretMessageDto, this.controller.createSecreteMessage);
 
         /**
         * @swagger
@@ -151,7 +152,7 @@ class AuthRoutes {
         *       400:
         *         description: Invalid input
         */
-        this.router.post("/verifysecretmessage", AuthDto.verifySecretMessageDto, this.controller.verifySecretMessage);
+        this.router.post("/verifysecretmessage", twoFactorProtect("ADMIN"), AuthDto.verifySecretMessageDto, this.controller.verifySecretMessage);
 
         /**
         * @swagger
@@ -188,7 +189,7 @@ class AuthRoutes {
         *       401:
         *         description: Invalid or expired token
         */
-        this.router.post("/tenant/verify", AuthDto.verifyDto, this.controller.verifyStaffCode);
+        this.router.post("/tenant/verify", twoFactorProtect("STAFF"), AuthDto.verifyDto, this.controller.verifyStaffCode);
 
         /**
          * @swagger
@@ -215,14 +216,14 @@ class AuthRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.get("/tenant/:userId/:module", AuthDto.authDto, this.controller.generateTenantAuthenticator);
+        this.router.get("/tenant/:userId/:module", twoFactorProtect("STAFF"), AuthDto.authDto, this.controller.generateTenantAuthenticator);
 
         /**
         * @swagger
         * /api/v1/auth/tenant/createsecretemessage:
         *   post:
         *     summary: create 2FA secret message
-        *     description: creates a user's 2FA secret using their user ID and secret.
+        *     description: creates a 2FA secret for the authenticated user. userId is only needed for legacy calls without a bearer token.
         *     tags:
         *       - Auth
         *     requestBody:
@@ -232,15 +233,15 @@ class AuthRoutes {
         *           schema:
         *             type: object
         *             required:
-        *               - userId
         *               - secret
+        *               - authQuestion
         *               - module
         *             properties:
         *               userId:
         *                 type: string
         *                 format: uuid
         *                 example: "123e4567-e89b-12d3-a456-426614174000"
-        *                 description: UUID of the user
+        *                 description: Optional with Authorization bearer token; required only for legacy calls without a token
         *               secret:
         *                 type: string
         *                 example: "malik"
@@ -259,7 +260,7 @@ class AuthRoutes {
         *       400:
         *         description: Invalid input
         */
-        this.router.post("/tenant/createsecretemessage", AuthDto.secretMessageDto, this.controller.createStaffSecreteMessage);
+        this.router.post("/tenant/createsecretemessage", twoFactorProtect("STAFF"), AuthDto.secretMessageDto, this.controller.createStaffSecreteMessage);
 
         /**
         * @swagger
@@ -294,7 +295,7 @@ class AuthRoutes {
         *       400:
         *         description: Invalid input
         */
-        this.router.post("/tenant/verifysecretmessage", AuthDto.verifySecretMessageDto, this.controller.verifyStaffSecretMessage);
+        this.router.post("/tenant/verifysecretmessage", twoFactorProtect("STAFF"), AuthDto.verifySecretMessageDto, this.controller.verifyStaffSecretMessage);
 
         /**
         * @swagger

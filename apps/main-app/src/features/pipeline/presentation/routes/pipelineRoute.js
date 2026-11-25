@@ -880,7 +880,7 @@ class PipelineRoutes {
         *       400:
         *         description: Validation error
         */
-        this.router.patch("/stage/order", adminProtect(), PipelineDto.updateStageOrderDto, this.controller.updateStage);
+        this.router.patch("/stage/order", adminProtect({ permission: "edit_pipeline_stage" }), PipelineDto.updateStageOrderDto, this.controller.updateStage);
 
         /**
         * @swagger
@@ -1065,7 +1065,7 @@ class PipelineRoutes {
          *       400:
          *         description: Validation error
          */
-        this.router.patch("/multi/move/tenant/item", adminProtect(), PipelineDto.moveMultipleItemsDto, this.controller.moveMultipleTenantPipelineItems);
+        this.router.patch("/multi/move/tenant/item", adminProtect({ permission: "move_prospect" }), PipelineDto.moveMultipleItemsDto, this.controller.moveMultipleTenantPipelineItems);
 
         /**
          * @swagger

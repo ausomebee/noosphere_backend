@@ -3,6 +3,7 @@ import TenantStaffLicense from '../domain/license.js';
 import TenantStaffPayroll from '../domain/payroll.js';
 import TenantStaff from '../domain/staff.js';
 import MailService from '../../../utilities/ses.js';
+import { issuePasswordResetToken } from '../../../utilities/passwordResetTokens.js';
 import templateRenderer from '../../../utilities/templateRenderer.js';
 
 class TenantStaffService {
@@ -53,6 +54,12 @@ class TenantStaffService {
             throw new Error("Failed to create candidate");
         }
 
+        const inviteToken = await issuePasswordResetToken(this.prisma, {
+            ownerId: newStaff.staff.id,
+            ownerType: "STAFF",
+            expiresInMs: 7 * 24 * 60 * 60 * 1000
+        });
+
         const attachments = [
             {
                 filename: "Logowrap.png",
@@ -66,6 +73,7 @@ class TenantStaffService {
             companyName: tenant.companyName,
             email: newStaff.staff.email,
             staffId: newStaff.staff.id,
+            resetToken: encodeURIComponent(inviteToken),
             clientUrl: templateRenderer.buildTenantClientUrl(tenant.subdomain),
             subdomain: tenant.subdomain
         });

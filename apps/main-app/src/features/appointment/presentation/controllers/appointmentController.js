@@ -371,7 +371,8 @@ export class AppointmentController {
     });
 
     getTenantAppointments = expressAsyncHandler(async (req, res) => {
-        const appointments = await this.service.getTenantAppointments(req.params.tenantId);
+        const tenantId = req.user?.type === "STAFF" ? req.user.tenantId : req.params.tenantId;
+        const appointments = await this.service.getTenantAppointments(tenantId, req.user);
 
         if (!appointments) {
             res.status(500).json({ message: 'Failed to fetch appointments' });
@@ -445,13 +446,21 @@ export class AppointmentController {
     });
 
     getStaffAppointments = expressAsyncHandler(async (req, res) => {
+        const canViewStaffList = req.user?.permissions?.includes("view_staff_list");
+        if (!canViewStaffList && req.user?.id !== req.params.staffId) {
+            return res.status(403).json({
+                message: "Forbidden: You can only view your own appointments",
+                status: "error"
+            });
+        }
+
         const appointments = await this.service.getStaffAppointments(req.params.staffId);
 
         if (!appointments) {
             res.status(500).json({ message: 'Failed to fetch appointments' });
         }
 
-        return res.status(201).json({
+        return res.status(200).json({
             message: "appointments fetched successfully",
             status: 'ok',
             data: appointments

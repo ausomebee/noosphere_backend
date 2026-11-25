@@ -2,6 +2,7 @@ import MailService from '../../../utilities/ses.js';
 import Tenant from '../domain/tenant.js';
 import argon2 from "argon2";
 import { seedTenantBillingDefaults } from './tenantOnboardingSeed.js';
+import { issuePasswordResetToken, consumePasswordResetToken } from '../../../utilities/passwordResetTokens.js';
 
 const escapeHtml = (value = '') => String(value)
     .replace(/&/g, '&amp;')
@@ -62,7 +63,12 @@ class TenantService {
             throw new Error("Failed to create candidate");
         }
 
-        return {...newCandidate.pipelineItem, companyName: data.companyName};
+        return {
+            ...newCandidate.pipelineItem,
+            companyName: data.companyName,
+            email: data.email,
+            phoneNumber: data.phoneNumber,
+        };
     }
 
     async sendTenantWelcomeEmail(tenant) {
@@ -80,6 +86,7 @@ class TenantService {
         const hashedPass = await argon2.hash(generatedPass);
         const updatedStaff = await this.staffRepository.update(tenantStaff.id, {
             password: hashedPass,
+            passwordChanged: false,
         });
 
         if (!updatedStaff) {
@@ -257,6 +264,12 @@ class TenantService {
     }
 
     async changeAdminPassword(data) {
+        const actingAdmin = await this.prisma.admin.findUnique({ where: { id: data.adminId } });
+        if (!actingAdmin?.password || !(await argon2.verify(actingAdmin.password, data.adminPassword || ""))) {
+            const error = new Error("Incorrect administrator password");
+            error.name = "Unauthorized";
+            throw error;
+        }
         const tenant = await this.tenantRepository.findOne({ id: data.id })
 
         if (!tenant) {
@@ -274,6 +287,7 @@ class TenantService {
 
         const updated = await this.staffRepository.update(tenantStaff.id, {
             password: hashedPass,
+            passwordChanged: false,
         });
 
         if (!updated) {
@@ -519,10 +533,12 @@ class TenantService {
             }
         ]
 
+        const inviteToken = await issuePasswordResetToken(this.prisma, { ownerId: newStaff.id, ownerType: "STAFF", expiresInMs: 7 * 24 * 60 * 60 * 1000 });
         const html = await this.templateRenderer.render('tenant-welcome-staff.html', {
             companyName: tenant.companyName,
             email: newStaff.email,
             staffId: newStaff.id,
+            resetToken: encodeURIComponent(inviteToken),
             clientUrl: this.templateRenderer.buildTenantClientUrl(tenant.subdomain),
             subdomain: tenant.subdomain
         });
@@ -550,8 +566,8 @@ class TenantService {
         }
 
         if (!tenant.active) {
-            throw new Error(tenant.suspended && tenant.suspensionReason
-                ? tenant.suspensionReason
+            throw new Error(tenant.suspended
+                ? "Forbidden: Tenant account is suspended. Please contact your administrator."
                 : "Not Authorized: Tenant account is not active.");
         }
 
@@ -567,12 +583,18 @@ class TenantService {
 
         const claims = {
             id: tenantStaff.id,
+            ownerType: "STAFF",
             role: tenantStaff.role.name,
             permissions: tenantStaff.role.access
         }
 
         const { password: _sp, ...staffData } = tenantStaff;
-        return { ...staffData, accessToken: this.token.generateAccessToken(claims), refreshToken: this.token.generateRefreshToken(tenantStaff.id, "STAFF") };
+        const choices = await this.choiceRepository.findFirst({ tenantId: tenantStaff.tenantId });
+        const requiresTwoFactor = Boolean(choices?.isEnabled && (choices.setForAll || tenantStaff.authType));
+        if (requiresTwoFactor) {
+            return { ...staffData, role: tenantStaff.role.name, passwordChanged: tenantStaff.passwordChanged, tenantId: tenantStaff.tenantId, isSuperAdmin: false, twoFactorRequired: true, twoFactorToken: this.token.generateTwoFactorToken(tenantStaff.id, "STAFF") };
+        }
+        return { ...staffData, role: tenantStaff.role.name, passwordChanged: tenantStaff.passwordChanged, tenantId: tenantStaff.tenantId, isSuperAdmin: false, accessToken: this.token.generateAccessToken({ ...claims, isSuperAdmin: false }), refreshToken: this.token.generateRefreshToken(tenantStaff.id, "STAFF") };
     }
 
     async tenantAdminChoices(data) {
@@ -720,20 +742,9 @@ class TenantService {
 
     async forgotPassword(email) {
         const staffExists = await this.staffRepository.staffExistsWithRole(email);
+        if (!staffExists) return true;
 
-        if (!staffExists) {
-            throw new Error("staff not found.");
-        }
-
-        if (!staffExists.auth2FADone && staffExists.role.name === "ADMIN") {
-            throw new Error("2FA required.");
-        }
-
-        const setAll = await this.choiceRepository.findFirst({});
-
-        if (!staffExists.auth2FADone && setAll.setForAll) {
-            throw new Error("2FA required.");
-        }
+        const token = await issuePasswordResetToken(this.prisma, { ownerId: staffExists.id, ownerType: "STAFF" });
 
         const attachments = [
             {
@@ -751,15 +762,60 @@ class TenantService {
         ]
 
         const html = await this.templateRenderer.render('tenant-password-reset.html', {
-            staffId: staffExists.id
+            staffId: staffExists.id,
+            resetToken: encodeURIComponent(token),
         });
 
-        const sendMail = await MailService.sendMail(staffExists.email, "Reset your password", null, html, attachments)
-        if (!sendMail.success) {
-            throw new Error("Failed to send mail");
-        }
+        void MailService.sendMail(staffExists.email, "Reset your password", null, html, attachments)
+            .catch((error) => console.error("Failed to send a password reset email:", error.message));
 
         return true;
+    }
+
+    async resetStaffPassword(data, authenticatedIdentity) {
+        const password = await argon2.hash(data.password);
+        return this.prisma.$transaction(async (tx) => {
+            if (authenticatedIdentity) {
+                if (authenticatedIdentity.id !== data.id) {
+                    const error = new Error("The password reset user does not match the authenticated user");
+                    error.name = "Forbidden";
+                    throw error;
+                }
+                const staff = await tx.tenantStaff.findUnique({
+                    where: { id: data.id },
+                    select: { passwordChanged: true },
+                });
+                if (!staff || staff.passwordChanged) {
+                    const error = new Error("A reset token is required");
+                    error.name = "Unauthorized";
+                    throw error;
+                }
+            } else {
+                await consumePasswordResetToken(tx, { token: data.token, ownerId: data.id, ownerType: "STAFF" });
+            }
+            const updated = await tx.tenantStaff.update({
+                where: { id: data.id },
+                data: { password, passwordChanged: true },
+                include: { role: true, tenant: { include: { tenantAdminChoices: true } } },
+            });
+            const choices = updated.tenant?.tenantAdminChoices;
+            const requiresTwoFactor = Boolean(choices?.isEnabled && (choices.setForAll || updated.authType));
+            const base = {
+                passwordChanged: updated.passwordChanged,
+                auth2FADone: updated.auth2FADone,
+                authType: updated.authType,
+                authQuestion: updated.authQuestion,
+                isSuperAdmin: false,
+                role: updated.role?.name,
+                tenantId: updated.tenantId,
+            };
+            if (!requiresTwoFactor) return base;
+            return {
+                ...base,
+                twoFactorRequired: true,
+                twoFactorToken: this.token.generateTwoFactorToken(updated.id, "STAFF"),
+            };
+        });
     }
 
     async resetTenantStaff2FA(staffId) {
@@ -780,6 +836,7 @@ class TenantService {
 
         const updated = await this.staffRepository.update(staffId, {
             password: hashedPass,
+            passwordChanged: false,
             authType: null,
             authQuestion: null,
             auth2FADone: false,
@@ -865,8 +922,11 @@ class TenantService {
         return update;
     }
 
-    async getAllTenantStaffs(tenantId) {
-        const staffs = await this.staffRepository.findAll({ tenantId });
+    async getAllTenantStaffs(tenantId, actor = null) {
+        const staffs = await this.staffRepository.findAll({
+            tenantId,
+            ...(actor?.type === "STAFF" && !actor.permissions?.includes("view_staff_list") ? { id: actor.id } : {}),
+        });
 
         if (!staffs) {
             throw new Error("staffs not found")

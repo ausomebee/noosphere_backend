@@ -408,14 +408,14 @@ class SubscriptionController {
     });
 
     getSubscriptionByStatus = expressAsyncHandler(async (req, res) => {
-        const subscription = await this.service.getSubscriptionByStatus();
+        const subscription = await this.service.getSubscriptionByStatus(req.params.status);
 
         if (!subscription) {
             res.status(500).json({ message: 'Failed to count subscription' });
         }
 
-        return res.status(201).json({
-            message: "subscription counted successfully",
+        return res.status(200).json({
+            message: "subscriptions fetched successfully",
             status: 'ok',
             data: subscription
         });

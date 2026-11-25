@@ -201,18 +201,24 @@ class InvoiceService {
     async validatePaymentToken(token) {
         const decoded = this.token.validatePaymentToken(token);
 
+        const invalidToken = (message) => {
+            const error = new Error(message);
+            error.name = "Unauthorized";
+            return error;
+        };
+
         const tokenRecord = await this.invoiceTokenRepository.findFirst({ invoiceId: decoded.invoiceId, tokenHash: token });
 
         if (!tokenRecord) {
-            throw new Error("Invalid token");
+            throw invalidToken("Invalid token");
         }
 
         if (tokenRecord.expiresAt < new Date()) {
-            throw new Error("Token expired");
+            throw invalidToken("Token expired");
         }
 
         if (tokenRecord.used) {
-            throw new Error("Token has already been used");
+            throw invalidToken("Token has already been used");
         }
 
         const invoice = await this.invoiceRepository.findOneAndPopulate(
@@ -328,10 +334,6 @@ class InvoiceService {
             page,
             pageSize
         );
-
-        if (!invoices || invoices.data.length === 0) {
-            throw new Error("No invoices found");
-        }
 
         return invoices;
     }
@@ -544,20 +546,9 @@ class InvoiceService {
             throw new Error("Invoice Management not found");
         }
 
-        const update = await this.invoiceManagementRepository.update(data.id, {
-            onPlanPurchase: data.onPlanPurchase ?? invoiceManagement.onPlanPurchase,
-            isDaysBeforeDueDate: data.isDaysBeforeDueDate ?? invoiceManagement.isDaysBeforeDueDate,
-            daysBeforeDueDate: data.daysBeforeDueDate ?? invoiceManagement.daysBeforeDueDate,
-            upcomingInvoiceHeader: data.upcomingInvoiceHeader || invoiceManagement.upcomingInvoiceHeader,
-            upcomingInvoiceBody: data.upcomingInvoiceBody || invoiceManagement.upcomingInvoiceBody,
-            onDueDate: data.onDueDate ?? invoiceManagement.onDueDate,
-            dueInvoiceHeader: data.dueInvoiceHeader || invoiceManagement.dueInvoiceHeader,
-            dueInvoiceBody: data.dueInvoiceBody || invoiceManagement.dueInvoiceBody,
-            markOverDue: data.markOverDue || invoiceManagement.markOverDue,
-            unpaidReminderTimesBefore: data.unpaidReminderTimesBefore || invoiceManagement.unpaidReminderTimesBefore,
-            attachInvoiceToReminder: data.attachInvoiceToReminder ?? invoiceManagement.attachInvoiceToReminder,
-            reminderEmail: data.reminderEmail || invoiceManagement.reminderEmail
-        });
+        const fields = ["onPlanPurchase", "isDaysBeforeDueDate", "daysBeforeDueDate", "upcomingInvoiceHeader", "upcomingInvoiceBody", "onDueDate", "dueInvoiceHeader", "dueInvoiceBody", "markOverDue", "unpaidReminderTimesBefore", "attachInvoiceToReminder", "reminderEmail"];
+        const updateData = Object.fromEntries(fields.filter((field) => Object.hasOwn(data, field)).map((field) => [field, data[field]]));
+        const update = await this.invoiceManagementRepository.update(data.id, updateData);
 
         if (!update) {
             throw new Error("Failed to update Invoice Management");

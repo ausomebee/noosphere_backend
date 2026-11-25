@@ -39,6 +39,14 @@ class AdminController {
     });
 
     updateAdmin = expressAsyncHandler(async (req, res) => {
+        if (req.body.token || req.adminPasswordResetIdentity) {
+            const result = await this.service.resetAdminPassword(req.body, req.adminPasswordResetIdentity);
+            return res.status(200).json({
+                message: "Password updated successfully",
+                status: "ok",
+                data: result
+            });
+        }
         const admin = await this.service.updateAdmin(req.body);
 
         if (!admin) {
@@ -158,16 +166,12 @@ class AdminController {
     });
 
     forgotPassword = expressAsyncHandler(async (req, res) => {
-        const mail = await this.service.forgotPassword(req.params);
+        void this.service.forgotPassword({ email: req.body?.email || req.params.email })
+            .catch((error) => console.error("Password reset request could not be processed:", error.message));
 
-        if (!mail) {
-            res.status(500).json({ message: 'Failed to send mail' });
-        }
-
-        return res.status(201).json({
-            message: "mail sent successfully",
+        return res.status(200).json({
+            message: "If an account exists for that email, reset instructions have been sent.",
             status: 'ok',
-            data: mail
         });
     });
 

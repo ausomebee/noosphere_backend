@@ -452,6 +452,8 @@ export const PERMISSIONS_CONFIG = {
                 permissions: [
                     { key: "view_onboarding_pipeline", label: "View onboarding pipeline" },
                     { key: "manage_pipeline_setup", label: "Manage pipeline setup (edit, move, disable)" },
+                    { key: "move_prospect", label: "Move prospects between pipeline stages" },
+                    { key: "edit_pipeline_stage", label: "Reorder pipeline stages" },
                     { key: "create_pipeline", label: "Create pipeline" },
                     { key: "create_candidate_in_pipeline", label: "Create candidate in pipeline" },
                     { key: "manage_candidate_in_pipeline", label: "Manage candidate in pipeline" },

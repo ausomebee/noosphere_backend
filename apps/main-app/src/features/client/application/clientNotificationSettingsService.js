@@ -10,10 +10,16 @@ class ClientNotificationSettingsService {
         });
 
         if (exists) {
-            throw new Error("Notification settings for this client already exist.");
+            return this.clientNotificationSettingsRepository.findOne({ id: exists.id });
         }
 
-        const newRecord = await this.clientNotificationSettingsRepository.create(data);
+        let newRecord;
+        try {
+            newRecord = await this.clientNotificationSettingsRepository.create(data);
+        } catch (error) {
+            if (error.code !== "P2002") throw error;
+            return this.clientNotificationSettingsRepository.findByClientId(data.tenantClientId);
+        }
 
         if (!newRecord) {
             throw new Error("Failed to create notification settings.");
@@ -54,8 +60,9 @@ class ClientNotificationSettingsService {
     async getNotificationSettingsByClient(tenantClientId) {
         const record = await this.clientNotificationSettingsRepository.findByClientId(tenantClientId);
 
-        if (record.length === 0) {
-            const newRecord = await this.clientNotificationSettingsRepository.create({
+        if (!record) {
+            try {
+                const newRecord = await this.clientNotificationSettingsRepository.create({
                 tenantClientId,
 
                 appointmentScheduled: true,
@@ -74,13 +81,14 @@ class ClientNotificationSettingsService {
                 authorizationUnitsExhausted: true,
 
                 signatureRequested: true
-            });
+                });
 
-            if (!newRecord) {
-                throw new Error("Failed to create notification settings.");
+                if (!newRecord) throw new Error("Failed to create notification settings.");
+                return newRecord;
+            } catch (error) {
+                if (error.code !== "P2002") throw error;
+                return this.clientNotificationSettingsRepository.findByClientId(tenantClientId);
             }
-
-            return newRecord;
         }
 
         return record;

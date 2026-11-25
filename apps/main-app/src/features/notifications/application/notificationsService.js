@@ -91,11 +91,7 @@ class NotificationService {
             {}
         );
 
-        if (!records) {
-            throw new Error("No notifications found for this user.");
-        }
-
-        return records;
+        return records ?? [];
     }
 
     async markAsRead(notificationId) {
