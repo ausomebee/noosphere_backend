@@ -1,15 +1,17 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import argon2 from "argon2";
 import StripeBillingService from "./stripeBillingService.js";
 
 test("sends a tenant payment confirmation only when a Stripe invoice is first activated", async () => {
     let invoiceStatus = "Due";
     const emailCalls = [];
     const templateCalls = [];
+    let updatedStaff;
     const invoice = {
         id: 42,
         tenantId: "tenant-1",
-        tenant: { email: "tenant@example.com", companyName: "Example Clinic" },
+        tenant: { email: "tenant@example.com", companyName: "Example Clinic", subdomain: "example" },
         plan: { name: "Standard", forStaff: 3, forClient: 5 },
         total: 120,
         billingFrequency: "Monthly",
@@ -39,6 +41,12 @@ test("sends a tenant payment confirmation only when a Stripe invoice is first ac
         tenant: {
             update: async () => invoice.tenant,
         },
+        tenantStaff: {
+            findFirst: async () => ({ id: "staff-1", password: null }),
+            update: async ({ data }) => {
+                updatedStaff = data;
+            },
+        },
     };
     const service = new StripeBillingService({
         prisma: { $transaction: async (callback) => callback(tx) },
@@ -54,6 +62,7 @@ test("sends a tenant payment confirmation only when a Stripe invoice is first ac
                 templateCalls.push(args);
                 return "<html>Payment confirmation</html>";
             },
+            buildTenantClientUrl: (subdomain) => `https://${subdomain}.noospherehub.org`,
         },
     });
     const paymentIntent = {
@@ -70,13 +79,23 @@ test("sends a tenant payment confirmation only when a Stripe invoice is first ac
 
     assert.equal(firstActivation.alreadyPaid, false);
     assert.equal(duplicateActivation.alreadyPaid, true);
-    assert.equal(emailCalls.length, 1);
+    assert.equal(emailCalls.length, 2);
     assert.equal(emailCalls[0][0], "tenant@example.com");
-    assert.equal(emailCalls[0][1], "Payment Made for Plan");
-    assert.equal(templateCalls[0][0], "billing-payment-confirmation.html");
-    assert.equal(templateCalls[0][1].subscriptionPlan, "Standard");
-    assert.equal(templateCalls[0][1].numberOfLicenses, 8);
-    assert.equal(templateCalls[0][1].paymentMethod, "visa ending in 4242");
+    assert.equal(emailCalls[0][1], "Welcome to Noosphere");
+    assert.equal(emailCalls[1][0], "tenant@example.com");
+    assert.equal(emailCalls[1][1], "Payment Made for Plan");
+    assert.equal(templateCalls[0][0], "tenant-welcome.html");
+    assert.equal(templateCalls[0][1].clientUrl, "https://example.noospherehub.org");
+    assert.match(templateCalls[0][1].password, /[a-z]/);
+    assert.match(templateCalls[0][1].password, /[A-Z]/);
+    assert.match(templateCalls[0][1].password, /\d/);
+    assert.match(templateCalls[0][1].password, /[!@#$%^*-?]/);
+    assert.equal(await argon2.verify(updatedStaff.password, templateCalls[0][1].password), true);
+    assert.equal(updatedStaff.passwordChanged, false);
+    assert.equal(templateCalls[1][0], "billing-payment-confirmation.html");
+    assert.equal(templateCalls[1][1].subscriptionPlan, "Standard");
+    assert.equal(templateCalls[1][1].numberOfLicenses, 8);
+    assert.equal(templateCalls[1][1].paymentMethod, "visa ending in 4242");
 });
 
 test("sends a confirmation for a successful saved-card charge", async () => {
@@ -111,6 +130,9 @@ test("sends a confirmation for a successful saved-card charge", async () => {
         },
         tenant: {
             update: async () => undefined,
+        },
+        tenantStaff: {
+            findFirst: async () => ({ id: "staff-1", password: "existing-password-hash" }),
         },
     };
     const service = new StripeBillingService({
