@@ -583,9 +583,7 @@ class TenantService {
 
         const claims = {
             id: tenantStaff.id,
-            ownerType: "STAFF",
-            role: tenantStaff.role.name,
-            permissions: tenantStaff.role.access
+            ownerType: "STAFF"
         }
 
         const { password: _sp, ...staffData } = tenantStaff;
