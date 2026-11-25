@@ -26,6 +26,28 @@ jobs:
             echo "env=preprod" >> $GITHUB_OUTPUT
           fi
 
+      - name: Validate cache service secrets
+        env:
+          DEV_CACHE_SERVICE_URL: ${{ secrets.DEV_CACHE_SERVICE_URL }}
+          DEV_CACHE_SERVICE_TOKEN: ${{ secrets.DEV_CACHE_SERVICE_TOKEN }}
+          PREPROD_REDIS_URL: ${{ secrets.PREPROD_REDIS_URL }}
+          PREPROD_CACHE_SERVICE_TOKEN: ${{ secrets.PREPROD_CACHE_SERVICE_TOKEN }}
+        run: |
+          BRANCH=${GITHUB_REF##*/}
+          if [ "$BRANCH" = "develop" ]; then
+            CACHE_SERVICE_URL="$DEV_CACHE_SERVICE_URL"
+            CACHE_SERVICE_TOKEN="$DEV_CACHE_SERVICE_TOKEN"
+            if [ -z "$CACHE_SERVICE_URL" ] || [ "${#CACHE_SERVICE_TOKEN}" -lt 32 ]; then
+              echo "Set DEV_CACHE_SERVICE_URL and a DEV_CACHE_SERVICE_TOKEN of at least 32 characters." >&2
+              exit 1
+            fi
+          else
+            if [ -z "$PREPROD_REDIS_URL" ] || [ "${#PREPROD_CACHE_SERVICE_TOKEN}" -lt 32 ]; then
+              echo "Set PREPROD_REDIS_URL and a PREPROD_CACHE_SERVICE_TOKEN of at least 32 characters." >&2
+              exit 1
+            fi
+          fi
+
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
@@ -93,6 +115,8 @@ jobs:
                 echo "RDS_TOTAL_STORAGE_GB=${{ secrets.DEV_RDS_TOTAL_STORAGE_GB }}"
                 echo "STRIPE_SECRET_KEY=${{ secrets.DEV_STRIPE_SECRET_KEY }}"
                 echo "STRIPE_WEBHOOK_SECRET=${{ secrets.DEV_STRIPE_WEBHOOK_SECRET }}"
+                echo "CACHE_SERVICE_URL=${{ secrets.DEV_CACHE_SERVICE_URL }}"
+                echo "CACHE_SERVICE_TOKEN=${{ secrets.DEV_CACHE_SERVICE_TOKEN }}"
               } > .env
             elif [ "$BRANCH" = "pre-prod" ]; then
               {
@@ -118,6 +142,11 @@ jobs:
                 echo "RDS_TOTAL_STORAGE_GB=${{ secrets.PREPROD_RDS_TOTAL_STORAGE_GB }}"
                 echo "STRIPE_SECRET_KEY=${{ secrets.PREPROD_STRIPE_SECRET_KEY }}"
                 echo "STRIPE_WEBHOOK_SECRET=${{ secrets.PREPROD_STRIPE_WEBHOOK_SECRET }}"
+                echo "REDIS_URL=${{ secrets.PREPROD_REDIS_URL }}"
+                echo "CACHE_SERVICE_PORT=3333"
+                echo "CACHE_SERVICE_URL=http://127.0.0.1:3333"
+                echo "HOST=127.0.0.1"
+                echo "CACHE_SERVICE_TOKEN=${{ secrets.PREPROD_CACHE_SERVICE_TOKEN }}"
               } > .env
             fi
 
@@ -137,7 +166,7 @@ jobs:
               process.stdin.setEncoding("utf8");
               process.stdin.on("data", chunk => input += chunk);
               process.stdin.on("end", () => {
-                const names = new Set(["noosphere-backend", "noosphere-worker"]);
+                const names = new Set(["noosphere-backend", "noosphere-worker", "noosphere-cache"]);
                 for (const app of JSON.parse(input)) {
                   const name = app.name ?? app.pm2_env?.name;
                   const id = app.pm_id ?? app.pm2_env?.pm_id;
@@ -156,6 +185,23 @@ jobs:
                 pm2 delete "$id"
               fi
             done <<< "$old_pm2_ids"
+
+            if [ "$BRANCH" = "pre-prod" ]; then
+              pm2 start npm --name noosphere-cache -- run start:cache
+
+              cache_ready=0
+              for attempt in $(seq 1 30); do
+                if curl --fail --silent --max-time 2 http://127.0.0.1:3333/health >/dev/null; then
+                  cache_ready=1
+                  break
+                fi
+                sleep 1
+              done
+              if [ "$cache_ready" -ne 1 ]; then
+                echo "Preprod cache service failed its health check." >&2
+                exit 1
+              fi
+            fi
 
             pm2 start npm --name noosphere-backend -- run start
             pm2 start npm --name noosphere-worker -- run start:worker

@@ -566,8 +566,8 @@ class TenantService {
         }
 
         if (!tenant.active) {
-            throw new Error(tenant.suspended && tenant.suspensionReason
-                ? tenant.suspensionReason
+            throw new Error(tenant.suspended
+                ? "Forbidden: Tenant account is suspended. Please contact your administrator."
                 : "Not Authorized: Tenant account is not active.");
         }
 
