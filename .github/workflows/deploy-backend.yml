@@ -200,7 +200,7 @@ jobs:
             }
             old_pm2_ids="\$(managed_pm2_ids)"
             while IFS= read -r id; do
-              if [ -n "$id" ]; then
+              if [ -n "\$id" ]; then
                 echo "Removing stale PM2 process id \$id"
                 pm2 delete "\$id"
               fi
