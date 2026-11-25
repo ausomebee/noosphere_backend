@@ -1,4 +1,6 @@
 import Stripe from "stripe";
+import argon2 from "argon2";
+import { randomInt } from "node:crypto";
 import MailService from "../../../utilities/ses.js";
 import templateRenderer from "../../../utilities/templateRenderer.js";
 
@@ -162,6 +164,87 @@ class StripeBillingService {
         return endDate;
     }
 
+    generateTemporaryPassword() {
+        const lowercase = "abcdefghijklmnopqrstuvwxyz";
+        const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const numbers = "0123456789";
+        const special = "!@#$%^*-?";
+        const all = lowercase + uppercase + numbers + special;
+        const pick = (characters) => characters[randomInt(characters.length)];
+        const password = [
+            pick(lowercase),
+            pick(uppercase),
+            pick(numbers),
+            pick(special),
+            ...Array.from({ length: 12 }, () => pick(all)),
+        ];
+
+        for (let index = password.length - 1; index > 0; index -= 1) {
+            const swapIndex = randomInt(index + 1);
+            [password[index], password[swapIndex]] = [password[swapIndex], password[index]];
+        }
+
+        return password.join("");
+    }
+
+    async prepareWelcomeEmail(tx, invoice) {
+        const tenantStaff = await tx.tenantStaff.findFirst({
+            where: {
+                email: invoice.tenant.email,
+                tenantId: invoice.tenantId,
+                isDeleted: false,
+            },
+            select: { id: true, password: true },
+        });
+
+        if (!tenantStaff) return { welcomeEmail: null, missingTenantStaff: true };
+        if (tenantStaff.password) return { welcomeEmail: null, missingTenantStaff: false };
+
+        const password = this.generateTemporaryPassword();
+        await tx.tenantStaff.update({
+            where: { id: tenantStaff.id },
+            data: {
+                password: await argon2.hash(password),
+                passwordChanged: false,
+            },
+        });
+
+        return {
+            welcomeEmail: {
+                companyName: invoice.tenant.companyName,
+                email: invoice.tenant.email,
+                password,
+                clientUrl: this.renderer.buildTenantClientUrl(invoice.tenant.subdomain),
+                subdomain: invoice.tenant.subdomain,
+            },
+            missingTenantStaff: false,
+        };
+    }
+
+    async notifyWelcomeEmail(invoiceId, welcomeEmail) {
+        try {
+            const html = await this.renderer.render("tenant-welcome.html", welcomeEmail);
+            const result = await this.mailService.sendMail(
+                welcomeEmail.email,
+                "Welcome to Noosphere",
+                null,
+                html,
+                [{
+                    filename: "Logowrap.png",
+                    path: "Logowrap.png",
+                    cid: "unique@image",
+                    contentType: "image/png",
+                }],
+            );
+
+            if (!result?.success) {
+                throw new Error(result?.error || "Tenant credentials email was not accepted");
+            }
+        } catch (error) {
+            console.error(`Stripe payment succeeded but tenant credentials email failed for invoice ${invoiceId}:`, error);
+        }
+    }
+
     async notifyPaymentConfirmation(invoice, paymentIntent) {
         try {
             const card = paymentIntent.latest_charge?.payment_method_details?.card;
@@ -248,10 +331,17 @@ class StripeBillingService {
             const updatedInvoice = await tx.invoice.update({ where: { id: invoice.id }, data: { status: "Paid", subscriptionId: subscription.id } });
             await tx.invoiceToken.updateMany({ where: { invoiceId: invoice.id, tokenHash: token }, data: { used: true } });
             await tx.tenant.update({ where: { id: invoice.tenantId }, data: { active: true } });
-            return { alreadyPaid: false, invoice: updatedInvoice };
+            const welcome = await this.prepareWelcomeEmail(tx, invoice);
+            return { alreadyPaid: false, invoice: updatedInvoice, ...welcome };
         });
 
-        if (!result.alreadyPaid) await this.notifyPaymentConfirmation(invoice, paymentIntent);
+        if (!result.alreadyPaid) {
+            if (result.missingTenantStaff) {
+                console.error(`Stripe payment succeeded but tenant staff was not found for invoice ${invoice.id}`);
+            }
+            if (result.welcomeEmail) await this.notifyWelcomeEmail(invoice.id, result.welcomeEmail);
+            await this.notifyPaymentConfirmation(invoice, paymentIntent);
+        }
         return result;
     }
 
@@ -309,10 +399,17 @@ class StripeBillingService {
                 data: { active: true, suspended: false, featuresDisabled: false, suspensionReason: null, suspendedAt: null }
             });
 
-            return { alreadyPaid: false, invoice: updatedInvoice };
+            const welcome = await this.prepareWelcomeEmail(tx, invoice);
+            return { alreadyPaid: false, invoice: updatedInvoice, ...welcome };
         });
 
-        if (!result.alreadyPaid) await this.notifyPaymentConfirmation(invoice, paymentIntent);
+        if (!result.alreadyPaid) {
+            if (result.missingTenantStaff) {
+                console.error(`Stripe payment succeeded but tenant staff was not found for invoice ${invoice.id}`);
+            }
+            if (result.welcomeEmail) await this.notifyWelcomeEmail(invoice.id, result.welcomeEmail);
+            await this.notifyPaymentConfirmation(invoice, paymentIntent);
+        }
         return result;
     }
 
