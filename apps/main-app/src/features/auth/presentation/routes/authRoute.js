@@ -80,7 +80,7 @@ class AuthRoutes {
         * /api/v1/auth/createsecretemessage:
         *   post:
         *     summary: create 2FA secret message
-        *     description: creates a user's 2FA secret using their user ID and secret.
+        *     description: creates a 2FA secret for the authenticated user. userId is only needed for legacy calls without a bearer token.
         *     tags:
         *       - Auth
         *     requestBody:
@@ -90,15 +90,15 @@ class AuthRoutes {
         *           schema:
         *             type: object
         *             required:
-        *               - userId
         *               - secret
+        *               - authQuestion
         *               - module
         *             properties:
         *               userId:
         *                 type: string
         *                 format: uuid
         *                 example: "123e4567-e89b-12d3-a456-426614174000"
-        *                 description: UUID of the user
+        *                 description: Optional with Authorization bearer token; required only for legacy calls without a token
         *               secret:
         *                 type: string
         *                 example: "malik"
@@ -223,7 +223,7 @@ class AuthRoutes {
         * /api/v1/auth/tenant/createsecretemessage:
         *   post:
         *     summary: create 2FA secret message
-        *     description: creates a user's 2FA secret using their user ID and secret.
+        *     description: creates a 2FA secret for the authenticated user. userId is only needed for legacy calls without a bearer token.
         *     tags:
         *       - Auth
         *     requestBody:
@@ -233,15 +233,15 @@ class AuthRoutes {
         *           schema:
         *             type: object
         *             required:
-        *               - userId
         *               - secret
+        *               - authQuestion
         *               - module
         *             properties:
         *               userId:
         *                 type: string
         *                 format: uuid
         *                 example: "123e4567-e89b-12d3-a456-426614174000"
-        *                 description: UUID of the user
+        *                 description: Optional with Authorization bearer token; required only for legacy calls without a token
         *               secret:
         *                 type: string
         *                 example: "malik"
