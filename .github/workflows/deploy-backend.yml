@@ -157,7 +157,8 @@ jobs:
               fi
             done <<< "$old_pm2_ids"
 
-            pm2 start ecosystem.deploy.config.cjs --update-env
+            pm2 start npm --name noosphere-backend -- run start
+            pm2 start npm --name noosphere-worker -- run start:worker
             pm2 save
 
             echo "✅ Deployment completed"
