@@ -21,14 +21,25 @@ class AuthController {
         let claims;
         let isSuperAdmin = false;
         if (ownerType === "ADMIN") {
-            const admin = await this.prisma.admin.findUnique({ where: { id }, include: { roles: { include: { roleModuleAccesses: true } } } });
+            const admin = await this.prisma.admin.findUnique({
+                where: { id },
+                select: { id: true, active: true, isDeleted: true, superAdmin: true },
+            });
             if (!admin || !admin.active || admin.isDeleted) throw new Error("Account not found or inactive");
             isSuperAdmin = Boolean(admin.superAdmin);
-            claims = { id, ownerType, role: admin.roles?.name, permissions: admin.roles, isSuperAdmin };
+            claims = { id, ownerType, isSuperAdmin };
         } else {
-            const staff = await this.prisma.tenantStaff.findUnique({ where: { id }, include: { role: { include: { roleModuleAccesses: true } }, tenant: true } });
+            const staff = await this.prisma.tenantStaff.findUnique({
+                where: { id },
+                select: {
+                    id: true,
+                    active: true,
+                    isDeleted: true,
+                    tenant: { select: { active: true, isDeleted: true } },
+                },
+            });
             if (!staff || !staff.active || staff.isDeleted || !staff.tenant?.active || staff.tenant.isDeleted) throw new Error("Account not found or inactive");
-            claims = { id, ownerType, role: staff.role.name, permissions: staff.role.roleModuleAccesses, isSuperAdmin: false };
+            claims = { id, ownerType, isSuperAdmin: false };
         }
         return {
             accessToken: TokenService.generateAccessToken(claims),
@@ -183,26 +194,32 @@ class AuthController {
         if (ownerType === "ADMIN") {
             const admin = await this.prisma.admin.findUnique({
                 where: { id: userId },
-                include: { roles: true },
+                select: { id: true, isDeleted: true, active: true, superAdmin: true, authType: true },
             });
             if (!admin || admin.isDeleted || !admin.active) {
                 res.status(401);
                 throw new Error("Account not found or inactive");
             }
-            claims = { id: admin.id, ownerType, role: admin.roles.name, permissions: admin.roles };
+            claims = { id: admin.id, ownerType };
             isSuperAdmin = Boolean(admin.superAdmin);
             const choices = await this.prisma.superAdminChoices.findFirst();
             mfaRequired = Boolean(choices?.isEnabled && (choices.setForAll || admin.authType));
         } else if (ownerType === "STAFF") {
             const staff = await this.prisma.tenantStaff.findUnique({
                 where: { id: userId },
-                include: { role: true, tenant: { include: { tenantAdminChoices: true } } },
+                select: {
+                    id: true,
+                    isDeleted: true,
+                    active: true,
+                    authType: true,
+                    tenant: { select: { tenantAdminChoices: true } },
+                },
             });
             if (!staff || staff.isDeleted || !staff.active) {
                 res.status(401);
                 throw new Error("Account not found or inactive");
             }
-            claims = { id: staff.id, ownerType, role: staff.role.name, permissions: staff.role.access };
+            claims = { id: staff.id, ownerType };
             const choices = staff.tenant?.tenantAdminChoices;
             mfaRequired = Boolean(choices?.isEnabled && (choices.setForAll || staff.authType));
         } else if (ownerType === "CLIENT") {

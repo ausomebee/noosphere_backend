@@ -211,9 +211,7 @@ class AdminService {
 
         const claims = {
             id: admin.id,
-            ownerType: "ADMIN",
-            role: admin.roles.name,
-            permissions: admin.roles
+            ownerType: "ADMIN"
         }
 
         const { password: _ap, administratorPassword: _administratorPassword, ...adminData } = admin;
