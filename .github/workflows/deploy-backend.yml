@@ -132,11 +132,22 @@ jobs:
               npm install -g pm2
             fi
 
-            for app in noosphere-backend noosphere-worker; do
-              if pm2 describe "$app" >/dev/null 2>&1; then
-                pm2 delete "$app"
+            old_pm2_ids="$(pm2 jlist | node -e '
+              let input = "";
+              process.stdin.setEncoding("utf8");
+              process.stdin.on("data", chunk => input += chunk);
+              process.stdin.on("end", () => {
+                const names = new Set(["noosphere-backend", "noosphere-worker"]);
+                for (const app of JSON.parse(input)) {
+                  if (names.has(app.name)) console.log(app.pm_id);
+                }
+              });
+            ')"
+            while IFS= read -r id; do
+              if [ -n "$id" ]; then
+                pm2 delete "$id"
               fi
-            done
+            done <<< "$old_pm2_ids"
 
             pm2 start ecosystem.deploy.config.cjs --update-env
             pm2 save
