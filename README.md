@@ -23,11 +23,13 @@ Configure the cache service:
 - `CACHE_SERVICE_TOKEN`: random shared bearer token of at least 32 characters
 - `CACHE_SERVICE_PORT`: optional listen port, defaults to `3333` (falls back to `PORT` if unset)
 
-Configure the API/worker hosts:
+For an API/worker using a separately deployed cache service:
 
 - `CACHE_SERVICE_URL`: base URL of the separately deployed cache service, preferably on a private network over HTTPS
 - `CACHE_SERVICE_TOKEN`: the same secret configured on the cache service
 - `CRON_LOCK_TTL_MS`: optional lease duration, defaults to `120000` ms (service accepts 30000–600000 ms)
+
+The develop and pre-prod deployments each install and start Valkey on their backend EC2 host, then run the cache service bound to `127.0.0.1:3333`. Redis uses `redis://127.0.0.1:6379`; each host gets its own persistent random cache-service token in the EC2 user's home directory, written to the protected `.env` file. These deployments do not require cache-service GitHub secrets.
 
 Keep the cache service and Redis reachable only from trusted application/worker networks. Do not expose the bearer token in browser code. Multiple cache-service instances can share the same Redis backend. For availability, Redis itself must also be managed or deployed with appropriate persistence/failover; the HTTP service alone does not provide cache durability.
 
