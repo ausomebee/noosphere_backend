@@ -139,12 +139,20 @@ jobs:
               process.stdin.on("end", () => {
                 const names = new Set(["noosphere-backend", "noosphere-worker"]);
                 for (const app of JSON.parse(input)) {
-                  if (names.has(app.name)) console.log(app.pm_id);
+                  const name = app.name ?? app.pm2_env?.name;
+                  const id = app.pm_id ?? app.pm2_env?.pm_id;
+                  if (names.has(name)) {
+                    if (id === undefined || id === null) {
+                      throw new Error(`Missing PM2 id for ${name}`);
+                    }
+                    console.log(id);
+                  }
                 }
               });
             ')"
             while IFS= read -r id; do
               if [ -n "$id" ]; then
+                echo "Removing stale PM2 process id $id"
                 pm2 delete "$id"
               fi
             done <<< "$old_pm2_ids"
